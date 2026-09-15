@@ -1,0 +1,24 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.Repository",
+  "properties": [
+    { "name": "name", "value": "<repository-name>" },
+    { "name": "nestedName", "value": "<repository-name>" },
+    { "name": "resolveInfo", "value": "<repository-name>" },
+    { "name": "isStatic", "value": "true" },
+    { "name": "virtualPackage", "value": "<virtual-package>" }
+  ],
+  "references": [],
+  "children": [
+    {
+      "role": "visibility",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.PublicVisibility",
+          "properties": [],
+          "references": [],
+          "children": []
+        }
+      ]
+    }
+  ]
+}

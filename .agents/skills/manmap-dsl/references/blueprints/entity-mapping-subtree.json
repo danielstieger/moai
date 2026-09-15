@@ -1,0 +1,51 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.EntityMapping",
+  "properties": [
+    { "name": "name", "value": "<mapping-name>" }
+  ],
+  "references": [
+    { "role": "classConcept", "target": "<class-concept-node-ref>" }
+  ],
+  "children": [
+    {
+      "role": "tableName",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+          "properties": [
+            { "name": "value", "value": "<table-name>" }
+          ],
+          "references": [],
+          "children": []
+        }
+      ]
+    },
+    {
+      "role": "atomMpig",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.manmap.structure.FieldMapping",
+          "properties": [],
+          "references": [
+            { "role": "property", "target": "<property-node-ref>" }
+          ],
+          "children": [
+            {
+              "role": "fieldName",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+                  "properties": [
+                    { "name": "value", "value": "<column-name>" }
+                  ],
+                  "references": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

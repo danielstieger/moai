@@ -1,0 +1,26 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.ReferenceMapping",
+  "references": [{ "role": "property", "target": "<reference-property-node-ref>" }],
+  "children": [
+    {
+      "role": "keyMapping",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.manmap.structure.FieldMapping",
+          "references": [{ "role": "property", "target": "<target-key-property-node-ref>" }],
+          "children": [
+            {
+              "role": "fieldName",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+                  "properties": [{ "name": "value", "value": "<foreign-key-column-name>" }]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

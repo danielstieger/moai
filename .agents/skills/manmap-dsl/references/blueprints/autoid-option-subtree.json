@@ -1,0 +1,14 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.AutoidOption",
+  "children": [
+    {
+      "role": "sequenceName",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+          "properties": [{ "name": "value", "value": "<database-sequence-name>" }]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.C2SqlBlock",
+  "children": [
+    {
+      "role": "statements",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.StatementList",
+          "children": [
+            {
+              "role": "statement",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.manmap.structure.C2SqlText",
+                  "children": [
+                    {
+                      "role": "lines",
+                      "nodes": [
+                        {
+                          "concept": "jetbrains.mps.lang.text.structure.Line",
+                          "children": [
+                            {
+                              "role": "elements",
+                              "nodes": [
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "select" }] },
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "count(*)" }] },
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "from" }] },
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "example_table" }] }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "mapping",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.manmap.structure.RowMapperFieldRef",
+          "references": [
+            { "role": "rowMapperField", "target": "<row-mapper-field-node-ref>" }
+          ]
+        }
+      ]
+    }
+  ]
+}

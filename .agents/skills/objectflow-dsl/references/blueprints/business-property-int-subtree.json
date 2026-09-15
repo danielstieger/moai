@@ -1,0 +1,43 @@
+{
+  "concept": "org.modellwerkstatt.objectflow.structure.BusinessProperty",
+  "properties": [
+    { "name": "name", "value": "id" },
+    { "name": "propertyName", "value": "id" }
+  ],
+  "children": [
+    {
+      "role": "type",
+      "nodes": [
+        { "concept": "jetbrains.mps.baseLanguage.structure.IntegerType" }
+      ]
+    },
+    {
+      "role": "propertyImplementation",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.DefaultPropertyImplementation",
+          "children": [
+            {
+              "role": "defaultGetAccessor",
+              "nodes": [
+                { "concept": "jetbrains.mps.baseLanguage.structure.DefaultGetAccessor" }
+              ]
+            },
+            {
+              "role": "defaultSetAccessor",
+              "nodes": [
+                { "concept": "jetbrains.mps.baseLanguage.structure.DefaultSetAccessor" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "visibility",
+      "nodes": [
+        { "concept": "jetbrains.mps.baseLanguage.structure.PublicVisibility" }
+      ]
+    }
+  ]
+}

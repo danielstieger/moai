@@ -1,0 +1,20 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.QueryFromMap",
+  "references": [
+    { "role": "entityMapping", "target": "<source-entity-mapping-node-ref>" }
+  ],
+  "children": [
+    {
+      "role": "joinOption",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.manmap.structure.RefJoinOption",
+          "references": [
+            { "role": "refMapping", "target": "<reference-mapping-node-ref>" },
+            { "role": "entityMapping", "target": "<target-entity-mapping-node-ref>" }
+          ]
+        }
+      ]
+    }
+  ]
+}

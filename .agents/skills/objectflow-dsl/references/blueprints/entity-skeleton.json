@@ -1,0 +1,16 @@
+{
+  "concept": "org.modellwerkstatt.objectflow.structure.Entity",
+  "properties": [
+    { "name": "name", "value": "ExampleEntity" },
+    { "name": "nestedName", "value": "ExampleEntity" },
+    { "name": "isStatic", "value": "true" }
+  ],
+  "children": [
+    {
+      "role": "visibility",
+      "nodes": [
+        { "concept": "jetbrains.mps.baseLanguage.structure.PublicVisibility" }
+      ]
+    }
+  ]
+}

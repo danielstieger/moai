@@ -1,0 +1,33 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.C2Dot",
+  "properties": [],
+  "references": [],
+  "children": [
+    {
+      "role": "operand",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.manmap.structure.C2SqlWordVarReference",
+          "properties": [],
+          "references": [
+            { "role": "varDecl", "target": "<object-variable-declaration-node-ref>" }
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "role": "operation",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.manmap.structure.C2PropertyReference",
+          "properties": [],
+          "references": [
+            { "role": "property", "target": "<object-property-node-ref>" }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ]
+}

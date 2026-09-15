@@ -1,0 +1,61 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.C2SqlBlock",
+  "children": [
+    {
+      "role": "statements",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.StatementList",
+          "children": [
+            {
+              "role": "statement",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.manmap.structure.C2SqlText",
+                  "children": [
+                    {
+                      "role": "lines",
+                      "nodes": [
+                        {
+                          "concept": "jetbrains.mps.lang.text.structure.Line",
+                          "children": [
+                            {
+                              "role": "elements",
+                              "nodes": [
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "select" }] },
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "group_id," }] },
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "sum(amount)" }] },
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "as" }] },
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "total" }] },
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "from" }] },
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "example_table" }] },
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "group" }] },
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "by" }] },
+                                { "concept": "jetbrains.mps.lang.text.structure.Word", "properties": [{ "name": "value", "value": "group_id" }] }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "mapping",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.manmap.structure.NoKeyMapperFieldRef",
+          "references": [
+            { "role": "noKeyMapperField", "target": "<no-key-mapper-field-node-ref>" }
+          ]
+        }
+      ]
+    }
+  ]
+}

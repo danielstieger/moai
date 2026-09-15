@@ -1,0 +1,6 @@
+{
+  "concept": "org.modellwerkstatt.objectflow.structure.Command",
+  "properties": [
+    { "name": "name", "value": "Example Command" }
+  ]
+}

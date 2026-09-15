@@ -1,0 +1,15 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.DeleteWithMap",
+  "references": [{ "role": "entityMapping", "target": "<entity-mapping-node-ref>" }],
+  "children": [
+    {
+      "role": "expression",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.VariableReference",
+          "references": [{ "role": "variableDeclaration", "target": "<entity-variable-node-ref>" }]
+        }
+      ]
+    }
+  ]
+}

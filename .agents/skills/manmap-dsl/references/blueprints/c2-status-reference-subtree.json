@@ -1,0 +1,34 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.C2SqlStatusReference",
+  "properties": [],
+  "references": [],
+  "children": [
+    {
+      "role": "primConstant",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.objectflow.structure.StatusConstReference",
+          "properties": [],
+          "references": [
+            { "role": "status", "target": "<status-declaration-node-ref>" }
+          ],
+          "children": [
+            {
+              "role": "operation",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.objectflow.structure.StatusElementReference",
+                  "properties": [],
+                  "references": [
+                    { "role": "statusElement", "target": "<status-element-node-ref>" }
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.NoKeyMapperField",
+  "properties": [
+    {
+      "name": "name",
+      "value": "<mapper-name>"
+    }
+  ],
+  "references": [
+    {
+      "role": "classConcept",
+      "target": "<result-class-node-ref>"
+    }
+  ],
+  "children": [
+    {
+      "role": "atomMpig",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.manmap.structure.IncludeMapping",
+          "references": [
+            {
+              "role": "mapping",
+              "target": "<entity-mapping-node-ref>"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
