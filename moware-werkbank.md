@@ -120,22 +120,21 @@ Entity / ValueObject / DTO / Service / Command
 - **objectflow** definiert die fachlichen Daten, Regeln und Anwendungsfälle.
 - **manmap** verbindet Entities und DTOs mit der relationalen Persistenz und stellt den Datenzugriff über Repositories bereit.
 - **dataux** projiziert Commands und deren Daten in Seiten, Formulare, Tabellen und ausführbare Module.
-- **OFXConfig** verdrahtet die benötigten Komponenten und bestimmt über AppFactories die verwendete Laufzeitumgebung.
+
 
 ### Wo gehört eine Änderung hin?
 
-| Änderungswunsch                                      | Primärer Modellierungsort                  |
-| ---------------------------------------------------- | ------------------------------------------ |
-| Neue fachliche Eigenschaft oder Geschäftsregel       | `org.modellwerkstatt.objectflow`           |
-| Neues Mapping, neue Datenbankabfrage oder Speicherung | `org.modellwerkstatt.manmap`               |
-| Neuer Anwendungsfall oder Ablauf                     | `Command` in `org.modellwerkstatt.objectflow` |
-| Neue Darstellung oder Benutzerinteraktion            | `org.modellwerkstatt.dataux`               |
-| Neue Anwendung oder neuer BatchJob                   | `AppUiModule` oder `BatchJobModule`        |
-| Auswahl und Verdrahtung der Laufzeit                 | `OFXConfig` und AppFactories               |
-| Laufzeitspezifische Sonderfunktion                   | Betroffene Runtime; Portabilität prüfen    |
+| Änderungswunsch                                         | DSL                                                                             | Primärer Modellierungsort                                                                         |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Neue fachliche Eigenschaft                              | `org.modellwerkstatt.objectflow`                                                | `Entity`, `ValueObject` oder `DTO`, abhängig von der Bedeutung der Daten                          |
+| Neue Geschäftsregel oder Berechnung                     | `org.modellwerkstatt.objectflow`                                                | Fachliches Verhalten in `Entity`, `ValueObject` oder `Service`                                    |
+| Neues Persistenzmapping                                 | `org.modellwerkstatt.manmap`                                                    | Entity-Mapping innerhalb einer `PersistenceDescription`                                           |
+| Neue Datenbankabfrage oder Speicheroperation            | `org.modellwerkstatt.manmap`                                                    | Methode und gegebenenfalls Mapper innerhalb eines `Repository`                                    |
+| Neuer Anwendungsfall oder geänderter Interaktionsablauf | `org.modellwerkstatt.objectflow`                                                | `Command` und dessen Pages                                                                        |
+| Neue Darstellung oder Bedienelemente                    | `org.modellwerkstatt.dataux`                                                    | `PagePane` und darin eingebundene Formulare, Tabellen, Layouts oder andere UI-Komponenten         |
+| Neue Anwendung oder geändertes Hauptmenü                | `org.modellwerkstatt.dataux`                                                    | `AppUiModule`                                                                                     |
 
-Fachliche Prüfungen und Berechnungen gehören nicht in die UI. Datenbankabfragen und Speicheroperationen gehören in Repositories. Commands koordinieren den Anwendungsfall, die Session und die zugehörigen Pages.
-
+Fachliche Prüfungen und Berechnungen gehören in das fachliche Modell beziehungsweise in Services. Datenbankabfragen und Speicheroperationen werden in Repositories implementiert. Commands koordinieren den Anwendungsfall, die Session und die zugehörigen Pages. Deren Darstellung wird durch `PagePane`s und die darin eingebundenen UI-Komponenten beschrieben. Eine Änderung kann daher mehrere Modellierungsorte und DSLs betreffen.
 
 ## Laufzeitumgebungen
 
