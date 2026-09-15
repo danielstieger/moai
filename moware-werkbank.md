@@ -16,7 +16,7 @@ Aus den in MPS modellierten Anwendungen wird Java-Code generiert. Für die Ausf�
 
 ## Grundprinzipien und Ziele
 
-Die **modellwerkstratt moware werkbank** stellt die fachliche Gestaltung von Geschäftsanwendungen in den Mittelpunkt: Welche Daten werden benötigt, wie hängen sie zusammen, welche Geschäftsregeln gelten und wie arbeiten Benutzer mit ihnen? Die Modellsprachen bieten dafür passende Ausdrucksmittel. Generatoren und Laufzeitumgebungen übernehmen wiederkehrende technische Aufgaben und Infrastruktur-Code. Dadurch konzentriert sich die Anwendungsentwicklung auf fachliche Datenstrukturen, Geschäftslogik und Benutzerinteraktionen.
+Die **modellwerkstatt moware werkbank** stellt die fachliche Gestaltung von Geschäftsanwendungen in den Mittelpunkt: Welche Daten werden benötigt, wie hängen sie zusammen, welche Geschäftsregeln gelten und wie arbeiten Benutzer mit ihnen? Die Modellsprachen bieten dafür passende Ausdrucksmittel. Generatoren und Laufzeitumgebungen übernehmen wiederkehrende technische Aufgaben und Infrastruktur-Code. Dadurch konzentriert sich die Anwendungsentwicklung auf fachliche Datenstrukturen, Geschäftslogik und Benutzerinteraktionen.
 
 **Fachliche Modellierung.** Die Architektur orientiert sich an ausgewählten Konzepten des Domain-Driven Design. Entities und Value Objects beschreiben fachliche Daten, Repositories deren Laden und Speichern, Services die Geschäftslogik. Die Entwicklung geeigneter Datenstrukturen und korrekter Geschäftsregeln bleibt die zentrale Entwurfsaufgabe.
 
@@ -31,50 +31,105 @@ Die **modellwerkstratt moware werkbank** stellt die fachliche Gestaltung von Ges
 **Langfristige Wartbarkeit und technische Flexibilität.** Das fachliche Wissen wird in den Modellen festgehalten. Generatoren und Laufzeitumgebungen bestimmen dessen technische Umsetzung. Diese Trennung ermöglicht es, fachliche Anforderungen und technische Infrastruktur weitgehend unabhängig weiterzuentwickeln. Ziel ist, bestehende Modelle langfristig zu nutzen und Anpassungen an Frameworks oder Ausführungsplattformen möglichst zentral umzusetzen.
 
 
-## Fachliche Architektur und Domain-Driven Design
+## Zentrale Konzepte der moware werkbank DSLs
+ 
+Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimmt aber nicht sämtliche DDD-Konzepte. Diese Übersicht erfasst die zentralen Konzepte der drei MoWare-Sprachen. Sie beschreiben die erkennbare Verantwortung der Konzepte, ohne zusätzliche DDD-Regeln für die DSLs festzulegen.
 
-Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimmt aber nicht sämtliche DDD-Konzepte. Aus dieser Orientierung dürfen keine zusätzlichen, hier nicht beschriebenen Regeln für die DSLs abgeleitet werden.
 
-| Baustein | Rolle im Stack |
-| --- | --- |
-| Entities und Value Objects | Modellierung fachlicher Daten |
-| DTOs (Data Transfer Objects) | Datencontainer ausschließlich für die Benutzeroberfläche |
-| Persistenzbausteine | Laden von Daten aus der Datenbank und Speichern von Daten; genaue Konzeptbezeichnung noch zu bestätigen |
-| Commands und Command-Handler | Beschreibung beziehungsweise Umsetzung von Aktionen und Benutzerinteraktionen; vier Typen mit unterschiedlichen Session-Regeln |
-| UI-Beschreibungen | Modellierung der Benutzeroberflächen |
+### Einordnung entlang der fachlichen Architektur
 
-Die genauen Eigenschaften und Abgrenzungen von Entities, Value Objects und DTOs werden in der DSL-Referenz beschrieben. Der Begriff für die Persistenzbausteine war in der Spracheingabe nicht eindeutig und wird daher noch nicht als technischer Bezeichner verwendet.
+| Schicht                            | Primäre Root Nodes                                                              | DSL                              |
+| ---------------------------------- | ------------------------------------------------------------------------------- | -------------------------------- |
+| Fachliches Modell                  | `Entity`, `ValueObject`, `DTO`                                                  | `org.modellwerkstatt.objectflow` |
+| Geschäftslogik und Anwendungsfälle | `Service`, `Command`                                                            | `org.modellwerkstatt.objectflow` |
+| Persistenz                         | `PersistenceDescription`, `Repository`                                          | `org.modellwerkstatt.manmap`     |
+| Benutzeroberfläche                 | `PagePane`, `Table`, `DelegateForm`, `GridLayout`, `TabLayout`, `CustomElement` | `org.modellwerkstatt.dataux`     |
+| Ausführbare Module                 | `AppUiModule`, `BatchJobModule`                                                 | `org.modellwerkstatt.dataux`     |
+| Querschnitt                        | `OFXConfig`, `OFXTestSuit`, `RolesAndPermissions`, `StaticRessources`           | `org.modellwerkstatt.objectflow` |
 
-## Sessions, Commands und Transaktionen
 
-> Arbeitsstand: Die folgenden Abläufe stammen aus der Beschreibung des Sprachverantwortlichen. Die vier Bezeichnungen wurden durch die Spracheingabe nicht eindeutig wiedergegeben. Die Zeilen beschreiben vorläufig vier Verhaltensweisen und legen keine technischen Typnamen fest.
+### org.modellwerkstatt.manmap im Detail
 
-| Beschriebener Typ | Session und Interaktion | Schreiben und Commit |
-| --- | --- | --- |
-| SEARCH Command | Startet eine Session im Hintergrund. Lädt Daten anhand von Filtern, kann sie aufbereiten und über mehrere Pages beziehungsweise Views anzeigen. | Die Session darf nicht committed werden; Änderungen dürfen über diese Session nicht in die Datenbank geschrieben werden. |
-| GRAPH_OWNER Command | Startet eine eigene Session. Lädt Daten und bereitet sie auf; Benutzer können sie auch über die Oberfläche bearbeiten. | Zum Abschluss werden registrierte Session Operations innerhalb einer Datenbanktransaktion ausgeführt und committed. Der genaue Auslöser ist noch zu klären. |
-| GRAPH_EDIT Command | Startet keine neue Session, sondern übernimmt eine bestehende Session eines Performers. Dient der Modellierung von Benutzerinteraktion. | Eigene Abschluss- und Commit-Befugnisse sind noch zu klären. |
-| MODAL_GRAPH_OWNER | Modale Benutzerinteraktion, vergleichbar mit einem Dialogfenster. | Session-Zuordnung und Transaktionsverhalten sind noch zu bestätigen. |
+`org.modellwerkstatt.manmap` bildet die Persistenzschicht und verbindet fachliche Objekte mit der relationalen Datenbank (Oracle oder MySQL). Neben der Persistierung von Entitäten unterstützt die Sprache benutzerdefinierte SQL-Abfragen und das Überführen ihrer Ergebnismengen in Datencontainer.
 
-Beim ändernden Command registriert der Anwendungsentwickler auszuführende Operationen auf einem **Session Operation Stack**. Zum beschriebenen Abschluss wird eine Datenbanktransaktion gestartet, die registrierten Operationen werden ausgeführt und die Transaktion wird committed. Die Reihenfolge der Abarbeitung, das Verhalten bei Fehlern und Abbruch sowie der genaue Abschlussmechanismus sind noch offen; aus dem Wort „Stack“ wird keine Ausführungsreihenfolge abgeleitet.
+| Kurzbezeichnung          | FQ-Name                                                       | Beschreibung/Aufgabe                                                                                                                                                                                                                                                                                   |
+| ------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `PersistenceDescription` | `org.modellwerkstatt.manmap.structure.PersistenceDescription` | Bündelt die Persistenzabbildungen eines Modells. Die enthaltenen Entity-Mappings ordnen fachliche Objekte und ihre Eigenschaften Tabellen, Spalten und Beziehungen zu.                                                                                                                                 |
+| `Repository`             | `org.modellwerkstatt.manmap.structure.Repository`             | Kapselt den Datenbankzugriff. Enthält Methoden zum Abfragen, Laden, Zusammensetzen, Speichern und Löschen fachlicher Objekte. Unterstützt außerdem benutzerdefinierte SQL-Abfragen (Custom SQL) und spezialisierte Mapper, die Ergebnismengen (Result-Sets) in Objekte, insbesondere DTOs, überführen. |
 
-Die beschriebene Session begleitet Laden und Benutzerinteraktion. Die Datenbanktransaktion zur Ausführung der Session Operations beginnt dagegen erst beim genannten Abschluss. Session-Lebensdauer und diese Transaktionsdauer sind daher getrennt zu dokumentieren. Über weitere Transaktionen beim Laden trifft diese Beschreibung keine Aussage.
+### org.modellwerkstatt.objectflow im Detail
 
-## Von der Modellierung zur Ausführung
+`org.modellwerkstatt.objectflow` beschreibt das fachliche Modell, Service-Komponenten, Anwendungsoperationen und Geschäftsabläufe. Ergänzend stellt die Sprache Konzepte für Konfiguration, Tests, Berechtigungen und gemeinsame Ressourcen bereit.
 
-1. Die Applikation wird mit den DSLs in MPS modelliert.
-2. Aus dem Applikationsmodell wird Java-Code generiert.
-3. Die Anwendung wird für die gewählte Laufzeitumgebung gebaut und bereitgestellt. Die konkreten Build- und Bereitstellungsschritte sind noch zu dokumentieren.
-4. Die Anwendung wird in der gewählten Laufzeitumgebung ausgeführt.
+| Kurzbezeichnung       | FQ-Name                                                        | Beschreibung/Aufgabe                                                                                                                                                                                                                                                                |
+| --------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Entity`              | `org.modellwerkstatt.objectflow.structure.Entity`              | Beschreibt ein fachliches Objekt mit eigener Identität und Lebenszyklus. Trägt fachliche Eigenschaften und Verhalten und ist typischerweise persistent.                                                                                                                             |
+| `ValueObject`         | `org.modellwerkstatt.objectflow.structure.ValueObject`         | Beschreibt einen fachlichen Wert ohne eigene Identität. Seine Gleichheit kann über ausgewählte Eigenschaften definiert werden.                                                                                                                                                      |
+| `DTO`                 | `org.modellwerkstatt.objectflow.structure.DTO`                 | Definiert einen Datencontainer für die Benutzeroberfläche oder die Ergebnisse von Datenbankabfragen. Nimmt die für eine Darstellung oder Interaktion benötigten Daten auf und kann durch Mapper aus Result-Sets befüllt werden, ohne selbst ein persistentes Domänenobjekt zu sein. |
+| `Service`             | `org.modellwerkstatt.objectflow.structure.Service`             | Bündelt fachliche oder anwendungsbezogene Operationen, die nicht sinnvoll einer einzelnen Entity oder einem Value Object zugeordnet werden. Erlaubt Zugriff auf Repositories und andere Infrastrukturkomponenten.                                                                             |
+| `Command`             | `org.modellwerkstatt.objectflow.structure.Command`             | Modelliert einen Anwendungsfall beziehungsweise eine Benutzeraktion. Koordiniert Parameter, Zustandsvariablen, Seiten sowie Initialisierung und Abschluss bei Bestätigung oder Abbruch. Steuert Session-Logik.                                                                                             |
+| `OFXConfig`           | `org.modellwerkstatt.objectflow.structure.OFXConfig`           | Definiert die zentrale Konfiguration der Anwendungskomponenten und ihrer Abhängigkeiten. Ist konzeptionell mit einer XML-basierten Spring-Bean-Konfiguration vergleichbar: Komponenten werden konfiguriert und ihre Abhängigkeiten miteinander verdrahtet.                          |
+| `OFXTestSuit`         | `org.modellwerkstatt.objectflow.structure.OFXTestSuit`         | Definiert eine eigenständig ausführbare Testsuite mit konfigurierten Komponenten, Start-/Ende-Logik und Testinhalten.                                                                                                                                                               |
+| `RolesAndPermissions` | `org.modellwerkstatt.objectflow.structure.RolesAndPermissions` | Beschreibt das Berechtigungsmodell mit Rollen, Geltungsbereichen und Identitäten. Dient als zentrale Grundlage für Zugriffskontrollen.                                                                                                                                              |
+| `StaticRessources`    | `org.modellwerkstatt.objectflow.structure.StaticRessources`    | Bündelt wiederverwendbare, plattformbezogene Ressourcen wie Bezeichnungen und Farben. Ressourcensätze können aufeinander aufbauen.                                                                                                                                                  |
+
+### org.modellwerkstatt.dataux im Detail
+
+`org.modellwerkstatt.dataux` beschreibt Benutzeroberflächen, ausführbare Anwendungen und Batch-Verarbeitung.
+
+| Kurzbezeichnung  | FQ-Name                                               | Beschreibung/Aufgabe                                                                                                                                                                                              |
+| ---------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AppUiModule`    | `org.modellwerkstatt.dataux.structure.AppUiModule`    | Definiert eine ausführbare Anwendung mit Benutzeroberfläche. Bündelt Konfiguration, Authentifizierung, Haupt- und Zusatzmenüs sowie Kacheln.                                                   |
+| `BatchJobModule` | `org.modellwerkstatt.dataux.structure.BatchJobModule` | Definiert einen automatisiert ausführbaren BatchJob. Bündelt Konfiguration, Fehlerstrategie und Producer-Consumer-Verarbeitung; Betriebsart und Zeitsteuerung werden über Optionen festgelegt. |
+| `PagePane`       | `org.modellwerkstatt.dataux.structure.PagePane`       | Kapselt den Inhalt einer Anwendungsseite als wiederverwendbares UI-Element und kann seitenspezifische Optionen und Menüeinträge bereitstellen.                                                                    |
+| `Table`          | `org.modellwerkstatt.dataux.structure.Table`          | Beschreibt eine tabellarische Darstellung gebundener Daten. Delegates, Optionen und Menüeinträge bestimmen Spalten, Darstellung und Interaktionen.                                                                |
+| `DelegateForm`   | `org.modellwerkstatt.dataux.structure.DelegateForm`   | Beschreibt ein an ein fachliches Objekt oder eine Eigenschaft gebundenes Formular, dessen Felder aus Delegates zusammengesetzt werden.                                                                            |
+| `GridLayout`     | `org.modellwerkstatt.dataux.structure.GridLayout`     | Ordnet UI-Elemente in Zeilen und Spalten an. Gewichtungen steuern die Größenverteilung im Raster.                                                                                                                 |
+| `TabLayout`      | `org.modellwerkstatt.dataux.structure.TabLayout`      | Strukturiert eine Oberfläche in mehrere Registerkarten und bündelt deren jeweilige Inhalte.                                                                                                                       |
+| `CustomElement`  | `org.modellwerkstatt.dataux.structure.CustomElement`  | Deklariert ein projektspezifisches UI-Element mit eigener Implementierungsklasse, optionaler Datenbindung, Delegates und Menüaktionen.                                                                            |
+
 
 ## Laufzeitumgebungen
 
-| Ziel | Technologie | Laufzeitumgebung | Primäre Gerätezielgruppe |
-| --- | --- | --- | --- |
-| Desktop-Anwendung | JavaFX | `org.modellwerkstatt.fx8forms` | Desktop-PCs |
-| Webanwendung auf Tomcat | Vaadin | `org.modellwerkstatt.turkuforms` | Desktop-PCs |
-| HTML5-Webanwendung auf Tomcat | Pebble Templates | `org.modellwerkstatt.h2forms` | Mobile Datenerfassungsgeräte (MDE), beispielsweise von Zebra oder Datalogic, sowie Smartphones |
+Die Ausführung richtet sich nach dem modellierten Modultyp: Anwendungen mit Benutzeroberfläche unterstützen drei Laufzeitumgebungen, BatchJobs können automatisiert oder mit Benutzeroberfläche betrieben werden. Testsuiten werden in der MPS-Konsole ausgeführt.
 
-Die Applikationsmodelle sind laut Sprachverantwortlichem mit wenigen Ausnahmen zwischen den drei Laufzeitumgebungen portabel. Die konkreten Ausnahmen sind noch zu erfassen.
+| Modultyp         | Ausführungsart                                    | Technologie / Laufzeitumgebung                   | Primärer Einsatz                                                       |
+| ---------------- | ------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------- |
+| `AppUiModule`    | Desktop-Anwendung                                 | JavaFX / `org.modellwerkstatt.fx8forms`          | Desktop-PCs                                                            |
+| `AppUiModule`    | Webanwendung auf Tomcat                           | Vaadin / `org.modellwerkstatt.turkuforms`        | Desktop-PCs                                                            |
+| `AppUiModule`    | HTML5-Webanwendung auf Tomcat                     | Pebble Templates / `org.modellwerkstatt.h2forms` | MDE-Geräte, beispielsweise von Zebra oder Datalogic, sowie Smartphones |
+| `BatchJobModule` | Automatisierte Ausführung ohne Benutzeroberfläche | Servlet auf Tomcat                               | Hintergrundverarbeitung                                                |
+| `BatchJobModule` | Ausführung mit Desktop-Oberfläche                 | JavaFX / `org.modellwerkstatt.fx8forms`          | Interaktive Ausführung auf Desktop-PCs                                 |
+| `BatchJobModule` | Ausführung mit Weboberfläche                      | Vaadin / `org.modellwerkstatt.turkuforms`        | Interaktive Ausführung im Browser                                      |
+| `OFXTestSuit`    | Testausführung                                    | MPS-Konsole                                      | Ausführen und Prüfen modellierter Testabläufe                          |
 
-Die Gerätezielgruppen unterscheiden sich insbesondere durch ihre Bildschirmgrößen: `h2forms` richtet sich an MDE-Geräte und Smartphones; `turkuforms` und `fx8forms` primär an Desktop-PCs. Die technische Portabilität eines Modells ist deshalb von der Eignung seiner Oberfläche für die jeweilige Bildschirmgröße zu unterscheiden. Konkrete Empfehlungen zur Gestaltung und gegebenenfalls nötige Modellanpassungen sind noch zu dokumentieren.
+Applikationsmodelle sind mit wenigen Ausnahmen zwischen `org.modellwerkstatt.fx8forms`, `org.modellwerkstatt.turkuforms` und `org.modellwerkstatt.h2forms` portabel. Bei der Oberflächengestaltung sind die unterschiedlichen Gerätezielgruppen und Bildschirmgrößen zu berücksichtigen: Eine technisch ausführbare Oberfläche ist nicht automatisch für jedes Gerät gleichermaßen geeignet.
+
+BatchJobs können direkt gestartet, zeitgesteuert über Cron ausgeführt oder kontinuierlich mit einer konfigurierten Wartezeit zwischen den Durchläufen betrieben werden. Zusätzlich ist eine Ausführung mit Benutzeroberfläche über `org.modellwerkstatt.fx8forms` oder `org.modellwerkstatt.turkuforms` möglich.
+
+
+## Von der Modellierung zur Ausführung
+
+1. **Modellieren und versionieren:** Die Applikation wird mit den DSLs in MPS modelliert und mit Git versioniert. MPS speichert die Modelle als XML-Dateien. Diese enthalten strukturierte Modelle mit Referenzen und Identitäten; ein rein textueller Merge kann deren Konsistenz verletzen. Für die Versionsverwaltung werden deshalb die Git-Unterstützung von MPS und der MPS-Merge-Driver verwendet. Modellkonflikte werden mit den modellbewussten Werkzeugen von MPS aufgelöst. Agenten bearbeiten Modelle über die MPS-Werkzeuge und führen keine manuellen Text-Merges der XML-Modelldateien durch.
+
+2. **Laufzeitkonfiguration auswählen:** In der `OFXConfig` wird über die **AppFactories** festgelegt, welche Laufzeitumgebung tatsächlich verwendet wird. Ein Projekt enthält daher meist mehrere Konfigurationen. Vor dem Build ist zu prüfen, welche `OFXConfig` das auszuführende Modul verwendet und ob deren AppFactories zur gewünschten Laufzeitumgebung passen.
+
+3. **Vollständig neu bauen:** Vor jedem Ant-Build wird die gesamte Applikation in MPS vollständig neu gebaut (**Rebuild**). Ein inkrementeller Build reicht nicht aus. Dabei wird insbesondere der Java-Code aus den Modellen neu generiert. Erst nach einem erfolgreichen Rebuild wird mit dem nächsten Schritt fortgefahren.
+
+4. **Mit Ant bauen und bereitstellen:** Anschließend wird Ant auf der Konsole ausgeführt. Die projektspezifische Builddatei und die gewählten Targets bestimmen den Build und die Bereitstellung. Sie müssen zur ausgewählten Laufzeitkonfiguration passen.
+
+5. **Ausführen und prüfen:** Die Anwendung wird in der durch die `OFXConfig` festgelegten Laufzeitumgebung gestartet und ihre Funktionsfähigkeit geprüft.
+
+## Weiterführende Dokumentation
+
+Die Detaildokumentationen beschreiben Konzepte, Möglichkeiten, Einschränkungen, Regeln, Beispiele und Best Practices der jeweiligen DSL.
+
+| DSL                              | Dokumentation                  |
+| -------------------------------- | ------------------------------ |
+| `org.modellwerkstatt.manmap`     | [manmap.md](manmap.md)         |
+| `org.modellwerkstatt.objectflow` | [objectflow.md](objectflow.md) |
+| `org.modellwerkstatt.dataux`     | [dataux.md](dataux.md)         |
+
+
+## Stand der Dokumentation
+Diese Dokumentation beschreibt die **modellwerkstatt moware werkbank, Stand Herbst 2026**, auf Basis von **JetBrains MPS 2026.1**.
