@@ -10,7 +10,7 @@ Die Dokumentation richtet sich an Anwendungsentwickler und KI-Agenten. Als Einst
 
 | Dokument                                                   | Inhalt                                                                                                                   |
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| [modellwerkstatt-overview.md](modellwerkstatt-overview.md) | Grundprinzipien, fachliche Architektur, zentrale Konzepte, Laufzeitumgebungen und Entwicklungsablauf                     |
+| [moware-werkbank.md](moware-werkbank.md) | Grundprinzipien, fachliche Architektur, zentrale Konzepte, Laufzeitumgebungen und Entwicklungsablauf                     |
 | [manmap.md](manmap.md)                                     | `org.modellwerkstatt.manmap`: Persistenzabbildungen, Repositories, SQL-Abfragen und Mapping von Ergebnismengen           |
 | [objectflow.md](objectflow.md)                             | `org.modellwerkstatt.objectflow`: fachliche Datenstrukturen, Services, Commands, Konfiguration, Tests und Berechtigungen |
 | [dataux.md](dataux.md)                                     | `org.modellwerkstatt.dataux`: Benutzeroberflächen, Applikationen, Menüs und BatchJobs                                    |

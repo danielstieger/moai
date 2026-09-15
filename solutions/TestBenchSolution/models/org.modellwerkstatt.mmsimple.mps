@@ -24,6 +24,9 @@
         <child id="1202065356069" name="defaultGetAccessor" index="3wFrgM" />
         <child id="1202078082794" name="defaultSetAccessor" index="3xrYvX" />
       </concept>
+      <concept id="1137021947720" name="jetbrains.mps.baseLanguage.structure.ConceptFunction" flags="in" index="2VMwT0">
+        <child id="1137022507850" name="body" index="2VODD2" />
+      </concept>
       <concept id="1070475926800" name="jetbrains.mps.baseLanguage.structure.StringLiteral" flags="nn" index="Xl_RD">
         <property id="1070475926801" name="value" index="Xl_RC" />
       </concept>
@@ -69,6 +72,7 @@
       <concept id="1146644602865" name="jetbrains.mps.baseLanguage.structure.PublicVisibility" flags="nn" index="3Tm1VV" />
     </language>
     <language id="ec097fca-5b84-41f2-847d-6a5690cae277" name="org.modellwerkstatt.objectflow">
+      <concept id="6525155817176738379" name="org.modellwerkstatt.objectflow.structure.PageInitConceptFunc" flags="ig" index="20qEzJ" />
       <concept id="1707086779731223260" name="org.modellwerkstatt.objectflow.structure.OnCreationStatusElemOption" flags="ng" index="2_5uyX" />
       <concept id="4533072425307715670" name="org.modellwerkstatt.objectflow.structure.StatusElement" flags="ng" index="2XvgOc">
         <property id="4533072425307715682" name="value" index="2XvgOS" />
@@ -82,6 +86,7 @@
       <concept id="4533072425307800381" name="org.modellwerkstatt.objectflow.structure.StatusType" flags="ig" index="2XvVpB">
         <reference id="6600213247848012755" name="status" index="3$lB4D" />
       </concept>
+      <concept id="3887124829264538773" name="org.modellwerkstatt.objectflow.structure.PagePaneActionProviderLink" flags="ng" index="3063JU" />
       <concept id="4313579457188683399" name="org.modellwerkstatt.objectflow.structure.IOFXObject" flags="ngI" index="13YVsI">
         <child id="3207218222495905601" name="businessProperties" index="TxmiU" />
       </concept>
@@ -92,6 +97,14 @@
         <child id="3674496190757459099" name="propertyOption" index="0orDa" />
         <child id="5770301300929026308" name="longDesc" index="2CNmdL" />
         <child id="5770301300929026304" name="shortDesc" index="2CNmdP" />
+      </concept>
+      <concept id="7192042020163999178" name="org.modellwerkstatt.objectflow.structure.Command" flags="ng" index="3ugp7m">
+        <property id="1001479520354727786" name="newWindowTitleType" index="1ptSWV" />
+        <child id="7192042020164064743" name="pages" index="3ug97V" />
+      </concept>
+      <concept id="7192042020163999174" name="org.modellwerkstatt.objectflow.structure.PageCrtl" flags="ng" index="3ugp7q">
+        <child id="3887124829264538806" name="pagePaneActionProviderLink" index="3063Jp" />
+        <child id="1881524139084590808" name="pageInit" index="10qiF$" />
       </concept>
     </language>
     <language id="5aaa957f-3447-4783-b1f7-b301fa3e0394" name="org.modellwerkstatt.manmap">
@@ -132,6 +145,7 @@
       <concept id="871579071900248872" name="org.modellwerkstatt.manmap.structure.IMapsClassConcept" flags="ngI" index="12nLe$">
         <child id="4557816287827057767" name="atomMpig" index="3caO6$" />
       </concept>
+      <concept id="781751828139414632" name="org.modellwerkstatt.manmap.structure.NoKeyMapperField" flags="ng" index="1o6$dd" />
     </language>
     <language id="ceab5195-25ea-4f22-9b92-103b95ca8c0c" name="jetbrains.mps.lang.core">
       <concept id="1133920641626" name="jetbrains.mps.lang.core.structure.BaseConcept" flags="ng" index="2VYdi">
@@ -486,6 +500,7 @@
       </node>
       <node concept="3Tm1VV" id="6qR6GZqeVaU" role="1B3o_S" />
     </node>
+    <node concept="1o6$dd" id="XNEDnbIGIx" role="jymVt" />
     <node concept="DXQ2B" id="6qR6GZqeVaV" role="jymVt">
       <property role="2a4t7v" value="3PtsrckEx4n/CHECKOUT" />
       <property role="TrG5h" value="checkout" />
@@ -530,6 +545,16 @@
         </node>
       </node>
       <node concept="3Tm1VV" id="6qR6GZqeVbo" role="1B3o_S" />
+    </node>
+  </node>
+  <node concept="3ugp7m" id="XNEDnbIGQQ">
+    <property role="1ptSWV" value="R_Y55k$Btz/OVERWRITE_FORCED" />
+    <node concept="3ugp7q" id="XNEDnbIGQZ" role="3ug97V">
+      <property role="TrG5h" value="Page_0" />
+      <node concept="20qEzJ" id="XNEDnbIGR0" role="10qiF$">
+        <node concept="3clFbS" id="XNEDnbIGR1" role="2VODD2" />
+      </node>
+      <node concept="3063JU" id="XNEDnbIGR2" role="3063Jp" />
     </node>
   </node>
 </model>

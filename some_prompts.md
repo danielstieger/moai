@@ -10,4 +10,5 @@ Wie sollte ein manmap skill aufgebaut sein im Idealfall, wie sollte ein Umsetzun
 
 
 - Deprecated Konzepte QueryFromSql / UpdateFromSql nicht dokumentieren! 
+- Wann methoden in Entitäen/ ValueObjects wann Services? 
 - 
