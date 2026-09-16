@@ -52,7 +52,7 @@ Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimm
 | Ausführbare Module                 | `AppUiModule`, `BatchJobModule`                                                 | `org.modellwerkstatt.dataux`     |
 | Querschnitt                        | `OFXConfig`, `OFXTestSuit`, `RolesAndPermissions`, `StaticRessources`           | `org.modellwerkstatt.objectflow` |
 
-### `org.modellwerkstatt.manmap` im Detail
+### `org.modellwerkstatt.manmap` eine Übersicht
 
 `org.modellwerkstatt.manmap` bildet die Persistenzschicht und verbindet fachliche Objekte mit der relationalen Datenbank (Oracle oder MySQL). Neben der Persistierung von Entitäten unterstützt die Sprache benutzerdefinierte SQL-Abfragen und das Überführen ihrer Ergebnismengen in Datencontainer.
 
@@ -61,7 +61,7 @@ Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimm
 | `PersistenceDescription` | `org.modellwerkstatt.manmap.structure.PersistenceDescription` | Bündelt die Persistenzabbildungen eines Modells. Die enthaltenen Entity-Mappings ordnen fachliche Objekte und ihre Eigenschaften Tabellen, Spalten und Beziehungen zu.                                                                                                                                  |
 | `Repository`             | `org.modellwerkstatt.manmap.structure.Repository`             | Kapselt den Datenbankzugriff. Enthält Methoden zum Abfragen, Laden, Zusammensetzen, Speichern und Löschen fachlicher Objekte. Unterstützt außerdem benutzerdefinierte SQL-Abfragen und spezialisierte Mapper, die Ergebnismengen in Objekte, insbesondere DTOs, überführen.                                 |
 
-### `org.modellwerkstatt.objectflow` im Detail
+### `org.modellwerkstatt.objectflow` eine Übersicht
 
 `org.modellwerkstatt.objectflow` beschreibt das fachliche Modell, Service-Komponenten, Anwendungsoperationen und Geschäftsabläufe. Ergänzend stellt die Sprache Konzepte für Konfiguration, Tests, Berechtigungen und gemeinsame Ressourcen bereit.
 
@@ -77,7 +77,7 @@ Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimm
 | `RolesAndPermissions` | `org.modellwerkstatt.objectflow.structure.RolesAndPermissions` | Beschreibt das Berechtigungsmodell mit Rollen, Geltungsbereichen und Identitäten. Dient als zentrale Grundlage für Zugriffskontrollen.                                                                                                                                         |
 | `StaticRessources`    | `org.modellwerkstatt.objectflow.structure.StaticRessources`    | Bündelt wiederverwendbare, plattformbezogene Ressourcen wie Bezeichnungen und Farben. Ressourcensätze können aufeinander aufbauen.                                                                                                                                             |
 
-### `org.modellwerkstatt.dataux` im Detail
+### `org.modellwerkstatt.dataux` eine Übersicht
 
 `org.modellwerkstatt.dataux` beschreibt Benutzeroberflächen, ausführbare Anwendungen und Batch-Verarbeitung.
 
