@@ -256,7 +256,7 @@ Eine `OFXTestSuit` kann beispielsweise folgende Fälle abdecken:
 
 Rechnungsstruktur, Berechnungen, fachliche Prüfungen und Aggregationslogik bilden den sorgfältig abzusichernden fachlichen Kern (**ExpensiveCode**).
 
-Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion mit diesem Modell (Commands) gehören zum **CheapCode**. Sie lassen sich beim Ausprobieren unmittelbar beurteilen und durch kurze Feedbackzyklen verbessern.
+Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion mit diesem Modell gehören zum **CheapCode**. Sie lassen sich beim Ausprobieren unmittelbar beurteilen und durch kurze Feedbackzyklen verbessern. Darstellungs- und Interaktionsanteile eines Commands sind typischerweise CheapCode; fachlich relevante Ablaufregeln im Command können aber auch ExpensiveCode sein.
 
 
 ## Von der Modellierung zur Ausführung
