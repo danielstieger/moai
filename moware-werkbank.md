@@ -43,7 +43,7 @@ Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimm
 
 ### Einordnung entlang der fachlichen Architektur
 
-| Schicht                            | Primäre Root Nodes                                                              | DSL                              |
+| Schicht                            | Konzept                                                                         | DSL                              |
 | ---------------------------------- | ------------------------------------------------------------------------------- | -------------------------------- |
 | Fachliches Modell                  | `Entity`, `ValueObject`, `DTO`                                                  | `org.modellwerkstatt.objectflow` |
 | Geschäftslogik und Anwendungsfälle | `Service`, `Command`                                                            | `org.modellwerkstatt.objectflow` |
@@ -124,7 +124,7 @@ Entity / ValueObject / DTO / Service / Command
 
 ### Wo gehört eine Änderung hin?
 
-| Änderungswunsch                                         | DSL                                                                             | Primärer Modellierungsort                                                                         |
+| Änderungswunsch                                         | mit DSL                                                                         | Primärer Modellierungsort                                                                         |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | Neue fachliche Eigenschaft                              | `org.modellwerkstatt.objectflow`                                                | `Entity`, `ValueObject` oder `DTO`, abhängig von der Bedeutung der Daten                          |
 | Neue Geschäftsregel oder Berechnung                     | `org.modellwerkstatt.objectflow`                                                | Fachliches Verhalten in `Entity`, `ValueObject` oder `Service`                                    |
@@ -159,41 +159,42 @@ BatchJobs können direkt gestartet, zeitgesteuert über Cron ausgeführt oder ko
 
 Das Beispiel umfasst die Suche nach Rechnungen, die Bearbeitung einer Rechnung mit ihren Positionen und die Anzeige der Summe aller Rechnungen. Die verwendeten Namen sind beispielhaft; die Beschreibung ist eine fachliche Skizze, keine ausführbare DSL-Syntax.
 
-### Fachliches Modell – `org.modellwerkstatt.objectflow`
+### Fachliches Modell mit der DSL `org.modellwerkstatt.objectflow`
 
-| Element       | Beispiel                  | Aufgabe                                                                                                                         |
-| ------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `Entity`      | `Rechnung`                | Enthält Rechnungs-ID, Rechnungsnummer, Rechnungsdatum und eine Liste von Rechnungspositionen.                                   |
-| `Entity`      | `Rechnungsposition`       | Enthält Positionsnummer, Beschreibung, Menge und Einzelpreis.                                                                   |
-| `ValueObject` | `Geldbetrag`              | Fasst Betrag und Währung zusammen.                                                                                              |
-| `DTO`         | `RechnungFilter`          | Enthält Suchkriterien, beispielsweise Rechnungsnummer und Datumsbereich, sowie die Property `results` vom Typ `list<Rechnung>`. |
-| `DTO`         | `RechnungsSummenErgebnis` | Nimmt das Ergebnis der SQL-Aggregation zur Summe aller Rechnungen auf.                                                          |
-| `Service`     | `RechnungsService`        | Berechnet Positionswerte und Rechnungssumme und prüft fachliche Regeln bei der Bearbeitung.                                     |
+| Element       | Beispiel                  | Aufgabe                                                                                                                                                       |
+| ------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Entity`      | `Rechnung`                | Enthält Rechnungs-ID, Rechnungsnummer, Rechnungsdatum und eine Liste von Rechnungspositionen.                                                                 |
+| `Entity`      | `Rechnungsposition`       | Enthält Positionsnummer, Beschreibung, Menge und Einzelpreis.                                                                                                 |
+| `ValueObject` | `Geldbetrag`              | Fasst Betrag und Währung zusammen.                                                                                                                            |
+| `DTO`         | `RechnungInfo`            | Read-only-Projektion für ein Suchergebnis. Enthält die Rechnungs-ID sowie die für die Ergebnisliste benötigten Rechnungsdaten.                                 |
+| `DTO`         | `RechnungFilter`          | Enthält Suchkriterien, beispielsweise Rechnungsnummer und Datumsbereich, sowie die Property `results` vom Typ `list<RechnungInfo>`.                           |
+| `DTO`         | `RechnungsSummenErgebnis` | Nimmt das Ergebnis der SQL-Aggregation zur Summe aller Rechnungen auf.                                                                                        |
+| `Service`     | `RechnungsService`        | Berechnet Positionswerte und Rechnungssumme und prüft fachliche Regeln bei der Bearbeitung.                                                                   |
 
 Für das vereinfachte Beispiel müssen Mengen positiv und Einzelpreise nicht negativ sein. Alle Rechnungen verwenden dieselbe Währung. Die Summe einer Rechnung ergibt sich aus ihren Positionswerten. Steuern und Rundungsregeln werden in diesem Beispiel nicht behandelt.
 
-### Persistenz – `org.modellwerkstatt.manmap`
+### Persistenz mit der DSL `org.modellwerkstatt.manmap`
 
 Eine `PersistenceDescription` enthält die Mappings für `Rechnung` und `Rechnungsposition`. Die Positionstabelle besitzt eine Zuordnung zur jeweiligen Rechnung.
 
 Das `RechnungsRepository` kapselt die Datenbankzugriffe:
 
-| Beispielhafte Repository-Methode | Aufgabe                                                                                                                                                                    |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sucheRechnungen(filter)`        | Übersetzt die Suchkriterien aus `RechnungFilter` in die Datenbankabfrage und lädt über das Mapping passende `Rechnung`-Entitäten. Die Positionen werden dabei nicht geladen. |
-| `checkoutRechnung(id)`           | Lädt die Rechnung und explizit ihre Positionen zur Bearbeitung. Stellt den vollständigen Rechnungsgraphen zusammen.                                                        |
-| `checkinRechnung(rechnung)`      | Speichert die bearbeitete Rechnung einschließlich der zugehörigen Änderungen an ihren Positionen.                                                                          |
-| `ladeSummeAllerRechnungen()`     | Führt die Aggregation direkt per SQL in der Datenbank aus. Ein Mapper vom Typ `nokeystore/read-only map` überführt das Ergebnis in `RechnungsSummenErgebnis`.                |
+| Beispielhafte Repository-Methode | Aufgabe                                                                                                                                                                                         |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sucheRechnungen(filter)`        | Übersetzt die Suchkriterien aus `RechnungFilter` in eine benutzerdefinierte SQL-Abfrage. Ein No-Key-Mapper überführt jede Ergebniszeile in ein read-only `RechnungInfo`-DTO. |
+| `checkoutRechnung(id)`           | Lädt die Rechnung und explizit ihre Positionen zur Bearbeitung. Stellt den vollständigen Rechnungsgraphen zusammen.                                                                           |
+| `checkinRechnung(rechnung)`      | Speichert die bearbeitete Rechnung einschließlich der zugehörigen Änderungen an ihren Positionen.                                                                                               |
+| `ladeSummeAllerRechnungen()`     | Führt die Aggregation direkt per SQL in der Datenbank aus. Ein No-Key-Mapper überführt das Ergebnis in das read-only DTO `RechnungsSummenErgebnis`.                                         |
 
-Die Suche arbeitet unmittelbar mit `Rechnung`-Entitäten. Für die Übersicht werden nur die Rechnungsdaten geladen; die Positionen bleiben ungeladen. Ein ungeladener Positionsgraph bedeutet dabei nicht, dass die Rechnung keine Positionen besitzt. Die vollständigen Daten werden erst beim Öffnen einer Rechnung zur Bearbeitung explizit geladen.
+Die Suche lädt keine `Rechnung`-Entitäten. Die benutzerdefinierte SQL-Abfrage liest nur die für die Ergebnisliste benötigten Daten und bildet jede Zeile auf ein `RechnungInfo`-DTO ab. Diese No-Key-Ergebnisse sind read-only und werden nicht in die Session-Identity-Map integriert. Erst beim Öffnen eines Suchergebnisses wird anhand seiner Rechnungs-ID die zugehörige `Rechnung` einschließlich ihrer Positionen zur Bearbeitung explizit geladen.
 
 Auch für die Summe aller Rechnungen werden keine vollständigen Rechnungsgraphen aufgebaut. Die Datenbank berechnet das Aggregationsergebnis, das anschließend als DTO zur Anzeige bereitsteht. Diese Auswertung umfasst alle Rechnungen und ist unabhängig vom aktuellen Suchfilter.
 
-### Anwendungsfälle – `org.modellwerkstatt.objectflow`
+### Anwendungsfälle mit der DSL `org.modellwerkstatt.objectflow`
 
-| Beispiel-Command                  | Typ           | Aufgabe                                                                                                                      |
+| Beispiel-Command                  | Command-Typ   | Aufgabe                                                                                                                      |
 | --------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `Rechnungen suchen`               | `SEARCH`      | Erfasst Suchkriterien und zeigt die gefundenen Rechnungen auf einer zweiten Seite an.                                        |
+| `Rechnungen suchen`               | `SEARCH`      | Erfasst Suchkriterien und zeigt die als `RechnungInfo`-DTOs geladenen Treffer auf einer zweiten Seite an.                    |
 | `Rechnung bearbeiten`             | `GRAPH_OWNER` | Lädt eine Rechnung anhand ihrer ID zur Bearbeitung und registriert Repository-Methoden zum Speichern als Session Operations. |
 | `Rechnungsposition bearbeiten`    | `GRAPH_EDIT`  | Bearbeitet eine Position innerhalb der bestehenden Session des `GRAPH_OWNER`.                                                |
 | `Summe aller Rechnungen anzeigen` | `SEARCH`      | Ruft die SQL-Aggregation im Repository auf und zeigt das Ergebnis an.                                                        |
@@ -205,17 +206,17 @@ Der ebenfalls verfügbare Typ `MODAL_GRAPH_OWNER` wird in diesem Beispiel nicht 
 Der Command `Rechnungen suchen` startet eine eigene Read-only-Session und besteht aus zwei Pages:
 
 1. **Suchfilter eingeben:** Ein Formular ist an das DTO `RechnungFilter` gebunden. Der Benutzer legt die Suchkriterien fest.
-2. **Suchergebnisse anzeigen:** Mit den Kriterien aus dem DTO wird die Repository-Methode `sucheRechnungen(filter)` aufgerufen. Die geladenen `Rechnung`-Entitäten werden in der Property `results` des DTOs abgelegt. Eine Tabelle auf der zweiten Page zeigt diese Liste an.
+2. **Suchergebnisse anzeigen:** Mit den Kriterien aus dem DTO wird die Repository-Methode `sucheRechnungen(filter)` aufgerufen. Sie führt benutzerdefiniertes SQL aus und legt die über ein No-Key-Mapper erzeugten `RechnungInfo`-DTOs in der Property `results` des Filter-DTOs ab. Eine Tabelle auf der zweiten Page zeigt diese Liste an.
 
-Die Positionen der gefundenen Rechnungen werden bei der Suche nicht geladen. Die Session des `SEARCH`-Commands kann nicht committed werden. Die Eingabe von Suchkriterien und das Befüllen von `results` im DTO sind davon unabhängig: Diese Daten dienen dem Suchablauf und werden nicht in die Datenbank geschrieben.
+Bei der Suche werden weder `Rechnung`-Entitäten noch deren Positionen geladen. Die Session des `SEARCH`-Commands kann nicht committed werden. Die Eingabe von Suchkriterien und das Befüllen von `results` im DTO sind davon unabhängig: Diese Daten dienen dem Suchablauf und werden nicht in die Datenbank geschrieben. Auch die `RechnungInfo`-Ergebnisse des No-Key-Mapper sind read-only und nicht Bestandteil der Session-Identity-Map.
 
-Ein Doppelklick auf eine Tabellenzeile startet `Rechnung bearbeiten`. Als Parameter wird die ID der ausgewählten Rechnung übergeben.
+Ein Doppelklick auf eine Tabellenzeile startet `Rechnung bearbeiten`. Als Parameter wird die Rechnungs-ID aus dem ausgewählten `RechnungInfo`-DTO übergeben.
 
 #### Rechnung und Positionen bearbeiten
 
 Der Command `Rechnung bearbeiten` hat den Typ `GRAPH_OWNER` und startet eine eigene Session. Er ist dafür verantwortlich, die Daten zur Bearbeitung zu laden (**Checkout**). Dazu ruft er `checkoutRechnung(id)` mit der übergebenen Rechnungs-ID auf. Die Repository-Methode lädt den Rechnungskopf und die zugehörigen Positionen.
 
-Der Benutzer kann den Rechnungskopf und die Positionen bearbeiten. Für die Bearbeitung einer einzelnen Position wird `Rechnungsposition bearbeiten` vom Typ `GRAPH_EDIT` verwendet. Dieser Command arbeitet innerhalb der bestehenden Session des `GRAPH_OWNER` und eröffnet keine eigene Session.
+Der Benutzer kann den Rechnungskopf und die Positionen bearbeiten. Für die Bearbeitung einer einzelnen Position wird `Rechnungsposition bearbeiten` vom Typ `GRAPH_EDIT` verwendet. Dieser Command arbeitet innerhalb der bestehenden Session des `GRAPH_OWNER` und eröffnet keine eigene Session. Änderungen werden direkt an der Entität Rechnungsposition durchgeführt.
 
 Der `RechnungsService` übernimmt fachliche Prüfungen und Berechnungen. Der `GRAPH_OWNER` registriert die zum Speichern benötigten Repository-Methoden (**Check-in**) als **Session Operations**. Im Beispiel dient dazu `checkinRechnung(rechnung)`.
 
@@ -225,9 +226,9 @@ Beim vorgesehenen Abschluss des `GRAPH_OWNER` wird eine Datenbanktransaktion ges
 
 Der Command `Summe aller Rechnungen anzeigen` hat den Typ `SEARCH` und verwendet eine eigene Read-only-Session. Er ruft `ladeSummeAllerRechnungen()` im Repository auf.
 
-Die Repository-Methode führt eine aggregierende SQL-Abfrage direkt auf der Datenbank aus. Ein Mapper vom Typ `nokeystore/read-only map` überführt deren Ergebnis in das DTO `RechnungsSummenErgebnis`. Der Command stellt dieses DTO für die Anzeige bereit. Ein Laden und anschließendes Durchlaufen aller Rechnungsentitäten in der Anwendung ist dafür nicht erforderlich.
+Die Repository-Methode führt eine aggregierende SQL-Abfrage direkt auf der Datenbank aus. Ein No-Key-Mapper überführt deren Ergebnis in das read-only DTO `RechnungsSummenErgebnis`, das nicht in die Session-Identity-Map integriert wird. Der Command stellt dieses DTO für die Anzeige bereit. Ein Laden und anschließendes Durchlaufen aller Rechnungsentitäten in der Anwendung ist dafür nicht erforderlich.
 
-### Benutzeroberfläche – `org.modellwerkstatt.dataux`
+### Benutzeroberfläche mit der DSL `org.modellwerkstatt.dataux`
 
 Eine **Page** beschreibt eine Seite im Ablauf eines Commands. Die zugehörige **`PagePane`** bildet ihr Gegenstück in der Benutzeroberfläche und nimmt deren UI-Inhalte auf. Formulare, Tabellen, Layouts und andere UI-Komponenten müssen jeweils innerhalb einer `PagePane` eingebunden sein, gegebenenfalls über darin enthaltene Layouts. `PagePane`s können wiederverwendet werden.
 
@@ -235,7 +236,7 @@ Eine **Page** beschreibt eine Seite im Ablauf eines Commands. Die zugehörige **
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `AppUiModule`                           | Einstieg in die Rechnungsverwaltung mit Menüeinträgen für `Rechnungen suchen` und `Summe aller Rechnungen anzeigen`.                                                       |
 | `PagePane` für die Suchfilter-Page      | Enthält ein `DelegateForm`, dessen Eingabefelder an die Suchkriterien des DTOs `RechnungFilter` gebunden sind.                                                             |
-| `PagePane` für die Suchergebnis-Page    | Enthält eine `Table`, die die `Rechnung`-Objekte aus `RechnungFilter.results` zeigt. Ein Doppelklick startet `Rechnung bearbeiten` mit der Rechnungs-ID.                   |
+| `PagePane` für die Suchergebnis-Page    | Enthält eine `Table`, die die `RechnungInfo`-DTOs aus `RechnungFilter.results` zeigt. Ein Doppelklick startet `Rechnung bearbeiten` mit der Rechnungs-ID aus dem DTO.    |
 | `PagePane` für die Rechnungsbearbeitung | Enthält ein `DelegateForm` für den Rechnungskopf und eine `Table` für die geladenen Rechnungspositionen. Ein `GridLayout` oder `TabLayout` strukturiert diese Komponenten. |
 | `PagePane` für die Positionsbearbeitung | Enthält ein `DelegateForm` zur Bearbeitung einer einzelnen Rechnungsposition im Command `Rechnungsposition bearbeiten`.                                                    |
 | `PagePane` für die Summenanzeige        | Enthält ein `DelegateForm` zur Anzeige des DTOs `RechnungsSummenErgebnis`.                                                                                                 |
@@ -248,22 +249,23 @@ Eine `OFXTestSuit` kann beispielsweise folgende Fälle abdecken:
 
 - Zwei Positionen mit `2 × 50 EUR` und `1 × 30 EUR` ergeben eine Rechnungssumme von `130 EUR`.
 - Eine Position mit Menge `0` wird fachlich abgelehnt.
+- Die benutzerdefinierte Suchabfrage bildet einen bekannten Datenbestand korrekt auf `RechnungInfo`-DTOs ab und liefert keine `Rechnung`-Entitäten.
 - Die SQL-Aggregation liefert für einen bekannten Datenbestand die erwartete Summe aller Rechnungen, unabhängig vom aktuell verwendeten Suchfilter.
 
 ### ExpensiveCode und CheapCode im Beispiel
 
 Rechnungsstruktur, Berechnungen, fachliche Prüfungen und Aggregationslogik bilden den sorgfältig abzusichernden fachlichen Kern (**ExpensiveCode**).
 
-Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion mit diesem Modell gehören zum **CheapCode**. Sie lassen sich beim Ausprobieren unmittelbar beurteilen und durch kurze Feedbackzyklen verbessern.
+Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion mit diesem Modell (Commands) gehören zum **CheapCode**. Sie lassen sich beim Ausprobieren unmittelbar beurteilen und durch kurze Feedbackzyklen verbessern.
 
 
 ## Von der Modellierung zur Ausführung
 
 1. **Modellieren und versionieren:** Die Applikation wird mit den DSLs in MPS modelliert und mit Git versioniert. MPS speichert die Modelle als XML-Dateien. Diese enthalten strukturierte Modelle mit Referenzen und Identitäten; ein rein textueller Merge kann deren Konsistenz verletzen. Für die Versionsverwaltung werden deshalb die Git-Unterstützung von MPS und der MPS-Merge-Driver verwendet. Modellkonflikte werden mit den modellbewussten Werkzeugen von MPS aufgelöst. Agenten bearbeiten Modelle über die MPS-Werkzeuge und führen keine manuellen Text-Merges der XML-Modelldateien durch.
 
-2. **Laufzeitkonfiguration auswählen:** In der `OFXConfig` wird über die **AppFactories** festgelegt, welche Laufzeitumgebung tatsächlich verwendet wird. Ein Projekt enthält daher meist mehrere Konfigurationen. Vor dem Build ist zu prüfen, welche `OFXConfig` das auszuführende Modul verwendet und ob deren AppFactories zur gewünschten Laufzeitumgebung passen.
+2. **Laufzeitkonfiguration auswählen:** In der `OFXConfig` wird über **AppFactories** festgelegt, welche Laufzeitumgebung tatsächlich verwendet wird. Ein Projekt enthält häufig mehrere Konfigurationen.
 
-3. **Vollständig neu bauen:** Vor jedem Ant-Build wird die gesamte Applikation in MPS vollständig neu gebaut (**Rebuild**). Ein inkrementeller Build reicht nicht aus. Dabei wird insbesondere der Java-Code aus den Modellen neu generiert. Erst nach einem erfolgreichen Rebuild wird mit dem nächsten Schritt fortgefahren.
+3. **Vollständig neu bauen:** Vor jedem Ant-Build wird die gesamte Applikation in MPS (alle dem Projekt zugeordneten MPS-Solutions) vollständig neu gebaut (**Rebuild**). Ein inkrementeller Build reicht nicht aus. Dabei wird insbesondere der Java-Code aus den Modellen neu generiert. Erst nach einem erfolgreichen Rebuild wird mit dem nächsten Schritt fortgefahren.
 
 4. **Mit Ant bauen und bereitstellen:** Anschließend wird Ant auf der Konsole ausgeführt. Die projektspezifische Builddatei und die gewählten Targets bestimmen den Build und die Bereitstellung. Sie müssen zur ausgewählten Laufzeitkonfiguration passen.
 
@@ -272,13 +274,21 @@ Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion m
 
 ## Weiterführende Dokumentation
 
-Die geplanten Detaildokumentationen beschreiben Konzepte, Möglichkeiten, Einschränkungen, Regeln, Beispiele und Best Practices der jeweiligen DSL.
+Die Detaildokumentationen beschreiben Konzepte, Möglichkeiten, Einschränkungen, Regeln, Beispiele und Best Practices der jeweiligen DSL.
 
-| DSL                              | Geplante Dokumentation | Status                  |
-| -------------------------------- | ---------------------- | ----------------------- |
-| `org.modellwerkstatt.manmap`     | `manmap.md`            | noch nicht verfügbar    |
-| `org.modellwerkstatt.objectflow` | `objectflow.md`         | noch nicht verfügbar    |
-| `org.modellwerkstatt.dataux`     | `dataux.md`            | noch nicht verfügbar    |
+### Detaildokumentationen zu DSLs
+
+| DSL                              | Geplante Dokumentation         | Status             |
+| -------------------------------- | ------------------------------ | ------------------ |
+| `org.modellwerkstatt.manmap`      | [manmap.md](manmap.md)          | initialer Entwurf   |
+| `org.modellwerkstatt.objectflow`  | [objectflow.md](objectflow.md)  | leerer Platzhalter |
+| `org.modellwerkstatt.dataux`      | [dataux.md](dataux.md)          | leerer Platzhalter |
+
+### Zusätzliche Informationen
+
+| Thema       | Dokumentation                     |
+| ----------- | --------------------------------- |
+| Konventionen bei der Modellierung | [konventionen.md](konventionen.md) |
 
 
 ## Stand der Dokumentation
