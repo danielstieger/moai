@@ -15,6 +15,8 @@
   </imports>
   <registry>
     <language id="f3061a53-9226-4cc5-a443-f952ceaf5816" name="jetbrains.mps.baseLanguage">
+      <concept id="4836112446988635817" name="jetbrains.mps.baseLanguage.structure.UndefinedType" flags="in" index="2jxLKc" />
+      <concept id="1465982738277781862" name="jetbrains.mps.baseLanguage.structure.PlaceholderMember" flags="nn" index="2tJIrI" />
       <concept id="1201370618622" name="jetbrains.mps.baseLanguage.structure.Property" flags="ig" index="2RhdJD">
         <property id="1201371481316" name="propertyName" index="2RkwnN" />
         <child id="1201371521209" name="type" index="2RkE6I" />
@@ -98,6 +100,10 @@
       </concept>
     </language>
     <language id="5aaa957f-3447-4783-b1f7-b301fa3e0394" name="org.modellwerkstatt.manmap">
+      <concept id="774207833082734171" name="org.modellwerkstatt.manmap.structure.WhereQuery" flags="ng" index="jxyYR">
+        <child id="774207833082734172" name="filter" index="jxyYK" />
+      </concept>
+      <concept id="774207833082820017" name="org.modellwerkstatt.manmap.structure.QuerySmartClosureParamDeclaration" flags="ig" index="jxRLt" />
       <concept id="774207833082573402" name="org.modellwerkstatt.manmap.structure.QueryFromMap" flags="ng" index="jybIQ">
         <property id="3572493221071471725" name="readOnly" index="HScZ5" />
         <child id="774207833082779687" name="queryOperation" index="jxX7b" />
@@ -106,6 +112,9 @@
       <concept id="774207833082557389" name="org.modellwerkstatt.manmap.structure.KeyOption" flags="ng" index="jyRCx" />
       <concept id="774207833082557394" name="org.modellwerkstatt.manmap.structure.AutoidOption" flags="ng" index="jyRCY">
         <child id="774207833082557396" name="sequenceName" index="jyRCS" />
+      </concept>
+      <concept id="2153030403787874161" name="org.modellwerkstatt.manmap.structure.RowMapperField" flags="ng" index="2_xkrf">
+        <child id="2153030403787874164" name="rowMapper" index="2_xkra" />
       </concept>
       <concept id="4421815423107469587" name="org.modellwerkstatt.manmap.structure.Repository" flags="ig" index="DXQ2w" />
       <concept id="4421815423107469588" name="org.modellwerkstatt.manmap.structure.RepositoryInstanceMethodDeclaration" flags="ig" index="DXQ2B">
@@ -134,6 +143,15 @@
       </concept>
       <concept id="871579071900248872" name="org.modellwerkstatt.manmap.structure.IMapsClassConcept" flags="ngI" index="12nLe$">
         <child id="4557816287827057767" name="atomMpig" index="3caO6$" />
+      </concept>
+      <concept id="1974135804380344167" name="org.modellwerkstatt.manmap.structure.MappingReference" flags="ng" index="3_7ulE">
+        <reference id="1974135804380645439" name="mappingSource" index="3_688M" />
+      </concept>
+    </language>
+    <language id="fd392034-7849-419d-9071-12563d152375" name="jetbrains.mps.baseLanguage.closures">
+      <concept id="1199569711397" name="jetbrains.mps.baseLanguage.closures.structure.ClosureLiteral" flags="nn" index="1bVj0M">
+        <child id="1199569906740" name="parameter" index="1bW2Oz" />
+        <child id="1199569916463" name="body" index="1bW5cS" />
       </concept>
     </language>
     <language id="ceab5195-25ea-4f22-9b92-103b95ca8c0c" name="jetbrains.mps.lang.core">
@@ -466,6 +484,15 @@
     <property role="2Lvdk3" value="InvoiceRepository" />
     <property role="3n5e7y" value="true" />
     <property role="3GE5qa" value="persistence" />
+    <node concept="2_xkrf" id="3jryzBXfPUJ" role="jymVt">
+      <node concept="1bVj0M" id="3jryzBXfPUL" role="2_xkra">
+        <node concept="3clFbS" id="3jryzBXfPUM" role="1bW5cS" />
+        <node concept="jxRLt" id="3jryzBXfPUN" role="1bW2Oz">
+          <property role="TrG5h" value="row" />
+          <node concept="2jxLKc" id="3jryzBXfPUO" role="1tU5fm" />
+        </node>
+      </node>
+    </node>
     <node concept="3Tm1VV" id="6qR6GZqeV8Y" role="1B3o_S" />
     <node concept="DXQ2B" id="6qR6GZqeVaI" role="jymVt">
       <property role="2a4t7v" value="3PtsrckEx4q/CHECKIN" />
@@ -489,6 +516,7 @@
       </node>
       <node concept="3Tm1VV" id="6qR6GZqeVaU" role="1B3o_S" />
     </node>
+    <node concept="2tJIrI" id="3jryzBXfP3H" role="jymVt" />
     <node concept="DXQ2B" id="6qR6GZqeVaV" role="jymVt">
       <property role="2a4t7v" value="3PtsrckEx4n/CHECKOUT" />
       <property role="TrG5h" value="checkout" />
@@ -529,6 +557,11 @@
           <node concept="jybIQ" id="6qR6GZqeVbm" role="3clFbG">
             <property role="HScZ5" value="true" />
             <ref role="P14SV" node="6qR6GZqeV4O" resolve="InvoiceMapping" />
+            <node concept="jxyYR" id="3jryzBXfP5k" role="jxX7b">
+              <node concept="3_7ulE" id="3jryzBXfPM4" role="jxyYK">
+                <ref role="3_688M" node="6qR6GZqeVbm" />
+              </node>
+            </node>
           </node>
         </node>
       </node>
