@@ -36,6 +36,7 @@ Die **modellwerkstatt MoWare-Werkbank** stellt die fachliche Gestaltung von Gesc
 
 **Langfristige Wartbarkeit und technische Flexibilität.** Das fachliche Wissen wird in den Modellen festgehalten. Generatoren und Laufzeitumgebungen bestimmen dessen technische Umsetzung. Diese Trennung ermöglicht es, fachliche Anforderungen und technische Infrastruktur weitgehend unabhängig weiterzuentwickeln. Ziel ist, bestehende Modelle langfristig zu nutzen und Anpassungen an Frameworks oder Ausführungsplattformen möglichst zentral umzusetzen.
 
+> **Redaktioneller Kommentar** Und welche Konsequenzen ergeben sich aus diesen Grundprenzipien konkret für die Entwicklung von Applikationen? Dies ist als Regeln festzuhalten die befolgt werden müssen!
 
 ## Zentrale Konzepte der MoWare-Werkbank
 

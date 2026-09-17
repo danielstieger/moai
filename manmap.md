@@ -26,6 +26,7 @@
 | Session-Verhalten | Ergebnisse von `get`/`where` auf einem Mapping (`QueryFromMap`) werden in die ObjectFlow-Session integriert. | Ergebnisse von `nokeystore/read-only map` (`NoKeyMapperField`) sind read-only und nicht in die Session-Identity-Map integriert. |
 | Lebensdauer | Begleitet einen fachlichen Bearbeitungs- und Speicherablauf | Wird für den Anwendungsfall geladen, verwendet und verworfen |
 
+> Ein Lesemodell kann auch mit Entities (und Value Objects) und Entity-Mapping sowie where (`QueryFromMap`) realisiert werden, sofern der Funktionsumfang, die Ausdrucksstärke des where und die Möglichkeiten im Zusammenhang mit joins, für den Anwendungsfall ausreichend sind. Übersichtlichkeit, Wartung und Pflege sind dann mitunter besser gewährleistet, die Session-Integration muss allerdings berücksichtigt werden.    
 
 ## Repositories und die vier Methodenarten
 
@@ -56,7 +57,7 @@ Der Methodentyp beschreibt die Rolle der Methode im Lebenszyklus. Er ersetzt nic
 
 ### Read-only, Checkout und Session-Identität
 
-Ergebnisse von `get`/`where` auf einem Mapping (`QueryFromMap`) werden in die Identity-Map der laufenden ObjectFlow-Session integriert. Wiederholte Read-only-Abfragen auf dieselbe Entity verwenden innerhalb dieser Session dieselbe Objektidentität. Wird versucht, eine bereits read-only oder veränderbar geladene Entity erneut auszuchecken, wirft ManMap eine `IllegalStateException`; stattdessen ist die bereits in der Session vorhandene Instanz zu verwenden.
+Ergebnisse von `get`/`where` auf einem Mapping (`QueryFromMap`) werden in die Identity-Map der laufenden ObjectFlow-Session integriert. Wiederholte Read-only-Abfragen auf dieselbe Entity liefern innerhalb einer Session eine gecachte Entität; dabei wird dieselbe Objektinstanz verwendet. Wird allerdings versucht, eine bereits veränderbar geladene Entity erneut auszuchecken, wirft ManMap eine `IllegalStateException`; stattdessen ist die bereits in der Session vorhandene Instanz zu verwenden. 
 
 Read-only schützt eine Entity nicht erst beim Speichern: Bereits eine Änderung oder das Löschen des Objekts ist unzulässig. Ein durch ein `nokeystore/read-only map` (`NoKeyMapperField`) erzeugtes Ergebnis ist ebenfalls read-only, liegt selbst aber außerhalb der Session-Identity-Map. Reguläre Entities, die über Joins eines solchen No-Key-Mappings geladen werden, können dagegen in die Session integriert sein.
 
