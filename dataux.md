@@ -164,7 +164,12 @@ Die Zielgeräte sind bei der Layoutwahl ausdrücklich mitzudenken. Eine breite D
 
 ### Menüs und Command-Aktionen
 
-Ein `Page Pane` (`PagePane`), eine `Table` (`Table`) und weitere dafür vorgesehene UI-Elemente können Menüeinträge bereitstellen.
+Ein `Page Pane` (`PagePane`) und eine `Table` (`Table`) besitzen Menüs, deren fachlicher Bezug unterschiedlich ist:
+
+- Das Menü einer Tabelle richtet sich vor allem an die gebundenen Tabellenobjekte. Seine Aktionen arbeiten typischerweise mit der aktuell ausgewählten Zeile oder mit mehreren ausgewählten Zeilen.
+- Das Menü eines `Page Pane`s gehört zum gesamten Seitenkontext. Seine Aktionen betreffen daher eher das gebundene Wurzelobjekt, den vollständigen Aggregatgraphen oder den übergreifenden Ablauf der Page.
+
+Auch für ein `Custom UI Element` (`CustomElement`) kann ein Menü modelliert werden. Ob und wie es sichtbar und bedienbar ist, hängt jedoch davon ab, ob die konkrete UI-Laufzeitkomponente diese Menüintegration unterstützt. Ein `Include` (`Include`) kann eigene Menüeinträge angeben und damit das Menü des eingebundenen Elements am jeweiligen Verwendungsort überschreiben. Das ist insbesondere beim Einbinden einer Tabelle oder eines Custom Elements nützlich.
 
 #### Konzeptlandkarte der Menüs
 
@@ -177,7 +182,15 @@ Ein `Page Pane` (`PagePane`), eine `Table` (`Table`) und weitere dafür vorgeseh
 | `Submenu` | `MenuSub` | `org.modellwerkstatt.dataux.structure.MenuSub` | Gruppiert weitere Menüeinträge |
 | `- - - -` | `MenuSeparator` | `org.modellwerkstatt.dataux.structure.MenuSeparator` | Trennt Menügruppen optisch |
 
-Eine `Action` (`MenuAction`) referenziert einen ObjectFlow-`Command`; seine erforderlichen Argumente werden als Ausdrücke übergeben. Menüaktionen arbeiten im aktuellen UI-Kontext. Bei Tabellenaktionen ist insbesondere die aktuelle Selektion des Zeilentyps relevant.
+Ein Menü beginnt üblicherweise mit einem `Submenu` (`MenuSub`). Die Oberfläche stellt diese Gruppe als Overflow-Menü dar, vergleichbar mit dem bekannten Android-Muster. Nur wenige, außergewöhnlich wichtige Aktionen sollten direkt auf der obersten Ebene stehen; zu viele Top-Level-Aktionen nehmen Platz ein und verwässern die Priorisierung.
+
+Eine `Action` (`MenuAction`) referenziert einen ObjectFlow-`Command`. Die im Command definierte Standardparametrisierung gilt auch für eine Action, sodass sie ohne explizite Argumente modelliert werden kann. Nur wenn der Aufrufkontext andere Werte verlangt, überschreibt die Action einzelne beziehungsweise alle Argumente mit Ausdrücken. Typische Quellen dafür sind:
+
+- `getSelected()` (`SelectedObject`) für das aktuell ausgewählte Objekt,
+- `getSelectedObjects()` (`SelectedList`) für die ausgewählten Objekte einer Mehrfachselektion,
+- Konstanten für fest vorgegebene Aufrufvarianten.
+
+Menüaktionen arbeiten immer im aktuellen UI-Kontext. Bei Tabellenaktionen ist deshalb die Selektion des Zeilentyps maßgeblich; bei Page-Pane-Aktionen steht eher das gebundene Wurzelobjekt oder der gesamte Seitenablauf im Vordergrund.
 
 Vor dem Modellieren einer Aktion ist deshalb zu klären:
 
@@ -186,7 +199,9 @@ Vor dem Modellieren einer Aktion ist deshalb zu klären:
 - Was geschieht bei leerer Selektion?
 - Soll die Aktion global, in einem Submenü oder nur an der fokussierten Komponente angeboten werden?
 
-Eine `Compound Action` (`MenuCompoundAction`) kann mehrere Commands verbinden. Page-Conclusions bestimmen, unter welcher Abschlussart der Folgeablauf fortgesetzt wird.
+Eine `Compound Action` (`MenuCompoundAction`) verbindet einen `GRAPH_OWNER` optional mit einem anschließenden `GRAPH_EDIT`. Wird für den `GRAPH_OWNER` unmittelbar eine Page-Conclusion angegeben, kann er ohne sichtbare UI bis zu diesem Abschluss ausgeführt werden. Zusätzlich kann die Compound Action in derselben Session und mit den vom Owner bereitgestellten Daten direkt einen `GRAPH_EDIT` starten. Sowohl für den `GRAPH_OWNER` als auch für den `GRAPH_EDIT` lässt sich optional eine automatische Conclusion angeben.
+
+Damit kann beispielsweise aus einem Suchergebnis heraus eine Aktion auf einem vollständigen Aggregat ausgeführt werden: Der `GRAPH_OWNER` öffnet das ausgewählte Objekt, lädt den Aggregatgraphen vollständig und stellt die Session bereit. Anschließend führt der `GRAPH_EDIT` die fachliche Änderung aus. Dessen Conclusion bestätigt die Änderung; die Conclusion des Owners speichert und schließt den Aggregatgraphen. Ohne nachgelagerten `GRAPH_EDIT` eignet sich dasselbe Muster auch dazu, einen `GRAPH_OWNER` vollständig ohne UI auszuführen.
 
 `PageConclusionReference` verweist dabei auf eine Abschlussart; `USER_CANCEL` (`PageConclusionOptionUserCancel`) modelliert ausdrücklich die Fortsetzung nach einem Benutzerabbruch.
 
@@ -201,50 +216,31 @@ Eine `Compound Action` (`MenuCompoundAction`) kann mehrere Commands verbinden. P
 7. Typgerechte Delegates beschreiben Felder und Tabellenspalten.
 8. Menüs rufen Commands mit Argumenten aus dem aktuellen Bindungs- und Selektionskontext auf.
 
-## Teil II - Application / Batchjob
+## Teil II – Application / Batchjob
 
-### Gemeinsamer Modulrahmen
+`AppUI Module` (`AppUiModule`) und `BatchJob Module` (`BatchJobModule`) sind ausführbare Einstiegspunkte. Die fachlichen Anwendungsfälle verbleiben in Commands, Services und Repositories.
 
-`AppUI Module` (`AppUiModule`) und `BatchJob Module` (`BatchJobModule`) sind ausführbare Root-Konzepte. Beide besitzen einen gemeinsamen Modulrahmen:
-
-| Bestandteil | Zweck |
-| --- | --- |
-| `configuration` | Optionale Standard-`OFXConfig`, insbesondere für den Start aus der Konsole |
-| konfigurierte Komponenten | Im Modul verfügbare, konfigurierte Abhängigkeiten |
-| Parameter und Variablen | Eingaben und Zustand des Modulcontainers |
-| `onStartup` | Initialisierung beim Start |
-| `onShutdown` | Aufräum- beziehungsweise Abschlusslogik |
-| `isAuthenticated` | Authentifizierung beziehungsweise Initialisierung des Benutzerkontexts |
-| Moduloptionen | Metadaten und Laufzeitoptionen, etwa Version und offizieller Name |
-
-Die Module definieren den ausführbaren Rahmen, ersetzen aber nicht die fachlichen Commands, Services oder Repositories. Diese bleiben für die Anwendungsfälle und Geschäftslogik verantwortlich.
-
-### Konzeptlandkarte des Modulrahmens
-
-| Name | Konzeptname | FQ-Name | Rolle |
-| --- | --- | --- | --- |
-| `AppUI Module` | `AppUiModule` | `org.modellwerkstatt.dataux.structure.AppUiModule` | Ausführbare interaktive Anwendung mit Navigation und Tiles |
-| `BatchJob Module` | `BatchJobModule` | `org.modellwerkstatt.dataux.structure.BatchJobModule` | Ausführbare Producer/Consumer-Hintergrundverarbeitung |
-| `isAuthenticated` | `AppAuthenticationFunction` | `org.modellwerkstatt.dataux.structure.AppAuthenticationFunction` | Prüft oder initialisiert den Benutzerkontext |
-| `VERSION` | `OptVersion` | `org.modellwerkstatt.dataux.structure.OptVersion` | Version des Moduls |
-| `OFFICIAL NAME` | `OptOfficialAppName` | `org.modellwerkstatt.dataux.structure.OptOfficialAppName` | Sichtbarer offizieller Anwendungsname |
-
+Die in beiden Konzepten noch vorhandenen Bereiche `onStartup` und `onShutdown` werden von der Laufzeit nicht mehr unterstützt. Dort modellierte Anweisungen werden nicht ausgeführt und dürfen daher nicht für Initialisierung oder Aufräumarbeiten verwendet werden. Die Referenz `configuration` dient ausschließlich dem Start mit FX8, aus MPS oder im Standalone-Betrieb; im regulär bereitgestellten Laufzeitkontext ist sie nicht die Anwendungskonfiguration.
 
 ### Application mit `AppUI Module` (`AppUiModule`)
 
-Ein `AppUI Module` (`AppUiModule`) beschreibt eine interaktive Anwendung. Neben dem gemeinsamen Rahmen besitzt es Navigation und Einstiegspunkte:
+Ein `AppUI Module` (`AppUiModule`) beschreibt eine interaktive Anwendung. Neben Benutzerkontext und Modulmetadaten besitzt es Navigation und Einstiegspunkte:
 
-- `mainMenu`, `extrasMenu` und `helpMenu` strukturieren die Command-Aufrufe.
+- `mainMenu` bildet das fachliche Start- beziehungsweise Hauptmenü.
+- `extrasMenu` nimmt ergänzende, seltener benötigte Funktionen auf.
+- `helpMenu` bündelt Hilfe- und Dokumentationsaktionen.
 - `Tile` (`AppTile`) bietet einen hervorgehobenen Einstiegspunkt mit einer `Action` (`MenuAction`) sowie optional dynamischem Text und dynamischer Farbe.
 - `tileInit` (`TileInitFunction`) initialisiert Werte, die für Tiles benötigt werden.
 - Ein optionaler Start-Command (`StartupCommandCall`) kann beim Start aufgerufen und über einen Ausdruck aktiviert werden.
 - `VERSION` (`OptVersion`) und `OFFICIAL NAME` (`OptOfficialAppName`) beschreiben Modulmetadaten.
 
+Die Funktion `isAuthenticated` (`AppAuthenticationFunction`) ist für den Benutzerkontext des AppUI-Moduls wesentlich. Sie übernimmt den von der Laufzeit gelieferten Benutzernamen in die `userEnvironment` und setzt zusätzlich die zugehörige Benutzer-ID. Diese ID wird üblicherweise über einen Service oder ein Repository zum Benutzernamen ermittelt und nicht als Konstante hinterlegt. Je nach Laufzeit stammt der Benutzername beispielsweise aus einer OAuth-Anmeldung oder aus einer Login-Maske. Authentifizierung und fachliche Berechtigungsprüfung bleiben trotzdem getrennte Aufgaben.
+
 #### Konzeptlandkarte der Anwendung
 
 | Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
-| `AppUI Module` | `AppUiModule` | `org.modellwerkstatt.dataux.structure.AppUiModule` | Anwendung mit Konfiguration, Lebenszyklus, Authentifizierung und Navigation |
+| `AppUI Module` | `AppUiModule` | `org.modellwerkstatt.dataux.structure.AppUiModule` | Anwendung mit Benutzerkontext, Navigation und Tiles |
 | `Tile` | `AppTile` | `org.modellwerkstatt.dataux.structure.AppTile` | Hervorgehobener Command-Einstieg mit optionalem Label- und Farbausdruck |
 | `tileInit` | `TileInitFunction` | `org.modellwerkstatt.dataux.structure.TileInitFunction` | Initialisiert den Tile-Zustand |
 | kein eigener Alias | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` | Bedingter Command-Aufruf beim Anwendungsstart |
@@ -260,37 +256,75 @@ AppUI Module
         -> DataUX Page Pane
 ```
 
-Konfiguration und Authentifizierung werden zentral am Modul beschrieben. Fachliche Berechtigungen müssen dennoch in den dafür vorgesehenen fachlichen Komponenten geprüft werden. Das Ausblenden eines Menüeintrags ist keine ausreichende Zugriffskontrolle.
+Der Benutzerkontext wird zentral am Modul initialisiert. Fachliche Berechtigungen müssen dennoch in den dafür vorgesehenen fachlichen Komponenten geprüft werden. Das Ausblenden eines Menüeintrags ist keine ausreichende Zugriffskontrolle.
 
 #### Tiles und dynamische Darstellung
 
-Ein `Tile` (`AppTile`) kann Beschriftung, Farbe und Aktivierung über BaseLanguage-Ausdrücke dynamisch bestimmen. Typische Anwendungsfälle für eingebettete Ausdrücke sind:
+Tiles bilden die Startoberfläche der Anwendung. Sie werden nach dem Applikationsstart sowie immer dann angezeigt, wenn kein Command mehr geöffnet beziehungsweise in Ausführung ist. Damit bieten sie zugleich Einstiegspunkte und eine kompakte Übersicht über den aktuellen Arbeitsstand.
+
+`tileInit` (`TileInitFunction`) bereitet den gemeinsamen Zustand dieser Startoberfläche vor. Die Funktion kann beispielsweise offene Aufgaben laden, Kennzahlen berechnen oder Daten für mehrere Tiles organisieren. Die einzelnen Tiles verwenden diese vorbereiteten Werte anschließend für dynamische Beschriftungen und Farben. So können sie den Anwendungsnutzern nicht nur eine Aktion anbieten, sondern unmittelbar relevante Informationen anzeigen.
+
+Ein `Tile` (`AppTile`) kann Beschriftung und Farbe über BaseLanguage-Ausdrücke dynamisch bestimmen. Typische Anwendungsfälle für eingebettete Ausdrücke sind:
 
 - dynamische Labels und Tile-Texte,
 - Farben und Hervorhebungen,
-- Aktivierungsbedingungen,
 - Argumente für Command-Aufrufe,
 - Darstellungsoptionen, die vom aktuellen Zustand abhängen.
 
 Welche Variablen sichtbar sind und welcher Ergebnistyp erwartet wird, hängt von der Einbettungsstelle ab. Ein Ausdruck in einer Tile-Funktion ist deshalb nicht automatisch im Modul-Lebenszyklus oder in einer anderen UI-Funktion gültig.
 
-Diese Ausdrücke sollen Darstellungs- und Interaktionslogik enthalten. Fachliche Berechnungen und Regeln bleiben in den zuständigen Entities, Value Objects, Services oder Commands und werden von dort aufgerufen.
+Diese Ausdrücke sollen Darstellungs- und Interaktionslogik enthalten. Fachliche Berechnungen und Regeln bleiben in den zuständigen Entities, Value Objects, Services oder Commands und werden von dort aufgerufen. `tileInit` darf solche fachlichen Fähigkeiten aufrufen und ihre Ergebnisse für die Darstellung aufbereiten.
 
 
 ### Batchjob mit `BatchJob Module` (`BatchJobModule`)
 
-Ein `BatchJob Module` (`BatchJobModule`) beschreibt eine ausführbare Hintergrundverarbeitung. Sein Kern sind ObjectFlow-Producer/Consumer-Paare. Ein Producer stellt Arbeit bereit; ein Consumer beziehungsweise ein vom Pair gestarteter Command verarbeitet sie. Mehrere Paare können in einem Modul zusammengefasst werden.
+Ein `BatchJob Module` (`BatchJobModule`) beschreibt eine ausführbare Hintergrundverarbeitung. Sein Kern sind ObjectFlow-Producer/Consumer-Paare (`OFXProducerConsumerPair`). Mehrere Paare können in einem Modul zusammengefasst und jeweils separat geplant und parallelisiert werden.
 
-Ein Batchjob besitzt eine verpflichtende Exception-Strategie. Sie legt fest, wie technische Ausnahmen oder passende Meldungen behandelt werden, beispielsweise durch verzögerte Wiederholung. Sie ersetzt keine fachliche Fehlerbehandlung innerhalb des verarbeiteten Commands.
+Jedes Pair folgt einer Inbox-Denkweise:
 
-Die Authentifizierungsfunktion ist auch strukturell Bestandteil des Batchjob-Moduls. Ihre Anpassung des Benutzerkontexts ist insbesondere relevant, wenn eine UI vorhanden ist; sie darf nicht als alleinige Sicherheitsgrenze der Hintergrundverarbeitung verstanden werden.
+1. Der Producer sucht oder berechnet Arbeitseinheiten und legt deren Entities beziehungsweise Schlüssel in eine typisierte Inbox.
+2. Die konfigurierte Anzahl von Consumern entnimmt jeweils ein Inbox-Element und verarbeitet es, häufig über einen oder mehrere `GRAPH_OWNER`-Commands.
+3. Eine Vorbedingung sollte erneut prüfen, ob die Arbeitseinheit noch verarbeitet werden muss. Das schützt unter anderem vor zwischenzeitlichen UI-Änderungen und macht Wiederholungen robuster.
+4. Nach erfolgreicher Verarbeitung wird die Arbeitseinheit abgeschlossen; fachliche Abbrüche und technische Fehlschläge werden getrennt behandelt.
 
-### Konzeptlandkarte der Batch-Optionen
+Die Inbox ist eine flüchtige In-Memory-Queue und keine persistente Jobwarteschlange. Vor jedem Producer-Lauf wird ihr bisheriger Inhalt gelöscht und aus dem Producer-Ergebnis neu aufgebaut. Bei einem Prozess- oder Jobneustart geht die Inbox ebenfalls verloren. Ein zuverlässiger Wiederanlauf setzt deshalb voraus, dass der Producer offene Arbeit erneut ermitteln kann. Die Consumer-Verarbeitung muss idempotent sein oder durch eine Vorbedingung erkennen, ob eine Arbeitseinheit bereits verarbeitet wurde.
+
+Ein Inbox-Element wird vor seiner Verarbeitung aus der Queue genommen. Nach einem technischen Fehler wird es nur dann erneut eingestellt, wenn die Exception-Strategie ausdrücklich `READD_TO_INBOX` verlangt. Ohne diese Reaktion findet kein automatischer Retry desselben Inbox-Eintrags statt. Ein unerwartet beendeter Consumer gibt sein noch bekanntes Verarbeitungselement zwar an die Inbox zurück, wird aber ohne eine entsprechende Restart-Strategie nicht automatisch ersetzt.
+
+Der Producer läuft nur, wenn kein Consumer des Pairs mehr arbeitet. Dadurch entsteht pro Durchlauf ein abgegrenzter Arbeitsvorrat. Bei mehreren Consumern werden die Elemente parallel verarbeitet; die Reihenfolge ihres Abschlusses ist dann nicht definiert.
+
+Ein Pair darf auch nur aus einem Producer bestehen, wenn der gestartete Command die Arbeit vollständig erledigt und keine einzelnen Inbox-Elemente nachbearbeitet werden müssen. Ein solches Producer-only-Pair darf seine Inbox nicht füllen: Enthält sie Elemente, obwohl kein Consumer vorhanden ist, verwirft die Laufzeit sie wieder. `null`-Elemente aus einem Producer-Ergebnis werden ebenfalls nicht übernommen.
+
+Producer und Consumer liefern einen Statustext zurück, der für Protokollierung und Monitoring verwendet wird. Insbesondere beim Consumer ist ein leerer oder nur aus Leerraum bestehender Status ein Laufzeitfehler, weil die Arbeitseinheit dann als nicht behandelt gilt.
+
+Auch ein Batchjob benötigt einen konsistenten technischen Benutzerkontext. Seine Authentifizierungsfunktion setzt deshalb Benutzername und Benutzer-ID in der `userEnvironment`; die Benutzer-ID wird wie bei einer App über einen Service oder ein Repository ermittelt. Der Benutzerkontext dient der Ausführung und Nachvollziehbarkeit, ist aber keine alleinige Sicherheitsgrenze.
+
+#### Exception-Strategien und Wiederanlauf
+
+Ein Batchjob besitzt eine verpflichtende Exception-Strategie (`OFXExceptionStrategy`). Ihre Regeln werden der Reihe nach geprüft; die letzte Regel muss eine Default-Strategie sein. Eine Regel kann mehrere Laufzeitreaktionen kombinieren:
+
+| Reaktion | Wirkung |
+| --- | --- |
+| `READD_TO_INBOX` | Stellt das fehlgeschlagene Element erneut in die Inbox ein |
+| `DELAY_EXECUTION` | Wartet vor der weiteren Verarbeitung beziehungsweise Neuplanung |
+| `CLEAR_INBOX` | Verwirft alle noch wartenden Inbox-Elemente und veranlasst eine Neuplanung |
+| `CONSUMER_RESTART` | Beendet den betroffenen Consumer und startet einen Ersatz-Consumer |
+| `JOB_SHUTDOWN` / `VM_SHUTDOWN` | Wählt den Shutdown-Pfad; eine weitergehende VM-Reaktion muss die umgebende Laufzeit übernehmen |
+| `JOB_RESTART` / `VM_RESTART` | Wählt den Shutdown-Pfad mit beabsichtigtem, extern auszuführendem Neustart |
+| `SILENT_NO_LOG` | Unterdrückt die übliche Problemprotokollierung; der Vorgang bleibt als nicht protokollierte Exception gezählt |
+
+Bei mehreren gleichzeitig fehlschlagenden Consumern wartet die Laufzeit, bis kein Consumer mehr arbeitet, und verwendet dann die längste angeforderte Verzögerung. Nach einem Producerfehler wird eine positive Wiederanlaufzeit auf mindestens fünf Minuten angehoben. Ein fachlicher Abbruch wird separat als *canceled* gezählt: Er ist kein technischer Fehler und stellt das betroffene Element nicht automatisch erneut in die Inbox.
+
+**Aktueller Laufzeitstand:** `JOB_RESTART` und `VM_RESTART` führen zwar in den Shutdown-Pfad, die anschließende Restart-Auswertung ist in der untersuchten Implementierung jedoch nicht ausgeführt. Ohne einen externen Prozess- oder Container-Restart darf deshalb kein automatischer Neustart angenommen werden.
+
+Die Exception-Strategie ersetzt keine fachliche Problembehandlung innerhalb des verarbeiteten Commands. Die Laufzeit setzt außerdem kein fachliches Verarbeitungstimeout für ein einzelnes Inbox-Element. Blockierende Zugriffe auf externe Datenbanken, Dateitransfers oder entfernte Dienste müssen daher eigene Verbindungs- und Lese-Timeouts besitzen; andernfalls können sie einen Consumer dauerhaft binden und auch das Herunterfahren verzögern.
+
+#### Konzeptlandkarte der Batch-Optionen
 
 | Name | Konzeptname | FQ-Name | Bedeutung |
 | --- | --- | --- | --- |
 | `CRON` | `OptCronPairExp` | `org.modellwerkstatt.dataux.structure.OptCronPairExp` | Zeitplan für ein referenziertes Producer/Consumer-Paar |
-| `DELAY` | `OptDelayPair` | `org.modellwerkstatt.dataux.structure.OptDelayPair` | Wartezeit nach verarbeiteter Arbeit für ein referenziertes Paar |
+| `DELAY` | `OptDelayPair` | `org.modellwerkstatt.dataux.structure.OptDelayPair` | Wartezeit zwischen vollständigen Durchläufen eines referenzierten Pairs |
 | `CONSUMERS` | `OptNumConsumersPair` | `org.modellwerkstatt.dataux.structure.OptNumConsumersPair` | Anzahl paralleler Consumer eines referenzierten Paars |
 | `DEPENDENT_CONSECUTIVE` | `OptBatchDependent` | `org.modellwerkstatt.dataux.structure.OptBatchDependent` | Paare werden abhängig und nacheinander behandelt |
 | `RUN_IN_CONSOLE` | `OptRunInConsole` | `org.modellwerkstatt.dataux.structure.OptRunInConsole` | Start ohne instanziierte UI |
@@ -300,14 +334,51 @@ Die Authentifizierungsfunktion ist auch strukturell Bestandteil des Batchjob-Mod
 
 `CRON` (`OptCronPairExp`) beschreibt die Felder Sekunde, Minute, Stunde, Tag des Monats, Monat und Wochentag. `CRON`, `DELAY` und `CONSUMERS` referenzieren jeweils ein konkretes Pair. Bei mehreren Paaren muss daher jede Option bewusst dem richtigen Pair zugeordnet werden.
 
+Aus diesen Optionen ergeben sich drei typische Betriebsweisen:
+
+- **Zeitpunktausführung:** Ein `CRON`-Ausdruck startet den Producer zu einem bestimmten Zeitpunkt; die Consumer arbeiten die dadurch gefüllte Inbox ab.
+- **Zeitfenster:** `DELAY` schaltet das Pair in den kontinuierlichen Modus und legt den Abstand zwischen vollständigen Durchläufen fest. Zusätzliche `CRON`-Ausdrücke begrenzen diesen Modus auf Zeitfenster. Außerhalb des Fensters erhalten Consumer keine neue Arbeit; laufende Verarbeitungen dürfen enden und die restliche Inbox bleibt bis zum nächsten Fenster erhalten, solange der Prozess nicht neu gestartet wird.
+- **Abhängige Folge:** Mit `DEPENDENT_CONSECUTIVE` werden mehrere Paare in ihrer modellierten Reihenfolge ausgeführt. Ein nachfolgendes Pair beginnt erst, wenn seine Vorgänger erfolgreich abgeschlossen sind. Nur das erste Pair darf `CRON` oder `DELAY` besitzen. Nach einem Fehler oder dem Verlassen des Zeitfensters beginnt die Kette beim erneuten Start wieder mit dem ersten Pair.
+
+Im zeitpunktspezifischen Modus muss der CRON-Ausdruck mit einem konkreten Sekundenwert beginnen. Im Zeitfenstermodus beginnen die Ausdrücke dagegen mit einem Sekunden-Wildcard. Wird `DELAY` ohne `CRON` verwendet, läuft das Pair grundsätzlich ohne tägliche Zeitfensterbegrenzung. Die Auswertung verwendet die Standardzeitzone der JVM. Beim Jobstart wird eine Abweichung von mehr als zehn Minuten zwischen JVM- und Datenbankzeit protokolliert, sie verhindert den Start jedoch nicht.
+
+`CONSUMERS` steuert die Parallelität pro Pair. Eine Erhöhung beschleunigt die Abarbeitung nur, wenn die Verarbeitung parallel ausführbar ist und die verwendeten externen Systeme sowie Sperrstrategien dies vertragen. `RUN_IN_CONSOLE` unterdrückt die UI-Instanziierung; `OptIncludeBatchUi` bindet umgekehrt einen Batchjob in den UI-Kontext eines Moduls ein.
+
 Ein typischer Batchablauf lautet:
 
-1. Das Modul startet mit seiner Konfiguration und führt gegebenenfalls `onStartup` aus.
-2. Ein CRON-Ausdruck oder ein anderer Trigger aktiviert ein Producer/Consumer-Paar.
-3. Der Producer ermittelt Arbeitseinheiten beziehungsweise Schlüssel.
-4. Der Consumer oder ein aufgerufener Command verarbeitet die Arbeit.
-5. Die Exception-Strategie entscheidet über die technische Fehlerfolge.
-6. Beim Ende des Moduls wird `onShutdown` ausgeführt.
+1. Ein CRON-Ausdruck, ein manueller Start oder ein anderer Trigger aktiviert ein Producer/Consumer-Paar.
+2. Der Producer ermittelt Arbeitseinheiten beziehungsweise Schlüssel und füllt die Inbox.
+3. Die konfigurierte Zahl von Consumern entnimmt Arbeitseinheiten aus der Inbox.
+4. Der Consumer prüft die Vorbedingung und verarbeitet die Arbeit über die vorgesehenen Commands.
+5. Bei Erfolg wird das Element abgeschlossen; bei einer technischen Ausnahme bestimmt die Exception-Strategie die Laufzeitreaktion.
+6. Bei `DEPENDENT_CONSECUTIVE` wird nach erfolgreichem Abschluss mit dem nächsten Pair fortgefahren.
+
+#### Manuelle Ausführung und Konsolenbetrieb
+
+Die Laufzeit bietet pro Pair eine Operation zum manuellen Start des Producers. Sie stellt lediglich eine asynchrone Startnachricht ein; ihre unmittelbare Rückmeldung bedeutet noch nicht, dass der Producer oder das Pair abgeschlossen wurde. Ein manueller Lauf:
+
+- darf das CRON-Zeitfenster umgehen,
+- leert die Inbox und baut sie neu auf,
+- wird nicht nachgeholt, wenn zum Ausführungszeitpunkt noch Consumer arbeiten,
+- setzt bei einem Verarbeitungsfehler die restliche manuelle Inbox zurück und plant keinen automatischen Retry,
+- führt im abhängigen Modus nur das ausdrücklich gestartete Pair aus und setzt die Pair-Kette nicht automatisch fort.
+
+Ein manueller Producer-Lauf sollte deshalb nur bei einem eindeutig ruhenden Pair gestartet werden. Das Stoppen des Jobtimers verhindert neue zeitgesteuerte Starts, beendet aber keine bereits laufende Producer- oder Consumer-Verarbeitung. Das Deaktivieren eines Producers betrifft automatische Starts; ein manueller Start bleibt möglich. Das Zurücksetzen des Timerzustands macht ältere geplante Nachrichten ungültig und erzeugt die Zeitplanung neu.
+
+Beim Start über die Konsolen-Laufzeit werden alle Paare als eine abhängige Kette genau einmal ausgeführt. Unabhängig von der modellierten Consumerzahl verwendet jedes Pair dabei nur einen Consumer. Dieser Modus eignet sich daher für kontrollierte Einmalläufe, ist aber kein realistischer Lasttest für die konfigurierte Parallelität des Serverbetriebs.
+
+#### Monitoring und Betriebsdiagnose
+
+Die Job-Laufzeit stellt für jedes Pair unter anderem folgende Werte bereit:
+
+- aktuelle Inbox-Größe, Zeitpunkt und Dauer des letzten Fillups,
+- Producerstatus, letzte Aktion und nächste geplante Läufe,
+- erfolgreiche, fachlich abgebrochene und technisch fehlgeschlagene Verarbeitungen,
+- durchschnittliche und maximale Laufzeiten von Producer und Consumern,
+- protokollierte sowie durch `SILENT_NO_LOG` nicht protokollierte Exceptions,
+- Jobname, Version, technischer Benutzer, Verbindungsziel und Laufzeitzeitzone.
+
+Das HTML-Dashboard dient der lesenden Betriebsübersicht. Die aktiven Operationen — Producer manuell starten, Producer aktivieren oder deaktivieren, Jobtimer stoppen oder starten, Timerzustand neu aufbauen und detailliertes Tracing aktivieren — werden über die JMX-Schnittstelle angeboten. Ein Timerstopp oder deaktivierter Producer ist deshalb im Monitoring von einem fachlich leeren Lauf und von einem technischen Fehler zu unterscheiden.
 
 
 ### Wahl zwischen Application und Batchjob
@@ -350,14 +421,21 @@ Beide Modulformen können dieselben fachlichen Services und Repositories verwend
 - **Fachlogik in UI-Ausdrücke verschieben:** Dynamische Labels und Farben sind UI-Aufgaben; Geschäftsregeln gehören in fachliche Komponenten.
 - **Command-Argumente aus dem falschen Selektionskontext bilden:** Tabellenaktionen benötigen häufig die selektierte Zeile und nicht das Parent-Objekt des `Page Pane`s.
 - **Batchoption keinem Pair eindeutig zuordnen:** `CRON`, `DELAY` und `CONSUMERS` referenzieren jeweils ein konkretes Producer/Consumer-Paar.
+- **`DELAY` als Pause zwischen Inbox-Elementen verstehen:** Die Verzögerung liegt zwischen vollständigen Pair-Durchläufen; innerhalb einer gefüllten Inbox arbeiten freie Consumer ohne diese Pause weiter.
+- **Die Inbox als persistent ansehen:** Ihr Inhalt existiert nur im Arbeitsspeicher. Nach einem Neustart muss der Producer noch offene Arbeit erneut finden können.
+- **Automatischen Retry voraussetzen:** Ein fehlgeschlagenes Element wird nur mit `READD_TO_INBOX` erneut eingestellt. `CLEAR_INBOX` verwirft auch die übrigen wartenden Elemente.
+- **Manuellen Start während laufender Consumer auslösen:** Die Anforderung wird in diesem Zustand nicht für später vorgemerkt. Vor dem Start muss der Pair-Status geprüft werden.
+- **Parallele Consumer bei reihenfolgeabhängiger Verarbeitung verwenden:** Mehrere Consumer schließen Elemente nicht zwingend in Inbox-Reihenfolge ab.
+- **Externe Aufrufe ohne eigene Timeouts ausführen:** Die Job-Laufzeit begrenzt die Bearbeitungszeit eines einzelnen Inbox-Elements nicht zuverlässig.
+- **Automatischen Prozessneustart aus `JOB_RESTART` oder `VM_RESTART` ableiten:** Der aktuelle Laufzeitstand leitet den Shutdown ein, führt den beabsichtigten Restart aber nicht selbst aus.
+- **Serverzeitzone übersehen:** CRON-Ausdrücke werden in der Standardzeitzone der JVM ausgewertet.
 - **Exception-Strategie als fachliche Fehlerbehandlung behandeln:** Sie steuert den technischen Umgang mit Ausnahmen, nicht die Domänenentscheidung.
 - **Desktop-Layout unverändert mobil verwenden:** Unterschiedliche Geräteklassen benötigen häufig eigene `Page Pane`s oder Anwendungsmodule.
 - **Name und Konzeptname verwechseln:** Name, Konzeptname und FQ-Name nach der eingangs festgelegten Schreibweise unterscheiden.
 
-
 ## Konzeptindex für Agenten
 
-Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, nicht alle Konzepte der Sprache. Für JSON-Blueprints sind die FQ-Namen zu verwenden. Vor einer Modelländerung müssen Referenzen, Child-Roles, Kardinalitäten und zulässige Optionen über MPS MCP im aktuellen Projekt aufgelöst werden.
+Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konzepte sowie die unmittelbar benötigten ObjectFlow-Konzepte, nicht alle Konzepte der Sprachen. Für JSON-Blueprints sind die FQ-Namen zu verwenden. Vor einer Modelländerung müssen Referenzen, Child-Roles, Kardinalitäten und zulässige Optionen über MPS MCP im aktuellen Projekt aufgelöst werden.
 
 | Themenbereich | Name | Konzeptname | FQ-Name |
 | --- | --- | --- | --- |
@@ -416,6 +494,8 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 | Menü | `USER_CANCEL` | `PageConclusionOptionUserCancel` | `org.modellwerkstatt.dataux.structure.PageConclusionOptionUserCancel` |
 | Menü | `Submenu` | `MenuSub` | `org.modellwerkstatt.dataux.structure.MenuSub` |
 | Menü | `- - - -` | `MenuSeparator` | `org.modellwerkstatt.dataux.structure.MenuSeparator` |
+| Menüargument | `getSelected()` | `SelectedObject` | `org.modellwerkstatt.objectflow.structure.SelectedObject` |
+| Menüargument | `getSelectedObjects()` | `SelectedList` | `org.modellwerkstatt.objectflow.structure.SelectedList` |
 | Application | `AppUI Module` | `AppUiModule` | `org.modellwerkstatt.dataux.structure.AppUiModule` |
 | Application | `Tile` | `AppTile` | `org.modellwerkstatt.dataux.structure.AppTile` |
 | Application | `tileInit` | `TileInitFunction` | `org.modellwerkstatt.dataux.structure.TileInitFunction` |
@@ -424,6 +504,8 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 | Moduloption | `VERSION` | `OptVersion` | `org.modellwerkstatt.dataux.structure.OptVersion` |
 | Moduloption | `OFFICIAL NAME` | `OptOfficialAppName` | `org.modellwerkstatt.dataux.structure.OptOfficialAppName` |
 | Batchjob | `BatchJob Module` | `BatchJobModule` | `org.modellwerkstatt.dataux.structure.BatchJobModule` |
+| Batchjob | Producer/Consumer-Paar | `OFXProducerConsumerPair` | `org.modellwerkstatt.objectflow.structure.OFXProducerConsumerPair` |
+| Batchjob | Exception-Strategie | `OFXExceptionStrategy` | `org.modellwerkstatt.objectflow.structure.OFXExceptionStrategy` |
 | Batchoption | `CRON` | `OptCronPairExp` | `org.modellwerkstatt.dataux.structure.OptCronPairExp` |
 | Batchoption | `DELAY` | `OptDelayPair` | `org.modellwerkstatt.dataux.structure.OptDelayPair` |
 | Batchoption | `CONSUMERS` | `OptNumConsumersPair` | `org.modellwerkstatt.dataux.structure.OptNumConsumersPair` |
@@ -434,4 +516,4 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 
 ## Quellen für die Modellarbeit
 
-Die fachliche Beschreibung in diesem Dokument beruht auf den zusammengetragenen Hintergrundinformationen, der live geladenen DataUX-Sprachdefinition und repräsentativen geladenen Verbrauchermodellen. Sie ersetzt nicht die Prüfung der geladenen Sprache. Für konkrete Modelländerungen gelten die MPS-Sprachdefinition, ihre Constraints, die Typprüfung und die Validierung als technische Quelle der Wahrheit.
+Die fachliche Beschreibung in diesem Dokument beruht auf den zusammengetragenen Hintergrundinformationen, der live geladenen DataUX-Sprachdefinition, repräsentativen geladenen Verbrauchermodellen und der untersuchten generierten Implementierung der ObjectFlow-Job-Laufzeit. Generierter Java-Code ist dabei eine Quelle für das aktuelle Laufzeitverhalten, darf aber nicht direkt geändert werden. Für konkrete Modelländerungen gelten die MPS-Sprachdefinition, ihre Constraints, die Typprüfung und die Validierung als technische Quelle der Wahrheit.
