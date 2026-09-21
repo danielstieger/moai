@@ -497,8 +497,3 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konz
 | Batchoption | `DEPENDENT_CONSECUTIVE` | `OptBatchDependent` | `org.modellwerkstatt.dataux.structure.OptBatchDependent` |
 | Batchoption | `RUN_IN_CONSOLE` | `OptRunInConsole` | `org.modellwerkstatt.dataux.structure.OptRunInConsole` |
 | Batchoption | kein eigener Alias | `OptIncludeBatchUi` | `org.modellwerkstatt.dataux.structure.OptIncludeBatchUi` |
-
-
-## Quellen für die Modellarbeit
-
-Die fachliche Beschreibung in diesem Dokument beruht auf den zusammengetragenen Hintergrundinformationen, der live geladenen DataUX-Sprachdefinition, repräsentativen geladenen Verbrauchermodellen und der untersuchten generierten Implementierung der ObjectFlow-Job-Laufzeit. Generierter Java-Code ist dabei eine Quelle für das aktuelle Laufzeitverhalten, darf aber nicht direkt geändert werden. Für konkrete Modelländerungen gelten die MPS-Sprachdefinition, ihre Constraints, die Typprüfung und die Validierung als technische Quelle der Wahrheit.
