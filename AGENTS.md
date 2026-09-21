@@ -1,4 +1,5 @@
 # Agents Guide for This MPS Project
+ 
 
 This is a JetBrains MPS language project. All source of truth lives in MPS models, language definitions, and generators. Use this file as the entry point.
 

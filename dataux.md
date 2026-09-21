@@ -20,17 +20,17 @@ Die Sprache beschreibt vor allem, **welche fachlichen Daten wie visualisiert wer
 | Fachliche Daten | Gebundene Entity- oder DTO-Instanzen und deren Properties | Parameter, Variablen, konfigurierte Komponenten und Laufzeitkonfiguration |
 
 
-## Teil I - UI-Modellierung
+## Teil I – UI-Modellierung
 
-### Pages und `Page Pane`s (`PagePane`)
+### Page Panes
 
 Eine ObjectFlow-`Page` gehört zu einem `Command` und beschreibt eine Seite seines Interaktionsablaufs. Ein `Page Pane` (`PagePane`) ist das Gegenstück auf der UI-Seite: Es beschreibt den sichtbaren Inhalt dieser Page.
 
-Ein `Page Pane` (`PagePane`) besitzt genau ein oberstes UI-Element. Dieses kann unmittelbar ein `Delegate Form` (`DelegateForm`) oder eine `Table` (`Table`) sein. Sollen mehrere Elemente kombiniert werden, bildet ein `Grid Layout` (`GridLayout`) oder `Tab Layout` (`TabLayout`) das oberste Element. Zusätzlich kann das `Page Pane` Optionen und Menüeinträge enthalten.
+Ein `Page Pane` besitzt genau ein oberstes UI-Element. Dieses kann unmittelbar ein `Delegate Form` (`DelegateForm`) oder eine `Table` (`Table`) sein. Sollen mehrere Elemente kombiniert werden, bildet ein `Grid Layout` (`GridLayout`) oder `Tab Layout` (`TabLayout`) das oberste Element. Zusätzlich kann das `Page Pane` Menüeinträge enthalten.
 
-Die Page stellt die Daten bereit; das `Page Pane` stellt sie dar. Eine UI-Bindung lädt keine Daten nach. Benötigte Referenzen und Listen müssen bereits durch den Command beziehungsweise seine Repositories geladen und an die Page übergeben worden sein - eine wesentliche Einschränkung der Architektur.  
+Die Page stellt die Daten bereit; das `Page Pane` stellt sie dar. Eine UI-Bindung lädt keine Daten nach. Benötigte Referenzen und Listen müssen bereits durch den Command beziehungsweise seine Repositories geladen und an die Page übergeben worden sein.
 
-### Konzeptlandkarte der UI-Komposition
+#### Konzeptlandkarte der UI-Komposition
 
 | Name | Konzeptname | FQ-Name | Rolle |
 | --- | --- | --- | --- |
@@ -38,48 +38,46 @@ Die Page stellt die Daten bereit; das `Page Pane` stellt sie dar. Eine UI-Bindun
 | `Delegate Form` | `DelegateForm` | `org.modellwerkstatt.dataux.structure.DelegateForm` | Formular aus typgerechten Property-Delegates |
 | `Table` | `Table` | `org.modellwerkstatt.dataux.structure.Table` | Tabelle für eine gebundene Liste aus Entities oder DTOs |
 | `Grid Layout` | `GridLayout` | `org.modellwerkstatt.dataux.structure.GridLayout` | Raster aus Zeilen und Spalten mit einem oder mehreren UI-Elementen |
-| `Tab Layout` | `TabLayout` | `org.modellwerkstatt.dataux.structure.TabLayout` | Container für mehrerer Tabs |
+| `Tab Layout` | `TabLayout` | `org.modellwerkstatt.dataux.structure.TabLayout` | Container für mehrere Tabs |
 | `Tab` | `Tab` | `org.modellwerkstatt.dataux.structure.Tab` | Beschrifteter Tab mit genau einem UI-Element |
 | `Include` | `Include` | `org.modellwerkstatt.dataux.structure.Include` | Einbindung eines bereits deklarierten bindbaren UI-Elements |
 | `Custom UI Element` | `CustomElement` | `org.modellwerkstatt.dataux.structure.CustomElement` | Projektspezifisches UI-Element mit eigener Implementierungsklasse |
 
-`Delegate Form` (`DelegateForm`), `Table` (`Table`), `Grid Layout` (`GridLayout`), `Tab Layout` (`TabLayout`) und `Custom UI Element` (`CustomElement`) können sowohl innerhalb eines `Page Pane`s als auch als eigenständige, wiederverwendbare Root Nodes deklariert werden.
+`Delegate Form`, `Table`, `Grid Layout`, `Tab Layout` und `Custom UI Element` können sowohl innerhalb eines `Page Pane`s als auch als eigenständige, wiederverwendbare Root Nodes deklariert werden.
 
+#### Datenbindung und Selektion
 
-### Datenbindung und Selektion
+DataUX bindet UI-Komponenten an fachliche Typen und deren Properties. Ein bindbares Element spezifiziert einen Entity- oder DTO-Typ (`boundClassifier`) und optional eine Property dieses Typs (`boundProperty`). Fehlt eine explizite Bindung, kann der Kontext vom umgebenden Element übernommen werden.
 
-DataUX bindet UI-Komponenten an fachliche Typen und deren Properties. Ein bindbares Element spezifiziert einen Entity- / DTO-Typen (`boundClassifier`) und optional eine Property dieses Typen (`boundProperty`). Fehlt eine explizite Bindung, kann der Kontext vom umgebenden Element übernommen werden.
+Jedes `Page Pane` besitzt einen gemeinsamen **Selektionskontext**. Für jeden darin verwendeten Entity- oder DTO-Typ kann eine aktuell selektierte Instanz existieren. Diese Selektion gehört nicht einer einzelnen Tabelle oder einem einzelnen Formular, sondern steht allen Komponenten des `Page Pane`s zur Verfügung.
 
-Zusätzlich besitzt jedes `Page Pane` (`PagePane`) einen gemeinsamen **Selektionskontext**. Für jeden darin verwendeten Entity- oder DTO-Typ kann eine aktuell selektierte Instanz existieren. Diese Selektion gehört nicht einer einzelnen Tabelle oder einem einzelnen Formular, sondern steht allen Komponenten des `Page Pane`s zur Verfügung.
+##### Typbindung
 
-#### Typbindung
+Eine Bindung nur an einen Entity- oder DTO-Typ verwendet grundsätzlich die aktuelle Selektion dieses Typs. Ein an `Rechnung` gebundenes `Delegate Form` zeigt beispielsweise die aktuell selektierte `Rechnung`.
 
-Eine Bindung nur an einen Entity- oder DTO-Typ verwendet grundsätzlich die aktuelle Selektion dieses Typs. Ein an `Rechnung` gebundenes `Delegate Form` (`DelegateForm`) zeigt beispielsweise die aktuell selektierte `Rechnung`.
+Wird einem `Page Pane` auf Root-Ebene genau eine Instanz seines Root-Typs bereitgestellt – unmittelbar oder als Liste mit genau einem Element –, ist diese Instanz automatisch selektiert. Ein direkt an den Root-Typ gebundenes Formular kann sie deshalb ohne eine Tabelle mit `SELECT FIRST` unmittelbar anzeigen. Diese automatische Selektion gilt für das Root-Objekt; eine untergeordnete Liste wird nicht allein deshalb selektiert, weil sie nur ein Element enthält.
 
-Wird einem `Page Pane` auf Root-Ebene genau eine Instanz seines Root-Typs bereitgestellt - unmittelbar oder als Liste mit genau einem Element -, ist diese Instanz automatisch selektiert. Ein direkt an den Root-Typ gebundenes Formular kann sie deshalb unmittelbar anzeigen (Ohne Tabelle mit SELECT_FIRST). Diese automatische Selektion gilt für das Root-Objekt; eine untergeordnete Liste wird nicht allein deshalb selektiert, weil sie nur ein Element enthält.
+##### Property-Bindung
 
-#### Property-Bindung
-
-Eine Property-Bindung wird auf der aktuellen Selektion ihres Eigentümertyps ausgewertet. Bei einer selektierten `Rechnung` bedeutet die Bindung `Rechnung.kunde` das `kunde`-Objekt genau dieser Rechnung. Ein `Delegate Form` (`DelegateForm`) kann so an eine Property gebunden werden, deren Typ eine Entity, ein DTO oder ein Value Object ist.
+Eine Property-Bindung wird auf der aktuellen Selektion ihres Eigentümertyps ausgewertet. Bei einer selektierten `Rechnung` bezeichnet die Bindung `Rechnung.kunde` das `kunde`-Objekt genau dieser Rechnung. Ein `Delegate Form` kann so an eine Property gebunden werden, deren Typ eine Entity, ein DTO oder ein Value Object ist.
 
 Das Formular liest diesen Bindungskontext, erzeugt oder verändert aber keine Selektion. Ein an `Rechnung.kunde` gebundenes Formular hängt daher nicht an einer eventuell vorhandenen `Kunde`-Selektion, sondern zeigt ausschließlich den `kunde` der aktuell selektierten `Rechnung`.
 
-#### Tabellenbindung und Selektion
+##### Tabellenbindung und Selektion
 
-Eine `Table` (`Table`) benötigt eine Liste von Entities oder DTOs. Listen von Value Objects sind kein Tabellen-Bindungsmodell in DataUX.
+Eine `Table` benötigt eine Liste von Entities oder DTOs. Listen von Value Objects sind kein Tabellen-Bindungsmodell in DataUX.
 
 Ist der Zeilentyp mit dem Root-Typ des `Page Pane`s identisch, kann die Tabelle direkt an diesen Typ gebunden werden und verwendet den Root-Datenbestand. Soll die Tabelle Objekte eines anderen Typs anzeigen, wird sie an eine Listen-Property eines selektierten Objekts gebunden. Eine Tabelle für `Rechnung.positionen` zeigt somit die Positionen der aktuell selektierten Rechnung; ihr Zeilentyp ist `Rechnungsposition`, nicht `Rechnung`.
 
 Die Auswahl einer Tabellenzeile bestimmt die gemeinsame Selektion des Zeilentyps. Mit `SELECT FIRST` (`SelectFirstFOption`) kann eine Tabelle beim initialen Anzeigen das erste Element selektieren und so eine abhängige Detaildarstellung initialisieren.
 
-Mehrere Tabellen mit demselben Zeilentyp teilen dieselbe Selektion. Enthält eine andere Tabelle dieselbe Laufzeitinstanz, markiert sie diese ebenfalls. Enthält sie die Instanz nicht, zeigt sie keine ausgewählte Zeile; die gemeinsame Selektion bleibt erhalten. Maßgeblich ist dieselbe Laufzeitinstanz, nicht nur eine gleiche fachliche ID oder fachliche Gleichheit (durch die Session-Integration von Entitäten/DTOs wird ohnedies auf Instanzebene Eindeutigkeit sichergestellt).
+Mehrere Tabellen mit demselben Zeilentyp teilen dieselbe Selektion. Enthält eine andere Tabelle dieselbe Laufzeitinstanz, markiert sie diese ebenfalls. Enthält sie die Instanz nicht, zeigt sie keine ausgewählte Zeile; die gemeinsame Selektion bleibt erhalten. Maßgeblich ist dieselbe Laufzeitinstanz, nicht nur eine gleiche fachliche ID oder fachliche Gleichheit. Durch die Session-Integration von Entities und DTOs ist die Instanz innerhalb der Session eindeutig.
 
-#### Leere Selektion
+##### Leere Selektion
 
 Für einen Entity- oder DTO-Typ kann keine Instanz selektiert sein. Ein ausschließlich an diesen Typ gebundenes Formular zeigt dann keine Daten. Tabellen können ihre Zeilen weiterhin darstellen, obwohl keine Zeile ausgewählt ist.
 
-
-### Master-Detail
+##### Master-Detail
 
 Der gemeinsame Selektionskontext ermöglicht Master-Detail-Oberflächen ohne explizite Synchronisationslogik zwischen den Komponenten. Eine Rechnungsseite kann beispielsweise aus einer Tabelle der `Rechnung`-Objekte, einer Tabelle für `Rechnung.positionen` und einem Formular für die ausgewählte `Rechnungsposition` bestehen.
 
@@ -89,14 +87,13 @@ Die Bindungskette lautet sinngemäß:
 
 Das Detailformular muss nicht wissen, aus welcher Tabelle die Selektion stammt. Auch beim Wechsel des Masters ist keine zusätzliche Synchronisationslogik erforderlich; die Laufzeit wertet abhängige Bindungen und Selektionen im gemeinsamen Kontext aus.
 
-
 ### Formulare, Tabellen und Delegates
 
 Ein `Delegate Form` (`DelegateForm`) beschreibt ein Formular. Seine Bindung bestimmt das dargestellte Objekt, seine Delegates bestimmen die sichtbaren Felder und seine Spaltengewichte deren horizontale Aufteilung. Eine `Table` (`Table`) beschreibt eine Objektliste; ihre Delegates bilden die Spalten.
 
 Der Delegate-Typ folgt dem fachlichen Property-Typ. Ein Delegate ersetzt keine fachliche Validierung. Fachliche Regeln gehören in das Domänenmodell beziehungsweise in Services und Commands; Delegate- und Formularoptionen steuern Darstellung und Interaktion.
 
-### Konzeptlandkarte der Delegates
+#### Konzeptlandkarte der Delegates
 
 | Name | Konzeptname | FQ-Name | Typischer Zweck |
 | --- | --- | --- | --- |
@@ -107,48 +104,55 @@ Der Delegate-Typ folgt dem fachlichen Property-Typ. Ein Delegate ersetzt keine f
 | `DateTime (Date Only)` | `DateTimeDateOnlyDelegate` | `org.modellwerkstatt.dataux.structure.DateTimeDateOnlyDelegate` | Nur Datumskomponente eines DateTime-Werts |
 | `LocalDate` | `LocalDateDelegate` | `org.modellwerkstatt.dataux.structure.LocalDateDelegate` | Lokales Datum |
 | `Status` | `StatusDelegate` | `org.modellwerkstatt.dataux.structure.StatusDelegate` | ObjectFlow-Statuswert |
-| `Reference` | `ReferenceDelegate` | `org.modellwerkstatt.dataux.structure.ReferenceDelegate` | Referenz auf ein fachliches Objekt § WICHTIG: kurz reference description `scopeText` das ergibt dann den Text im Dropdown §  |
-| `Image` | `ImageDelegate` | `org.modellwerkstatt.dataux.structure.ImageDelegate` | Bilddarstellung - nur im Formular |
-| `Upload` | `UploadDelegate` | `org.modellwerkstatt.dataux.structure.UploadDelegate` | Datei-Upload - nur im Formular|
-| `Dummy` | `DummyDelegate` | `org.modellwerkstatt.dataux.structure.DummyDelegate` | Platzhalter in Formularen zur Ordnung  |
+| `Reference` | `ReferenceDelegate` | `org.modellwerkstatt.dataux.structure.ReferenceDelegate` | Referenz auf ein fachliches Objekt; die mit `scopeText` festgelegte Kurzbeschreibung bestimmt den im Dropdown angezeigten Text |
+| `Image` | `ImageDelegate` | `org.modellwerkstatt.dataux.structure.ImageDelegate` | Bilddarstellung, nur im Formular |
+| `Upload` | `UploadDelegate` | `org.modellwerkstatt.dataux.structure.UploadDelegate` | Datei-Upload, nur im Formular |
+| `Dummy` | `DummyDelegate` | `org.modellwerkstatt.dataux.structure.DummyDelegate` | Platzhalter zur Anordnung von Formularfeldern |
 
-Häufige Delegate-Optionen sind:
-§ neue spalte für Info Formular oder Tabelle einfügen, info darüber jetzt in Spalte wirkung §
+#### Delegate-Optionen
 
-| Name | Konzeptname | FQ-Name | Wirkung |
-| --- | --- | --- | --- |
-| `WIDTH` | `WidthDOption` | `org.modellwerkstatt.dataux.structure.WidthDOption` | Breite des Felds beziehungsweise der Spalte - nur Tabelle |
-| `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` | Delegate ist nicht editierbar - nur Formular |
-| `EDITABLE` | `EditableDOption` | `org.modellwerkstatt.dataux.structure.EditableDOption` | Property wird editierbar dargestellt - nur Tabelle |
-| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Wert darf fehlen beziehungsweise `null` sein - nur Formular |
-| `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` | Verwendet nach Möglichkeit eine Auswahlkomponente - nur Formuilar|
-| `IMPORTANT` | `ImportantDOption` | `org.modellwerkstatt.dataux.structure.ImportantDOption` | Hebt ein wichtiges Tabellenfeld hervor |
-| `COLOR` | `DynColorDOption` | `org.modellwerkstatt.dataux.structure.DynColorDOption` | Berechnet die Farbe dynamisch aus dem Wert - nur Tabelle|
-| `LONG DESC` | `StatusLongDescDOption` | `org.modellwerkstatt.dataux.structure.StatusLongDescDOption` | Verwendet die Langbeschreibung eines Status |
-| `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` | Löst eine verfügbare Update-Conclusion aus - nur Formular |
-| `OVERWRITE LABEL` | `OverwriteLabelDOption` | `org.modellwerkstatt.dataux.structure.OverwriteLabelDOption` | Überschreibt die vorgegebene Beschriftung laut Datenstruktur |
-| `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `org.modellwerkstatt.dataux.structure.OverwriteFormatDOption` | Überschreibt das vorgegebene Format laut Datensturktur|
-| `HOOK` | `DelegateHookDOption` | `org.modellwerkstatt.dataux.structure.DelegateHookDOption` | Bindet projektspezifische Delegate-Logik ein - nur Formular |
+| Name | Konzeptname | FQ-Name | Element | Wirkung |
+| --- | --- | --- | --- | --- |
+| `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` | Formular | Delegate ist nicht editierbar |
+| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Formular | Wert darf fehlen beziehungsweise `null` sein |
+| `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` | Formular | Verwendet nach Möglichkeit eine Auswahlkomponente |
+| `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` | Formular | Löst eine verfügbare Update-Conclusion aus |
+| `HOOK` | `DelegateHookDOption` | `org.modellwerkstatt.dataux.structure.DelegateHookDOption` | Formular | Bindet projektspezifische Delegate-Logik ein |
+| `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` | Formular | Verwendet für einen `StringDelegate` einen numerischen Editor |
+| `ALTER` | `AlternativeDOption` | `org.modellwerkstatt.dataux.structure.AlternativeDOption` | Formular | Verwendet für einen `ReferenceDelegate` oder `StatusDelegate` einen alternativen Editor, sofern die Laufzeitumgebung diesen unterstützt |
+| `WIDE` | `WideDOption` | `org.modellwerkstatt.dataux.structure.WideDOption` | Formular | Blendet nach Möglichkeit das Label links vom Editor aus und gibt dem Editor die gesamte Breite |
+| `OVERWRITE LABEL` | `OverwriteLabelDOption` | `org.modellwerkstatt.dataux.structure.OverwriteLabelDOption` | Formular und Tabelle | Überschreibt die von der Datenstruktur vorgegebene Beschriftung |
+| `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `org.modellwerkstatt.dataux.structure.OverwriteFormatDOption` | Formular und Tabelle | Überschreibt das von der Datenstruktur vorgegebene Format |
+| `WIDTH` | `WidthDOption` | `org.modellwerkstatt.dataux.structure.WidthDOption` | Tabelle | Legt die Breite der Spalte fest |
+| `EDITABLE` | `EditableDOption` | `org.modellwerkstatt.dataux.structure.EditableDOption` | Tabelle | Property wird editierbar dargestellt |
+| `IMPORTANT` | `ImportantDOption` | `org.modellwerkstatt.dataux.structure.ImportantDOption` | Tabelle | Hebt ein wichtiges Tabellenfeld hervor |
+| `COLOR` | `DynColorDOption` | `org.modellwerkstatt.dataux.structure.DynColorDOption` | Tabelle | Berechnet die Farbe dynamisch aus dem Wert |
+| `LONG DESC` | `StatusLongDescDOption` | `org.modellwerkstatt.dataux.structure.StatusLongDescDOption` | Tabelle | Verwendet die Langbeschreibung eines Status |
+| `FOLD` | `FoldDOption` | `org.modellwerkstatt.dataux.structure.FoldDOption` | Tabelle | Blendet die Spalte zunächst aus; der Benutzer kann sie per Doppelklick auf den Spaltenkopf einblenden |
 
-Weitere Delegate-Optionen steuern unter anderem Ausrichtung, mehrzeilige Darstellung, Fokus, alternative Editoren und dynamische Scopes. Vor dem Einsatz muss geprüft werden, ob die Option für den konkreten Delegate- und Property-Typ zulässig ist.
+Weitere Delegate-Optionen steuern unter anderem Ausrichtung, mehrzeilige Darstellung, Fokus und dynamische Scopes. Vor dem Einsatz muss geprüft werden, ob die Option für den konkreten Delegate- und Property-Typ zulässig ist.
 
-Wichtige Optionen für das gesamte Formular oder Tabell sind:
-§ Zeilen der Tabelle ordnen nach Element §
-| Name | Konzeptname | FQ-Name | Wirkung |
-| --- | --- | --- | --- |
-| `DISABLED` | `DisabledFOption` | `org.modellwerkstatt.dataux.structure.DisabledFOption` | Formular ist nicht editierbar |
-| `FLEXIBLE` | `FlexibleOption` | `org.modellwerkstatt.dataux.structure.FlexibleOption` | Erlaubt eine flexible Größenanpassung bei Gridlayout |
-| `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` | Setzt die Beschriftung des Elements |
-| `SELECT FIRST` | `SelectFirstFOption` | `org.modellwerkstatt.dataux.structure.SelectFirstFOption` | Selektiert das erste Tabellenelement bei der Initialisierung |
-| `FOCUS FORWARD 2` | `SkipFocusOption` | `org.modellwerkstatt.dataux.structure.SkipFocusOption` | Verschiebt den initialen Fokus auf ein späteres Element bei Gridlayout |
-| `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.SelectionSummaryLineFOption` | Berechnet eine Zusammenfassung für ausgewählte Objekte in der Tabelle |
-| `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.TableSummaryLineFOption` | Berechnet eine Zusammenfassung über alle Tabellenobjekte |
-| `CUSTOM CSV EXPORT` | `TableCustomCsvExportFOption` | `org.modellwerkstatt.dataux.structure.TableCustomCsvExportFOption` | Passt den CSV-Export einer Tabelle an |
+#### Optionen für Formulare und Tabellen
 
+| Name | Konzeptname | FQ-Name | Element | Wirkung |
+| --- | --- | --- | --- | --- |
+| `DISABLED` | `DisabledFOption` | `org.modellwerkstatt.dataux.structure.DisabledFOption` | Formular | Formular ist nicht editierbar |
+| `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` | Formular und Tabelle | Setzt die Beschriftung des Elements |
+| `SELECT FIRST` | `SelectFirstFOption` | `org.modellwerkstatt.dataux.structure.SelectFirstFOption` | Tabelle | Selektiert das erste Tabellenelement bei der Initialisierung |
+| `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.SelectionSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung für ausgewählte Tabellenobjekte |
+| `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.TableSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung über alle Tabellenobjekte |
+| `CUSTOM CSV EXPORT` | `TableCustomCsvExportFOption` | `org.modellwerkstatt.dataux.structure.TableCustomCsvExportFOption` | Tabelle | Passt den CSV-Export an |
 
 ### Layouts, Tabs und Wiederverwendung
 
-Ein `Grid Layout` (`GridLayout`) ordnet UI-Elemente in Zeilen und Spalten an. Zeilen- und Spaltengewichte bestimmen die Größenverteilung. Die sichtbaren Gewichte `-1`, `1*`, `2*`, `3*`, `4*` und `5*` werden durch `MinWeight`, `OneWeight`, `TwoWeight`, `ThreeWeight`, `FourWeight` und `FiveWeight` repräsentiert. So kann beispielsweise eine Tabelle links und ein Formular rechts oder ein kompaktes Suchformular oberhalb einer flexiblen Ergebnistabelle stehen. Die selben Gewichte werden auch im `Delegate Form` (`DelegateForm`) als Spaltengewichte verwendet. 
+Ein `Grid Layout` (`GridLayout`) ordnet UI-Elemente in Zeilen und Spalten an. Zeilen- und Spaltengewichte bestimmen die Größenverteilung. Die sichtbaren Gewichte `-1`, `1*`, `2*`, `3*`, `4*` und `5*` werden durch `MinWeight`, `OneWeight`, `TwoWeight`, `ThreeWeight`, `FourWeight` und `FiveWeight` repräsentiert. So kann beispielsweise eine Tabelle links und ein Formular rechts oder ein kompaktes Suchformular oberhalb einer flexiblen Ergebnistabelle stehen. Dieselben Gewichte werden auch im `Delegate Form` als Spaltengewichte verwendet, dort jedoch ohne `MinWeight`.
+
+Für ein `Grid Layout` stehen insbesondere folgende Optionen zur Verfügung:
+
+| Name | Konzeptname | FQ-Name | Wirkung |
+| --- | --- | --- | --- |
+| `FLEXIBLE` | `FlexibleOption` | `org.modellwerkstatt.dataux.structure.FlexibleOption` | Erlaubt eine flexible Größenanpassung |
+| `FOCUS FORWARD 2` | `SkipFocusOption` | `org.modellwerkstatt.dataux.structure.SkipFocusOption` | Verschiebt den initialen Fokus auf ein späteres Element |
 
 Ein `Tab Layout` (`TabLayout`) enthält mindestens einen `Tab` (`Tab`). Jeder Tab besitzt eine als Ausdruck modellierte Beschriftung und genau ein UI-Element.
 
@@ -158,13 +162,11 @@ Ein `Custom UI Element` (`CustomElement`) bindet eine projektspezifische UI-Impl
 
 Die Zielgeräte sind bei der Layoutwahl ausdrücklich mitzudenken. Eine breite Desktop-Aufteilung ist nicht automatisch für mobile Datenerfassungsgeräte oder Smartphones geeignet. Für unterschiedliche Geräteklassen können eigene `Page Pane`s erforderlich sein.
 
-
-# TODO - HIER BIN ICH STEHENGEBLIEBEN
 ### Menüs und Command-Aktionen
 
 Ein `Page Pane` (`PagePane`), eine `Table` (`Table`) und weitere dafür vorgesehene UI-Elemente können Menüeinträge bereitstellen.
 
-### Konzeptlandkarte der Menüs
+#### Konzeptlandkarte der Menüs
 
 | Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
@@ -188,24 +190,6 @@ Eine `Compound Action` (`MenuCompoundAction`) kann mehrere Commands verbinden. P
 
 `PageConclusionReference` verweist dabei auf eine Abschlussart; `USER_CANCEL` (`PageConclusionOptionUserCancel`) modelliert ausdrücklich die Fortsetzung nach einem Benutzerabbruch.
 
-
-### Page-Pane-Optionen und dynamische Darstellung
-
-`COLOR` (`ColorPpOption`) setzt eine konstante Farbe für ein `Page Pane`; `SCOLOR` (`StatusColorPpFOption`) leitet die Farbe aus einem Status ab. Delegates, Tiles und andere vorgesehene Stellen können Farbe, Label oder Aktivierung ebenfalls über BaseLanguage-Ausdrücke bestimmen.
-
-Typische Anwendungsfälle für eingebettete Ausdrücke sind:
-
-- dynamische Labels und Tile-Texte,
-- Farben und Hervorhebungen,
-- Aktivierungsbedingungen,
-- Argumente für Command-Aufrufe,
-- Darstellungsoptionen, die vom aktuellen Wert abhängen.
-
-Welche Variablen sichtbar sind und welcher Ergebnistyp erwartet wird, hängt von der Einbettungsstelle ab. Ein Ausdruck, der in einer Delegate-Farbfunktion gültig ist, ist nicht automatisch in einer Tile-Funktion oder im Modul-Lebenszyklus gültig.
-
-UI-Ausdrücke sollen Darstellungs- und Interaktionslogik enthalten. Fachliche Berechnungen und Regeln bleiben in den zuständigen Entities, Value Objects, Services oder Commands und werden von dort aufgerufen.
-
-
 ### Typischer UI-Modellierungsablauf
 
 1. Der ObjectFlow-Command und seine Pages legen fest, welche Daten und Aktionen der Ablauf benötigt.
@@ -216,8 +200,6 @@ UI-Ausdrücke sollen Darstellungs- und Interaktionslogik enthalten. Fachliche Be
 6. Tabellen können über die Auswahl ihrer Zeilen Selektionen für weitere UI-Komponenten bestimmen.
 7. Typgerechte Delegates beschreiben Felder und Tabellenspalten.
 8. Menüs rufen Commands mit Argumenten aus dem aktuellen Bindungs- und Selektionskontext auf.
-9. Der Ablauf wird auch mit leerer Selektion, mehreren Root-Objekten und nicht geladenen Beziehungen geprüft.
-
 
 ## Teil II - Application / Batchjob
 
@@ -258,7 +240,7 @@ Ein `AppUI Module` (`AppUiModule`) beschreibt eine interaktive Anwendung. Neben 
 - Ein optionaler Start-Command (`StartupCommandCall`) kann beim Start aufgerufen und über einen Ausdruck aktiviert werden.
 - `VERSION` (`OptVersion`) und `OFFICIAL NAME` (`OptOfficialAppName`) beschreiben Modulmetadaten.
 
-### Konzeptlandkarte der Anwendung
+#### Konzeptlandkarte der Anwendung
 
 | Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
@@ -279,6 +261,20 @@ AppUI Module
 ```
 
 Konfiguration und Authentifizierung werden zentral am Modul beschrieben. Fachliche Berechtigungen müssen dennoch in den dafür vorgesehenen fachlichen Komponenten geprüft werden. Das Ausblenden eines Menüeintrags ist keine ausreichende Zugriffskontrolle.
+
+#### Tiles und dynamische Darstellung
+
+Ein `Tile` (`AppTile`) kann Beschriftung, Farbe und Aktivierung über BaseLanguage-Ausdrücke dynamisch bestimmen. Typische Anwendungsfälle für eingebettete Ausdrücke sind:
+
+- dynamische Labels und Tile-Texte,
+- Farben und Hervorhebungen,
+- Aktivierungsbedingungen,
+- Argumente für Command-Aufrufe,
+- Darstellungsoptionen, die vom aktuellen Zustand abhängen.
+
+Welche Variablen sichtbar sind und welcher Ergebnistyp erwartet wird, hängt von der Einbettungsstelle ab. Ein Ausdruck in einer Tile-Funktion ist deshalb nicht automatisch im Modul-Lebenszyklus oder in einer anderen UI-Funktion gültig.
+
+Diese Ausdrücke sollen Darstellungs- und Interaktionslogik enthalten. Fachliche Berechnungen und Regeln bleiben in den zuständigen Entities, Value Objects, Services oder Commands und werden von dort aufgerufen.
 
 
 ### Batchjob mit `BatchJob Module` (`BatchJobModule`)
@@ -402,16 +398,18 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 | Delegate-Option | `OVERWRITE LABEL` | `OverwriteLabelDOption` | `org.modellwerkstatt.dataux.structure.OverwriteLabelDOption` |
 | Delegate-Option | `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `org.modellwerkstatt.dataux.structure.OverwriteFormatDOption` |
 | Delegate-Option | `HOOK` | `DelegateHookDOption` | `org.modellwerkstatt.dataux.structure.DelegateHookDOption` |
+| Delegate-Option | `FOLD` | `FoldDOption` | `org.modellwerkstatt.dataux.structure.FoldDOption` |
+| Delegate-Option | `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` |
+| Delegate-Option | `ALTER` | `AlternativeDOption` | `org.modellwerkstatt.dataux.structure.AlternativeDOption` |
+| Delegate-Option | `WIDE` | `WideDOption` | `org.modellwerkstatt.dataux.structure.WideDOption` |
 | Formular-/Tabellenoption | `DISABLED` | `DisabledFOption` | `org.modellwerkstatt.dataux.structure.DisabledFOption` |
-| Formular-/Tabellenoption | `FLEXIBLE` | `FlexibleOption` | `org.modellwerkstatt.dataux.structure.FlexibleOption` |
 | Formular-/Tabellenoption | `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` |
 | Formular-/Tabellenoption | `SELECT FIRST` | `SelectFirstFOption` | `org.modellwerkstatt.dataux.structure.SelectFirstFOption` |
-| Formular-/Tabellenoption | `FOCUS FORWARD 2` | `SkipFocusOption` | `org.modellwerkstatt.dataux.structure.SkipFocusOption` |
 | Formular-/Tabellenoption | `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.SelectionSummaryLineFOption` |
 | Formular-/Tabellenoption | `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.TableSummaryLineFOption` |
 | Formular-/Tabellenoption | `CUSTOM CSV EXPORT` | `TableCustomCsvExportFOption` | `org.modellwerkstatt.dataux.structure.TableCustomCsvExportFOption` |
-| Page-Pane-Option | `COLOR` | `ColorPpOption` | `org.modellwerkstatt.dataux.structure.ColorPpOption` |
-| Page-Pane-Option | `SCOLOR` | `StatusColorPpFOption` | `org.modellwerkstatt.dataux.structure.StatusColorPpFOption` |
+| Gridlayout-Option | `FLEXIBLE` | `FlexibleOption` | `org.modellwerkstatt.dataux.structure.FlexibleOption` |
+| Gridlayout-Option | `FOCUS FORWARD 2` | `SkipFocusOption` | `org.modellwerkstatt.dataux.structure.SkipFocusOption` |
 | Menü | `Action` | `MenuAction` | `org.modellwerkstatt.dataux.structure.MenuAction` |
 | Menü | `Compound Action` | `MenuCompoundAction` | `org.modellwerkstatt.dataux.structure.MenuCompoundAction` |
 | Menü | kein eigener Alias | `PageConclusionReference` | `org.modellwerkstatt.dataux.structure.PageConclusionReference` |
