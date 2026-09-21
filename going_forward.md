@@ -1,3 +1,9 @@
+GATES / UNITS / Projektstrukturierung. Was gibt es noch... 
+Oder besser die Begriffe aus DDD verwenden. Konventionen etc. etc. 
+
+Kuratierter Aufgaben-Katalog: Sammlung von Aufgaben und Lösugen,   
+
+
 Konsistenz + REchtschreibung => Zusammenfassen auch in ein Reporting
 Wenn sich in einer DSL beschreibungsdatei Konzepte einer anderen DSL angesprochen werden und der KonzeptName in Klammern vorhanden ist, dann FQ-NAME nenn! Dann sieht man, dass es nicht zur aktuell dokumentierten DSL gehört! WICHTIG!
 
