@@ -446,7 +446,3 @@ Der Index enthält die in dieser Dokumentation behandelten Konzepte, nicht alle 
 | Row-Mapping | Row-Mapper verwenden | `RowMapperFieldRef` | `org.modellwerkstatt.manmap.structure.RowMapperFieldRef` |
 | Row-Mapping | `nokeystore/read-only map` | `NoKeyMapperField` | `org.modellwerkstatt.manmap.structure.NoKeyMapperField` |
 | Row-Mapping | No-Key-Mapper verwenden | `NoKeyMapperFieldRef` | `org.modellwerkstatt.manmap.structure.NoKeyMapperFieldRef` |
-
-## Quellen für die Modellarbeit
-
-Die fachliche Beschreibung in diesem Dokument ersetzt nicht die Prüfung der geladenen Sprache. Für konkrete Modelländerungen gelten die MPS-Sprachdefinition, ihre Constraints und die Validierung als technische Quelle der Wahrheit.

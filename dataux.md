@@ -297,8 +297,8 @@ Ein Batchjob besitzt eine verpflichtende Exception-Strategie (`org.modellwerksta
 | `DELAY_EXECUTION` | Wartet vor der weiteren Verarbeitung beziehungsweise Neuplanung |
 | `CLEAR_INBOX` | Verwirft alle noch wartenden Inbox-Elemente und veranlasst eine Neuplanung |
 | `CONSUMER_RESTART` | Beendet den betroffenen Consumer und startet einen Ersatz-Consumer |
-| `JOB_SHUTDOWN` / `VM_SHUTDOWN` | Wählt den Shutdown-Pfad; eine weitergehende VM-Reaktion muss die umgebende Laufzeit übernehmen |
-| `JOB_RESTART` / `VM_RESTART` | Wählt den Shutdown-Pfad mit beabsichtigtem, extern auszuführendem Neustart |
+| `JOB_SHUTDOWN` / `VM_SHUTDOWN` | Gegenwärtig nicht implementiert |
+| `JOB_RESTART` / `VM_RESTART` | Gegenwärtig nicht implementiert |
 | `SILENT_NO_LOG` | Unterdrückt die übliche Problemprotokollierung; der Vorgang bleibt als nicht protokollierte Exception gezählt |
 
 Bei mehreren gleichzeitig fehlschlagenden Consumern wartet die Laufzeit, bis kein Consumer mehr arbeitet, und verwendet dann die längste angeforderte Verzögerung. Nach einem Producerfehler wird eine positive Wiederanlaufzeit auf mindestens fünf Minuten angehoben. Ein fachlicher Abbruch wird separat als *canceled* gezählt: Er ist kein technischer Fehler und stellt das betroffene Element nicht automatisch erneut in die Inbox.
@@ -413,7 +413,6 @@ Beide Modulformen können dieselben fachlichen Services und Repositories verwend
 - **Manuellen Start während laufender Consumer auslösen:** Die Anforderung wird in diesem Zustand nicht für später vorgemerkt. Vor dem Start muss der Pair-Status geprüft werden.
 - **Parallele Consumer bei reihenfolgeabhängiger Verarbeitung verwenden:** Mehrere Consumer schließen Elemente nicht zwingend in Inbox-Reihenfolge ab.
 - **Externe Aufrufe ohne eigene Timeouts ausführen:** Die Job-Laufzeit begrenzt die Bearbeitungszeit eines einzelnen Inbox-Elements nicht zuverlässig.
-- **Automatischen Prozessneustart aus `JOB_RESTART` oder `VM_RESTART` ableiten:** Der aktuelle Laufzeitstand leitet den Shutdown ein, führt den beabsichtigten Restart aber nicht selbst aus.
 - **Serverzeitzone übersehen:** CRON-Ausdrücke werden in der Standardzeitzone der JVM ausgewertet.
 - **Exception-Strategie als fachliche Fehlerbehandlung behandeln:** Sie steuert den technischen Umgang mit Ausnahmen, nicht die Domänenentscheidung.
 - **Desktop-Layout unverändert mobil verwenden:** Unterschiedliche Geräteklassen benötigen häufig eigene `Page Pane`s oder Anwendungsmodule.
@@ -421,7 +420,7 @@ Beide Modulformen können dieselben fachlichen Services und Repositories verwend
 
 ## Konzeptindex für Agenten
 
-Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konzepte sowie die unmittelbar benötigten ObjectFlow-Konzepte, nicht alle Konzepte der Sprachen. Für JSON-Blueprints sind die FQ-Namen zu verwenden. Vor einer Modelländerung müssen Referenzen, Child-Roles, Kardinalitäten und zulässige Optionen über MPS MCP im aktuellen Projekt aufgelöst werden.
+Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konzepte sowie die unmittelbar benötigten ObjectFlow-Konzepte, nicht alle Konzepte der Sprachen.
 
 | Themenbereich | Name | Konzeptname | FQ-Name |
 | --- | --- | --- | --- |
