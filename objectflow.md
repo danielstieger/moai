@@ -342,6 +342,7 @@ if (!rechnung.empfaengerName.matches("[A-Za-z0-9 .-]+")) {
   precondition false : 'Der Empfängername enthält nicht erlaubte Zeichen.';
 }
 ```
+§ im obigen beispiel nicht fals, sondern einfach weglassen, der projektionale editor zeigt dann -> an. man muss keinen ausdruck angeben - prüfe das nochmal anhand des offenen projektes §
 
 Die Meldung erscheint typischerweise im allgemeinen Meldungsbereich oberhalb der Page und nicht unmittelbar am Feld. Durch `requestFocus()` steht der Cursor nach der Meldung dennoch an der richtigen Eingabestelle. Die Reihenfolge ist wesentlich: Wird die Precondition zuerst ausgelöst, erreicht der unterbrochene Programmfluss die Fokusanforderung nicht mehr.
 
