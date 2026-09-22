@@ -1,0 +1,27 @@
+{
+  "concept": "org.modellwerkstatt.dataux.structure.PagePane",
+  "properties": [
+    { "name": "name", "value": "<page-pane-name>" },
+    { "name": "isNamed", "value": "true" }
+  ],
+  "references": [
+    { "role": "boundClassifier", "target": "<parent-classifier-node-ref>" }
+  ],
+  "children": [
+    {
+      "role": "uxChild",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.Table",
+          "properties": [],
+          "references": [
+            { "role": "boundClassifier", "target": "<parent-classifier-node-ref>" },
+            { "role": "boundProperty", "target": "<list-property-node-ref>" }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ]
+}
+

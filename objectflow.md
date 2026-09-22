@@ -24,11 +24,11 @@ ObjectFlow bildet fachliche Datenstrukturen mit `Entity`, `Value Object` und `DT
 
 - Eine **Entity** wird durch ihre Identität und ihren Lebenszyklus bestimmt. Eine Rechnung bleibt beispielsweise dieselbe Rechnung, wenn sich Anschrift, Positionen oder Status ändern; entscheidend ist ihre fachliche oder technische Identität, etwa Rechnungsnummer oder interne ID.
 - Ein **Value Object** beschreibt einen fachlichen Wert ohne eigene Identität. Zwei Werte sind gleich, wenn ihre dafür ausgewählten Bestandteile gleich sind. Ein einfaches Beispiel ist ein Datum; ein zusammengesetztes Beispiel ist eine Gültigkeit aus Beginn und Toleranztagen. Value Objects sind im Anwendungscode im unveränderlichen Stil zu verwenden: Statt eine vorhandene Instanz schrittweise umzuschreiben, wird bei einer Änderung ein neuer Wert erzeugt. Dadurch bleiben Gleichheit, Wiederverwendung und Weitergabe des Werts nachvollziehbar.
-- Ein **DTO** (*Data Transfer Object*) ist ein anwendungsbezogener Datencontainer ohne eigene fachliche oder technische Entity-Identität. DTOs eignen sich für Suchfilter, Projektionen, Aggregationen und die Übergabe zwischen Abläufen. Sie dürfen selbst Objektgraphen bilden und dabei Value Objects, Entities sowie Listen solcher Objekte enthalten.
+- Ein **DTO** (*Data Transfer Object*) ist ein anwendungsbezogener Datencontainer ohne eigene fachliche oder technische Entity-Identität. DTOs eignen sich für Suchfilter, Projektionen, Aggregationen und die Übergabe zwischen Abläufen. Sie dürfen selbst Objektgraphen bilden und dabei Entities sowie Listen von Entitäten enthalten.
 
 Fachliche Modelle bestehen typischerweise nicht aus isolierten Objekten, sondern aus Graphen. Eine Rechnung kann beispielsweise eine Liste von Rechnungspositionen referenzieren; Rechnung und Positionen können ihrerseits Value Objects wie Geldbetrag, Anschrift oder Gültigkeit verwenden. Referenzen drücken dabei den fachlichen Zusammenhang aus, Listen eine geordnete Menge gleichartiger Bestandteile.
 
-Die drei rootfähigen Datenstrukturen besitzen Business Properties und können zusätzlich BaseLanguage-Member wie Konstruktoren und Methoden enthalten.
+Die drei rootfähigen Datenstrukturen besitzen Business Properties und können zusätzlich Konstruktoren und Methoden (BaseLanguage-Member) enthalten.
 
 | Name | Konzeptname | Primärer Zweck | Identität und Lebenszyklus |
 | --- | --- | --- | --- |
@@ -48,42 +48,73 @@ Eine Business Property (`BusinessProperty`) besteht mindestens aus Name, Typ und
 | Typ | BaseLanguage- beziehungsweise ObjectFlow-Typ der Property |
 | Kurzbeschreibung | Kompakte, von Oberflächen verwendbare Beschriftung |
 | Langbeschreibung | Ausführlichere Beschreibung für Darstellung und Dokumentation |
-| Format | Standardformat für numerische Darstellungen und Datum |
+| Format | Standardformat für `BigDecimal`-Darstellungen (nach `java.text.DecimalFormat`) und Datumsdarstellungen (nach `org.joda.time.format.DateTimeFormatter`) |
 | Property-Optionen | ManMap-Optionen wie `key`, `autoid`, Audit-, Größen- oder Indexhinweise |
 
 Der Editor schränkt den Typ einer Business Property bewusst ein. Die folgende Liste ist vollständig; beliebige BaseLanguage- oder Java-Typen werden an dieser Stelle nicht angeboten.
 
-| Sichtbarer Typ | FQ-Name des MPS-Typknotens beziehungsweise der Einschränkung | Bedeutung und Einschränkung |
+| Möglicher Typ | FQ-Name des Typs oder Konzeptname | Bedeutung und Einschränkung |
 | --- | --- | --- |
 | `string` | `jetbrains.mps.baseLanguage.structure.StringType` | Der von MPS besonders unterstützte String-Typ. Er wird direkt angeboten und nicht als manuell gewählter `java.lang.String`-Classifier modelliert. |
 | `int` | `jetbrains.mps.baseLanguage.structure.IntegerType` | Ganzzahliger primitiver Wert. Als Java-Primitive kann er nicht `null` sein. |
+| `LocalDate` | `org.joda.time.LocalDate` | Datum ohne Uhrzeit. |
+| `DateTime` | `org.joda.time.DateTime` | Zeitpunkt mit Datum und Uhrzeit. |
+| `BigDecimal` | `java.math.BigDecimal` | Exakte Dezimalzahl, insbesondere für Geldbeträge und fachliche Rechenwerte. |
 | deklarierter Status | `org.modellwerkstatt.objectflow.structure.StatusType` | Referenziert genau eine im Modell oder über Importe sichtbare `StatusDeclaration`. |
-| `Entity` | `jetbrains.mps.baseLanguage.structure.ClassifierType` → `org.modellwerkstatt.objectflow.structure.Entity` | Referenziert eine sichtbare ObjectFlow-Entity und bildet eine Beziehung im fachlichen Objektgraphen. |
-| `Value Object` | `jetbrains.mps.baseLanguage.structure.ClassifierType` → `org.modellwerkstatt.objectflow.structure.ValueObject` | Verwendet einen sichtbaren zusammengesetzten fachlichen Wert. |
-| `DTO` | `jetbrains.mps.baseLanguage.structure.ClassifierType` → `org.modellwerkstatt.objectflow.structure.DTO` | Referenziert einen sichtbaren anwendungsbezogenen Datencontainer. |
+| deklarierte Entity | `org.modellwerkstatt.objectflow.structure.Entity` | Referenziert eine sichtbare ObjectFlow-Entity und bildet eine Beziehung im fachlichen Objektgraphen. |
+| deklariertes Value Object | `org.modellwerkstatt.objectflow.structure.ValueObject` | Verwendet einen sichtbaren zusammengesetzten fachlichen Wert. |
+| deklariertes DTO | `org.modellwerkstatt.objectflow.structure.DTO` | Referenziert einen sichtbaren anwendungsbezogenen Datencontainer. |
 | `list<T>` | `jetbrains.mps.baseLanguage.collections.structure.ListType` | Modelliert eine Liste. Der Elementtyp `T` soll wiederum ein für die fachliche Datenstruktur geeigneter Typ sein. |
-| `LocalDate` | `jetbrains.mps.baseLanguage.structure.ClassifierType` → `org.joda.time.LocalDate` | Datum ohne Uhrzeit. |
-| `DateTime` | `jetbrains.mps.baseLanguage.structure.ClassifierType` → `org.joda.time.DateTime` | Zeitpunkt mit Datum und Uhrzeit. |
-| `BigDecimal` | `jetbrains.mps.baseLanguage.structure.ClassifierType` → `java.math.BigDecimal` | Exakte Dezimalzahl, insbesondere für Geldbeträge und fachliche Rechenwerte. |
 | `byte[]` | `jetbrains.mps.baseLanguage.structure.ArrayType` mit `jetbrains.mps.baseLanguage.structure.ByteType` | Binärdaten, beispielsweise ein Dokument oder Bildinhalt. |
 
 Persistenzoptionen an einer Business Property werden von ManMap ausgewertet. Ihre genaue Wirkung ist in [manmap.md](manmap.md) beschrieben.
 
+### Virtuelle Business Properties
+
+Eine Business Property kann statt eines eigenen gespeicherten Werts eine benutzerdefinierte Property-Implementierung (`CustomPropertyImplementation`) besitzen. Ihr `get`-Accessor berechnet oder beschafft den Wert bei jedem Lesen; ein optionaler `set(value)`-Accessor verteilt einen zugewiesenen Wert auf andere Properties oder führt eine passende Aktualisierung aus. Ohne `set`-Accessor ist die virtuelle Property nur lesbar.
+
+Virtuelle Properties behalten die fachlichen Metadaten einer Business Property – Typ, Kurz- und Langbeschreibung, Format und Dokumentation – und können deshalb wie normale Properties in Ausdrücken und DataUX-Bindings verwendet werden. Sie besitzen jedoch keinen eigenen Wert, der unabhängig persistiert werden könnte. Häufig kennzeichnet `PRESENTATION` eine nur für Berechnung oder Darstellung bestimmte Property.
+
+Für eine Rechnung könnte beispielsweise `offenerBetrag` als virtuelle, nur lesbare Property aus `gesamtbetrag - bezahlterBetrag` berechnet werden. Eine solche Ableitung bleibt zentral im Fachmodell und steht zugleich für Anzeige, Meldungen und weitere Berechnungen zur Verfügung. Getter können keine Repositories oder Services aufrufen; für sie gilt dieselbe Infrastrukturgrenze wie für andere Methoden der Datenstruktur.
+
+### Value-Object-Gleichheit
+
+Ein `Value Object` kann über `equal properties` (`EqualPropertyReference`) festlegen, welche seiner Business Properties die Wertgleichheit bestimmen. Das ist insbesondere für zusammengesetzte Schlüssel und fachliche Werte nützlich. Die ausgewählten Properties sollen gemeinsam den fachlichen Wert repräsentieren; technische oder nur darstellungsbezogene Properties gehören üblicherweise nicht dazu.
+
+
 ### Null-Werte in Datenstrukturen
 
-Referenztypen wie `string`, Status, Entity, Value Object, DTO, Datum/Zeit und `BigDecimal` können technisch `null` sein; `int` kann es als primitiver Typ nicht. `null` soll fachlich „kein Wert vorhanden“ bedeuten und nicht als Ersatz für einen regulären Zustand dienen. Bei Listen ist eine leere Liste in der Regel aussagekräftiger und sicherer als `null`.
+Anders als bei standard Java-Klassen werden die Properties von Datenstrukturen initialisiert. `string` beginnt als leere Zeichenkette, `int` als `0`, `BigDecimal` als `0.0`, ein Status mit seinem Default- beziehungsweise `ON_CREATION`-Element und eine Liste als leere Liste. Anwendungscode soll diese Werte deshalb nicht vorsorglich durch `null` ersetzen; insbesondere Listen werden als leere Listen verwendet.
 
-Der Java-Extension-Generator von ObjectFlow ersetzt allgemeine Gleichheits- und Ungleichheitsausdrücke durch einen null-sicheren Vergleich: Zwei `null`-Werte gelten als gleich, genau ein `null`-Wert als ungleich; andernfalls wird `equals` verwendet. Die Laufzeit stellt zusätzlich einen null-sicheren `BigDecimal`-Vergleich über `compareTo` bereit, wenn die fachliche Gleichheit unabhängig von der Skala sein soll. Diese Hilfen verhindern NullPointerExceptions beim Vergleichen, ersetzen aber keine bewusste fachliche Entscheidung über optionale Werte.
+Das bedeutet nicht, dass jeder enthaltene Referenzwert immer gesetzt ist. Datum/Zeit sowie Beziehungen zu Entities, Value Objects und DTOs können fachlich fehlen; auch die Laufzeit-Setter der Referenztypen unterstützen optionale Werte. `null` soll dann ausdrücklich „kein Wert vorhanden“ bedeuten und nicht als Ersatz für einen regulären Zustand dienen. `int` kann als primitiver Typ nicht `null` sein. In DataUX kennzeichnet die Delegate-Option `OPTIONAL`, dass ein Eingabewert fehlen darf; ohne diese Option setzt die Oberfläche einen erforderlichen Wert durch.
 
-In DataUX kennzeichnet die Delegate-Option `OPTIONAL`, dass ein Eingabewert fehlen darf. Ohne diese Option sollte die Oberfläche einen erforderlichen Wert durchsetzen. Formatierte Strings stellen `null` zur Diagnose als `#NULL?` dar; für eine fachlich gewünschte Leerdarstellung oder Ersatzbeschriftung ist deshalb eine explizite Fallunterscheidung vorzuziehen.
+Der ObjectFlow ersetzt allgemeine Gleichheits- und Ungleichheitsausdrücke durch einen null-sicheren Vergleich: Zwei `null`-Werte gelten als gleich, genau ein `null`-Wert als ungleich; andernfalls wird `equals` verwendet. Die Laufzeit stellt zusätzlich einen null-sicheren `BigDecimal`-Vergleich über `compareTo` bereit, wenn die fachliche Gleichheit unabhängig von der Skala sein soll. Diese Hilfen verhindern NullPointerExceptions beim Vergleichen, ersetzen aber keine bewusste fachliche Entscheidung über optionale Werte.
+
 
 ### Beziehungen und Objektgraphen
 
 Eine Business Property kann eine Entity, ein DTO oder ein Value Object sowie eine Liste geeigneter Elemente enthalten. Aus diesen Beziehungen entsteht der fachliche Objektgraph. Die Aggregatgrenze soll dabei bewusst erkennbar bleiben: Ein Graph bündelt die Objekte, die für eine fachliche Änderung gemeinsam konsistent gehalten werden müssen; bloße Querverweise auf andere Aggregate sind davon zu unterscheiden.
 
-### Value-Object-Gleichheit
+Mit `#Key` (`BPRefIdReference`) wird bei einer Entity-Beziehung ausdrücklich auf die Identität der referenzierten Entity statt auf das vollständige fachliche Objekt zugegriffen. Das Ergebnis besitzt den Schlüsseltyp der Ziel-Entity. Bei einem zusammengesetzten Schlüssel können dessen Bestandteile anschließend einzeln gelesen werden; bei einem einfachen Schlüssel kann das Ergebnis direkt verglichen oder weitergegeben werden.
 
-Ein `Value Object` kann über `equal properties` (`EqualPropertyReference`) festlegen, welche seiner Business Properties die Wertgleichheit bestimmen. Das ist insbesondere für zusammengesetzte Schlüssel und fachliche Werte nützlich. Die ausgewählten Properties sollen gemeinsam den fachlichen Wert repräsentieren; technische oder nur darstellungsbezogene Properties gehören üblicherweise nicht dazu.
+Der wichtigste Einsatz ist das explizite Nachladen einer Beziehung. ManMap lädt Referenz-Properties nur dann als Objekt, wenn die Repository-Query dafür einen Reference Join enthält. Der Fremdschlüssel steht dagegen auch dann über `#Key` zur Verfügung. Eine geladene Rechnung kann daher beispielsweise ihren Kundenschlüssel an ein Repository übergeben, ohne dass die Kunden-Entity bereits Teil des geladenen Graphen ist:
+
+```text
+Kunde kunde = # KundenRepo.get(rechnung.kunde#Key);
+boolean gleicherKunde = rechnung.kunde#Key.equals(gutschrift.kunde#Key);
+```
+
+Der erste Ausdruck lädt die Kunden-Entity gezielt über das Repository. Der zweite vergleicht zwei Beziehungen ausschließlich anhand ihrer Identität. Bei einem zusammengesetzten Schlüssel wäre zusätzlich ein Zugriff wie `rechnung.aussteller#Key.mandant` möglich. `#Key` selbst führt keinen Repository-Aufruf aus und lädt die Entity nicht nach.
+
+Auf `rechnung.kunde` direkt zuzugreifen setzt dagegen voraus, dass die Kundenreferenz von der ursprünglichen Query mitgeladen wurde. Fehlt der entsprechende Reference Join, löst der Zugriff `OFXNotInitializedException` aus. Die Wahl ist deshalb bewusst zu treffen: Entweder lädt die ursprüngliche Query die benötigte Beziehung mit, oder der Ablauf verwendet zunächst `#Key` und lädt die Entity über einen passenden Entity-Mapper.
+
+Mit `isNullKey` (`IsNull`) lässt sich prüfen, ob ein solcher Referenzschlüssel fachlich nicht gesetzt ist:
+
+```text
+rechnung.kunde#Key.isNullKey
+```
+
+Die Prüfung kennt die ObjectFlow/ManMap-Semantik leerer Schlüssel und ist deshalb aussagekräftiger als ein bloßer Vergleich mit Java-`null`: Auch die Leerwerte einfacher Schlüssel und die Bestandteile eines zusammengesetzten Value-Object-Schlüssels werden berücksichtigt. Das ist besonders bei optionalen Beziehungen sinnvoll, bevor der Schlüssel an ein Repository übergeben oder ein Bestandteil des Schlüssels gelesen wird. `isNullKey` prüft den Schlüssel; es prüft nicht, ob das referenzierte Objekt bereits geladen wurde.
 
 ### Status
 
@@ -116,17 +147,163 @@ Die Optionen liegen entweder an der Statusdeklaration oder an einem einzelnen St
 
 Entities, Value Objects und DTOs können BaseLanguage-Konstruktoren und -Methoden enthalten. Dort gehört allgemeine, objektbezogene Logik hin, die aus vielen Anwendungsfällen benötigt wird und allein mit dem Zustand des Objekts sowie expliziten Parametern auskommt. Typische Beispiele sind Berechnungen, Zustandsabfragen, Wertnormalisierung und Operationen, die ein Aggregat konsistent verändern, etwa das Hinzufügen oder Entfernen einer Position.
 
-Von einer Datenstruktur aus ist kein `OperationCall` auf Services, Repositories oder andere Infrastrukturkomponenten möglich. Daraus folgen klare Entwurfsregeln:
+Von einer Datenstruktur aus ist kein Komponentenaufruf `#Component_Name.Methoden_Name()` (`OperationCall`) auf Services, Repositories oder andere Infrastrukturkomponenten möglich. Daraus folgen klare Entwurfsregeln:
 
-- Eine Methode an einer Datenstruktur lädt keine fehlenden Daten nach und startet weder Session Operation noch Transaktion.
+- Eine Methode an einer Datenstruktur kann keine fehlenden Daten nachladen.
 - Benötigte Werte werden vom Aufrufer vorab bereitgestellt oder als Parameter übergeben.
 - Logik, die andere Aggregate, Repositories, Konfiguration oder weitere Komponenten benötigt, liegt in einem Service.
 - Die Datenstrukturmethoden bleiben dadurch in unterschiedlichen Commands, Jobs und Tests wiederverwendbar und lassen sich ohne Laufzeitkonfiguration prüfen.
 
 Die Grenze ist fachlich zu ziehen: Verhalten, das natürlich zu genau diesem Objekt oder Wert gehört, bleibt an der Datenstruktur. Eine allgemeine Domänenoperation über mehrere Objekte gehört in einen wiederverwendbaren Service. Die Koordination für einen konkreten Anwendungsfall gehört in einen anwendungsfallspezifischen Service oder Command.
 
+### Dirty-Tracking, Read-only und unveränderliche Werte
+
+Entitäten führen einen Dirty-Zustand. Wird einer normalen Business Property nach dem Laden über Manmap tatsächlich ein anderer Wert zugewiesen, wird die Entity dirty. Eine neu erzeugte Entity beginnt ebenfalls als neu und dirty. Nach dem Laden in eine ManMap-Session ist der Ausgangszustand "clean".
+
+Listen benötigen eine zusätzliche Prüfung, weil ihr Inhalt auch über `add`, `remove` oder andere Listenoperationen verändert werden kann, ohne den Property-Setter erneut aufzurufen. Intern wird ein Hash-Wert des Listeninhalts geführt. Beim Abrufen des Dirty-Zustands vergleicht die Entity jede ihrer Listen mit diesem Ausgangswert. Ein hinzugefügtes, entferntes oder ausgetauschtes Element macht die Entity damit ebenfalls dirty; eine reine Umsortierung wird von dieser inhaltsbezogenen Prüfung nicht als Änderung behandelt.
+
+Read-only und Checkout werden durch die Repository-Query festgelegt:
+
+- Eine read-only geladene Entity ist in die Session integriert, darf aber nicht über ihre Business-Property-Setter verändert werden; ein Änderungsversuch führt zu `OFXIllegalAccessException`.
+- Eine ausgecheckte Entity ist read/write und nimmt am Dirty-Tracking teil. Sie ist die richtige Form für einen Ablauf, der Änderungen später per Check-in speichern soll.
+- Innerhalb derselben Session gilt die Identity Map. Eine bereits integrierte Entity wird nicht als zweite Instanz materialisiert; ein erneuter Checkout derselben Identität wird abgelehnt.
+
+Value Objects besitzen dagegen keinen eigenen Entity-Dirty- oder Read-only-Zustand. Sie werden fachlich unveränderlich verwendet: Eine Änderung erzeugt ein neues Value Object, beispielsweise über einen Konstruktor oder eine `with...`-Methode, und weist dieses anschließend der Entity-Property zu. Dadurch wird die besitzende Entity zuverlässig dirty, und `equals` sowie `hashCode` bleiben stabil.
+
+Der Session-weite Read-only- und Dirty-Zustand wird im Abschnitt [Session und Unit of Work](#session-und-unit-of-work) beschrieben.
 
 ## Teil II – Services und Domänenlogik
+
+### Service-Komponenten
+
+Ein `Service` (`Service`) ist eine von der Laufzeit verwaltete Komponente. Services werden über die ObjectFlow-Konfiguration instanziiert und innerhalb einer Anwendung daher nur einmal erzeugt. Sie sind zustandslos zu implementieren: Aufrufübergreifender sowie benutzer- oder sessionbezogener Zustand darf nicht in Feldern eines Services gespeichert werden.
+
+Services bündeln vor allem:
+
+- fachliche Operationen über mehrere Objekte,
+- Zustandsübergänge und dazugehörige Prüfungen,
+- wiederverwendbare Berechnungen,
+- die Koordination mehrerer Repositories oder anderer Services,
+- Logik, die sowohl aus UI-Commands als auch aus Jobs und Tests benötigt wird.
+
+Für die Platzierung fachlicher Logik stehen vier Ebenen zur Verfügung. Nur zwei davon, allgemeiner Domänenservice und Anwendungsfallservice, werden technisch mit demselben ObjectFlow-Sprachkonzept `Service` modelliert. ObjectFlow besitzt keine getrennten Service-Untertypen für diese beiden Aufgaben; ihre Unterscheidung ergibt sich aus Verantwortung, Schnittstelle und Benennung. Datenstrukturmethoden und Commands sind dagegen eigene Modellierungsorte:
+
+- **Datenstrukturmethode** – technisch eine BaseLanguage-Methode in einer Entity, einem Value Object oder DTO: allgemeines Verhalten eines einzelnen fachlichen Objekts oder Werts, ohne Infrastrukturzugriff.
+- **Allgemeiner Domänenservice** – technisch ein `Service`: wiederverwendbare Geschäftslogik, die keinem einzelnen Objekt natürlich zugeordnet werden kann oder mehrere Objekte verbindet.
+- **Anwendungsfallservice** – ebenfalls technisch ein `Service`: spezifischere Orchestrierung für eine fachliche Fähigkeit, die von mehreren Einstiegspunkten wie UI, Batch und Tests genutzt werden kann. Er darf Repositories und andere Komponenten koordinieren, enthält aber keine Page-Navigation.
+- **Command** – technisch ein `Command`: konkreter Ablauf mit Parametern, Pages, Conclusions und Session-Grenze. Er ruft Datenstrukturmethoden und Services auf, dupliziert deren Regeln aber nicht.
+
+Eine grundsätzlich gültige Domänenregel liegt damit in einer Entity, einem Value Object oder einem allgemeinen Domänenservice. Eine Prüfung, die zu einer Service-Operation gehört und in allen Aufrufkontexten gelten soll, kann als Precondition der Service Method modelliert werden. Eine rein use-case- oder interaktionsbezogene Prüfung gehört hingegen in den Anwendungsfallservice beziehungsweise Command und seine Page Conclusions.
+
+### Service Methods
+
+Eine Service Method (`ServiceInstanceMethodDeclaration`) besitzt Parameter, Rückgabetyp, Body und optional Preconditions. Zwei Methodenoptionen verändern ihre technische Verwendung:
+
+| Name | Konzeptname | Bedeutung |
+| --- | --- | --- |
+| `API_METHOD` | `SimdApiMethod` | Kennzeichnet eine für die API-Integration vorgesehene Service Method |
+| `TO_SESSION_OPS` | `SimdToSessionOps` | Der Aufruf wird im passenden Session-Kontext nicht sofort ausgeführt, sondern als Session Operation registriert |
+
+Eine Methode mit `TO_SESSION_OPS` darf keine Preconditions besitzen. Eine solche Precondition würde erst während der Transaktionsausführung geprüft; die Laufzeit lehnt diese Kombination mit einer RuntimeException ab.
+
+### Komponenten mit `#` aufrufen
+
+Service- und Repository-Methoden werden mit dem Komponentenaufruf `#` (`OperationCall`) aufgerufen. Er ist nicht nur eine kürzere Schreibweise für einen Java-Methodenaufruf: Er kennt die konfigurierte Komponenteninstanz, die aktuelle Session und die Methodenart. Dadurch kann die Laufzeit entscheiden, ob der Aufruf sofort erfolgt oder als Session Operation registriert wird.
+
+| Ziel des `OperationCall` | Typisches Verhalten |
+| --- | --- |
+| Normale Service Method | Wird unmittelbar ausgeführt |
+| Service Method mit `TO_SESSION_OPS` | Wird im transaktionsfähigen Abschlusskontext als Session Operation registriert |
+| ManMap-`READONLY`-Methode | Wird unmittelbar in der aktuellen Session ausgeführt |
+| ManMap-`CHECKOUT`-Methode | Wird unmittelbar ausgeführt und integriert geladene Entities veränderbar in die Session |
+| ManMap-`CHECKIN`- oder `DELETE`-Methode in `FINAL_OK` | Wird automatisch als Session Operation registriert |
+| Dafür vorgesehener Aufruf in `FINAL_CANCEL` | Wird als Cancel-/Marker- beziehungsweise Journal-Operation in dem dafür vorgesehenen Cancel-Transaktionskontext behandelt |
+
+Für normale fachliche Aufrufe ist `OperationCall` zu verwenden. Ein direkter Java-Aufruf ist nicht möglich. Er würde die Komponenten-, Session- und Transaktionssemantik umgehen.
+
+### Explizite Session Operations
+
+Mit `session operation add` (`SessionOperationAdd`) kann ein `OperationCall` ausdrücklich auf dem Operation Stack der aktuellen Session registriert werden. Der Aufruf wird dabei noch nicht ausgeführt.
+
+Das hat zwei wichtige Konsequenzen:
+
+1. Ein Rückgabewert oder eine durch den späteren Aufruf vorgenommene Änderung ist direkt nach `session operation add` noch nicht verfügbar.
+2. Wird beispielsweise beim späteren Insert eine Entity-ID vergeben, kann diese ID nicht unmittelbar nach der Registrierung ausgegeben oder verwendet werden.
+
+Service Methods mit `TO_SESSION_OPS` und passende ManMap-`CHECKIN`-/`DELETE`-Methoden übernehmen diese Registrierung automatisch, wenn sie in dem dafür vorgesehenen Kontext per `OperationCall` aufgerufen werden. Die zwei oben genannten Konsequenzen gelten dann ebenfalls.
+
+### Preconditions, Validation, Guards und Exceptions
+
+ObjectFlow unterscheidet fachlich beziehungsweise für den Benutzer behandelbare Probleme von unerwarteten Systemzuständen.
+
+| Mechanismus | Zweck | Wirkung im Command-Ablauf |
+| --- | --- | --- |
+| Precondition (`Precondition`) | Verständliche, grundsätzlich korrigierbare Voraussetzung | Stoppt außerhalb einer `validation` den aktuellen Programmfluss; die Meldung wird in der UI angezeigt |
+| `validation` (`ValidationStatement`) | Mehrere Voraussetzungen gemeinsam prüfen | Führt die enthaltenen Prüfungen aus und sammelt alle verletzten Preconditions in einem Problembericht, der dann ebenfalls in der UI angezeigt wird. |
+| `guard` (`Guard`) | Unerwarteten beziehungsweise nicht durch den Benutzer korrigierbaren Zustand absichern | Beendet den Command in `FINAL_CANCEL` (Falls GRAPH_EDIT auch Parent GRAPH_OWNER); Benutzer erhalten eine neutrale Systemmeldung, Entwickler Diagnoseinformationen und Stacktrace |
+| Exception | Technischer Ausnahmefall | Beendet den betroffenen Command in `FINAL_CANCEL` |
+
+Bei einer Precondition beschreibt `condition` den gültigen Zustand: Nur wenn der Ausdruck `true` ergibt, läuft die Ausführung weiter. Bei `false` erzeugt die Precondition ein fachliches Problem. Für einen statischen benutzergerichteten Problemtext wird die ObjectFlow-Textprojektion `StringFormatString` in einfachen Anführungszeichen verwendet, beispielsweise `'Hallo Text'`, und kein BaseLanguage-String in doppelten Anführungszeichen. Platzhalter und Argumente können mit `%` ergänzt werden.
+
+Die vollständige Projektionsform lässt sich schematisch so lesen:
+
+```objectflow
+precondition <condition> : <options> 'Hallo Text' / <exception>
+  'propertyName' : <value>;
+```
+
+Alle Teile außer `condition` und Problemtext sind optional. Mehrere Optionen werden durch Kommas getrennt. `CheckOptionRef` verweist auf Werte von `IOFXProblem.Opt`:
+
+| Option | Wirkung |
+| --- | --- |
+| `WARNING_HINT` | Behandelt das Problem nur als Warnhinweis. |
+| `JOB_IGNORE` | Kennzeichnet das Problem für eine Job-Ausführung als zu ignorierenden Fall. |
+| `JOB_ITEM_ALREAD_DONE` | Kennzeichnet das betroffene Job-Element als bereits erledigt; die Schreibweise `ALREAD` ist Bestandteil der Laufzeit-API. |
+| `PRIO_INFO` | Meldet beziehungsweise protokolliert das Problem mit Priorität Info. |
+| `PRIO_ERROR` | Meldet beziehungsweise protokolliert das Problem mit Priorität Error. |
+| `PRIO_FATAL` | Meldet beziehungsweise protokolliert das Problem mit Priorität Fatal. |
+
+Nach dem Schrägstrich kann eine vorhandene Exception als Ausdruck weitergereicht werden. Sie bleibt dadurch als technische Ursache und mit ihrem Stacktrace am fachlichen Problem erhalten. Die anschließenden optionalen Schlüssel/Wert-Paare sind `LogStatementProperty`-Einträge. Sie ergänzen den Problembericht und die Diagnoseprotokollierung um strukturierte Werte, ohne den Benutzertext mit technischen Details zu überladen.
+
+Eine Precondition kann zusätzlich einen Command als Korrekturaktion anbieten. Nach einer fehlgeschlagenen Prüfung kann der Benutzer dadurch über ein Menü eine Reparatur ausführen oder eine andere Page Conclusion wählen.
+
+Ein Guard in einem `GRAPH_EDIT_CMD` besitzt ein besonderes Eskalationsverhalten: Er beendet nicht nur den Child-Command, sondern auch den zugehörigen Session Owner. Für den Endanwender erscheint sinngemäß die Meldung „Das Kommando konnte am System nicht ausgeführt werden“. Die technischen Details bleiben für Entwickler und Betrieb sichtbar. Eine normale Exception im `GRAPH_EDIT_CMD` besitzt dieses besondere Eskalationsverhalten nicht.
+
+Ein häufiges Muster für ändernde Domänenlogik lautet:
+
+1. Benötigte Fakten und Konfiguration laden.
+2. Alle fachlichen Voraussetzungen in einem `validation`-Block prüfen.
+3. Erst nach erfolgreicher Validation den fachlichen Graphen verändern.
+
+### Literale für Datum, Zeitpunkt und Dezimalzahl
+
+ObjectFlow ergänzt BaseLanguage um fachlich geeignete Literale. Sie vermeiden technische Konstruktoraufrufe und halten im Modell sichtbar, ob ein fester Wert oder die Serverzeit gemeint ist.
+
+| Projektion | Konzeptname | Typ und Semantik |
+| --- | --- | --- |
+| `31.12.2026` | `DateLiteral` | Erzeugt ein festes `org.joda.time.LocalDate` aus Tag, Monat und Jahr. |
+| `new_LocalDateFromServer()` | `DateLiteral` | Ermittelt das aktuelle Datum über den von der Laufzeit bereitgestellten Server-Zeitkontext. |
+| `31.12.2026 14:30:0` | `DateTimeLiteral` | Erzeugt einen festen `org.joda.time.DateTime` aus Datum, Stunde, Minute und Sekunde. |
+| `new_DateTimeFromServer()` | `DateTimeLiteral` | Ermittelt Datum und Uhrzeit über den Server-Zeitkontext. |
+| `13.44bd` | `DezimalLiteral` | Erzeugt ein `java.math.BigDecimal`; das Suffix `bd` verhindert die ungenaue Gleitkomma-Semantik von `double`. |
+
+Serverdatum und Serverzeitpunkt sind für fachliche Regeln den lokalen Uhren eines Clients immer vorzuziehen. Sie werden erst zur Laufzeit ausgewertet und können dadurch in einer Testkonfiguration zentral kontrolliert werden. Feste Literale eignen sich für fachliche Konstanten und Testdaten. Für Geld und andere exakte Dezimalwerte ist das `bd`-Literal zu verwenden; eine vorausgehende Berechnung mit `double` wird durch eine spätere Umwandlung in `BigDecimal` nicht nachträglich exakt. Auf java Double und Float ist stets zu verzichten!
+
+### UI-Metadaten einer Property mit `#Meta` steuern
+
+Mit `#Meta` (`BPMetaReference`) greift ObjectFlow nicht auf den fachlichen Wert einer Business Property zu, sondern auf ihre veränderbaren Laufzeitmetadaten. Ein Command kann damit die an diese Property gebundene DataUX-Darstellung situationsabhängig steuern, ohne dem statischen Aufbau einer `Page Pane` zu widersprechen.
+
+Beispielsweise kann ein Rechnungsablauf folgende Laufzeitmetadaten setzen:
+
+```text
+rechnung.rabatt#Meta.setEnabled(false);
+rechnung.zahlungsziel#Meta.setOptional(true);
+rechnung.rechnungsdatum#Meta.requestFocus();
+rechnung.status#Meta.setElements(Rechnungsstatus.Entwurf, Rechnungsstatus.Freigegeben);
+rechnung.kunde#Meta.setScope(buchbareKunden);
+```
+
+Damit lassen sich für die konkrete Objekt- und Property-Instanz insbesondere Eingabefähigkeit, Optionalität, Fokus, auswählbare Statuselemente und der Scope einer Entity-Auswahl beeinflussen. Der fachliche Property-Wert bleibt dabei unverändert. `#Meta` eignet sich für dynamische UI-Regeln eines Ablaufs; dauerhaft geltende Beschriftungen, Anordnungen werden weiterhin in Business-Property-Metadaten der Deklaration beziehungsweise DataUX modelliert. Fachliche Gültigkeitsregeln müssen zusätzlich als Preconditions oder Validierung bestehen und dürfen nicht allein von einer deaktivierten Eingabe abhängen!
 
 ### Formatieren von Zeichenketten
 
@@ -154,99 +331,6 @@ Der formatierte ObjectFlow-String (`StringFormatString`) verbindet einen Formatt
 Für die Standardkonvertierungen und `%bd` unterstützt die Laufzeit auch Formatflags, Breite und Genauigkeit. Die konfigurierten Standardmuster können in der Laufzeitkonfiguration überschrieben werden. Ein nicht zum Platzhalter passender Typ führt zu einer Exception; `null` wird als `#NULL?` sichtbar gemacht. Dadurch fallen unbeabsichtigt fehlende Werte auf. Soll ein fehlender Wert dagegen fachlich leer oder mit einer Ersatzbeschriftung erscheinen, muss dies vor der Formatierung ausdrücklich entschieden werden.
 
 Formatierung ist von fachlicher Berechnung zu trennen. Ein Geldbetrag wird fachlich als `BigDecimal` beziehungsweise Value Object berechnet; erst für Meldung oder Oberfläche wird er formatiert.
-
-### Service-Komponenten
-
-Ein `Service` (`Service`) ist eine von der Laufzeit verwaltete Komponente. Services werden über die ObjectFlow-Konfiguration verdrahtet und innerhalb einer Anwendung typischerweise einmal instanziiert. Sie sind deshalb grundsätzlich zustandslos zu behandeln: Aufrufübergreifender, benutzer- oder sessionbezogener Zustand gehört nicht in Service-Felder.
-
-Services bündeln vor allem:
-
-- fachliche Operationen über mehrere Objekte,
-- Zustandsübergänge und dazugehörige Prüfungen,
-- wiederverwendbare Berechnungen,
-- die Koordination mehrerer Repositories oder anderer Services,
-- Logik, die sowohl aus UI-Commands als auch aus Jobs und Tests benötigt wird.
-
-ObjectFlow besitzt für die folgenden Rollen nur das eine Sprachkonzept `Service`; die Unterscheidung ist also eine Architektur- und Benennungsentscheidung:
-
-- **Datenstrukturmethode:** Allgemeines Verhalten eines einzelnen fachlichen Objekts oder Werts, ohne Infrastrukturzugriff.
-- **Allgemeiner Domänenservice:** Wiederverwendbare Geschäftslogik, die keinem einzelnen Objekt natürlich zugeordnet werden kann oder mehrere Objekte verbindet.
-- **Anwendungsfallservice:** Spezifischere Orchestrierung für eine fachliche Fähigkeit, die von mehreren Einstiegspunkten wie UI, Batch und Tests genutzt werden kann. Er darf Repositories und andere Komponenten koordinieren, enthält aber keine Page-Navigation.
-- **Command:** Konkreter Ablauf mit Parametern, Pages, Conclusions und Session-Grenze. Er ruft Datenstrukturmethoden und Services auf, dupliziert deren Regeln aber nicht.
-
-Eine grundsätzlich gültige Domänenregel liegt damit in einer Entity, einem Value Object oder einem allgemeinen Domänenservice. Eine Prüfung, die zu einer Service-Operation gehört und in allen Aufrufkontexten gelten soll, kann als Precondition der Service Method modelliert werden. Eine rein use-case- oder interaktionsbezogene Prüfung gehört in den Anwendungsfallservice beziehungsweise Command und seine Page Conclusion.
-
-### Service Methods
-
-Eine Service Method (`ServiceInstanceMethodDeclaration`) besitzt Parameter, Rückgabetyp, Body und optional Preconditions. Zwei Methodenoptionen verändern ihre technische Verwendung:
-
-| Name | Konzeptname | Bedeutung |
-| --- | --- | --- |
-| `API_METHOD` | `SimdApiMethod` | Kennzeichnet eine für die API-Integration vorgesehene Service Method |
-| `TO_SESSION_OPS` | `SimdToSessionOps` | Der Aufruf wird im passenden Session-Kontext nicht sofort ausgeführt, sondern als Session Operation registriert |
-
-Eine Methode mit `TO_SESSION_OPS` darf keine Preconditions besitzen. Eine solche Precondition würde erst während der Transaktionsausführung geprüft; die Laufzeit lehnt diese Kombination mit einer RuntimeException ab.
-
-### Komponenten mit `#` aufrufen
-
-Service- und Repository-Methoden werden mit dem Komponentenaufruf `#` (`OperationCall`) aufgerufen. Er ist nicht nur eine kürzere Schreibweise für einen Java-Methodenaufruf: Er kennt die konfigurierte Komponenteninstanz, die aktuelle Session und die Methodenart. Dadurch kann die Laufzeit entscheiden, ob der Aufruf sofort erfolgt oder als Session Operation registriert wird.
-
-| Ziel des `OperationCall` | Typisches Verhalten |
-| --- | --- |
-| Normale Service Method | Wird unmittelbar ausgeführt |
-| Service Method mit `TO_SESSION_OPS` | Wird im transaktionsfähigen Abschlusskontext als Session Operation registriert |
-| ManMap-`READONLY`-Methode | Wird unmittelbar in der aktuellen Session ausgeführt |
-| ManMap-`CHECKOUT`-Methode | Wird unmittelbar ausgeführt und integriert geladene Entities veränderbar in die Session |
-| ManMap-`CHECKIN`- oder `DELETE`-Methode in `FINAL_OK` | Wird automatisch als Session Operation registriert |
-| Dafür vorgesehener Aufruf in `FINAL_CANCEL` | Wird als Cancel-/Marker- beziehungsweise Journal-Operation in dem dafür vorgesehenen Transaktionskontext behandelt |
-
-Für normale fachliche Aufrufe ist `OperationCall` zu verwenden. Ein direkter Java-Aufruf würde die Komponenten-, Session- und Transaktionssemantik umgehen.
-
-### Explizite Session Operations
-
-Mit `session operation add` (`SessionOperationAdd`) kann ein `OperationCall` ausdrücklich auf dem Operation Stack der aktuellen Session registriert werden. Der Aufruf wird dabei noch nicht ausgeführt.
-
-Das hat zwei wichtige Konsequenzen:
-
-1. Ein Rückgabewert oder eine durch den späteren Aufruf vorgenommene Änderung ist direkt nach `session operation add` noch nicht verfügbar.
-2. Wird beispielsweise beim späteren Insert eine Entity-ID vergeben, kann diese ID nicht unmittelbar nach der Registrierung ausgegeben oder verwendet werden.
-
-Service Methods mit `TO_SESSION_OPS` und passende ManMap-`CHECKIN`-/`DELETE`-Methoden übernehmen diese Registrierung automatisch, wenn sie in dem dafür vorgesehenen Kontext per `OperationCall` aufgerufen werden.
-
-### Preconditions, Validation, Guards und Exceptions
-
-ObjectFlow unterscheidet fachlich beziehungsweise für den Benutzer behandelbare Probleme von unerwarteten Systemzuständen.
-
-| Mechanismus | Zweck | Wirkung im Command-Ablauf |
-| --- | --- | --- |
-| Precondition (`Precondition`) | Verständliche, grundsätzlich korrigierbare Voraussetzung | Stoppt außerhalb einer `validation` den aktuellen Programmfluss; die Meldung wird in der UI angezeigt |
-| `validation` (`ValidationStatement`) | Mehrere Voraussetzungen gemeinsam prüfen | Führt die enthaltenen Prüfungen aus und sammelt alle verletzten Preconditions in einem Problembericht |
-| `guard` (`Guard`) | Unerwarteten beziehungsweise nicht durch den Benutzer korrigierbaren Zustand absichern | Beendet den Command in `FINAL_CANCEL`; Benutzer erhalten eine neutrale Systemmeldung, Entwickler Diagnoseinformationen und Stacktrace |
-| Exception | Technischer Ausnahmefall | Beendet den betroffenen Command in `FINAL_CANCEL` |
-
-Eine Precondition kann zusätzlich einen Command als Korrekturaktion anbieten. Nach einer fehlgeschlagenen Prüfung kann der Benutzer dadurch über ein Menü eine Reparatur ausführen oder eine andere Page Conclusion wählen.
-
-Ein Guard in einem `GRAPH_EDIT_CMD` besitzt ein besonderes Eskalationsverhalten: Er beendet nicht nur den Child-Command, sondern auch den zugehörigen Session Owner. Für den Endanwender erscheint sinngemäß die Meldung „Das Kommando konnte am System nicht ausgeführt werden“. Die technischen Details bleiben für Entwickler und Betrieb sichtbar. Eine normale Exception im `GRAPH_EDIT_CMD` besitzt dieses besondere Eskalationsverhalten nicht.
-
-Ein häufiges Muster für ändernde Domänenlogik lautet:
-
-1. Benötigte Fakten und Konfiguration laden.
-2. Alle fachlichen Voraussetzungen in einem `validation`-Block prüfen.
-3. Erst nach erfolgreicher Validation den fachlichen Graphen verändern.
-
-### Literale für Datum, Zeitpunkt und Dezimalzahl
-
-ObjectFlow ergänzt BaseLanguage um fachlich geeignete Literale. Sie vermeiden technische Konstruktoraufrufe und halten im Modell sichtbar, ob ein fester Wert oder die Serverzeit gemeint ist.
-
-| Name | Konzeptname | Projektion | Typ und Semantik |
-| --- | --- | --- | --- |
-| Datums-Literal | `DateLiteral` | `31.12.2026` | Erzeugt ein festes `org.joda.time.LocalDate` aus Tag, Monat und Jahr. |
-| aktuelles Serverdatum | `DateLiteral` | `new_LocalDateFromServer()` | Ermittelt das aktuelle Datum über den von der Laufzeit bereitgestellten Server-Zeitkontext. |
-| Zeitpunkt-Literal | `DateTimeLiteral` | `31.12.2026 14:30:0` | Erzeugt einen festen `org.joda.time.DateTime` aus Datum, Stunde, Minute und Sekunde. |
-| aktueller Serverzeitpunkt | `DateTimeLiteral` | `new_DateTimeFromServer()` | Ermittelt Datum und Uhrzeit über den Server-Zeitkontext. |
-| Dezimal-Literal | `DezimalLiteral` | `13.44bd` | Erzeugt ein `java.math.BigDecimal`; das Suffix `bd` verhindert die ungenaue Gleitkomma-Semantik von `double`. |
-
-Serverdatum und Serverzeitpunkt sind für fachliche Regeln den lokalen Uhren eines Clients vorzuziehen. Sie werden erst zur Laufzeit ausgewertet und können dadurch in einer Testkonfiguration zentral kontrolliert werden. Feste Literale eignen sich für fachliche Konstanten und Testdaten. Für Geld und andere exakte Dezimalwerte ist das `bd`-Literal zu verwenden; eine vorausgehende Berechnung mit `double` wird durch eine spätere Umwandlung in `BigDecimal` nicht nachträglich exakt.
 
 ## Teil III – Commands und Anwendungsabläufe
 
@@ -342,6 +426,8 @@ Schlägt eine Session Operation fehl, wird die Transaktion nicht committed. Ein 
 
 Unter `revert on FINAL_ / USER_CANCEL` können Parameter beziehungsweise Variablen angegeben werden, deren Zustand bei einem Abbruch wiederhergestellt werden soll. Beim Command-Start zieht die Laufzeit dafür automatisch eine Kopie.
 
+Bei Listen hängt diese Revert-Kopie von der Veränderbarkeit ihrer Elemente ab: Veränderbare Entity-Elemente werden kopiert; ausschließlich read-only geladene Elemente können als Referenzen wiederverwendet werden.
+
 - Bei `FINAL_CANCEL` und `FINAL_USER_CANCEL` wird der ursprüngliche Zustand wiederhergestellt.
 - Wird die Wurzel eines Graphen angegeben, wird der gesamte darunterliegende ObjectFlow-Graph zurückgesetzt.
 - Nicht als Revert-Objekt erfasste Änderungen werden nicht allein aufgrund eines Child-Abbruchs automatisch zurückgenommen.
@@ -383,6 +469,21 @@ Session Owner startet
 Das Konzept `session` (`Session`) gibt bei Bedarf direkten Zugriff auf Interna der aktuellen Session. Es ist für Fälle gedacht, die durch die höherwertigen Sprachkonzepte nicht abgedeckt werden. Direkter Session-Zugriff erhöht die Kopplung an die Laufzeit und sollte deshalb gezielt bleiben.
 
 Neu erzeugte Entities müssen Teil der Session werden, bevor Session- und UI-Mechanismen sie als bearbeiteten Graphen behandeln können. Dafür stellt die Session entsprechende Integrationsoperationen bereit.
+
+#### Session-weites Read-only und Dirty
+
+Mit `session.setReadOnly()` kann ein Command seine aktuelle Session ausdrücklich in den Read-only-Modus versetzen. In diesem Modus darf die Laufzeit keine speichernde Transaktion starten; generierte Insert- und Update-Operationen lehnen die Ausführung ebenfalls ab. Das ist insbesondere für Commands sinnvoll, die trotz umfangreicher Navigation und Repository-Zugriffe garantiert keine Daten speichern sollen.
+
+Der Session-Schalter ist von der Read-only-Eigenschaft einzelner Entities zu unterscheiden. `session.setReadOnly()` markiert die Session, setzt aber bereits integrierte Entity-Instanzen nicht nachträglich einzeln auf read-only. Ob deren Setter Änderungen zulassen, hängt weiterhin davon ab, ob sie read-only geladen oder ausgecheckt wurden. Für einen konsistent lesenden Ablauf sollen daher sowohl passende read-only Repository-Methoden als auch – wenn der gesamte Command schreibgeschützt sein soll – der Session-Modus verwendet werden.
+
+`session.isDirty()` beantwortet, ob die Session ungespeicherte Änderungen enthält. Die Prüfung berücksichtigt zunächst einen ausdrücklich gesetzten Session-Dirty-Zustand und durchläuft andernfalls die Key Stores aller in die Session integrierten Entity-Typen. Eine neu integrierte Entity ohne Schlüssel gilt als dirty; bei vorhandenen Entities wird deren Dirty-Zustand abgefragt. Diese Entity-Prüfung bezieht auch nachträgliche Änderungen an Listen ein. Der Aufruf betrachtet damit die gesamte Session und nicht nur das aktuell auf einer Page gebundene Objekt.
+
+```text
+session.setReadOnly();
+boolean ungespeicherteAenderungen = session.isDirty();
+```
+
+`session.isDirty()` eignet sich beispielsweise für Abbruchrückfragen oder zur Entscheidung, ob ein speichernder Abschluss angeboten wird. Da die Prüfung die integrierten Entities bis zum ersten Treffer durchläuft, sollte sie nicht unnötig in engen Schleifen aufgerufen werden.
 
 ### Entities in der Session prüfen
 
@@ -492,6 +593,7 @@ ObjectFlow unterstützt insbesondere folgende Testformen:
 
 Da Tests nicht committen, sollen persistenzwirksame Erwartungen gezielt über Testdatenaufbau, gelesenen Zustand und die registrierten beziehungsweise aufgerufenen Operationen geprüft werden.
 
+§ Hier fehlt noch, dass Repos mit Test-Repositories überschrieben werden können, mit hilfe der rolle Repository.superclass. Wenn man das test repository mit fake data dann in der config instanziert, dann gilt das test repository. Es kann also auch mehrere test-implementierungen für ein test-repo geben §
 
 ## Teil V – Querschnittsthemen
 
@@ -595,6 +697,12 @@ Serialisierung ist kein Ersatz für DTO-Modellierung. Ein explizites DTO bleibt 
 - **Service als zustandsbehaftete Benutzerinstanz behandeln:** Services werden typischerweise einmal pro Anwendung instanziiert und sollen zustandslos bleiben.
 - **Infrastrukturzugriff in eine Datenstrukturmethode verschieben:** Entities, Value Objects und DTOs können keinen `OperationCall` ausführen. Erforderliche Daten müssen vorab geladen oder als Parameter übergeben werden; die Koordination gehört in einen Service oder Command.
 - **Value Objects nachträglich verändern:** Dadurch werden wertbezogene Gleichheit und die Weitergabe gemeinsam genutzter Werte schwer nachvollziehbar. Bei einer fachlichen Änderung ist ein neuer Wert zu erzeugen.
+- **Virtuelle Property wie einen gespeicherten Wert behandeln:** Sie besitzt keinen eigenen Persistenzwert. Getter und Setter müssen den Wert vollständig aus den zugrunde liegenden Properties ableiten beziehungsweise dorthin zurückschreiben.
+- **Entity-Beziehungen über sämtliche Objektwerte vergleichen:** Mit `#Key` wird ausdrücklich die Identität verglichen; bei zusammengesetzten Schlüsseln stehen anschließend deren einzelne Bestandteile zur Verfügung.
+- **Nicht geladene Entity-Referenz direkt lesen:** Ohne Reference Join löst der Property-Zugriff `OFXNotInitializedException` aus. Über `#Key` kann die Ziel-Entity ausdrücklich per Repository geladen werden.
+- **`isNullKey` mit dem Ladezustand verwechseln:** Die Operation prüft, ob der Beziehungsschlüssel gesetzt ist; eine Entity kann einen gültigen Schlüssel besitzen und trotzdem noch nicht als Objekt geladen sein.
+- **Read-only Entity verändern:** Setter einer read-only geladenen Entity werfen `OFXIllegalAccessException`. Ändernde Abläufe benötigen einen gezielten Checkout.
+- **Nur `session.setReadOnly()` als Entity-Schutz betrachten:** Der Schalter verhindert speichernde Session-Operationen, setzt bereits integrierte Entities aber nicht nachträglich einzeln auf read-only.
 - **`null` als normalen Ersatzstatus verwenden:** Optionale Werte müssen fachlich und in DataUX ausdrücklich als optional modelliert werden; für reguläre Zustände ist ein Statuswert vorzuziehen.
 - **Unpassenden String-Platzhalter verwenden:** `OFXStringFormatter2` prüft die erwarteten Typen zur Laufzeit und wirft bei einer falschen Kombination eine Exception.
 - **Session-Operation mit unmittelbarem Aufruf verwechseln:** Nach der Registrierung sind Rückgabewerte und beim Speichern erzeugte IDs noch nicht vorhanden.
@@ -612,6 +720,7 @@ Serialisierung ist kein Ersatz für DTO-Modellierung. Ein explizites DTO bleibt 
 - **`IN_BACKGROUND` als Hintergrundausführung des gesamten Commands verstehen:** Nur `command init` läuft im Hintergrund.
 - **URL-Parameter nicht in den Command-Kontext pushen:** Nach der Initialisierung stehen sie sonst nicht wie normale Command-Parameter für den Ablauf bereit.
 - **UI-Logik und Domänenlogik vermischen:** Darstellung gehört nach DataUX; wiederverwendbare fachliche Regeln gehören in Datenstrukturen oder Services.
+- **`#Meta` als fachliche Validierung verwenden:** Deaktivierte oder eingeschränkte UI-Eingaben ersetzen keine serverseitige Precondition oder Validierung.
 - **Name und Konzeptname verwechseln:** Name, Konzeptname und FQ-Name nach der eingangs festgelegten Schreibweise unterscheiden.
 
 
@@ -625,6 +734,9 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 | Datenstruktur | `Value Object` | `ValueObject` | `org.modellwerkstatt.objectflow.structure.ValueObject` |
 | Datenstruktur | `DTO` | `DTO` | `org.modellwerkstatt.objectflow.structure.DTO` |
 | Datenstruktur | Business Property | `BusinessProperty` | `org.modellwerkstatt.objectflow.structure.BusinessProperty` |
+| Datenstruktur | virtuelle Property-Implementierung | `CustomPropertyImplementation` | `jetbrains.mps.baseLanguage.structure.CustomPropertyImplementation` |
+| Datenstruktur | `#Key` einer Entity-Beziehung | `BPRefIdReference` | `org.modellwerkstatt.objectflow.structure.BPRefIdReference` |
+| Datenstruktur | `isNullKey` | `IsNull` | `org.modellwerkstatt.objectflow.structure.IsNull` |
 | Datenstruktur | equal property | `EqualPropertyReference` | `org.modellwerkstatt.objectflow.structure.EqualPropertyReference` |
 | Status | Status | `StatusDeclaration` | `org.modellwerkstatt.objectflow.structure.StatusDeclaration` |
 | Status | Statuselement | `StatusElement` | `org.modellwerkstatt.objectflow.structure.StatusElement` |
@@ -638,6 +750,7 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 | Statusoption | `WHEN_NULL_WL` | `WhenNullOnDbStatusElemOption` | `org.modellwerkstatt.objectflow.structure.WhenNullOnDbStatusElemOption` |
 | Statusoption | `WHEN_UNDEFINED_WL` | `WhenUndefinedStatusElemOption` | `org.modellwerkstatt.objectflow.structure.WhenUndefinedStatusElemOption` |
 | Formatierung | formatierter String | `StringFormatString` | `org.modellwerkstatt.objectflow.structure.StringFormatString` |
+| UI-Metadaten | `#Meta` einer Business Property | `BPMetaReference` | `org.modellwerkstatt.objectflow.structure.BPMetaReference` |
 | Literal | Datum | `DateLiteral` | `org.modellwerkstatt.objectflow.structure.DateLiteral` |
 | Literal | Zeitpunkt | `DateTimeLiteral` | `org.modellwerkstatt.objectflow.structure.DateTimeLiteral` |
 | Literal | Dezimalzahl | `DezimalLiteral` | `org.modellwerkstatt.objectflow.structure.DezimalLiteral` |
@@ -647,6 +760,9 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 | Serviceoption | `TO_SESSION_OPS` | `SimdToSessionOps` | `org.modellwerkstatt.objectflow.structure.SimdToSessionOps` |
 | Komponentenaufruf | `#` | `OperationCall` | `org.modellwerkstatt.objectflow.structure.OperationCall` |
 | Prüfung | precondition | `Precondition` | `org.modellwerkstatt.objectflow.structure.Precondition` |
+| Prüfung | Problemtext einer Precondition | `ProblemMessage` | `org.modellwerkstatt.objectflow.structure.ProblemMessage` |
+| Prüfung | Precondition-Option | `CheckOptionRef` | `org.modellwerkstatt.objectflow.structure.CheckOptionRef` |
+| Prüfung | Diagnoseeigenschaft | `LogStatementProperty` | `org.modellwerkstatt.objectflow.structure.LogStatementProperty` |
 | Prüfung | validation | `ValidationStatement` | `org.modellwerkstatt.objectflow.structure.ValidationStatement` |
 | Prüfung | guard | `Guard` | `org.modellwerkstatt.objectflow.structure.Guard` |
 | Command | `Command` | `Command` | `org.modellwerkstatt.objectflow.structure.Command` |

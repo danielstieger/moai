@@ -1,0 +1,33 @@
+{
+  "concept": "org.modellwerkstatt.dataux.structure.AppUiModule",
+  "properties": [
+    { "name": "name", "value": "<application-name>" }
+  ],
+  "references": [],
+  "children": [
+    {
+      "role": "authFunction",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.AppAuthenticationFunction",
+          "properties": [],
+          "references": [],
+          "children": [
+            {
+              "role": "body",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StatementList",
+                  "properties": [],
+                  "references": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

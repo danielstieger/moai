@@ -1,0 +1,36 @@
+{
+  "concept": "org.modellwerkstatt.dataux.structure.PagePane",
+  "properties": [
+    { "name": "name", "value": "<page-pane-name>" },
+    { "name": "isNamed", "value": "true" }
+  ],
+  "references": [
+    { "role": "boundClassifier", "target": "<bound-classifier-node-ref>" }
+  ],
+  "children": [
+    {
+      "role": "uxChild",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.DelegateForm",
+          "properties": [],
+          "references": [],
+          "children": [
+            {
+              "role": "colWeights",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.dataux.structure.OneWeight",
+                  "properties": [],
+                  "references": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

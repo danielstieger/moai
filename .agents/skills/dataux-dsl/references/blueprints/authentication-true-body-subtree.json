@@ -1,0 +1,33 @@
+{
+  "concept": "jetbrains.mps.baseLanguage.structure.StatementList",
+  "properties": [],
+  "references": [],
+  "children": [
+    {
+      "role": "statement",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.ExpressionStatement",
+          "properties": [],
+          "references": [],
+          "children": [
+            {
+              "role": "expression",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.BooleanConstant",
+                  "properties": [
+                    { "name": "value", "value": "true" }
+                  ],
+                  "references": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
