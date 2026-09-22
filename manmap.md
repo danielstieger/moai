@@ -227,7 +227,7 @@ Eine leere Liste beweist daher nicht, dass in der Datenbank keine Kindzeilen vor
 
 ### Insert oder Update
 
-Ohne erzwingende Option prüft ManMap den Schlüssel über `MMStaticAccessHelper.isNullKeyStaticHelper()`:
+Ohne erzwingende Option prüft ManMap den Schlüssel folgendermassen:
 
 | Schlüsselform | Als „noch nicht vergeben“ behandelte Werte |
 | --- | --- |

@@ -243,12 +243,12 @@ ObjectFlow unterscheidet fachlich beziehungsweise für den Benutzer behandelbare
 | `guard` (`Guard`) | Unerwarteten beziehungsweise nicht durch den Benutzer korrigierbaren Zustand absichern | Beendet den Command in `FINAL_CANCEL` (Falls GRAPH_EDIT auch Parent GRAPH_OWNER); Benutzer erhalten eine neutrale Systemmeldung, Entwickler Diagnoseinformationen und Stacktrace |
 | Exception | Technischer Ausnahmefall | Beendet den betroffenen Command in `FINAL_CANCEL` |
 
-Bei einer Precondition beschreibt `condition` den gültigen Zustand: Nur wenn der Ausdruck `true` ergibt, läuft die Ausführung weiter. Bei `false` erzeugt die Precondition ein fachliches Problem. Für einen statischen benutzergerichteten Problemtext wird die ObjectFlow-Textprojektion `StringFormatString` in einfachen Anführungszeichen verwendet, beispielsweise `'Hallo Text'`, und kein BaseLanguage-String in doppelten Anführungszeichen. Platzhalter und Argumente können mit `%` ergänzt werden.
+Bei einer Precondition beschreibt `condition` den gültigen Zustand: Nur wenn der Ausdruck `true` ergibt, läuft die Ausführung weiter. Bei `false` erzeugt die Precondition ein fachliches Problem. Für einen statischen benutzergerichteten Problemtext wird die ObjectFlow-Textprojektion `StringFormatString` verwendet, beispielsweise 'Hallo Fehler-Text', und kein BaseLanguage-String in doppelten Anführungszeichen. Platzhalter und Argumente können mit `%` ergänzt werden.
 
 Die vollständige Projektionsform lässt sich schematisch so lesen:
 
 ```objectflow
-precondition <condition> : <options> 'Hallo Text' / <exception>
+precondition <condition> : <options> 'Hallo Fehler-Text' / <exception>
   'propertyName' : <value>;
 ```
 
@@ -256,16 +256,18 @@ Alle Teile außer `condition` und Problemtext sind optional. Mehrere Optionen we
 
 | Option | Wirkung |
 | --- | --- |
-| `WARNING_HINT` | Behandelt das Problem nur als Warnhinweis. |
-| `JOB_IGNORE` | Kennzeichnet das Problem für eine Job-Ausführung als zu ignorierenden Fall. |
-| `JOB_ITEM_ALREAD_DONE` | Kennzeichnet das betroffene Job-Element als bereits erledigt; die Schreibweise `ALREAD` ist Bestandteil der Laufzeit-API. |
+| `WARNING_HINT` | Behandelt das Problem nur als Warnhinweis. Der Programmfluss wird nicht abgebrochen; der Text erscheint orange statt rot. |
 | `PRIO_INFO` | Meldet beziehungsweise protokolliert das Problem mit Priorität Info. |
 | `PRIO_ERROR` | Meldet beziehungsweise protokolliert das Problem mit Priorität Error. |
 | `PRIO_FATAL` | Meldet beziehungsweise protokolliert das Problem mit Priorität Fatal. |
 
 Nach dem Schrägstrich kann eine vorhandene Exception als Ausdruck weitergereicht werden. Sie bleibt dadurch als technische Ursache und mit ihrem Stacktrace am fachlichen Problem erhalten. Die anschließenden optionalen Schlüssel/Wert-Paare sind `LogStatementProperty`-Einträge. Sie ergänzen den Problembericht und die Diagnoseprotokollierung um strukturierte Werte, ohne den Benutzertext mit technischen Details zu überladen.
 
-Eine Precondition kann zusätzlich einen Command als Korrekturaktion anbieten. Nach einer fehlgeschlagenen Prüfung kann der Benutzer dadurch über ein Menü eine Reparatur ausführen oder eine andere Page Conclusion wählen.
+Wird eine Precondition während der Bearbeitung einer bereits angezeigten Page verletzt, wird nur die gerade ausgeführte Aktion unterbrochen. Die aktuelle Page und ihr `Page Pane` bleiben sichtbar. Der Benutzer kann seine Eingaben korrigieren, eine andere Page Conclusion wählen oder einen in den Menüs angebotenen Command zur Korrektur starten. Dasselbe gilt für einen `validation`-Block, nachdem alle enthaltenen Probleme gesammelt und angezeigt wurden.
+
+Eine Precondition im `command init` wirkt früher: Sie verhindert, dass der Command seine erste Page erreicht. Die Meldung wird im UI-Kontext des Aufrufers angezeigt und dessen Oberfläche bleibt bestehen. Eine nicht warnende Precondition im Page Init ist dagegen problematisch, weil sie den Aufbau beziehungsweise die erneute Initialisierung der Page unterbricht. In Page Init sollen deshalb nur `WARNING_HINT`-Preconditions verwendet werden; notwendige abbrechende Prüfungen gehören in `command init` oder in eine Page Conclusion. Wird eine Precondition mittelbar in einem aufgerufenen Service ausgelöst, gilt die Wirkung des jeweiligen Aufruforts. Service-Preconditions müssen daher für alle möglichen Command- und Page-Abläufe geeignet sein.
+
+Eine Precondition kann zusätzlich einen Command als Korrekturaktion anbieten. Nach einer fehlgeschlagenen Prüfung kann der Benutzer dadurch über eine Schaltfläche direkt eine Korrektur starten.
 
 Ein Guard in einem `GRAPH_EDIT_CMD` besitzt ein besonderes Eskalationsverhalten: Er beendet nicht nur den Child-Command, sondern auch den zugehörigen Session Owner. Für den Endanwender erscheint sinngemäß die Meldung „Das Kommando konnte am System nicht ausgeführt werden“. Die technischen Details bleiben für Entwickler und Betrieb sichtbar. Eine normale Exception im `GRAPH_EDIT_CMD` besitzt dieses besondere Eskalationsverhalten nicht.
 
@@ -274,6 +276,33 @@ Ein häufiges Muster für ändernde Domänenlogik lautet:
 1. Benötigte Fakten und Konfiguration laden.
 2. Alle fachlichen Voraussetzungen in einem `validation`-Block prüfen.
 3. Erst nach erfolgreicher Validation den fachlichen Graphen verändern.
+
+Prüfungen und Änderungen sollen nicht abwechselnd ausgeführt werden. Schlägt eine spätere Prüfung fehl, nachdem frühere Anweisungen den Graphen bereits verändert haben, bleibt ein teilweise geänderter Zustand zurück. Welche Änderungen bereits erfolgt sind, ist dann nur schwer zuverlässig festzustellen und eine Korrektur wird unnötig kompliziert. Deshalb werden zuerst alle für die Änderung benötigten Voraussetzungen geprüft. Erst wenn dieser Prüfblock vollständig erfolgreich war, folgt die möglichst geradlinige Änderung des Graphen; in diesem Abschnitt sollen keine erwartbaren fachlichen Fehler mehr auftreten.
+
+### Formatieren von Zeichenketten
+
+Der formatierte ObjectFlow-String (`StringFormatString`) verbindet einen Formattext mit typisierten Werten. Er wird vor allem für Meldungen, Titel, Beschreibungen und Logging verwendet. Die Laufzeit `OFXStringFormatter2` ergänzt die üblichen Java-Formatierungen um fachliche Formate für Dezimalzahlen, Status sowie Datum und Uhrzeit.
+
+| Platzhalter | Erwarteter Wert | Standarddarstellung beziehungsweise Bedeutung |
+| --- | --- | --- |
+| `%s` | beliebiger Wert beziehungsweise `string` | Zeichenkettendarstellung |
+| `%d` | ganzzahliger Wert | dezimale Ganzzahl |
+| `%f` | Gleitkomma- oder Dezimalwert | Java-Dezimalformat; Breite und Genauigkeit können angegeben werden |
+| `%c` | Zeichen | einzelnes Zeichen |
+| `%o` | ganzzahliger Wert | Oktaldarstellung |
+| `%x` | ganzzahliger Wert | Hexadezimaldarstellung |
+| `%bd` | `BigDecimal` | lokalisiertes ObjectFlow-Dezimalformat, standardmäßig `#,##0.00` |
+| `%st` | Statuselement | Langbeschreibung des Status |
+| `%sts` | Statuselement | Kurzbeschreibung des Status |
+| `%stdb` | Statuselement | technischer Persistenzwert des Status |
+| `%dt` | `DateTime` oder kompatibler Joda-Time-Wert | Datum und Uhrzeit, standardmäßig `dd.MM.yyyy HH:mm:ss` |
+| `%ld` | `LocalDate`, `DateTime` oder kompatibler Joda-Time-Wert | Datum, standardmäßig `dd.MM.yy` |
+| `%sld` | `LocalDate`, `DateTime` oder kompatibler Joda-Time-Wert | kurzes Datum, standardmäßig `dd.MMM` |
+| `%tdt` | `LocalDate`, `DateTime` oder kompatibler Joda-Time-Wert | Uhrzeit, standardmäßig `HH:mm` |
+| `%n` | kein Argument | Zeilenumbruch |
+| `%%` | kein Argument | Prozentzeichen |
+
+Für die Standardkonvertierungen und `%bd` unterstützt die Laufzeit auch Formatflags, Breite und Genauigkeit. Die konfigurierten Standardmuster können in der Laufzeitkonfiguration überschrieben werden. Ein nicht zum Platzhalter passender Typ führt zu einer Exception; `null` wird als `#NULL?` sichtbar gemacht. Dadurch fallen unbeabsichtigt fehlende Werte auf. Soll ein fehlender Wert dagegen fachlich leer oder mit einer Ersatzbeschriftung erscheinen, muss dies vor der Formatierung ausdrücklich entschieden werden.
 
 ### Literale für Datum, Zeitpunkt und Dezimalzahl
 
@@ -305,47 +334,59 @@ rechnung.kunde#Meta.setScope(buchbareKunden);
 
 Damit lassen sich für die konkrete Objekt- und Property-Instanz insbesondere Eingabefähigkeit, Optionalität, Fokus, auswählbare Statuselemente und der Scope einer Entity-Auswahl beeinflussen. Der fachliche Property-Wert bleibt dabei unverändert. `#Meta` eignet sich für dynamische UI-Regeln eines Ablaufs; dauerhaft geltende Beschriftungen, Anordnungen werden weiterhin in Business-Property-Metadaten der Deklaration beziehungsweise DataUX modelliert. Fachliche Gültigkeitsregeln müssen zusätzlich als Preconditions oder Validierung bestehen und dürfen nicht allein von einer deaktivierten Eingabe abhängen!
 
-### Formatieren von Zeichenketten
+Ein nützliches Zusammenspiel ergibt sich bei einer feldbezogenen fachlichen Prüfung. Enthält beispielsweise der Empfängername einer Rechnung nicht erlaubte Zeichen, wird zuerst der Fokus auf die betroffene Property angefordert und danach die Precondition ausgelöst:
 
-Der formatierte ObjectFlow-String (`StringFormatString`) verbindet einen Formattext mit typisierten Werten. Er wird vor allem für Meldungen, Titel, Beschreibungen und Logging verwendet. Die Laufzeit `OFXStringFormatter2` ergänzt die üblichen Java-Formatierungen um fachliche Formate für Dezimalzahlen, Status sowie Datum und Uhrzeit.
+```objectflow
+if (!rechnung.empfaengerName.matches("[A-Za-z0-9 .-]+")) {
+  rechnung.empfaengerName#Meta.requestFocus();
+  precondition false : 'Der Empfängername enthält nicht erlaubte Zeichen.';
+}
+```
 
-| Platzhalter | Erwarteter Wert | Standarddarstellung beziehungsweise Bedeutung |
-| --- | --- | --- |
-| `%s` | beliebiger Wert beziehungsweise `string` | Zeichenkettendarstellung |
-| `%d` | ganzzahliger Wert | dezimale Ganzzahl |
-| `%f` | Gleitkomma- oder Dezimalwert | Java-Dezimalformat; Breite und Genauigkeit können angegeben werden |
-| `%c` | Zeichen | einzelnes Zeichen |
-| `%o` | ganzzahliger Wert | Oktaldarstellung |
-| `%x` | ganzzahliger Wert | Hexadezimaldarstellung |
-| `%bd` | `BigDecimal` | lokalisiertes ObjectFlow-Dezimalformat, standardmäßig `#,##0.00` |
-| `%st` | Statuselement | Langbeschreibung des Status |
-| `%sts` | Statuselement | Kurzbeschreibung des Status |
-| `%stdb` | Statuselement | technischer Persistenzwert des Status |
-| `%dt` | `DateTime` oder kompatibler Joda-Time-Wert | Datum und Uhrzeit, standardmäßig `dd.MM.yyyy HH:mm:ss` |
-| `%ld` | `LocalDate`, `DateTime` oder kompatibler Joda-Time-Wert | Datum, standardmäßig `dd.MM.yy` |
-| `%sld` | `LocalDate`, `DateTime` oder kompatibler Joda-Time-Wert | kurzes Datum, standardmäßig `dd.MMM` |
-| `%tdt` | `LocalDate`, `DateTime` oder kompatibler Joda-Time-Wert | Uhrzeit, standardmäßig `HH:mm` |
-| `%n` | kein Argument | Zeilenumbruch |
-| `%%` | kein Argument | Prozentzeichen |
+Die Meldung erscheint typischerweise im allgemeinen Meldungsbereich oberhalb der Page und nicht unmittelbar am Feld. Durch `requestFocus()` steht der Cursor nach der Meldung dennoch an der richtigen Eingabestelle. Die Reihenfolge ist wesentlich: Wird die Precondition zuerst ausgelöst, erreicht der unterbrochene Programmfluss die Fokusanforderung nicht mehr.
 
-Für die Standardkonvertierungen und `%bd` unterstützt die Laufzeit auch Formatflags, Breite und Genauigkeit. Die konfigurierten Standardmuster können in der Laufzeitkonfiguration überschrieben werden. Ein nicht zum Platzhalter passender Typ führt zu einer Exception; `null` wird als `#NULL?` sichtbar gemacht. Dadurch fallen unbeabsichtigt fehlende Werte auf. Soll ein fehlender Wert dagegen fachlich leer oder mit einer Ersatzbeschriftung erscheinen, muss dies vor der Formatierung ausdrücklich entschieden werden.
-
-Formatierung ist von fachlicher Berechnung zu trennen. Ein Geldbetrag wird fachlich als `BigDecimal` beziehungsweise Value Object berechnet; erst für Meldung oder Oberfläche wird er formatiert.
 
 ## Teil III – Commands und Anwendungsabläufe
 
+Ein `Command` (`Command`) modelliert einen ausführbaren Anwendungsfall oder einen abgegrenzten Teil einer Benutzerinteraktion. Er verbindet Eingaben, lokalen Ablaufzustand, fachliche Prüfungen, Pages und den erfolgreichen oder fehlerhaften Abschluss mit einer klaren Session-Grenze. Ein Command ist damit weder bloß eine UI-Aktion noch nur eine Methode: Er beschreibt den gesamten kontrollierten Ablauf zwischen Aufruf und Termination.
+
+Bevor eine Command-Aktion gestartet werden kann, müssen ihre Parameter beziehungsweise Default-Selektionen verfügbar sein, alle Ausdrücke unter `generally enabled` `true` liefern und eine passende Command-Berechtigung erfüllt sein. Die Berechtigungen heißen konkret `CAN_OPEN_RO` für lesenden und `CAN_OPEN_RW` für ändernden Zugriff und werden jeweils mit einer Rolle verbunden. Eine Rollenprüfung kann zusätzlich Teil von `generally enabled` sein, soll die deklarierte Command-Berechtigung aber nicht ersetzen.
+
+### Grundablauf eines Commands
+
+Der reguläre Ablauf folgt einer festen Reihenfolge:
+
+1. Der Aufrufer übergibt Parameter; Default-Ausdrücke wie `getSelected()` werden aus dem Aufrufkontext aufgelöst.
+2. Lokale Variablen bilden den internen Zustand der Command-Instanz.
+3. `command init` lädt oder erzeugt die benötigten Daten und kann den Start mit einer Precondition verhindern.
+4. Nach erfolgreichem `command init` wird der Window Title berechnet.
+5. Ohne explizite Abzweigung wird die erste deklarierte Page initialisiert und angezeigt. `page <Name>` kann stattdessen gezielt eine andere Page wählen; `done` überspringt die Pages und wechselt unmittelbar in `FINAL_OK`.
+6. Auf einer Page führt der Benutzer Menüs oder Page Conclusions aus. Eine Conclusion kann auf derselben Page bleiben, zu einer anderen Page wechseln oder mit `done` den erfolgreichen Abschluss auslösen.
+7. `FINAL_OK_CONCLUSION` führt den Erfolgsabschluss aus. Guards, Exceptions und technische Fehler führen nach `FINAL_CANCEL_CONCLUSION`; ein bewusster Benutzerabbruch führt nach `FINAL_USER_CANCEL`.
+
+Typische Varianten lassen sich damit einheitlich lesen:
+
+| Variante | Kontrollfluss |
+| --- | --- |
+| Eine Page | `command init` → Page Init → `Page Pane` → Conclusion mit `done` → `FINAL_OK` |
+| Mehrere Pages | `command init` → erste Page → Conclusion mit `page ZweitePage` → deren Page Init → Conclusion mit `done` |
+| Precondition in `command init` | Prüfung schlägt fehl → keine Page wird geöffnet → Meldung erscheint im aufrufenden UI |
+| Precondition in einer Conclusion | Standardmäßig werden Editorwerte übernommen → Conclusion startet → Prüfung schlägt fehl → aktuelle Page bleibt zur Korrektur sichtbar |
+| `done` in `command init` | Ein interaktionsloser oder bereits entscheidbarer Pfad überspringt alle Pages und führt `FINAL_OK` aus; ein anderer Zweig kann mit `page <Name>` dynamisch eine der vorhandenen Pages wählen |
+
+
 ### Die vier Command-Typen
 
-Ein `Command` (`Command`) beschreibt einen Anwendungsfall oder einen Teil einer Benutzerinteraktion. Der Command-Typ bestimmt vor allem Eigentum und Abschluss der Session.
+Der Command-Typ bestimmt vor allem Eigentum und Abschluss der Session.
 
 | Sichtbarer Typ | Session | Abschluss und Persistenz | Typischer Einsatz |
 | --- | --- | --- | --- |
 | `SEARCH_CMD` | Startet eine eigene Session | `FINAL_OK` beendet die Session ohne Commit; registrierte Session Operations werden nicht ausgeführt | Suche, Anzeige, Filterung und Read-only-Auswertung |
 | `GRAPH_OWNER_CMD` | Startet eine eigene Session und besitzt den bearbeiteten Graphen | Bei `FINAL_OK` werden Session Operations in einer Transaktion ausgeführt und committed | Bearbeitung eines vollständigen fachlichen Graphen |
 | `GRAPH_EDIT_CMD` | Übernimmt die Session seines Performers | Besitzt keinen eigenen Commit; erfolgreicher Abschluss kehrt zum Owner zurück | Teilbearbeitung und Benutzerinteraktion innerhalb eines vorhandenen Graphen |
-| `MODAL_GRAPH_OWNER_CMD` | Wie `GRAPH_OWNER_CMD`: eigene Session | Wie `GRAPH_OWNER_CMD`: eigener Commit bei `FINAL_OK` | Eigenständige Bearbeitung in einer modalen UI |
+| `GRAPH_OWNER_CMD_MODAL` | Wie `GRAPH_OWNER_CMD`: eigene Session | Wie `GRAPH_OWNER_CMD`: eigener Commit bei `FINAL_OK` | Eigenständige Bearbeitung in einer modalen UI |
 
-`MODAL_GRAPH_OWNER_CMD` unterscheidet sich fachlich und transaktional nicht vom normalen Graph Owner. Nur die Oberfläche ist modal.
+`GRAPH_OWNER_CMD_MODAL` unterscheidet sich fachlich und transaktional nicht vom normalen Graph Owner. Nur die Oberfläche ist modal.
 
 Ein `GRAPH_EDIT_CMD` kann technisch Session Operations registrieren. Diese werden bei einem Abbruch des Child-Commands jedoch nicht wieder vom Operation Stack entfernt. In der beobachteten Praxis sollen `GRAPH_EDIT_CMD`s deshalb keine Session Operations registrieren; der Session Owner übernimmt deren Registrierung.
 
@@ -353,48 +394,109 @@ Ein `GRAPH_EDIT_CMD` kann technisch Session Operations registrieren. Diese werde
 
 Ein Command kann folgende Bestandteile enthalten:
 
-| Bestandteil | Aufgabe |
-| --- | --- |
-| Parameter und Defaults | Eingaben des Aufrufs; Defaults können aus Selektion oder Konstanten entstehen |
-| `generally enabled` | Zusätzliche Bedingungen für die Verfügbarkeit einer Command-Aktion |
-| Permissions | Erforderliche Rollen beziehungsweise Zugriffsart |
-| Preconditions | Voraussetzungen vor Beginn des Ablaufs |
-| Lokale Variablen | Zustand innerhalb der Command-Ausführung |
-| Command Settings | Label, Icon, Hotkey, Farbe, Revert-Objekte, Locks und Optionen |
-| `command init` | Initialisierung; wird vor der ersten Page ausgeführt |
-| Pages | Interaktionsschritte mit Page Init, Bindung, Conclusions und UI-Zuordnung |
-| `FINAL OK_CONCLUSION` | Erfolgreicher Command-Abschluss |
-| `FINAL CANCEL_CONCLUSION` | Fachlicher oder technischer Abbruch |
-| `FINAL_USER_CANCEL` | Expliziter Abbruch durch den Benutzer |
+| Bestandteil | Technische Form | Aufgabe | Typischer Inhalt |
+| --- | --- | --- | --- |
+| Parameter und Defaults | Typisierte Parameterdeklaration mit optionalem Ausdruck | Eingaben des Aufrufs festlegen | Schlüssel, ausgewählte Entity oder DTO, Filterwert; Default über `getSelected()` oder Konstante |
+| `generally enabled` | Liste boolescher Ausdrücke, logisch UND-verknüpft | Sichtbare Command-Aktion fachlich aktivieren oder deaktivieren | Zulässiger Status, vorhandene Selektion, passende Betriebsart |
+| Permissions | `CAN_OPEN_RO`- oder `CAN_OPEN_RW`-Eintrag mit Rolle | Lesenden beziehungsweise ändernden Zugriff erlauben | Beobachterrolle für Anzeige, Sachbearbeiterrolle für Änderung |
+| Preconditions | Liste von `Precondition`-Knoten | Verständliche Voraussetzungen vor dem Start prüfen | Vollständige Parameter, fachlich erlaubter Ausgangszustand |
+| Lokale Variablen | Typisierte Variablendeklaration | Zustand einer Command-Instanz halten | Geladener Graph, Filter-DTO, Ergebnisliste, Ablaufkennzeichen |
+| Command Settings | Deklarative Einstellungen und Ausdrücke | Darstellung und Laufzeitverhalten konfigurieren | Label, Icon, Hotkey, Farbe, Revert-Objekte, Locks, Optionen |
+| `command init` | Funktion ohne Rückgabewert | Ablauf vorbereiten und erste Kontrollentscheidung treffen | Checkout oder Suche, DTO-Aufbau, Precondition, `page …` oder `done` |
+| Pages | `PageCrtl`-Knoten | Interaktionsschritte definieren | Page Init mit Rückgabewert, Bindung, Titel, Scopes, UI-Auswahl und Conclusions |
+| `FINAL OK_CONCLUSION` | Funktion ohne Rückgabewert plus Successors und Selektionen | Erfolgreichen Abschluss vorbereiten | Check-in-Operationen registrieren, Ergebnisobjekte pushen |
+| `FINAL CANCEL_CONCLUSION` | Funktion mit Problembericht plus Cancel-Operationen | Fachlichen oder technischen Abbruch behandeln | Diagnose, Fehlerstatus oder Journal in privater Cancel-Transaktion |
+| `FINAL_USER_CANCEL` | Deklarierter Benutzerabbruch | Bewusstes Schließen oder Zurückgehen behandeln | Revert der dafür angegebenen Objekte |
 
 ### Parameter, Defaults und Selektion
 
-Command-Parameter können beim Aufruf explizit gesetzt oder über Default-Ausdrücke belegt werden. Häufig verwendete Ausdrücke sind `getSelected()` (`SelectedObject`) und `getSelectedObjects()` (`SelectedList`). Sie beziehen sich auf die aktuelle Selektion des Aufrufkontexts. Eine abgeleitete Selektion kann auch Subtypen berücksichtigen.
+Command-Parameter können beim Aufruf explizit gesetzt oder über Default-Ausdrücke belegt werden. Häufig verwendete Ausdrücke sind `getSelected()` (`SelectedObject`) und `getSelectedObjects()` (`SelectedList`). Sie beziehen sich auf die aktuelle Selektion des Aufrufkontexts. Eine Selektion kann auch Subtypen berücksichtigen, dann muss das "+ derived" aktiviert sein (Property `andDerived`).
 
-Die Verfügbarkeit einer Aktion hängt sowohl von passenden Argumenten und Selektionen als auch von `generally enabled`, Permissions und gegebenenfalls UI-spezifischen Bedingungen ab. Ein Default ersetzt keine Prüfung auf einen fachlich zulässigen Aufruf.
+Die Verfügbarkeit eines Commands hängt sowohl von passenden Argumenten und Selektionen als auch von `generally enabled`, Permissions und gegebenenfalls UI-spezifischen Bedingungen ab. Ein Default ersetzt keine Prüfung auf einen fachlich zulässigen Aufruf.
+
+Ein Command zum Bearbeiten einer Rechnungsposition könnte beispielsweise zwei obligatorische Selektionen, einen zulässigen Rechnungsstatus und ändernden Zugriff für die Rolle `Sachbearbeiter` verlangen:
+
+```objectflow
+command 'Rechnungsposition bearbeiten'
+command type: GRAPH_EDIT_CMD
+
+command parameter and defaults:
+Rechnung rechnung = getSelected(Rechnung)
+Rechnungsposition position = getSelected(Rechnungsposition)
+
+generally enabled:
+rechnung.status of Entwurf, InBearbeitung
+
+command permissions:
+CAN_OPEN_RW role Sachbearbeiter()
+```
+
+Fehlt entweder die selektierte Rechnung oder die selektierte Rechnungsposition, ist der Command bereits wegen des nicht auflösbaren obligatorischen Defaults nicht verfügbar. Sind beide vorhanden, werden zusätzlich alle `generally enabled`-Ausdrücke geprüft. Erst wenn auch der Status passt und der Benutzer die erforderliche Rolle besitzt, kann der Command mit änderndem Zugriff gestartet werden.
 
 ### Command Init und Hintergrundinitialisierung
 
 `command init` bereitet Variablen und Daten für den folgenden Ablauf vor. Mit der Option `IN_BACKGROUND` wird ausschließlich dieses `command init` im Hintergrund ausgeführt. Pages und der weitere Interaktionsablauf werden dadurch nicht allgemein zu einem Hintergrundjob.
 
-Preconditions sollen vor fachlichen Änderungen geprüft werden. In Page Init sollen grundsätzlich keine abbrechenden Preconditions verwendet werden; Warnungen können dagegen Feedback geben, ohne den Ablauf zu zerstören.
+Preconditions sollen vor fachlichen Änderungen geprüft werden. Im `command init` verhindert eine fehlgeschlagene Precondition den Start des interaktiven Ablaufs und zeigt ihre Meldung im aufrufenden UI. `WARNING_HINT` unterbricht den Ablauf weder hier noch im Page Init. Eine nicht warnende Precondition im Page Init soll vermieden werden, weil sie die Initialisierung der anzuzeigenden Page abbricht. Diese Regeln gelten ebenso, wenn die Precondition in einem vom jeweiligen Abschnitt aufgerufenen Service liegt.
+
+Der Window Title wird nach `command init` berechnet. Dadurch dürfen sein Ausdruck und seine Formatargumente auf den dort aufgebauten lokalen Zustand zugreifen. Die Command-Property `newWindowTitleType` (`O2WindowTitleType`) bestimmt, wie der Text mit einem bereits vorhandenen Fenstertitel kombiniert wird:
+
+| Wert | Projektion | Wirkung |
+| --- | --- | --- |
+| `ADDON` | `(addon)` | Ergänzt den bestehenden Fenstertitel um den Command-Titel. Dies ist der Standard. |
+| `OVERWRITE` | `(overwrite)` | Ersetzt den Fenstertitel durch den Titel des aktuellen Commands. |
+| `OVERWRITE_FORCED` | `(overwrite predecessor)` | Erzwingt die Ersetzung auch gegenüber dem vom Vorgänger-Command übernommenen Titel. |
 
 ### Pages und Page Conclusions
 
-Eine Page (`PageCrtl`) beschreibt einen Interaktionsschritt des Commands. Sie kann:
+Eine Page (`PageCrtl`) ist der zentrale interaktive Schritt eines Commands. Sie verbindet das vom Command bereitgestellte Objekt mit einer sichtbaren DataUX-Darstellung und den möglichen Übergängen des Ablaufs. Page und `Page Pane` haben dabei getrennte Verantwortlichkeiten: ObjectFlow beschreibt Daten, Zustand und Kontrollfluss; DataUX beschreibt die sichtbare Darstellung und die Menüs.
 
-- an eine Entity oder ein DTO gebunden sein,
-- im Page Init Daten laden beziehungsweise bereitstellen,
-- dynamische Titel und Untertitel berechnen,
-- Scopes bereitstellen,
-- ein oder mehrere DataUX-`Page Pane`s auswählen,
-- auf beendete Child-Commands reagieren,
-- branching Commands anbieten,
-- mehrere Page Conclusions definieren.
+| Bestandteil einer Page | Technische Form | Aufgabe |
+| --- | --- | --- |
+| Bindung | optionale Referenz auf Entity- oder DTO-Typ | Legt den Typ des von Page Init bereitgestellten Root-Objekts fest |
+| Page Init | `PageInitConceptFunc`, liefert ein Objekt zurück | Lädt, aktualisiert oder liefert die anzuzeigenden Daten |
+| Page Title und Subtitle | optionale Ausdrücke | Beschriften den Inhalt dieser Page nach ihrer Initialisierung |
+| Scopes | `PageScopeConceptFunc` | Setzt Page-spezifische Auswahlmengen und andere `#Meta`-Werte |
+| Page-Pane-Umschaltung | ein oder mehrere `PagePaneActionProviderLink` | Wählt abhängig von Bedingungen die passende DataUX-Darstellung |
+| Termination Handler | null bis viele `PageCmdTermHandler` | Reagiert auf beendete Child- oder andere Commands und übernimmt gepushte Ergebnisse |
+| Branching Commands | für die Page angebotene Commands | Stellt mögliche Child-Aktionen bereit; ihre sichtbare Platzierung wird in den Menüs der `Page Pane`s modelliert |
+| Page Conclusions | null bis viele `PageConclusion`-Knoten | Bildet die regulären Schaltflächen am unteren Rand der UI und führt den nächsten Ablaufschritt aus |
 
-Eine normale Page Conclusion beendet nicht zwangsläufig den gesamten Command. Sie kann Editorwerte in die gebundenen Objekte übernehmen, Logik ausführen, die aktuelle Page neu initialisieren, zu einer anderen Page wechseln oder schließlich eine finale Conclusion auslösen.
+#### Page Init und Datenbereitstellung
 
-Page und `Page Pane` haben getrennte Verantwortlichkeiten: ObjectFlow beschreibt Daten und Ablauf, DataUX die sichtbare Darstellung und Menüs.
+Bei einem `GRAPH_OWNER_CMD` wird der bearbeitete Graph üblicherweise bereits im `command init` ausgecheckt; Page Init liefert dann das vorbereitete Root-Objekt. Bei einem `SEARCH_CMD` lädt Page Init häufig die aktuelle Ergebnisliste anhand eines Filter-DTOs. Das sind bewährte Muster, keine strukturelle Beschränkung der Sprache.
+
+Eine Conclusion kann mit `page <dieselbe Page>` bewusst auf die aktuelle Page zurückwechseln. Dadurch wird Page Init erneut ausgeführt und die Darstellung aktualisiert. So entsteht eine Refresh-Conclusion, ohne den Command neu zu starten. Ein Wechsel mit `page <andere Page>` initialisiert entsprechend den nächsten Interaktionsschritt.
+
+#### Window Title, Page Title und Subtitle
+
+Der Window Title gehört zum gesamten Command-Fenster und wird nach `command init` nach den Regeln von `O2WindowTitleType` gesetzt. Page Title und Subtitle gehören dagegen zu einer einzelnen Page. Ihre Ausdrücke werden nach Page Init berechnet und können daher den gerade geladenen Page-Zustand beschreiben. Ein mehrseitiger Command behält somit seinen Window Title, während Page Title und Subtitle je Interaktionsschritt wechseln können.
+
+#### Scopes und Page-Pane-Umschaltung
+
+Die Scope-Funktion (`PageScopeConceptFunc`) läuft nach Page Init und erneut nach der Termination eines Child-Commands. Sie eignet sich insbesondere dazu, die zulässigen Werte einer Reference- oder Status-Property über `#Meta` an den aktuellen Page-Zustand anzupassen. Sie lädt keine UI-Daten nach; benötigte Objekte müssen bereits durch Command oder Repository bereitgestellt sein.
+
+Eine Page besitzt mindestens einen `PagePaneActionProviderLink`. Ein unbedingter Link wird als `-> : PagePane` projiziert; ein bedingter Link als `<Bedingung> : PagePane`. Damit kann dieselbe fachliche Page beispielsweise für unterschiedliche Geräteklassen oder für Administratoren und reguläre Benutzer verschiedene Oberflächen auswählen. Die Bedingungen sollen sich eindeutig verhalten; ein unbedingter Link kann als Fallback dienen. Die fachliche Logik bleibt trotz unterschiedlicher Darstellung in derselben Page und demselben Command.
+
+#### Termination Handler
+
+Ein `PageCmdTermHandler` wird ausgeführt, wenn während der Page ein weiterer Command beendet wurde. `ChildCmdTerminated` reagiert auf echte Child-Commands; `AnyCmdTerminated` kann auch andere passende Terminationen erfassen. Ein optionaler Classifier filtert nach dem Typ des gepushten Objekts. Je nach Variante erhält die Funktion Informationen darüber, ob der beendete Command erfolgreich war, ob er ein Child war und welches Objekt gepusht wurde.
+
+Der Handler kann anschließend berechnete Werte aktualisieren, ein gepushtes Objekt mit `session merge` in den Parent-Graphen übernehmen oder die Selektion anpassen. Danach werden auch die Page-Scopes neu berechnet. Dieses explizite Verhalten ist besonders zusammen mit `NEWSTYLE_CMD_TERM_HANDLING` wichtig.
+
+#### Page Conclusions
+
+Eine `PageConclusion` besitzt ein Label, eine optionale `enabledWhen`-Bedingung, den Modus `ConclusionSaveType` und eine Funktion ohne Rückgabewert. Ihre Labels erscheinen typischerweise als Schaltflächen am unteren Rand der Page. Zusätzlich steht der Benutzerabbruch über Escape beziehungsweise Zurück zur Verfügung, solange der Command nicht die Option `NO_ESC` trägt.
+
+`ConclusionSaveType` hat die Werte `save` (`SAVE_CONCLUSION`, Standard) und `no_save` (`NOSAVE_CONCLUSION`). `save` übernimmt vor der Conclusion die aktuellen Editorwerte in die gebundenen Objekte. Das soll auch bei nicht editierbaren oder situationsabhängig deaktivierten UI-Elementen der normale Modus bleiben; deaktiviert bedeutet nicht, dass die übrigen Page-Werte verworfen werden sollen. `no_save` ist nur passend, wenn die noch im Editor befindlichen Änderungen für diese Aktion ausdrücklich nicht übernommen werden dürfen.
+
+Innerhalb der Conclusion steuern zwei spezielle Statements den weiteren Ablauf:
+
+- `page <Name>` (`PageCommand`) wechselt auf die angegebene Page und führt deren Page Init aus. Ein Verweis auf die aktuelle Page wirkt als Refresh.
+- `done` (`DoneCommand`) beendet den interaktiven Teil erfolgreich und führt `FINAL_OK_CONCLUSION` aus.
+
+Ohne `page` oder `done` bleibt der Command auf der aktuellen Page. Schlägt eine Precondition in der Conclusion fehl, wird deren Funktion an dieser Stelle beendet; die Page bleibt sichtbar und der Benutzer kann anhand der Meldung korrigieren oder eine andere Aktion wählen.
+
 
 ### `FINAL_OK`, `FINAL_CANCEL` und `FINAL_USER_CANCEL`
 
@@ -506,7 +608,9 @@ Ein wichtiger Einsatz ist die Prüfung, ob eine Entity bereits ausgecheckt wurde
 - Bei fehlgeschlagenem Commit wird er nicht gestartet.
 - Ohne UI – beispielsweise in Tests oder Jobs – wird die Einplanung ignoriert.
 
-Dieses Konzept eignet sich für einen Folgeablauf, der einen bereits erfolgreich persistierten Zustand benötigt.
+Dieses Konzept eignet sich für einen Folgeablauf, der einen bereits erfolgreich persistierten Zustand benötigt. Da der einzureihende Command und seine Argumente zur Laufzeit gewählt werden können, lassen sich damit auch längere fachliche Prozesse modellieren: Der aktuelle Schritt entscheidet anhand seines Ergebnisses, welcher Command nach dem Commit als nächster beginnt. Diese Entscheidung kann in einem wiederverwendbaren Service gekapselt sein, sofern er innerhalb des aktuellen UI-Command- und Session-Kontexts ausgeführt wird.
+
+Jeder solche Übergang bildet eine klare Sicherungsgrenze: Erst der erfolgreiche Commit des aktuellen Session Owners gibt den nächsten Command frei. Ein mehrstufiger Workflow kann dadurch aus mehreren eigenständigen Commands mit jeweils eigener Benutzerinteraktion und Transaktion bestehen. Der Mechanismus ersetzt jedoch keine allgemeine Job- oder Workflow-Engine: Ohne UI wird die Queue ignoriert, und bei Abbruch oder fehlgeschlagenem Commit findet kein Übergang statt.
 
 ### Explizites Command-Termination-Handling und Session Merge
 
@@ -593,7 +697,11 @@ ObjectFlow unterstützt insbesondere folgende Testformen:
 
 Da Tests nicht committen, sollen persistenzwirksame Erwartungen gezielt über Testdatenaufbau, gelesenen Zustand und die registrierten beziehungsweise aufgerufenen Operationen geprüft werden.
 
-§ Hier fehlt noch, dass Repos mit Test-Repositories überschrieben werden können, mit hilfe der rolle Repository.superclass. Wenn man das test repository mit fake data dann in der config instanziert, dann gilt das test repository. Es kann also auch mehrere test-implementierungen für ein test-repo geben §
+#### Repositories im Test ersetzen
+
+Ein ManMap-`Repository` kann über seine `superclass`-Rolle ein anderes Repository erweitern. Damit lässt sich zu einem produktiven Repository eine Testimplementierung modellieren, die einzelne Methoden überschreibt und beispielsweise kontrollierte Fake-Daten liefert. Wird in der von der Testsuite verwendeten `OFX Config` diese Testimplementierung anstelle der produktiven Implementierung instanziert, werden `OperationCall`s auf die passende konfigurierte Testkomponente aufgelöst.
+
+Für dasselbe Basis-Repository können mehrere Test-Repositories existieren, etwa für einen leeren Datenbestand, einen typischen Erfolgsfall oder einen simulierten Fehler. Die jeweilige Testkonfiguration wählt genau die benötigte Implementierung aus. Dadurch bleiben Service und Command unverändert und werden trotzdem mit einem gezielt kontrollierten Repository-Verhalten ausgeführt. Die Vererbung allein aktiviert das Test-Repository nicht; entscheidend ist seine Instanziierung und Auswahl in der tatsächlich von der Testsuite referenzierten Konfiguration.
 
 ## Teil V – Querschnittsthemen
 
@@ -621,7 +729,7 @@ Services und Repositories werden über diese Konfiguration zu Laufzeitkomponente
 | Scope | `Scope` | Liefert die für einen Benutzer beziehungsweise Kontext zugänglichen Objekte eines Typs |
 | Identity | `Identity` | Hält ein einzelnes, für den Anwendungskontext zentrales Objekt beziehungsweise dessen Schlüssel |
 
-Commands können erforderliche Rollen deklarieren. Die Projektion unterscheidet insbesondere lesenden und ändernden Zugriff. Rollen sind hierarchisch modellierbar: Eine übergeordnete Rolle kann die Fähigkeiten einer weiteren Rolle einschließen.
+Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN_OPEN_RW role ...`. Damit wird nicht nur eine Rolle, sondern zugleich die erlaubte Zugriffsart des Commands festgelegt. Rollen sind hierarchisch modellierbar: Eine übergeordnete Rolle kann die Fähigkeiten einer weiteren Rolle einschließen.
 
 Scopes sind nicht nur Berechtigungsflags, sondern liefern eine eingeschränkte Objektmenge. Sie können Parameter und lokale Variablen besitzen und Services beziehungsweise Repositories über `OperationCall` verwenden.
 
@@ -708,9 +816,13 @@ Serialisierung ist kein Ersatz für DTO-Modellierung. Ein explizites DTO bleibt 
 - **Session-Operation mit unmittelbarem Aufruf verwechseln:** Nach der Registrierung sind Rückgabewerte und beim Speichern erzeugte IDs noch nicht vorhanden.
 - **Session-Operationen im `GRAPH_EDIT_CMD` registrieren:** Sie bleiben auch nach einem Child-Abbruch im Stack. Die Registrierung gehört üblicherweise in den Session Owner.
 - **Commit bei `SEARCH_CMD` erwarten:** Seine Session wird auch nach `FINAL_OK` nicht committed.
-- **`MODAL_GRAPH_OWNER_CMD` für einen Graph Edit halten:** Er besitzt wie ein normaler Graph Owner eine eigene Session und einen eigenen Commit.
+- **`GRAPH_OWNER_CMD_MODAL` für einen Graph Edit halten:** Er besitzt wie ein normaler Graph Owner eine eigene Session und einen eigenen Commit.
 - **Precondition, Guard und Exception gleich behandeln:** Preconditions sind korrigierbare Benutzerprobleme; Guards und Exceptions beenden den Command technisch. Ein Guard im Graph Edit eskaliert zusätzlich zum Owner.
 - **Mehrere Preconditions ohne `validation` sammeln wollen:** Außerhalb des Blocks stoppt bereits die erste verletzte Precondition den Programmfluss.
+- **Prüfungen und Graphänderungen vermischen:** Schlägt eine spätere Prüfung fehl, bleibt ein schwer nachvollziehbarer teilweise geänderter Graph zurück. Zuerst vollständig validieren, danach ändern.
+- **Abbrechende Precondition in Page Init auslösen:** Dadurch wird der Aufbau oder Refresh der Page unterbrochen. In Page Init nur Warnungen verwenden; abbrechende Prüfungen gehören in `command init` oder eine Conclusion.
+- **`no_save` als normalen Conclusion-Modus verwenden:** `save` ist der Standard und übernimmt Editorwerte auch bei teilweise deaktivierter UI. `no_save` ist nur für bewusst zu verwerfende Editoränderungen gedacht.
+- **Branching Command mit seiner Darstellung verwechseln:** Die Page bietet den Command an; sichtbar wird er erst durch einen passenden Menüeintrag im DataUX-`Page Pane`.
 - **Precondition an einer `TO_SESSION_OPS`-Methode definieren:** Die Laufzeit lehnt dies ab.
 - **Revert als Datenbank-Rollback verstehen:** Revert stellt kopierte In-Memory-Objekte wieder her; die Check-in-Transaktion wurde bei einem normalen Abbruch noch nicht begonnen.
 - **Nur ein Kindobjekt statt der Graph-Wurzel für Revert auswählen:** Dann wird nicht automatisch der vollständige Aggregatgraph zurückgesetzt.
@@ -770,6 +882,13 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 | Command | Variable | `ContainerVariable` | `org.modellwerkstatt.objectflow.structure.ContainerVariable` |
 | Command | Page | `PageCrtl` | `org.modellwerkstatt.objectflow.structure.PageCrtl` |
 | Command | Page Conclusion | `PageConclusion` | `org.modellwerkstatt.objectflow.structure.PageConclusion` |
+| Command | Page-Wechsel | `PageCommand` | `org.modellwerkstatt.objectflow.structure.PageCommand` |
+| Command | `done` | `DoneCommand` | `org.modellwerkstatt.objectflow.structure.DoneCommand` |
+| Command | Page-spezifische Scopes | `PageScopeConceptFunc` | `org.modellwerkstatt.objectflow.structure.PageScopeConceptFunc` |
+| Command | bedingte `Page Pane`-Auswahl | `PagePaneActionProviderLink` | `org.modellwerkstatt.objectflow.structure.PagePaneActionProviderLink` |
+| Command | Termination Handler einer Page | `PageCmdTermHandler` | `org.modellwerkstatt.objectflow.structure.PageCmdTermHandler` |
+| Commandberechtigung | `CAN_OPEN_RO` | `OpenPermissionCmd` | `org.modellwerkstatt.objectflow.structure.OpenPermissionCmd` |
+| Commandberechtigung | `CAN_OPEN_RW` | `OpenSavePermissionCmd` | `org.modellwerkstatt.objectflow.structure.OpenSavePermissionCmd` |
 | Commandoption | `IN_BACKGROUND` | `CommandBackgroundOption` | `org.modellwerkstatt.objectflow.structure.CommandBackgroundOption` |
 | Commandoption | `NO_ESC` | `CommandNoEscOption` | `org.modellwerkstatt.objectflow.structure.CommandNoEscOption` |
 | Commandoption | `NEWSTYLE_CMD_TERM_HANDLING` | `CommandNoPushNewTermOption` | `org.modellwerkstatt.objectflow.structure.CommandNoPushNewTermOption` |
