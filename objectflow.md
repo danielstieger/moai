@@ -2,13 +2,12 @@
 
 ## Modellierungsumfang und Ausdrucksmöglichkeiten
 
-`org.modellwerkstatt.objectflow` ist eine der drei domänenspezifischen Sprachen der **modellwerkstatt moware werkbank**. Sie beschreibt fachliche Datenstrukturen, Domänen- und Anwendungslogik sowie die Abläufe, in denen Benutzer, Batchjobs und Tests diese Logik ausführen. Persistenz wird mit ManMap beschrieben; die sichtbare Benutzeroberfläche und ausführbare Application- beziehungsweise Batchjob-Module werden mit DataUX modelliert.
-
+`org.modellwerkstatt.objectflow` ist eine der drei domänenspezifischen Sprachen der **modellwerkstatt moware werkbank**. Sie beschreibt fachliche Datenstrukturen, Domänen- und Anwendungslogik sowie die Abläufe, in denen Benutzer, Batchjobs und Tests diese Logik ausführen.
 ObjectFlow verbindet fünf Aufgabenbereiche:
 
 1. **Datenmodellierung:** `Entity`, `Value Object` und `DTO` beschreiben fachliche Objekte, Werte und anwendungsbezogene Datencontainer.
-2. **Domänenlogik:** Zustandsübergänge, Berechnungen und fachliche Prüfungen liegen in den Datenstrukturen selbst oder in zustandslosen `Service`-Komponenten.
-3. **Anwendungsabläufe:** `Command`s koordinieren Parameter, Session, Pages, Conclusions und die Interaktion mit Services und Repositories.
+2. **Domänenlogik:** Zustandsübergänge, Berechnungen und fachliche Prüfungen liegen in den Datenstrukturen selbst oder häufig in zustandslosen `Service`-Komponenten.
+3. **Anwendungsabläufe:** `Command`s modellieren die mögliche Interaktion mit dem Endanwender. Sie können mehrere Pages mit Conclusions beinhalten, verwalten die Session und koordinieren Services und Repositories.
 4. **Tests:** `OFX Test Suit`s führen fachliche Tests und vollständige Commands ohne Benutzeroberfläche aus.
 5. **Querschnitt:** Konfiguration, Rollen und Berechtigungen, statische Ressourcen, Logging und Serialisierung ergänzen die fachlichen Bausteine.
 
@@ -21,17 +20,23 @@ Die Dokumentation beschreibt beobachtete und technisch bestätigte Praxis. Sie l
 
 ### Entity, Value Object und DTO
 
+ObjectFlow bildet fachliche Datenstrukturen mit `Entity`, `Value Object` und `DTO` ab. Die Unterscheidung folgt den Grundideen des Domain-Driven Design, ohne damit sämtliche DDD-Regeln technisch zu erzwingen:
+
+- Eine **Entity** wird durch ihre Identität und ihren Lebenszyklus bestimmt. Eine Rechnung bleibt beispielsweise dieselbe Rechnung, wenn sich Anschrift, Positionen oder Status ändern; entscheidend ist ihre fachliche oder technische Identität, etwa Rechnungsnummer oder interne ID.
+- Ein **Value Object** beschreibt einen fachlichen Wert ohne eigene Identität. Zwei Werte sind gleich, wenn ihre dafür ausgewählten Bestandteile gleich sind. Ein einfaches Beispiel ist ein Datum; ein zusammengesetztes Beispiel ist eine Gültigkeit aus Beginn und Toleranztagen. Value Objects sind im Anwendungscode im unveränderlichen Stil zu verwenden: Statt eine vorhandene Instanz schrittweise umzuschreiben, wird bei einer Änderung ein neuer Wert erzeugt. Dadurch bleiben Gleichheit, Wiederverwendung und Weitergabe des Werts nachvollziehbar.
+- Ein **DTO** (*Data Transfer Object*) ist ein anwendungsbezogener Datencontainer ohne eigene fachliche oder technische Entity-Identität. DTOs eignen sich für Suchfilter, Projektionen, Aggregationen und die Übergabe zwischen Abläufen. Sie dürfen selbst Objektgraphen bilden und dabei Value Objects, Entities sowie Listen solcher Objekte enthalten.
+
+Fachliche Modelle bestehen typischerweise nicht aus isolierten Objekten, sondern aus Graphen. Eine Rechnung kann beispielsweise eine Liste von Rechnungspositionen referenzieren; Rechnung und Positionen können ihrerseits Value Objects wie Geldbetrag, Anschrift oder Gültigkeit verwenden. Referenzen drücken dabei den fachlichen Zusammenhang aus, Listen eine geordnete Menge gleichartiger Bestandteile.
+
 Die drei rootfähigen Datenstrukturen besitzen Business Properties und können zusätzlich BaseLanguage-Member wie Konstruktoren und Methoden enthalten.
 
 | Name | Konzeptname | Primärer Zweck | Identität und Lebenszyklus |
 | --- | --- | --- | --- |
 | `Entity` | `Entity` | Fachliches Objekt, das typischerweise über ManMap persistiert und innerhalb einer Session bearbeitet wird | Besitzt eine fachliche oder technische Identität; Gleichheit wird nicht nur aus allen Werten abgeleitet |
 | `Value Object` | `ValueObject` | Zusammengesetzter fachlicher Wert, beispielsweise Geldbetrag oder zusammengesetzter Schlüssel | Keine eigenständige Entity-Identität; ausgewählte Properties können die Wertgleichheit bestimmen |
-| `DTO` | `DTO` | Datencontainer für Suche, Darstellung, Aggregation oder Übergabe zwischen Abläufen | Nicht selbst als persistentes Domänenobjekt gedacht; konkretes Read-only- und Session-Verhalten hängt von seiner Erzeugung ab |
+| `DTO` | `DTO` | Datencontainer für Suche, Darstellung, Aggregation oder Übergabe von Daten zwischen Abläufen | Nicht selbst als persistentes Domänenobjekt gedacht; konkretes Read-only- und Session-Verhalten hängt von seiner Erzeugung ab |
 
-Eine `Entity` wird nicht allein durch ihre ObjectFlow-Deklaration persistent. Tabellen, Schlüssel, Referenzen und Speicheroperationen werden mit `org.modellwerkstatt.manmap` beschrieben. Umgekehrt darf ein DTO fachliche Methoden besitzen, bleibt aber ein anwendungsbezogener Datencontainer und wird nicht über ein normales Entity-Mapping zurückgespeichert.
-
-Ein durch ein ManMap-`nokeystore/read-only map` erzeugtes DTO ist read-only und liegt außerhalb der Session-Identity-Map. Ein innerhalb eines Commands neu erzeugtes DTO unterliegt nicht automatisch dieser Einschränkung. Herkunft und beabsichtigte Verwendung sind deshalb bei DTOs wichtiger als der Klassenname allein.
+Die Modellierung einer Entity oder eines fachlichen Objektgraphen bewirkt noch keine Persistenz. Tabellen, Schlüssel, Referenzen sowie Lade- und Speicheroperationen werden mit `org.modellwerkstatt.manmap` beschrieben; die Einzelheiten stehen in [manmap.md](manmap.md).
 
 ### Business Properties
 
@@ -43,18 +48,38 @@ Eine Business Property (`BusinessProperty`) besteht mindestens aus Name, Typ und
 | Typ | BaseLanguage- beziehungsweise ObjectFlow-Typ der Property |
 | Kurzbeschreibung | Kompakte, von Oberflächen verwendbare Beschriftung |
 | Langbeschreibung | Ausführlichere Beschreibung für Darstellung und Dokumentation |
-| Zahlenformat | Standardformat für numerische Darstellungen |
+| Format | Standardformat für numerische Darstellungen und Datum |
 | Property-Optionen | ManMap-Optionen wie `key`, `autoid`, Audit-, Größen- oder Indexhinweise |
 
-Typische Property-Typen sind primitive Werte, `string`, `BigDecimal`, Datum/Zeit-Typen, Status, Value Objects, Referenzen auf Entities beziehungsweise DTOs und Listen geeigneter Elementtypen. Der in ObjectFlow verwendete Typ `string` ist nicht mit einer manuell modellierten Verwendung von `java.lang.String` gleichzusetzen. Dezimalliterale werden in MPS beispielsweise als `13.44bd` eingegeben.
+Der Editor schränkt den Typ einer Business Property bewusst ein. Die folgende Liste ist vollständig; beliebige BaseLanguage- oder Java-Typen werden an dieser Stelle nicht angeboten.
 
-Persistenzoptionen an einer Business Property gehören fachlich zur Datenstruktur, werden technisch aber von ManMap ausgewertet. Ihre genaue Wirkung ist deshalb in [manmap.md](manmap.md) beschrieben.
+| Sichtbarer Typ | FQ-Name des MPS-Typknotens beziehungsweise der Einschränkung | Bedeutung und Einschränkung |
+| --- | --- | --- |
+| `string` | `jetbrains.mps.baseLanguage.structure.StringType` | Der von MPS besonders unterstützte String-Typ. Er wird direkt angeboten und nicht als manuell gewählter `java.lang.String`-Classifier modelliert. |
+| `int` | `jetbrains.mps.baseLanguage.structure.IntegerType` | Ganzzahliger primitiver Wert. Als Java-Primitive kann er nicht `null` sein. |
+| deklarierter Status | `org.modellwerkstatt.objectflow.structure.StatusType` | Referenziert genau eine im Modell oder über Importe sichtbare `StatusDeclaration`. |
+| `Entity` | `jetbrains.mps.baseLanguage.structure.ClassifierType` → `org.modellwerkstatt.objectflow.structure.Entity` | Referenziert eine sichtbare ObjectFlow-Entity und bildet eine Beziehung im fachlichen Objektgraphen. |
+| `Value Object` | `jetbrains.mps.baseLanguage.structure.ClassifierType` → `org.modellwerkstatt.objectflow.structure.ValueObject` | Verwendet einen sichtbaren zusammengesetzten fachlichen Wert. |
+| `DTO` | `jetbrains.mps.baseLanguage.structure.ClassifierType` → `org.modellwerkstatt.objectflow.structure.DTO` | Referenziert einen sichtbaren anwendungsbezogenen Datencontainer. |
+| `list<T>` | `jetbrains.mps.baseLanguage.collections.structure.ListType` | Modelliert eine Liste. Der Elementtyp `T` soll wiederum ein für die fachliche Datenstruktur geeigneter Typ sein. |
+| `LocalDate` | `jetbrains.mps.baseLanguage.structure.ClassifierType` → `org.joda.time.LocalDate` | Datum ohne Uhrzeit. |
+| `DateTime` | `jetbrains.mps.baseLanguage.structure.ClassifierType` → `org.joda.time.DateTime` | Zeitpunkt mit Datum und Uhrzeit. |
+| `BigDecimal` | `jetbrains.mps.baseLanguage.structure.ClassifierType` → `java.math.BigDecimal` | Exakte Dezimalzahl, insbesondere für Geldbeträge und fachliche Rechenwerte. |
+| `byte[]` | `jetbrains.mps.baseLanguage.structure.ArrayType` mit `jetbrains.mps.baseLanguage.structure.ByteType` | Binärdaten, beispielsweise ein Dokument oder Bildinhalt. |
+
+Persistenzoptionen an einer Business Property werden von ManMap ausgewertet. Ihre genaue Wirkung ist in [manmap.md](manmap.md) beschrieben.
+
+### Null-Werte in Datenstrukturen
+
+Referenztypen wie `string`, Status, Entity, Value Object, DTO, Datum/Zeit und `BigDecimal` können technisch `null` sein; `int` kann es als primitiver Typ nicht. `null` soll fachlich „kein Wert vorhanden“ bedeuten und nicht als Ersatz für einen regulären Zustand dienen. Bei Listen ist eine leere Liste in der Regel aussagekräftiger und sicherer als `null`.
+
+Der Java-Extension-Generator von ObjectFlow ersetzt allgemeine Gleichheits- und Ungleichheitsausdrücke durch einen null-sicheren Vergleich: Zwei `null`-Werte gelten als gleich, genau ein `null`-Wert als ungleich; andernfalls wird `equals` verwendet. Die Laufzeit stellt zusätzlich einen null-sicheren `BigDecimal`-Vergleich über `compareTo` bereit, wenn die fachliche Gleichheit unabhängig von der Skala sein soll. Diese Hilfen verhindern NullPointerExceptions beim Vergleichen, ersetzen aber keine bewusste fachliche Entscheidung über optionale Werte.
+
+In DataUX kennzeichnet die Delegate-Option `OPTIONAL`, dass ein Eingabewert fehlen darf. Ohne diese Option sollte die Oberfläche einen erforderlichen Wert durchsetzen. Formatierte Strings stellen `null` zur Diagnose als `#NULL?` dar; für eine fachlich gewünschte Leerdarstellung oder Ersatzbeschriftung ist deshalb eine explizite Fallunterscheidung vorzuziehen.
 
 ### Beziehungen und Objektgraphen
 
-Eine Property kann ein anderes fachliches Objekt oder eine Liste solcher Objekte referenzieren. ObjectFlow beschreibt damit den fachlichen Graphen; es lädt ihn jedoch nicht automatisch aus einer Datenbank. ManMap-Repositories entscheiden explizit, welche Referenzen und Listen geladen werden.
-
-Für die Bearbeitung ist die Aggregatgrenze wichtig: Revert, Session-Integration und Speichern beziehen sich auf die tatsächlich in der Session vorhandenen Objekte. Eine deklarierte, aber nicht geladene Beziehung ist nicht automatisch Teil des bearbeiteten Graphen.
+Eine Business Property kann eine Entity, ein DTO oder ein Value Object sowie eine Liste geeigneter Elemente enthalten. Aus diesen Beziehungen entsteht der fachliche Objektgraph. Die Aggregatgrenze soll dabei bewusst erkennbar bleiben: Ein Graph bündelt die Objekte, die für eine fachliche Änderung gemeinsam konsistent gehalten werden müssen; bloße Querverweise auf andere Aggregate sind davon zu unterscheiden.
 
 ### Value-Object-Gleichheit
 
@@ -62,7 +87,7 @@ Ein `Value Object` kann über `equal properties` (`EqualPropertyReference`) fest
 
 ### Status
 
-Ein Status (`StatusDeclaration`) deklariert eine benannte Menge von Statuselementen (`StatusElement`). Ein Statuselement besitzt einen technischen Persistenzwert sowie Kurz- und Langbeschreibung. Statuswerte können als Property-Typ verwendet, verglichen, in SQL referenziert und durch DataUX mit Beschriftung und Farbe dargestellt werden.
+Ein Status (`StatusDeclaration`) übernimmt in fachlichen Datenstrukturen die Rolle, die in reinem Java häufig ein `enum` erfüllt: Er begrenzt einen Wert auf eine benannte Menge zulässiger Zustände. Er kann jedoch mehr als ein einfaches Java-Enum. Ein Statuselement (`StatusElement`) besitzt neben seinem Namen einen technischen Persistenzwert, Kurz- und Langbeschreibung sowie optionale Metadaten für Erzeugung, Laden und Darstellung. Statuswerte können als Property-Typ verwendet, verglichen, in SQL referenziert und durch DataUX mit Beschriftung und Farbe dargestellt werden.
 
 Wichtige Ausdrucksmittel sind:
 
@@ -74,22 +99,61 @@ Wichtige Ausdrucksmittel sind:
 | `of` | `StatusOfOperator` | Prüft, ob ein Wert einem oder mehreren Statuselementen entspricht |
 | `fromDbValue` | `StatusFromDbValue` | Ermittelt ein Statuselement aus seinem Datenbankwert |
 
-Statusoptionen unterstützen unter anderem einen Initialwert bei der Objekterzeugung (`ON_CREATION`), eine Standardfarbe (`COLOR`) und die Behandlung leerer oder unbekannter Persistenzwerte. Solche Fallbacks sollten bewusst gewählt werden: Ein unbekannter Datenbankwert kann auf einen Daten- oder Versionsfehler hinweisen und darf nicht versehentlich als normaler fachlicher Zustand erscheinen.
+Die Optionen liegen entweder an der Statusdeklaration oder an einem einzelnen Statuselement:
 
-### Formatierte Strings
+| Name | Konzeptname | Ort | Wirkung |
+| --- | --- | --- | --- |
+| `ALLOW_NULL_PERSISTANCE` | `AllowNullStatusDeclOption` | Statusdeklaration | Erlaubt, für diesen Status einen fehlenden Wert zu persistieren. Die historische Schreibweise `PERSISTANCE` ist Teil der DSL. |
+| `OPTIONAL_AS` | `OptionalAsStatusDeclOption` | Statusdeklaration | Legt eine abweichende sichtbare Beschriftung für den optionalen, nicht gesetzten Status fest. |
+| `ON_CREATION` | `OnCreationStatusElemOption` | Statuselement | Verwendet dieses Element als Anfangszustand bei der Erzeugung eines Objekts. |
+| `COLOR` | `ColorStatusElemOption` | Statuselement | Verknüpft das Element mit einer statischen ObjectFlow-Farbe für die Standarddarstellung. |
+| `WHEN_NULL_WL` | `WhenNullOnDbStatusElemOption` | Statuselement | Verwendet dieses Element beim Laden, wenn der Persistenzwert `null` oder leer ist. |
+| `WHEN_UNDEFINED_WL` | `WhenUndefinedStatusElemOption` | Statuselement | Verwendet dieses Element beim Laden, wenn der vorhandene Persistenzwert keinem deklarierten Element entspricht. |
 
-Der formatierte ObjectFlow-String (`StringFormatString`) verbindet einen Formattext mit typisierten Werten. Er wird unter anderem für Meldungen, Titel, Beschreibungen und Logging verwendet. Die Formatierung berücksichtigt die von der Laufzeit bereitgestellten Konventionen für Zahlen, Status- sowie Datums- und Zeitwerte.
-
-Formatierung ist von fachlicher Berechnung zu trennen. Ein Geldbetrag wird beispielsweise fachlich als Dezimalwert beziehungsweise Value Object berechnet; erst für Meldung oder Oberfläche wird er formatiert.
+`WHEN_NULL_WL` und `WHEN_UNDEFINED_WL` behandeln unterschiedliche Fälle. Ein leerer Wert kann fachlich erlaubt sein; ein unbekannter Wert weist dagegen häufig auf fehlerhafte Daten oder eine nicht abgestimmte Version hin. Der zweite Fallback darf diesen Fehler daher nur dann in einen normalen Status überführen, wenn dies fachlich ausdrücklich beabsichtigt ist.
 
 ### Methoden an Datenstrukturen
 
-Entities, Value Objects und DTOs können BaseLanguage-Konstruktoren und -Methoden enthalten. Wiederkehrende objektbezogene Regeln können dadurch nahe an den betroffenen Daten liegen. In bestehenden Anwendungen werden Methoden beispielsweise für Berechnungen, Zustandsabfragen sowie das konsistente Hinzufügen oder Entfernen von Elementen eines Aggregats verwendet.
+Entities, Value Objects und DTOs können BaseLanguage-Konstruktoren und -Methoden enthalten. Dort gehört allgemeine, objektbezogene Logik hin, die aus vielen Anwendungsfällen benötigt wird und allein mit dem Zustand des Objekts sowie expliziten Parametern auskommt. Typische Beispiele sind Berechnungen, Zustandsabfragen, Wertnormalisierung und Operationen, die ein Aggregat konsistent verändern, etwa das Hinzufügen oder Entfernen einer Position.
 
-Logik, die mehrere Aggregate, Repositories oder andere Komponenten benötigt, wird dagegen typischerweise in einem Service gebündelt.
+Von einer Datenstruktur aus ist kein `OperationCall` auf Services, Repositories oder andere Infrastrukturkomponenten möglich. Daraus folgen klare Entwurfsregeln:
+
+- Eine Methode an einer Datenstruktur lädt keine fehlenden Daten nach und startet weder Session Operation noch Transaktion.
+- Benötigte Werte werden vom Aufrufer vorab bereitgestellt oder als Parameter übergeben.
+- Logik, die andere Aggregate, Repositories, Konfiguration oder weitere Komponenten benötigt, liegt in einem Service.
+- Die Datenstrukturmethoden bleiben dadurch in unterschiedlichen Commands, Jobs und Tests wiederverwendbar und lassen sich ohne Laufzeitkonfiguration prüfen.
+
+Die Grenze ist fachlich zu ziehen: Verhalten, das natürlich zu genau diesem Objekt oder Wert gehört, bleibt an der Datenstruktur. Eine allgemeine Domänenoperation über mehrere Objekte gehört in einen wiederverwendbaren Service. Die Koordination für einen konkreten Anwendungsfall gehört in einen anwendungsfallspezifischen Service oder Command.
 
 
 ## Teil II – Services und Domänenlogik
+
+### Formatieren von Zeichenketten
+
+Der formatierte ObjectFlow-String (`StringFormatString`) verbindet einen Formattext mit typisierten Werten. Er wird vor allem für Meldungen, Titel, Beschreibungen und Logging verwendet. Die Laufzeit `OFXStringFormatter2` ergänzt die üblichen Java-Formatierungen um fachliche Formate für Dezimalzahlen, Status sowie Datum und Uhrzeit.
+
+| Platzhalter | Erwarteter Wert | Standarddarstellung beziehungsweise Bedeutung |
+| --- | --- | --- |
+| `%s` | beliebiger Wert beziehungsweise `string` | Zeichenkettendarstellung |
+| `%d` | ganzzahliger Wert | dezimale Ganzzahl |
+| `%f` | Gleitkomma- oder Dezimalwert | Java-Dezimalformat; Breite und Genauigkeit können angegeben werden |
+| `%c` | Zeichen | einzelnes Zeichen |
+| `%o` | ganzzahliger Wert | Oktaldarstellung |
+| `%x` | ganzzahliger Wert | Hexadezimaldarstellung |
+| `%bd` | `BigDecimal` | lokalisiertes ObjectFlow-Dezimalformat, standardmäßig `#,##0.00` |
+| `%st` | Statuselement | Langbeschreibung des Status |
+| `%sts` | Statuselement | Kurzbeschreibung des Status |
+| `%stdb` | Statuselement | technischer Persistenzwert des Status |
+| `%dt` | `DateTime` oder kompatibler Joda-Time-Wert | Datum und Uhrzeit, standardmäßig `dd.MM.yyyy HH:mm:ss` |
+| `%ld` | `LocalDate`, `DateTime` oder kompatibler Joda-Time-Wert | Datum, standardmäßig `dd.MM.yy` |
+| `%sld` | `LocalDate`, `DateTime` oder kompatibler Joda-Time-Wert | kurzes Datum, standardmäßig `dd.MMM` |
+| `%tdt` | `LocalDate`, `DateTime` oder kompatibler Joda-Time-Wert | Uhrzeit, standardmäßig `HH:mm` |
+| `%n` | kein Argument | Zeilenumbruch |
+| `%%` | kein Argument | Prozentzeichen |
+
+Für die Standardkonvertierungen und `%bd` unterstützt die Laufzeit auch Formatflags, Breite und Genauigkeit. Die konfigurierten Standardmuster können in der Laufzeitkonfiguration überschrieben werden. Ein nicht zum Platzhalter passender Typ führt zu einer Exception; `null` wird als `#NULL?` sichtbar gemacht. Dadurch fallen unbeabsichtigt fehlende Werte auf. Soll ein fehlender Wert dagegen fachlich leer oder mit einer Ersatzbeschriftung erscheinen, muss dies vor der Formatierung ausdrücklich entschieden werden.
+
+Formatierung ist von fachlicher Berechnung zu trennen. Ein Geldbetrag wird fachlich als `BigDecimal` beziehungsweise Value Object berechnet; erst für Meldung oder Oberfläche wird er formatiert.
 
 ### Service-Komponenten
 
@@ -103,12 +167,14 @@ Services bündeln vor allem:
 - die Koordination mehrerer Repositories oder anderer Services,
 - Logik, die sowohl aus UI-Commands als auch aus Jobs und Tests benötigt wird.
 
-Die beobachtete Abgrenzung lautet:
+ObjectFlow besitzt für die folgenden Rollen nur das eine Sprachkonzept `Service`; die Unterscheidung ist also eine Architektur- und Benennungsentscheidung:
 
-- Eine grundsätzlich gültige Domänenregel kann in einer Entity, einem Value Object oder Service liegen.
-- Eine Prüfung, die zu einer Service-Operation gehört und in allen Aufrufkontexten gelten soll, kann als Precondition der Service Method modelliert werden.
-- Eine rein use-case- oder interaktionsbezogene Prüfung gehört in den Command beziehungsweise seine Page Conclusion.
-- Ein Command koordiniert Ablauf und Session; er soll wiederverwendbare Domänenlogik nicht duplizieren.
+- **Datenstrukturmethode:** Allgemeines Verhalten eines einzelnen fachlichen Objekts oder Werts, ohne Infrastrukturzugriff.
+- **Allgemeiner Domänenservice:** Wiederverwendbare Geschäftslogik, die keinem einzelnen Objekt natürlich zugeordnet werden kann oder mehrere Objekte verbindet.
+- **Anwendungsfallservice:** Spezifischere Orchestrierung für eine fachliche Fähigkeit, die von mehreren Einstiegspunkten wie UI, Batch und Tests genutzt werden kann. Er darf Repositories und andere Komponenten koordinieren, enthält aber keine Page-Navigation.
+- **Command:** Konkreter Ablauf mit Parametern, Pages, Conclusions und Session-Grenze. Er ruft Datenstrukturmethoden und Services auf, dupliziert deren Regeln aber nicht.
+
+Eine grundsätzlich gültige Domänenregel liegt damit in einer Entity, einem Value Object oder einem allgemeinen Domänenservice. Eine Prüfung, die zu einer Service-Operation gehört und in allen Aufrufkontexten gelten soll, kann als Precondition der Service Method modelliert werden. Eine rein use-case- oder interaktionsbezogene Prüfung gehört in den Anwendungsfallservice beziehungsweise Command und seine Page Conclusion.
 
 ### Service Methods
 
@@ -168,6 +234,19 @@ Ein häufiges Muster für ändernde Domänenlogik lautet:
 2. Alle fachlichen Voraussetzungen in einem `validation`-Block prüfen.
 3. Erst nach erfolgreicher Validation den fachlichen Graphen verändern.
 
+### Literale für Datum, Zeitpunkt und Dezimalzahl
+
+ObjectFlow ergänzt BaseLanguage um fachlich geeignete Literale. Sie vermeiden technische Konstruktoraufrufe und halten im Modell sichtbar, ob ein fester Wert oder die Serverzeit gemeint ist.
+
+| Name | Konzeptname | Projektion | Typ und Semantik |
+| --- | --- | --- | --- |
+| Datums-Literal | `DateLiteral` | `31.12.2026` | Erzeugt ein festes `org.joda.time.LocalDate` aus Tag, Monat und Jahr. |
+| aktuelles Serverdatum | `DateLiteral` | `new_LocalDateFromServer()` | Ermittelt das aktuelle Datum über den von der Laufzeit bereitgestellten Server-Zeitkontext. |
+| Zeitpunkt-Literal | `DateTimeLiteral` | `31.12.2026 14:30:0` | Erzeugt einen festen `org.joda.time.DateTime` aus Datum, Stunde, Minute und Sekunde. |
+| aktueller Serverzeitpunkt | `DateTimeLiteral` | `new_DateTimeFromServer()` | Ermittelt Datum und Uhrzeit über den Server-Zeitkontext. |
+| Dezimal-Literal | `DezimalLiteral` | `13.44bd` | Erzeugt ein `java.math.BigDecimal`; das Suffix `bd` verhindert die ungenaue Gleitkomma-Semantik von `double`. |
+
+Serverdatum und Serverzeitpunkt sind für fachliche Regeln den lokalen Uhren eines Clients vorzuziehen. Sie werden erst zur Laufzeit ausgewertet und können dadurch in einer Testkonfiguration zentral kontrolliert werden. Feste Literale eignen sich für fachliche Konstanten und Testdaten. Für Geld und andere exakte Dezimalwerte ist das `bd`-Literal zu verwenden; eine vorausgehende Berechnung mit `double` wird durch eine spätere Umwandlung in `BigDecimal` nicht nachträglich exakt.
 
 ## Teil III – Commands und Anwendungsabläufe
 
@@ -514,8 +593,12 @@ Serialisierung ist kein Ersatz für DTO-Modellierung. Ein explizites DTO bleibt 
 
 - **Service oder Repository direkt als Java-Objekt aufrufen:** Dadurch wird die Komponenten-, Session- und Transaktionssemantik von `OperationCall` umgangen.
 - **Service als zustandsbehaftete Benutzerinstanz behandeln:** Services werden typischerweise einmal pro Anwendung instanziiert und sollen zustandslos bleiben.
-- **Session Operation mit unmittelbarem Aufruf verwechseln:** Nach der Registrierung sind Rückgabewerte und beim Speichern erzeugte IDs noch nicht vorhanden.
-- **Session Operations im `GRAPH_EDIT_CMD` registrieren:** Sie bleiben auch nach einem Child-Abbruch im Stack. Die Registrierung gehört üblicherweise in den Session Owner.
+- **Infrastrukturzugriff in eine Datenstrukturmethode verschieben:** Entities, Value Objects und DTOs können keinen `OperationCall` ausführen. Erforderliche Daten müssen vorab geladen oder als Parameter übergeben werden; die Koordination gehört in einen Service oder Command.
+- **Value Objects nachträglich verändern:** Dadurch werden wertbezogene Gleichheit und die Weitergabe gemeinsam genutzter Werte schwer nachvollziehbar. Bei einer fachlichen Änderung ist ein neuer Wert zu erzeugen.
+- **`null` als normalen Ersatzstatus verwenden:** Optionale Werte müssen fachlich und in DataUX ausdrücklich als optional modelliert werden; für reguläre Zustände ist ein Statuswert vorzuziehen.
+- **Unpassenden String-Platzhalter verwenden:** `OFXStringFormatter2` prüft die erwarteten Typen zur Laufzeit und wirft bei einer falschen Kombination eine Exception.
+- **Session-Operation mit unmittelbarem Aufruf verwechseln:** Nach der Registrierung sind Rückgabewerte und beim Speichern erzeugte IDs noch nicht vorhanden.
+- **Session-Operationen im `GRAPH_EDIT_CMD` registrieren:** Sie bleiben auch nach einem Child-Abbruch im Stack. Die Registrierung gehört üblicherweise in den Session Owner.
 - **Commit bei `SEARCH_CMD` erwarten:** Seine Session wird auch nach `FINAL_OK` nicht committed.
 - **`MODAL_GRAPH_OWNER_CMD` für einen Graph Edit halten:** Er besitzt wie ein normaler Graph Owner eine eigene Session und einen eigenen Commit.
 - **Precondition, Guard und Exception gleich behandeln:** Preconditions sind korrigierbare Benutzerprobleme; Guards und Exceptions beenden den Command technisch. Ein Guard im Graph Edit eskaliert zusätzlich zum Owner.
@@ -548,7 +631,16 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 | Status | Status-Typ | `StatusType` | `org.modellwerkstatt.objectflow.structure.StatusType` |
 | Status | `of` | `StatusOfOperator` | `org.modellwerkstatt.objectflow.structure.StatusOfOperator` |
 | Status | `fromDbValue` | `StatusFromDbValue` | `org.modellwerkstatt.objectflow.structure.StatusFromDbValue` |
+| Statusoption | `ALLOW_NULL_PERSISTANCE` | `AllowNullStatusDeclOption` | `org.modellwerkstatt.objectflow.structure.AllowNullStatusDeclOption` |
+| Statusoption | `OPTIONAL_AS` | `OptionalAsStatusDeclOption` | `org.modellwerkstatt.objectflow.structure.OptionalAsStatusDeclOption` |
+| Statusoption | `ON_CREATION` | `OnCreationStatusElemOption` | `org.modellwerkstatt.objectflow.structure.OnCreationStatusElemOption` |
+| Statusoption | `COLOR` | `ColorStatusElemOption` | `org.modellwerkstatt.objectflow.structure.ColorStatusElemOption` |
+| Statusoption | `WHEN_NULL_WL` | `WhenNullOnDbStatusElemOption` | `org.modellwerkstatt.objectflow.structure.WhenNullOnDbStatusElemOption` |
+| Statusoption | `WHEN_UNDEFINED_WL` | `WhenUndefinedStatusElemOption` | `org.modellwerkstatt.objectflow.structure.WhenUndefinedStatusElemOption` |
 | Formatierung | formatierter String | `StringFormatString` | `org.modellwerkstatt.objectflow.structure.StringFormatString` |
+| Literal | Datum | `DateLiteral` | `org.modellwerkstatt.objectflow.structure.DateLiteral` |
+| Literal | Zeitpunkt | `DateTimeLiteral` | `org.modellwerkstatt.objectflow.structure.DateTimeLiteral` |
+| Literal | Dezimalzahl | `DezimalLiteral` | `org.modellwerkstatt.objectflow.structure.DezimalLiteral` |
 | Service | `Service` | `Service` | `org.modellwerkstatt.objectflow.structure.Service` |
 | Service | service method | `ServiceInstanceMethodDeclaration` | `org.modellwerkstatt.objectflow.structure.ServiceInstanceMethodDeclaration` |
 | Serviceoption | `API_METHOD` | `SimdApiMethod` | `org.modellwerkstatt.objectflow.structure.SimdApiMethod` |
