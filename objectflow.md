@@ -340,6 +340,27 @@ ObjectFlow ergänzt BaseLanguage um fachlich geeignete Literale. Sie vermeiden t
 
 Serverdatum und Serverzeitpunkt sind für fachliche Regeln den lokalen Uhren eines Clients immer vorzuziehen. Sie werden erst zur Laufzeit ausgewertet und können dadurch in einer Testkonfiguration zentral kontrolliert werden. Feste Literale eignen sich für fachliche Konstanten und Testdaten. Für Geld und andere exakte Dezimalwerte ist das `bd`-Literal zu verwenden; eine vorausgehende Berechnung mit `double` wird durch eine spätere Umwandlung in `BigDecimal` nicht nachträglich exakt. Auf java Double und Float ist stets zu verzichten!
 
+### Statuswerte mit `status switch` behandeln
+
+`status switch` (`OnStatement`) ist die auf ObjectFlow-Status zugeschnittene Verzweigung. Der Ausdruck hinter `status switch` muss auf eine Statusdeklaration verweisen. Dadurch kennt der Editor die zulässigen Statuselemente und bietet in den `case`-Zweigen nur Elemente genau dieses Status an.
+
+```objectflow
+status switch rechnung.status
+  case Entwurf :
+    rechnung.bearbeitbar = true;
+
+  case Geprueft :
+    rechnung.bearbeitbar = false;
+
+  case Freigegeben :
+    rechnung.bearbeitbar = false;
+.
+```
+
+Ein `case` kann auch mehrere Statuselemente zusammenfassen. Jedes Statuselement darf innerhalb desselben `status switch` nur einem `case` zugeordnet sein. Ohne `default` prüft die Sprache außerdem, dass sämtliche Elemente der betreffenden Statusdeklaration behandelt werden; ein später ergänztes Statuselement macht eine unvollständige Verzweigung dadurch sichtbar.
+
+Der optionale Zweig `default: // and null` behandelt sowohl alle nicht ausdrücklich genannten Statuselemente als auch `null`. Sobald ein `default` vorhanden ist, entfällt die Vollständigkeitsprüfung der einzelnen `case`-Zweige. Das ist passend, wenn alle übrigen Werte bewusst dieselbe Behandlung erhalten. Soll dagegen jede fachliche Statusausprägung ausdrücklich entschieden werden, ist eine vollständige Verzweigung ohne `default` vorzuziehen.
+
 ### UI-Metadaten einer Property mit `#Meta` steuern
 
 Mit `#Meta` (`BPMetaReference`) greift ObjectFlow nicht auf den fachlichen Wert einer Business Property zu, sondern auf ihre veränderbaren Laufzeitmetadaten. Ein Command kann damit die an diese Property gebundene DataUX-Darstellung situationsabhängig steuern, ohne dem statischen Aufbau einer `Page Pane` zu widersprechen.
@@ -535,12 +556,6 @@ Repository- und Property-Namen sind hier Pseudocode; wesentlich ist die Aufteilu
 
 Eine Page besitzt mindestens einen `PagePaneActionProviderLink`. Ein unbedingter Link wird als `-> : PagePane` projiziert; ein bedingter Link als `<Bedingung> : PagePane`. Die Links werden in ihrer modellierten Reihenfolge ausgewertet. Damit kann dieselbe fachliche Page beispielsweise für unterschiedliche Geräteklassen oder für Administratoren und reguläre Benutzer verschiedene Oberflächen auswählen. Bedingungen sollen sich möglichst eindeutig verhalten; der verpflichtende unbedingte Default-Link steht als letztes Element der Liste. Die fachliche Logik bleibt trotz unterschiedlicher Darstellung in derselben Page und demselben Command.
 
-```objectflow
-page panes switch:
-  isPlatform(Mobile) : RechnungMobil
-  role RechnungsAdministration() : RechnungAdministration
-  -> : RechnungStandard
-```
 
 #### Termination Handler
 
@@ -552,12 +567,12 @@ Ein `SEARCH_CMD` kann ein erfolgreich vom Child gepushtes Objekt beispielsweise 
 
 ```objectflow
 cmd terminated handler for page:
+
   child cmd term with Rechnung
   func(terminatedInFinalOk, pushed)->void {
     if (terminatedInFinalOk) {
       Rechnung integriert = session merge entity pushed
         into list<> suchergebnis.treffer (in session as readonly);
-      pushSelection(integriert);
     }
   }
 ```
@@ -580,23 +595,32 @@ Preconditions in einer Conclusion prüfen die vom Editor übernommenen Eingaben 
 Zwei häufige Muster sind eine Aktualisieren-Conclusion im `SEARCH_CMD` und eine Speichern-&-Beenden-Conclusion im `GRAPH_OWNER_CMD`:
 
 ```objectflow
-// SEARCH_CMD
-conclusion label: Aktualisieren
-  func()->void {
-    precondition filter.isDefined() : 'Bitte mindestens ein Suchkriterium angeben.';
-    page Ergebnisse;  // dieselbe Page erneut initialisieren
-  }
 
 // GRAPH_OWNER_CMD
 conclusion label: Speichern & Beenden
   func()->void {
+
     validation {
       precondition rechnung.positionen.isNotEmpty : 'Mindestens eine Position ist erforderlich.';
       precondition rechnung.summe.signum() >= 0 : 'Die Rechnungssumme darf nicht negativ sein.';
     }
-    done;  // danach FINAL_OK_CONCLUSION und Session Operations
+
+    done  //run FINAL_OK_CONCLUSION
   }
 ```
+
+### Selektion mit `pushSelection` setzen
+
+`pushSelection(<Objekt>);` (`PushObject`) legt ein Objekt oder mehrere Objekte als Selektion im aktuellen Selektionskontext ab. Zulässig sind eine Entity, ein DTO oder eine Liste solcher Objekte. Das Statement beendet den Command nicht; es beeinflusst ausschließlich die Selektion, die nachfolgende UI- beziehungsweise Command-Schritte sehen.
+
+Die DSL erlaubt `pushSelection` nur 
+
+- in der Page-Initialisierung (`PageInitConceptFunc`),
+- in einer Page Conclusion (`PageConclusion`),
+- in der Funktion eines Command-Termination-Handlers (`PageCmdTermConceptFunction`) 
+
+Damit ist `pushSelection` in einem Termination-Handler zwar sprachseitig zulässig, aber meist nicht erwünscht. Die bestehende Selektion soll meist beibehalten werden. 
+
 
 ### `FINAL_OK`, `FINAL_CANCEL` und `FINAL_USER_CANCEL`
 
@@ -670,7 +694,11 @@ func()->void {
 url param adjust: rechnung.id, ansicht
 ```
 
-Wird der Command aus einem bestehenden Fenster in einem neuen Browserfenster gestartet, verwendet die Laufzeit diese Werte ebenfalls für die Browser-URL.
+Das Beispiel erzeugt nach der Initialisierung beispielsweise den Pfad `/rechnung/4711/details`.
+
+Als URL-Parameter unterstützt die Sprache derzeit `string`, `int` beziehungsweise `Integer` und Statuswerte. Ein Status wird mit seinem technischen Persistenzwert übertragen. Es erfolgt keine URL-Kodierung oder -Dekodierung; insbesondere darf ein Parameterwert nicht ungeprüft ein `/` als Bestandteil enthalten.
+
+Fehlt ein optionaler String oder Status Parameter, liefert die Laufzeit `null`; bei einem fehlenden optionalen Integer-Segment liefert sie `0`. 
 
 ### Session und Unit of Work
 
