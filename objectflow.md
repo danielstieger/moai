@@ -40,7 +40,7 @@ Die Modellierung einer Entity oder eines fachlichen Objektgraphen bewirkt noch k
 
 ### Business Properties
 
-Eine Business Property (`BusinessProperty`) besteht mindestens aus Name, Typ und Property-Implementierung. Zusätzlich können Kurz- und Langbeschreibung, Zahlenformat, Dokumentation, Sichtbarkeit sowie ManMap-Feldoptionen modelliert werden.
+Eine Business Property (`BusinessProperty`) besteht mindestens aus Name, Typ und Property-Implementierung. Zusätzlich können Kurz- und Langbeschreibung, Zahlenformat, Dokumentation, Sichtbarkeit sowie ObjectFlow- und ManMap-Property-Optionen modelliert werden.
 
 | Bestandteil | Rolle |
 | --- | --- |
@@ -49,7 +49,31 @@ Eine Business Property (`BusinessProperty`) besteht mindestens aus Name, Typ und
 | Kurzbeschreibung | Kompakte, von Oberflächen verwendbare Beschriftung |
 | Langbeschreibung | Ausführlichere Beschreibung für Darstellung und Dokumentation |
 | Format | Standardformat für `BigDecimal`-Darstellungen (nach `java.text.DecimalFormat`) und Datumsdarstellungen (nach `org.joda.time.format.DateTimeFormatter`) |
-| Property-Optionen | ManMap-Optionen wie `key`, `autoid`, Audit-, Größen- oder Indexhinweise |
+| Property-Optionen | Optionale ObjectFlow- und ManMap-Feldoptionen für Fachsemantik, Schlüssel, automatische IDs, Audit und Schemahinweise |
+
+Die Child-Rolle `propertyOption` einer Business Property akzeptiert konkrete Unterkonzepte von ManMaps abstraktem `FieldOption`. Dazu gehören sowohl fachliche ObjectFlow-Optionen als auch ManMap-Persistenzoptionen. Die vollständige Menge der geladenen Sprachen lautet:
+
+| Projektion | Konzeptname | FQ-Name | Bedeutung |
+| --- | --- | --- | --- |
+| `PRESENTATION` | `NotPersistedOption` | `org.modellwerkstatt.objectflow.structure.NotPersistedOption` | Kennzeichnet eine reine Darstellungs- oder Berechnungsproperty; sie wird nicht persistiert und ihre Änderung ist für das Dirty-Tracking irrelevant. |
+| `CONTAINMENT` | `Containmentoption` | `org.modellwerkstatt.objectflow.structure.Containmentoption` | Kennzeichnet eine Listen-Property als Parent-Child-Beziehung und kann die zugehörige Rückreferenz angeben. |
+| `OPPOSITE` | `OppositeOption` | `org.modellwerkstatt.objectflow.structure.OppositeOption` | Kennzeichnet eine Property als Rückreferenz auf die Parent-Entity. |
+| `DEPRECATED` | `DeprecatedOption` | `org.modellwerkstatt.objectflow.structure.DeprecatedOption` | Kennzeichnet die Property als veraltet. |
+| `RANGE` für `int` | `IRangeOption` | `org.modellwerkstatt.objectflow.structure.IRangeOption` | Beschreibt den zulässigen ganzzahligen Bereich von `start` bis `stop`. |
+| `RANGE` für `BigDecimal` | `RangeOption` | `org.modellwerkstatt.objectflow.structure.RangeOption` | Beschreibt Bereich und Skalierung eines Dezimalwerts. |
+| `LENGTH` | `LengthOption` | `org.modellwerkstatt.objectflow.structure.LengthOption` | Beschreibt minimale und maximale Länge eines Strings. |
+| `KEY` | `KeyOption` | `org.modellwerkstatt.manmap.structure.KeyOption` | Markiert die Property als Persistenzschlüssel. |
+| `AUTOID` | `AutoidOption` | `org.modellwerkstatt.manmap.structure.AutoidOption` | Bezieht den Schlüssel vor einem Insert aus der angegebenen Datenbank-Sequence; vorgesehen für einen einfachen Schlüssel. |
+| `CREATEDAT` | `CreatedAtFieldOption` | `org.modellwerkstatt.manmap.structure.CreatedAtFieldOption` | Verwendet die Property als Erstellungszeitpunkt des Audit-Trails. |
+| `CREATEDBY` | `CreatedByFieldOption` | `org.modellwerkstatt.manmap.structure.CreatedByFieldOption` | Verwendet die Property als Ersteller des Audit-Trails. |
+| `MODIFIEDAT` | `ModifiedAtFieldOption` | `org.modellwerkstatt.manmap.structure.ModifiedAtFieldOption` | Verwendet die Property als Zeitpunkt der letzten Änderung. |
+| `MODIFIEDBY` | `ModifiedByFieldOption` | `org.modellwerkstatt.manmap.structure.ModifiedByFieldOption` | Verwendet die Property als Benutzer der letzten Änderung. |
+| `INDEX` | `IndexOption` | `org.modellwerkstatt.manmap.structure.IndexOption` | Beschreibt einen Indexhinweis für die gemappte Spalte. |
+| `NOTNULL` | `NotnullOption` | `org.modellwerkstatt.manmap.structure.NotnullOption` | Beschreibt die Anforderung, dass die gemappte Spalte keinen SQL-`NULL`-Wert enthalten darf. |
+| `SIZE` | `SizeOption` | `org.modellwerkstatt.manmap.structure.SizeOption` | Beschreibt Größe beziehungsweise Präzision und gegebenenfalls Nachkommastellen der gemappten Spalte. |
+| `UNIQUE` | `UniqueOption` | `org.modellwerkstatt.manmap.structure.UniqueOption` | Beschreibt eine Eindeutigkeitsanforderung für die gemappte Spalte. |
+
+Die Schemahinweise `index`, `notnull`, `size` und `unique` dokumentieren Anforderungen des Mappings; sie führen nicht selbst eine allgemeine Migration eines bestehenden Datenbankschemas aus. Die ausführliche Persistenzsemantik einschließlich Audit und Auto-ID steht in [manmap.md](manmap.md#felder-schlüssel-und-optionen).
 
 Der Editor schränkt den Typ einer Business Property bewusst ein. Die folgende Liste ist vollständig; beliebige BaseLanguage- oder Java-Typen werden an dieser Stelle nicht angeboten.
 
@@ -67,7 +91,7 @@ Der Editor schränkt den Typ einer Business Property bewusst ein. Die folgende L
 | `list<T>` | `jetbrains.mps.baseLanguage.collections.structure.ListType` | Modelliert eine Liste. Der Elementtyp `T` soll wiederum ein für die fachliche Datenstruktur geeigneter Typ sein. |
 | `byte[]` | `jetbrains.mps.baseLanguage.structure.ArrayType` mit `jetbrains.mps.baseLanguage.structure.ByteType` | Binärdaten, beispielsweise ein Dokument oder Bildinhalt. |
 
-Persistenzoptionen an einer Business Property werden von ManMap ausgewertet. Ihre genaue Wirkung ist in [manmap.md](manmap.md) beschrieben.
+ManMap-Persistenzoptionen an einer Business Property werden von ManMap ausgewertet. Ihre genaue Wirkung ist in [manmap.md](manmap.md) beschrieben.
 
 ### Virtuelle Business Properties
 
@@ -243,7 +267,7 @@ ObjectFlow unterscheidet fachlich beziehungsweise für den Benutzer behandelbare
 | `guard` (`Guard`) | Unerwarteten beziehungsweise nicht durch den Benutzer korrigierbaren Zustand absichern | Beendet den Command in `FINAL_CANCEL` (Falls GRAPH_EDIT auch Parent GRAPH_OWNER); Benutzer erhalten eine neutrale Systemmeldung, Entwickler Diagnoseinformationen und Stacktrace |
 | Exception | Technischer Ausnahmefall | Beendet den betroffenen Command in `FINAL_CANCEL` |
 
-Bei einer Precondition beschreibt `condition` den gültigen Zustand: Nur wenn der Ausdruck `true` ergibt, läuft die Ausführung weiter. Bei `false` erzeugt die Precondition ein fachliches Problem. Für einen statischen benutzergerichteten Problemtext wird die ObjectFlow-Textprojektion `StringFormatString` verwendet, beispielsweise 'Hallo Fehler-Text', und kein BaseLanguage-String in doppelten Anführungszeichen. Platzhalter und Argumente können mit `%` ergänzt werden.
+Bei einer Precondition beschreibt `condition` den gültigen Zustand: Nur wenn der Ausdruck `true` ergibt, läuft die Ausführung weiter. Bei `false` erzeugt die Precondition ein fachliches Problem. Für einen statischen benutzergerichteten Problemtext wird das ObjectFlow-Konzept `StringFormatString` verwendet, beispielsweise 'Hallo Fehler-Text', und kein BaseLanguage-String in doppelten Anführungszeichen. Platzhalter und Argumente können mit `%` ergänzt werden.
 
 Die vollständige Projektionsform lässt sich schematisch so lesen:
 
@@ -264,8 +288,6 @@ Alle Teile außer `condition` und Problemtext sind optional. Mehrere Optionen we
 Nach dem Schrägstrich kann eine vorhandene Exception als Ausdruck weitergereicht werden. Sie bleibt dadurch als technische Ursache und mit ihrem Stacktrace am fachlichen Problem erhalten. Die anschließenden optionalen Schlüssel/Wert-Paare sind `LogStatementProperty`-Einträge. Sie ergänzen den Problembericht und die Diagnoseprotokollierung um strukturierte Werte, ohne den Benutzertext mit technischen Details zu überladen.
 
 Wird eine Precondition während der Bearbeitung einer bereits angezeigten Page verletzt, wird nur die gerade ausgeführte Aktion unterbrochen. Die aktuelle Page und ihr `Page Pane` bleiben sichtbar. Der Benutzer kann seine Eingaben korrigieren, eine andere Page Conclusion wählen oder einen in den Menüs angebotenen Command zur Korrektur starten. Dasselbe gilt für einen `validation`-Block, nachdem alle enthaltenen Probleme gesammelt und angezeigt wurden.
-
-Eine Precondition im `command init` wirkt früher: Sie verhindert, dass der Command seine erste Page erreicht. Die Meldung wird im UI-Kontext des Aufrufers angezeigt und dessen Oberfläche bleibt bestehen. Eine nicht warnende Precondition im Page Init ist dagegen problematisch, weil sie den Aufbau beziehungsweise die erneute Initialisierung der Page unterbricht. In Page Init sollen deshalb nur `WARNING_HINT`-Preconditions verwendet werden; notwendige abbrechende Prüfungen gehören in `command init` oder in eine Page Conclusion. Wird eine Precondition mittelbar in einem aufgerufenen Service ausgelöst, gilt die Wirkung des jeweiligen Aufruforts. Service-Preconditions müssen daher für alle möglichen Command- und Page-Abläufe geeignet sein.
 
 Eine Precondition kann zusätzlich einen Command als Korrekturaktion anbieten. Nach einer fehlgeschlagenen Prüfung kann der Benutzer dadurch über eine Schaltfläche direkt eine Korrektur starten.
 
@@ -339,10 +361,11 @@ Ein nützliches Zusammenspiel ergibt sich bei einer feldbezogenen fachlichen Pr�
 ```objectflow
 if (!rechnung.empfaengerName.matches("[A-Za-z0-9 .-]+")) {
   rechnung.empfaengerName#Meta.requestFocus();
-  precondition false : 'Der Empfängername enthält nicht erlaubte Zeichen.';
+  precondition -> : 'Der Empfängername enthält nicht erlaubte Zeichen.';
 }
 ```
-§ im obigen beispiel nicht fals, sondern einfach weglassen, der projektionale editor zeigt dann -> an. man muss keinen ausdruck angeben - prüfe das nochmal anhand des offenen projektes §
+
+Innerhalb des bereits prüfenden `if`-Zweigs ist kein weiterer boolescher Ausdruck nötig. Bleibt die optionale `condition` des Konzepts `Precondition` leer, zeigt der projektionsbasierte Editor an ihrer Stelle `->`; die Precondition wird beim Erreichen des Statements immer ausgelöst.
 
 Die Meldung erscheint typischerweise im allgemeinen Meldungsbereich oberhalb der Page und nicht unmittelbar am Feld. Durch `requestFocus()` steht der Cursor nach der Meldung dennoch an der richtigen Eingabestelle. Die Reihenfolge ist wesentlich: Wird die Precondition zuerst ausgelöst, erreicht der unterbrochene Programmfluss die Fokusanforderung nicht mehr.
 
@@ -362,7 +385,7 @@ Der reguläre Ablauf folgt einer festen Reihenfolge:
 3. `command init` lädt oder erzeugt die benötigten Daten und kann den Start mit einer Precondition verhindern.
 4. Nach erfolgreichem `command init` wird der Window Title berechnet.
 5. Ohne explizite Abzweigung wird die erste deklarierte Page initialisiert und angezeigt. `page <Name>` kann stattdessen gezielt eine andere Page wählen; `done` überspringt die Pages und wechselt unmittelbar in `FINAL_OK`.
-6. Auf einer Page führt der Benutzer Menüs oder Page Conclusions aus. Eine Conclusion kann auf derselben Page bleiben, zu einer anderen Page wechseln oder mit `done` den erfolgreichen Abschluss auslösen.
+6. Auf einer Page führt der Benutzer Commands aus Menüs oder Page Conclusions aus. Eine Conclusion bleibt bei einer verletzten Precondition oder ohne Übergabestatement auf derselben Page, wechselt mit `page <Name>` zu einer anderen Page oder löst mit `done` (`DoneCommand`) den erfolgreichen Abschluss aus.
 7. `FINAL_OK_CONCLUSION` führt den Erfolgsabschluss aus. Guards, Exceptions und technische Fehler führen nach `FINAL_CANCEL_CONCLUSION`; ein bewusster Benutzerabbruch führt nach `FINAL_USER_CANCEL`.
 
 Typische Varianten lassen sich damit einheitlich lesen:
@@ -399,7 +422,7 @@ Ein Command kann folgende Bestandteile enthalten:
 | --- | --- | --- | --- |
 | Parameter und Defaults | Typisierte Parameterdeklaration mit optionalem Ausdruck | Eingaben des Aufrufs festlegen | Schlüssel, ausgewählte Entity oder DTO, Filterwert; Default über `getSelected()` oder Konstante |
 | `generally enabled` | Liste boolescher Ausdrücke, logisch UND-verknüpft | Sichtbare Command-Aktion fachlich aktivieren oder deaktivieren | Zulässiger Status, vorhandene Selektion, passende Betriebsart |
-| Permissions | `CAN_OPEN_RO`- oder `CAN_OPEN_RW`-Eintrag mit Rolle | Lesenden beziehungsweise ändernden Zugriff erlauben | Beobachterrolle für Anzeige, Sachbearbeiterrolle für Änderung |
+| Permissions | `CAN_OPEN_RO`- oder `CAN_OPEN_RW`-Eintrag mit Rolle; fehlt beides, dann uneingeschränkter Zugriff | Lesenden beziehungsweise ändernden Zugriff erlauben | Beobachterrolle für Anzeige, Sachbearbeiterrolle für Änderung |
 | Preconditions | Liste von `Precondition`-Knoten | Verständliche Voraussetzungen vor dem Start prüfen | Vollständige Parameter, fachlich erlaubter Ausgangszustand |
 | Lokale Variablen | Typisierte Variablendeklaration | Zustand einer Command-Instanz halten | Geladener Graph, Filter-DTO, Ergebnisliste, Ablaufkennzeichen |
 | Command Settings | Deklarative Einstellungen und Ausdrücke | Darstellung und Laufzeitverhalten konfigurieren | Label, Icon, Hotkey, Farbe, Revert-Objekte, Locks, Optionen |
@@ -407,7 +430,7 @@ Ein Command kann folgende Bestandteile enthalten:
 | Pages | `PageCrtl`-Knoten | Interaktionsschritte definieren | Page Init mit Rückgabewert, Bindung, Titel, Scopes, UI-Auswahl und Conclusions |
 | `FINAL OK_CONCLUSION` | Funktion ohne Rückgabewert plus Successors und Selektionen | Erfolgreichen Abschluss vorbereiten | Check-in-Operationen registrieren, Ergebnisobjekte pushen |
 | `FINAL CANCEL_CONCLUSION` | Funktion mit Problembericht plus Cancel-Operationen | Fachlichen oder technischen Abbruch behandeln | Diagnose, Fehlerstatus oder Journal in privater Cancel-Transaktion |
-| `FINAL_USER_CANCEL` | Deklarierter Benutzerabbruch | Bewusstes Schließen oder Zurückgehen behandeln | Revert der dafür angegebenen Objekte |
+| `FINAL_USER_CANCEL` | Benutzerabbruch durch ESC | Bewusstes Schließen oder Zurückgehen behandeln | Revert der dafür angegebenen Objekte |
 
 ### Parameter, Defaults und Selektion
 
@@ -438,7 +461,7 @@ Fehlt entweder die selektierte Rechnung oder die selektierte Rechnungsposition, 
 
 `command init` bereitet Variablen und Daten für den folgenden Ablauf vor. Mit der Option `IN_BACKGROUND` wird ausschließlich dieses `command init` im Hintergrund ausgeführt. Pages und der weitere Interaktionsablauf werden dadurch nicht allgemein zu einem Hintergrundjob.
 
-Preconditions sollen vor fachlichen Änderungen geprüft werden. Im `command init` verhindert eine fehlgeschlagene Precondition den Start des interaktiven Ablaufs und zeigt ihre Meldung im aufrufenden UI. `WARNING_HINT` unterbricht den Ablauf weder hier noch im Page Init. Eine nicht warnende Precondition im Page Init soll vermieden werden, weil sie die Initialisierung der anzuzeigenden Page abbricht. Diese Regeln gelten ebenso, wenn die Precondition in einem vom jeweiligen Abschnitt aufgerufenen Service liegt.
+Preconditions sollen vor fachlichen Änderungen geprüft werden. Im `command init` verhindert eine fehlgeschlagene Precondition den Start des interaktiven Ablaufs und zeigt ihre Meldung im aufrufenden UI; dessen Oberfläche bleibt bestehen. `WARNING_HINT` zeigt dagegen nur einen Hinweis und unterbricht das `command init` nicht. Dieselbe Wirkung gilt, wenn die Precondition in einem von `command init` aufgerufenen Service liegt.
 
 Der Window Title wird nach `command init` berechnet. Dadurch dürfen sein Ausdruck und seine Formatargumente auf den dort aufgebauten lokalen Zustand zugreifen. Die Command-Property `newWindowTitleType` (`O2WindowTitleType`) bestimmt, wie der Text mit einem bereits vorhandenen Fenstertitel kombiniert wird:
 
@@ -450,44 +473,100 @@ Der Window Title wird nach `command init` berechnet. Dadurch dürfen sein Ausdru
 
 ### Pages und Page Conclusions
 
-Eine Page (`PageCrtl`) ist der zentrale interaktive Schritt eines Commands. Sie verbindet das vom Command bereitgestellte Objekt mit einer sichtbaren DataUX-Darstellung und den möglichen Übergängen des Ablaufs. Page und `Page Pane` haben dabei getrennte Verantwortlichkeiten: ObjectFlow beschreibt Daten, Zustand und Kontrollfluss; DataUX beschreibt die sichtbare Darstellung und die Menüs.
+Eine Page (`PageCrtl`) ist der zentrale interaktive Schritt eines Commands. Sie verbindet das vom Command bereitgestellte Objekt mit einer sichtbaren DataUX-Darstellung, einer `Page Pane` und den möglichen Übergängen des Ablaufs. Page und `Page Pane` haben dabei getrennte Verantwortlichkeiten: ObjectFlow beschreibt Daten, Zustand und Kontrollfluss; DataUX beschreibt die sichtbare Darstellung und die Menüs.
 
 | Bestandteil einer Page | Technische Form | Aufgabe |
 | --- | --- | --- |
-| Bindung | optionale Referenz auf Entity- oder DTO-Typ | Legt den Typ des von Page Init bereitgestellten Root-Objekts fest |
+| Bindung | Referenz auf Entity- oder DTO-Typ; strukturell optional, für eine normale UI-Page erforderlich | Legt den Typ des von Page Init bereitgestellten Root-Objekts fest |
 | Page Init | `PageInitConceptFunc`, liefert ein Objekt zurück | Lädt, aktualisiert oder liefert die anzuzeigenden Daten |
 | Page Title und Subtitle | optionale Ausdrücke | Beschriften den Inhalt dieser Page nach ihrer Initialisierung |
 | Scopes | `PageScopeConceptFunc` | Setzt Page-spezifische Auswahlmengen und andere `#Meta`-Werte |
 | Page-Pane-Umschaltung | ein oder mehrere `PagePaneActionProviderLink` | Wählt abhängig von Bedingungen die passende DataUX-Darstellung |
 | Termination Handler | null bis viele `PageCmdTermHandler` | Reagiert auf beendete Child- oder andere Commands und übernimmt gepushte Ergebnisse |
-| Branching Commands | für die Page angebotene Commands | Stellt mögliche Child-Aktionen bereit; ihre sichtbare Platzierung wird in den Menüs der `Page Pane`s modelliert |
-| Page Conclusions | null bis viele `PageConclusion`-Knoten | Bildet die regulären Schaltflächen am unteren Rand der UI und führt den nächsten Ablaufschritt aus |
+| Branching Commands | für die Page angebotene Commands | Deklariert die Child-Commands, deren sichtbare Platzierung in den Menüs der `Page Pane`s modelliert wird |
+| Page Conclusions | 0 oder mehr `PageConclusion`-Knoten | Bildet die regulären Schaltflächen am unteren Rand der UI und führt den nächsten Ablaufschritt aus |
 
 #### Page Init und Datenbereitstellung
 
 Bei einem `GRAPH_OWNER_CMD` wird der bearbeitete Graph üblicherweise bereits im `command init` ausgecheckt; Page Init liefert dann das vorbereitete Root-Objekt. Bei einem `SEARCH_CMD` lädt Page Init häufig die aktuelle Ergebnisliste anhand eines Filter-DTOs. Das sind bewährte Muster, keine strukturelle Beschränkung der Sprache.
 
-Eine Conclusion kann mit `page <dieselbe Page>` bewusst auf die aktuelle Page zurückwechseln. Dadurch wird Page Init erneut ausgeführt und die Darstellung aktualisiert. So entsteht eine Refresh-Conclusion, ohne den Command neu zu starten. Ein Wechsel mit `page <andere Page>` initialisiert entsprechend den nächsten Interaktionsschritt.
+Eine nicht warnende Precondition im Page Init unterbricht den Aufbau beziehungsweise die erneute Initialisierung der Page. Dort sollen deshalb nur `WARNING_HINT`-Preconditions verwendet werden. Abbrechende Voraussetzungen gehören in `command init`, wenn der Command gar nicht erst geöffnet werden soll, oder in eine Page Conclusion, wenn der Benutzer seine Eingaben auf der sichtbaren Page korrigieren können soll. Das gilt auch für Preconditions, die mittelbar in einem von Page Init aufgerufenen Service ausgelöst werden.
+
+Eine Conclusion kann mit `page <dieselbe Page>` bewusst auf die aktuelle Page zurückwechseln. Dadurch wird Page Init erneut ausgeführt und die Darstellung aktualisiert. So entsteht beispielsweise eine Refresh-Conclusion für ein `SEARCH_CMD`, ohne den Command neu zu starten. Ein Wechsel mit `page <andere Page>` initialisiert entsprechend den nächsten Interaktionsschritt.
 
 #### Window Title, Page Title und Subtitle
 
-Der Window Title gehört zum gesamten Command-Fenster und wird nach `command init` nach den Regeln von `O2WindowTitleType` gesetzt. Page Title und Subtitle gehören dagegen zu einer einzelnen Page. Ihre Ausdrücke werden nach Page Init berechnet und können daher den gerade geladenen Page-Zustand beschreiben. Ein mehrseitiger Command behält somit seinen Window Title, während Page Title und Subtitle je Interaktionsschritt wechseln können.
+Der Window Title gehört zum gesamten Command-Fenster und wird nach `command init` gesetzt. Page Title und Subtitle gehören dagegen zu einer einzelnen Page. Ihre Ausdrücke werden nach Page Init berechnet und können daher den gerade geladenen Page-Zustand beschreiben. Ein mehrseitiger Command behält somit seinen Window Title, während Page Title und Subtitle je Interaktionsschritt wechseln können.
 
-#### Scopes und Page-Pane-Umschaltung
+#### Scopes
 
 Die Scope-Funktion (`PageScopeConceptFunc`) läuft nach Page Init und erneut nach der Termination eines Child-Commands. Sie eignet sich insbesondere dazu, die zulässigen Werte einer Reference- oder Status-Property über `#Meta` an den aktuellen Page-Zustand anzupassen. Sie lädt keine UI-Daten nach; benötigte Objekte müssen bereits durch Command oder Repository bereitgestellt sein.
 
-Eine Page besitzt mindestens einen `PagePaneActionProviderLink`. Ein unbedingter Link wird als `-> : PagePane` projiziert; ein bedingter Link als `<Bedingung> : PagePane`. Damit kann dieselbe fachliche Page beispielsweise für unterschiedliche Geräteklassen oder für Administratoren und reguläre Benutzer verschiedene Oberflächen auswählen. Die Bedingungen sollen sich eindeutig verhalten; ein unbedingter Link kann als Fallback dienen. Die fachliche Logik bleibt trotz unterschiedlicher Darstellung in derselben Page und demselben Command.
+Ein Bearbeitungs-Command kann beispielsweise die zulässigen Kunden im `command init` laden und anschließend in der Scope-Funktion an den gerade angezeigten Zustand binden:
+
+```objectflow
+local variables:
+list<Kunde> buchbareKunden
+Rechnung rechnung
+
+command init:
+func()->void {
+  buchbareKunden = # KundenRepository.findeBuchbareKunden();
+  rechnung = # RechnungsRepository.checkout(rechnungId);
+}
+
+page ctrl 'Bearbeitung' bound to Rechnung
+  page init:
+    pageLoadFunc()->Object {
+      rechnung;
+    }
+
+  and scopes:
+    pageSetScopesFunc()->void {
+      rechnung.kunde#Meta.setScope(buchbareKunden);
+      rechnung.status#Meta.setElements(Rechnungsstatus.Entwurf, Rechnungsstatus.Geprüft);
+      rechnung.rabatt#Meta.setEnabled(rechnung.status of Rechnungsstatus.Entwurf);
+    }
+```
+
+Repository- und Property-Namen sind hier Pseudocode; wesentlich ist die Aufteilung: Daten laden im Command, UI-Metadaten setzen in der Scope-Funktion.
+
+#### Mehrere Page Panes
+
+Eine Page besitzt mindestens einen `PagePaneActionProviderLink`. Ein unbedingter Link wird als `-> : PagePane` projiziert; ein bedingter Link als `<Bedingung> : PagePane`. Die Links werden in ihrer modellierten Reihenfolge ausgewertet. Damit kann dieselbe fachliche Page beispielsweise für unterschiedliche Geräteklassen oder für Administratoren und reguläre Benutzer verschiedene Oberflächen auswählen. Bedingungen sollen sich möglichst eindeutig verhalten; der verpflichtende unbedingte Default-Link steht als letztes Element der Liste. Die fachliche Logik bleibt trotz unterschiedlicher Darstellung in derselben Page und demselben Command.
+
+```objectflow
+page panes switch:
+  isPlatform(Mobile) : RechnungMobil
+  role RechnungsAdministration() : RechnungAdministration
+  -> : RechnungStandard
+```
 
 #### Termination Handler
 
 Ein `PageCmdTermHandler` wird ausgeführt, wenn während der Page ein weiterer Command beendet wurde. `ChildCmdTerminated` reagiert auf echte Child-Commands; `AnyCmdTerminated` kann auch andere passende Terminationen erfassen. Ein optionaler Classifier filtert nach dem Typ des gepushten Objekts. Je nach Variante erhält die Funktion Informationen darüber, ob der beendete Command erfolgreich war, ob er ein Child war und welches Objekt gepusht wurde.
 
-Der Handler kann anschließend berechnete Werte aktualisieren, ein gepushtes Objekt mit `session merge` in den Parent-Graphen übernehmen oder die Selektion anpassen. Danach werden auch die Page-Scopes neu berechnet. Dieses explizite Verhalten ist besonders zusammen mit `NEWSTYLE_CMD_TERM_HANDLING` wichtig.
+Der Handler kann anschließend berechnete Werte aktualisieren, ein gepushtes Objekt mit `session merge` in den Parent-Graphen übernehmen oder die Selektion anpassen. Danach werden auch die Page-Scopes neu berechnet. Dieses explizite Verhalten ist besonders zusammen mit `NEWSTYLE_CMD_TERM_HANDLING` wichtig; die Merge-Varianten und ihre Session-Semantik werden unter [Explizites Command-Termination-Handling und Session Merge](#explizites-command-termination-handling-und-session-merge) erläutert.
+
+Ein `SEARCH_CMD` kann ein erfolgreich vom Child gepushtes Objekt beispielsweise in seine read-only Ergebnisliste integrieren:
+
+```objectflow
+cmd terminated handler for page:
+  child cmd term with Rechnung
+  func(terminatedInFinalOk, pushed)->void {
+    if (terminatedInFinalOk) {
+      Rechnung integriert = session merge entity pushed
+        into list<> suchergebnis.treffer (in session as readonly);
+      pushSelection(integriert);
+    }
+  }
+```
+
+Das Beispiel ist Pseudocode. Entscheidend ist, mit dem von `session merge` gelieferten Objekt weiterzuarbeiten: Es ist die in den Parent-Kontext integrierte Instanz, während `pushed` aus dem beendeten Command stammt.
 
 #### Page Conclusions
 
-Eine `PageConclusion` besitzt ein Label, eine optionale `enabledWhen`-Bedingung, den Modus `ConclusionSaveType` und eine Funktion ohne Rückgabewert. Ihre Labels erscheinen typischerweise als Schaltflächen am unteren Rand der Page. Zusätzlich steht der Benutzerabbruch über Escape beziehungsweise Zurück zur Verfügung, solange der Command nicht die Option `NO_ESC` trägt.
+Eine `PageConclusion` besitzt ein Label, eine optionale `enabledWhen`-Bedingung, den Modus `ConclusionSaveType` und eine Funktion ohne Rückgabewert. Ihre Labels erscheinen typischerweise als Schaltflächen am unteren Rand der Page. Zusätzlich steht der Benutzerabbruch über Escape zur Verfügung, solange der Command nicht die Option `NO_ESC` trägt.
 
 `ConclusionSaveType` hat die Werte `save` (`SAVE_CONCLUSION`, Standard) und `no_save` (`NOSAVE_CONCLUSION`). `save` übernimmt vor der Conclusion die aktuellen Editorwerte in die gebundenen Objekte. Das soll auch bei nicht editierbaren oder situationsabhängig deaktivierten UI-Elementen der normale Modus bleiben; deaktiviert bedeutet nicht, dass die übrigen Page-Werte verworfen werden sollen. `no_save` ist nur passend, wenn die noch im Editor befindlichen Änderungen für diese Aktion ausdrücklich nicht übernommen werden dürfen.
 
@@ -496,8 +575,28 @@ Innerhalb der Conclusion steuern zwei spezielle Statements den weiteren Ablauf:
 - `page <Name>` (`PageCommand`) wechselt auf die angegebene Page und führt deren Page Init aus. Ein Verweis auf die aktuelle Page wirkt als Refresh.
 - `done` (`DoneCommand`) beendet den interaktiven Teil erfolgreich und führt `FINAL_OK_CONCLUSION` aus.
 
-Ohne `page` oder `done` bleibt der Command auf der aktuellen Page. Schlägt eine Precondition in der Conclusion fehl, wird deren Funktion an dieser Stelle beendet; die Page bleibt sichtbar und der Benutzer kann anhand der Meldung korrigieren oder eine andere Aktion wählen.
+Preconditions in einer Conclusion prüfen die vom Editor übernommenen Eingaben unmittelbar vor dem Übergang. Ein `GRAPH_EDIT_CMD` kann so seine Teilbearbeitung vor `done` prüfen; ein `GRAPH_OWNER_CMD` kann vor `done` die Voraussetzungen für das anschließende Registrieren und Ausführen der Speicheroperationen absichern. Ohne `page` oder `done` bleibt der Command auf der aktuellen Page. Schlägt eine Precondition fehl, endet die Conclusion an dieser Stelle ebenfalls ohne Übergang: Die Page bleibt sichtbar und der Benutzer kann anhand der Meldung korrigieren oder eine andere Aktion wählen.
 
+Zwei häufige Muster sind eine Aktualisieren-Conclusion im `SEARCH_CMD` und eine Speichern-&-Beenden-Conclusion im `GRAPH_OWNER_CMD`:
+
+```objectflow
+// SEARCH_CMD
+conclusion label: Aktualisieren
+  func()->void {
+    precondition filter.isDefined() : 'Bitte mindestens ein Suchkriterium angeben.';
+    page Ergebnisse;  // dieselbe Page erneut initialisieren
+  }
+
+// GRAPH_OWNER_CMD
+conclusion label: Speichern & Beenden
+  func()->void {
+    validation {
+      precondition rechnung.positionen.isNotEmpty : 'Mindestens eine Position ist erforderlich.';
+      precondition rechnung.summe.signum() >= 0 : 'Die Rechnungssumme darf nicht negativ sein.';
+    }
+    done;  // danach FINAL_OK_CONCLUSION und Session Operations
+  }
+```
 
 ### `FINAL_OK`, `FINAL_CANCEL` und `FINAL_USER_CANCEL`
 
@@ -507,21 +606,21 @@ Ohne `page` oder `done` bleibt der Command auf der aktuellen Page. Schlägt eine
 FINAL-OK-Funktion
         │
         ▼
-Session Operations in Registrierungsreihenfolge
+ gemeinsame Datenbanktransaktion starten
         │
         ▼
-gemeinsame Datenbanktransaktion
+ Session Operations in Registrierungsreihenfolge ausführen
         │
         ▼
-Commit
+ Commit
         │
         ▼
-gegebenenfalls geplanter nächster Command
+ Root Objekt des Aggregates pushen
 ```
 
 Schlägt eine Session Operation fehl, wird die Transaktion nicht committed. Ein `SEARCH_CMD` durchläuft zwar ebenfalls seinen erfolgreichen Command-Abschluss, seine Session wird anschließend aber ausdrücklich nicht committed.
 
-`FINAL_CANCEL` ist ein vom Command beziehungsweise System ausgelöster Abbruch. Guards und Exceptions führen in diesen Abschluss. Registrierte normale Session Operations werden nicht als erfolgreicher Check-in ausgeführt. Für Fehlerstatus, Marker oder Journale stehen gesonderte Cancel-Operationen zur Verfügung, die in einem dafür vorgesehenen privaten Transaktionskontext ausgeführt werden können.
+`FINAL_CANCEL` ist ein vom Command beziehungsweise System ausgelöster Abbruch. Guards und Exceptions führen in diesen Abschluss. Registrierte normale Session Operations werden nicht als erfolgreicher Check-in ausgeführt. Für Fehlerstatus, Marker oder Journale stehen gesonderte Cancel-Operationen zur Verfügung, die in einem dafür vorgesehenen privaten Transaktionskontext ausgeführt werden.
 
 `FINAL_USER_CANCEL` entsteht durch eine bewusste Benutzeraktion, insbesondere Escape, Zurück oder Schließen. Die Command-Option `NO_ESC` deaktiviert den Abbruch über Escape.
 
@@ -532,11 +631,12 @@ Unter `revert on FINAL_ / USER_CANCEL` können Parameter beziehungsweise Variabl
 Bei Listen hängt diese Revert-Kopie von der Veränderbarkeit ihrer Elemente ab: Veränderbare Entity-Elemente werden kopiert; ausschließlich read-only geladene Elemente können als Referenzen wiederverwendet werden.
 
 - Bei `FINAL_CANCEL` und `FINAL_USER_CANCEL` wird der ursprüngliche Zustand wiederhergestellt.
-- Wird die Wurzel eines Graphen angegeben, wird der gesamte darunterliegende ObjectFlow-Graph zurückgesetzt.
-- Nicht als Revert-Objekt erfasste Änderungen werden nicht allein aufgrund eines Child-Abbruchs automatisch zurückgenommen.
+- Wird die Wurzel eines Graphen angegeben, wird der gesamte darunterliegende Objekt-Graph zurückgesetzt.
 - Session Operations eines abgebrochenen `GRAPH_EDIT_CMD` werden durch Revert nicht aus dem Stack entfernt.
 
-Revert ist damit eine In-Memory-Rücknahme des bearbeiteten ObjectFlow-Graphen und nicht mit einem Datenbank-Rollback gleichzusetzen. Die Datenbanktransaktion für den normalen Check-in beginnt ohnehin erst beim erfolgreichen Abschluss des Session Owners.
+Revert ist ausdrücklich auf die unter `revert on FINAL_ / USER_CANCEL` aufgeführten Parameter und Variablen begrenzt. Das ist bei einem `GRAPH_EDIT_CMD` besonders wichtig, weil er in der Session seines Parent-Commands arbeitet: Verändert das Child einen gemeinsam genutzten Graphen und ist dessen Wurzel beim Child nicht als Revert-Objekt angegeben, bleiben diese In-Memory-Änderungen auch nach einem Benutzerabbruch des Childs im Parent sichtbar. Sollen sämtliche Änderungen des Childs verworfen werden, wird deshalb die gemeinsam bearbeitete Graph-Wurzel als Revert-Objekt des Child-Commands angegeben.
+
+Revert ist damit eine In-Memory-Rücknahme des bearbeiteten Objekt-Graphen und nicht mit einem Datenbank-Rollback gleichzusetzen. Die Datenbanktransaktion für den normalen Check-in beginnt ohnehin erst beim erfolgreichen Abschluss des Session Owners.
 
 ### Command-Optionen
 
@@ -544,10 +644,33 @@ Revert ist damit eine In-Memory-Rücknahme des bearbeiteten ObjectFlow-Graphen u
 | --- | --- | --- | --- |
 | `IN_BACKGROUND` | `CommandBackgroundOption` | `org.modellwerkstatt.objectflow.structure.CommandBackgroundOption` | Führt `command init` im Hintergrund aus |
 | `NO_ESC` | `CommandNoEscOption` | `org.modellwerkstatt.objectflow.structure.CommandNoEscOption` | Deaktiviert `FINAL_USER_CANCEL` über Escape |
-| `NEWSTYLE_CMD_TERM_HANDLING` | `CommandNoPushNewTermOption` | `org.modellwerkstatt.objectflow.structure.CommandNoPushNewTermOption` | Deaktiviert die alte automatische Übernahme gepushter Objekte; Termination und Merge werden explizit behandelt |
+| `NEWSTYLE_CMD_TERM_HANDLING` | `CommandNoPushNewTermOption` | `org.modellwerkstatt.objectflow.structure.CommandNoPushNewTermOption` | Deaktiviert die alte automatische Übernahme gepushter Objekte; Merge muss explizit behandelt werden, Termination Handler werden ausgelöst |
 | `URL` | `CommandUrlOption` | `org.modellwerkstatt.objectflow.structure.CommandUrlOption` | Macht einen Command in webfähigen Laufzeiten über einen Pfad und optionale URL-Parameter startbar |
 
-`URL` gilt für Turku- und H2-Laufzeiten. Wird ein URL-fähiger Command direkt aufgerufen, werden die Parameter aus der URL bereitgestellt und müssen nach `command init` in den Command-Kontext gepusht werden. Wird der Command aus einem bestehenden Fenster in einem neuen Browserfenster gestartet, passt die Laufzeit die Browser-URL ebenfalls an.
+`URL` gilt für Turku- und H2-Laufzeiten. Die Option deklariert einen Pfad und eine geordnete Liste von Command-Parametern (`CommandUrlParamOption`); nach dem ersten optionalen Parameter dürfen nur noch weitere optionale Parameter folgen. Bei einem direkten URL-Aufruf konvertiert die Laufzeit die Pfadsegmente und stellt sie vor `command init` als normale Command-Parameter bereit.
+
+Die Werte, mit denen die Browser-URL nach `command init` aufgebaut beziehungsweise normalisiert wird, stehen nicht als Zuweisungen im Funktionskörper, sondern im eigenen Command-Bereich `url param adjust`. Dessen Ausdrücke entsprechen positionsweise den in der `URL`-Option deklarierten Parametern und müssen zum jeweiligen Parametertyp passen. Für jeden nicht optionalen URL-Parameter ist ein Ausdruck erforderlich; nur optionale Parameter am Ende dürfen entfallen.
+
+```objectflow
+command parameter and defaults:
+int rechnungId
+string ansicht = "details"
+
+local variables:
+Rechnung rechnung
+
+command options: URL "rechnung"/ rechnungId / (opt) ansicht
+
+command init:
+func()->void {
+  rechnung = # RechnungsRepository.get(rechnungId);
+  ansicht = ansicht.isEmpty ? "details" : ansicht;
+}
+
+url param adjust: rechnung.id, ansicht
+```
+
+Wird der Command aus einem bestehenden Fenster in einem neuen Browserfenster gestartet, verwendet die Laufzeit diese Werte ebenfalls für die Browser-URL.
 
 ### Session und Unit of Work
 
@@ -894,6 +1017,7 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 | Commandoption | `NO_ESC` | `CommandNoEscOption` | `org.modellwerkstatt.objectflow.structure.CommandNoEscOption` |
 | Commandoption | `NEWSTYLE_CMD_TERM_HANDLING` | `CommandNoPushNewTermOption` | `org.modellwerkstatt.objectflow.structure.CommandNoPushNewTermOption` |
 | Commandoption | `URL` | `CommandUrlOption` | `org.modellwerkstatt.objectflow.structure.CommandUrlOption` |
+| Commandoption | URL-Parameter | `CommandUrlParamOption` | `org.modellwerkstatt.objectflow.structure.CommandUrlParamOption` |
 | Session | session | `Session` | `org.modellwerkstatt.objectflow.structure.Session` |
 | Session | session operation add | `SessionOperationAdd` | `org.modellwerkstatt.objectflow.structure.SessionOperationAdd` |
 | Session | session entities | `CheckedOutEntities` | `org.modellwerkstatt.objectflow.structure.CheckedOutEntities` |
