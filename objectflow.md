@@ -797,7 +797,7 @@ Bei einem Merge mit Session benötigt die Quelle einen gesetzten Schlüssel. Exi
 Für die weitere Verarbeitung ist stets der Rückgabewert des Merge-Ausdrucks zu verwenden. Nur er bezeichnet zuverlässig die bereits vorhandene oder neu erzeugte Zielinstanz. Ein Objektgraph wird bewusst in mehreren Schritten integriert: Root-Entity, enthaltene Listen und fachlich relevante Referenzen werden mit der jeweils passenden Merge-Form behandelt.
 
 
-### Successor-Commands und weitere Ablaufmuster
+### Successor-Commands
 
 Ein Command kann Successor-Commands deklarieren. Sie modellieren einen fachlichen Folgeablauf, der aus dem Abschluss des aktuellen Commands hervorgeht. Davon zu unterscheiden ist `session queue next command`: Dieses Konzept plant gezielt einen Command nach erfolgreichem Commit des Session Owners.
 
@@ -829,15 +829,26 @@ Successors eignen sich damit für mehrere unmittelbar aufeinanderfolgende Oberfl
 
 `session queue next command` setzt dagegen eine Commit-Grenze: Der aktuelle Session Owner wird zuerst vollständig abgeschlossen und persistiert, erst danach beginnt der geplante Command. Es ist deshalb die passendere Wahl, wenn der Folgeablauf den bereits committed Zustand benötigt oder eine eigenständige Unit of Work bilden soll.
 
-In bestehenden und historischen Modellen treten außerdem folgende Muster auf:
 
-- Suche → Graph Owner → mehrere Graph Edits,
-- Erzeugen eines Folgedokuments und anschließende Bearbeitung,
-- Compound Actions, die mehrere Commands anhand ihrer Conclusions verketten,
-- mehrfache Ausführung eines Commands auf selektierten Listenelementen,
-- erneute Validierung eines Parent-Graphen nach dem Ende eines Child-Commands.
+### Mehrfachausführung von GRAPH_OWNER / GRAPH_EDIT
 
-Diese Muster sind keine zusätzlichen Command-Typen. Ihre genaue Eignung hängt von Session-Grenze, Revert, Termination-Handling und Ziel-Laufzeit ab.
+Wählt ein Benutzer in einer DataUX-Tabelle mehrere Zeilen aus, kann eine gewöhnliche `Action` denselben Command automatisch nacheinander für jede ausgewählte Zeile starten. Der Command bleibt dabei auf genau ein Objekt ausgerichtet: Ein Parameter oder ein ausdrücklich an der Action angegebenes Argument verwendet `getSelected(Typ)` (`SelectedObject`). Vor jedem Einzellauf ersetzt die Laufzeit die aktuelle Auswahl vorübergehend durch das nächste Tabellenobjekt und berechnet damit die Argumente erneut. Im Command ist deshalb weder eine Schleife noch ein Listenparameter erforderlich.
+
+Diese automatische Mehrfachausführung wird nur angeboten, wenn die Action tatsächlich von der gebundenen Tabellenselektion abhängt. Bei einer Tabellenaction muss mindestens ein verwendetes `getSelected(Typ)` genau zum Zeilentyp der Tabelle passen. Enthält die Action beziehungsweise die Default-Parametrisierung dagegen `getSelectedObjects()` (`SelectedList`), behandelt die Laufzeit die gesamte Auswahl als ein einziges Argument und aktiviert die beschriebene Einzelausführung nicht. Commands mit Successors werden ebenfalls nicht auf diese Weise mehrfach gestartet.
+
+Die konkrete Command-Form bestimmt, ob eine normale Action potentiell mehrfach ausführbar ist:
+
+| Command-Form | Verhalten bei Mehrfachselektion | Verhalten nach Abbruch oder fachlichem Problem |
+| --- | --- | --- |
+| `GRAPH_OWNER_CMD` ohne Page | Ein eigener Command-Lauf je ausgewähltem Objekt; jeder Lauf besitzt eine neue Session und eine eigene Commit-Grenze | Der betroffene Einzellauf wird abgebrochen, anschließend wird das nächste ausgewählte Objekt verarbeitet |
+| `GRAPH_EDIT_CMD` mit Page | Die Bearbeitungsoberfläche wird für die ausgewählten Objekte nacheinander geöffnet; alle Läufe verwenden die Session des übergeordneten Session Owners | Nur ein erfolgreicher Abschluss startet den nächsten Lauf; ein Problem oder Benutzerabbruch beendet die restliche Mehrfachausführung |
+| `GRAPH_EDIT_CMD` ohne Page | Die Läufe werden ohne sichtbare Zwischenoberfläche nacheinander in der bestehenden Owner-Session ausgeführt | Ein Problem oder Abbruch beendet die restliche Mehrfachausführung |
+
+Ein `GRAPH_OWNER_CMD` mit sichtbarer Page kann von der Laufzeit nicht mehrfach-ausgeführt werden. Die automatische Mehrfachausführung prüft außerdem vor dem Start, ob die Parameter für jedes ausgewählte Objekt gebildet werden können und der Command jeweils enabled und erlaubt ist. Ist auch nur ein Einzellauf schon bei dieser Vorprüfung nicht zulässig, bleibt die Action für die Mehrfachselektion deaktiviert.
+
+Das Weiterlaufen eines page-losen `GRAPH_OWNER_CMD` bezieht sich auf einen regulären Command-Abbruch, etwa infolge einer fachlichen Precondition. Eine unerwartete technische Exception beendet dagegen die gesamte Mehrfachausführung. Die einzelnen Owner-Läufe bilden zudem keine gemeinsame Transaktion: Wurden die ersten Rechnungen erfolgreich abgeschlossen und scheitert eine spätere Rechnung fachlich, bleiben die bereits committed Einzelläufe erfolgreich. Dieses Verhalten eignet sich für stapelartige Benutzeraktionen, ist aber kein atomarer Batch über die gesamte Auswahl.
+
+Damit deckt die normale Command- und Action-Infrastruktur viele interaktive Stapelanforderungen bereits ab. Ein eigener Sammel-Command mit `getSelectedObjects()` ist erst nötig, wenn die Auswahl als Ganzes fachlich ausgewertet werden muss, eine gemeinsame Fortschritts- oder Ergebnislogik verlangt wird oder alle Elemente ausdrücklich in einer selbst definierten Gesamtoperation koordiniert werden sollen.
 
 
 ## Teil IV – Testing mit ObjectFlow
