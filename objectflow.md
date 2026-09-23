@@ -722,22 +722,17 @@ Session Owner startet
 
 Das Konzept `session` (`Session`) gibt bei Bedarf direkten Zugriff auf Interna der aktuellen Session. Es ist für Fälle gedacht, die durch die höherwertigen Sprachkonzepte nicht abgedeckt werden. Direkter Session-Zugriff erhöht die Kopplung an die Laufzeit und sollte deshalb gezielt bleiben.
 
-Neu erzeugte Entities müssen Teil der Session werden, bevor Session- und UI-Mechanismen sie als bearbeiteten Graphen behandeln können. Dafür stellt die Session entsprechende Integrationsoperationen bereit.
+Neu erzeugte Entities müssen Teil der Session werden, bevor Session- und UI-Mechanismen sie als bearbeiteten Graphen behandeln können. Dafür stellt die Session `session.ensureInSession(<Entity>)` bereit.
 
 #### Session-weites Read-only und Dirty
 
-Mit `session.setReadOnly()` kann ein Command seine aktuelle Session ausdrücklich in den Read-only-Modus versetzen. In diesem Modus darf die Laufzeit keine speichernde Transaktion starten; generierte Insert- und Update-Operationen lehnen die Ausführung ebenfalls ab. Das ist insbesondere für Commands sinnvoll, die trotz umfangreicher Navigation und Repository-Zugriffe garantiert keine Daten speichern sollen.
+Mit `session.setReadOnly()` kann ein Command seine aktuelle Session ausdrücklich in den Read-only-Modus versetzen. ObjectFlow setzt dann alle Page-Conclusions auf disabled. Escape steht dem Benutzer weiterhin zur Verfügung. Er kann auch Commands aus Menüs starten, sofern diese enabled sind. In diesem Modus darf die Laufzeit keine speichernde Transaktion starten.
 
-Der Session-Schalter ist von der Read-only-Eigenschaft einzelner Entities zu unterscheiden. `session.setReadOnly()` markiert die Session, setzt aber bereits integrierte Entity-Instanzen nicht nachträglich einzeln auf read-only. Ob deren Setter Änderungen zulassen, hängt weiterhin davon ab, ob sie read-only geladen oder ausgecheckt wurden. Für einen konsistent lesenden Ablauf sollen daher sowohl passende read-only Repository-Methoden als auch – wenn der gesamte Command schreibgeschützt sein soll – der Session-Modus verwendet werden.
+Der Session-Schalter ist von der Read-only-Eigenschaft einzelner Entities zu unterscheiden. `session.setReadOnly()` markiert die Session, setzt aber bereits integrierte Entity-Instanzen nicht nachträglich einzeln auf read-only. Ob deren Setter Änderungen zulassen, hängt weiterhin davon ab, ob sie read-only geladen oder ausgecheckt wurden.
 
 `session.isDirty()` beantwortet, ob die Session ungespeicherte Änderungen enthält. Die Prüfung berücksichtigt zunächst einen ausdrücklich gesetzten Session-Dirty-Zustand und durchläuft andernfalls die Key Stores aller in die Session integrierten Entity-Typen. Eine neu integrierte Entity ohne Schlüssel gilt als dirty; bei vorhandenen Entities wird deren Dirty-Zustand abgefragt. Diese Entity-Prüfung bezieht auch nachträgliche Änderungen an Listen ein. Der Aufruf betrachtet damit die gesamte Session und nicht nur das aktuell auf einer Page gebundene Objekt.
 
-```text
-session.setReadOnly();
-boolean ungespeicherteAenderungen = session.isDirty();
-```
-
-`session.isDirty()` eignet sich beispielsweise für Abbruchrückfragen oder zur Entscheidung, ob ein speichernder Abschluss angeboten wird. Da die Prüfung die integrierten Entities bis zum ersten Treffer durchläuft, sollte sie nicht unnötig in engen Schleifen aufgerufen werden.
+`session.isDirty()` wird von der Laufzeit für die automatische Abbruchrückfrage bei GRAPH_OWNER / GRAPH_OWNER_MODAL commands verwendet.
 
 ### Entities in der Session prüfen
 
@@ -750,7 +745,17 @@ boolean ungespeicherteAenderungen = session.isDirty();
 | `(all)` | Alle in der Session vorhandenen Entities des Typs |
 | `(keys of all)` | Schlüssel aller Session-Entities des Typs |
 
-Ein wichtiger Einsatz ist die Prüfung, ob eine Entity bereits ausgecheckt wurde. Dadurch lässt sich ein doppelter Checkout vermeiden, der von ManMap abgelehnt wird.
+Ein wichtiger Einsatz ist die Prüfung, ob eine Entity bereits ausgecheckt wurde. Dadurch lässt sich ein doppelter Checkout vermeiden, der von ManMap abgelehnt wird. Die Abfrage liest ausschließlich den aktuellen Session-Zustand; sie lädt keine weiteren Datensätze aus der Datenbank.
+
+| Einsatz | Geeigneter Modus | Nutzen |
+| --- | --- | --- |
+| Doppelten Checkout verhindern | `(keys of checked out)` | Bereits bearbeitete Schlüssel können vor einem Repository-Aufruf ausgeschlossen werden. |
+| Bereits integrierte Objekte nicht erneut laden | `(keys of all)` | Eine Datenbankabfrage kann alle in der Session vorhandenen Identitäten auslassen, unabhängig davon, ob sie read-only oder ausgecheckt sind. |
+| Nur veränderte Objekte nachbearbeiten | `(checked out)` | Spezifische Prüfungen, Ableitungen oder Löschmarkierungen können auf den tatsächlich bearbeiteten Instanzen ausgeführt werden. |
+| Aktuellen In-Memory-Zustand auswerten | `(all)` | Berechnungen und Validierungen sehen auch noch nicht persistierte Änderungen, die eine erneute Datenbankabfrage nicht liefern würde. |
+| Eine bereits integrierte Instanz wiederverwenden | `(all)` | Innerhalb der Unit of Work kann gezielt die kanonische Session-Instanz gesucht werden, statt eine zweite Objektinstanz derselben fachlichen Identität einzuführen. |
+
+Die Varianten mit Entities liefern die tatsächlichen Session-Instanzen und machen dadurch deren noch nicht persistierten Zustand sichtbar. Die Schlüsselvarianten eignen sich dagegen besonders zum Filtern und für Repository-Parameter, wenn die Objekte selbst nicht benötigt werden. `(all)` umfasst sowohl read-only integrierte als auch ausgecheckte Entities; `(checked out)` grenzt bewusst auf veränderbare Session-Objekte ein.
 
 ### Command nach dem Commit einplanen
 
@@ -773,15 +778,56 @@ Der Parent reagiert stattdessen in einem Command-Termination-Handler auf das bee
 1. Das Child pusht ein oder mehrere Objekte bei seinem Abschluss.
 2. Der Parent erhält diese Objekte im Termination-Handler.
 3. `session merge` (`MergeInto`) integriert die relevanten Werte explizit in ein Zielobjekt beziehungsweise eine Zielliste des Parent-Graphen.
-4. Falls erforderlich, wird anschließend die Selektion ausdrücklich auf das integrierte Ziel gesetzt.
 
-`MergeInto` kann primitive Werte und Schlüssel übernehmen, Listen elementweise anhand von Schlüsseln abgleichen und ein Ziel in der Session finden beziehungsweise integrieren. Der konkrete Merge-Modus bestimmt, ob Session- und Read-only-Zustand berücksichtigt werden. Entfernte Listenelemente werden nach den historischen Beschreibungen nicht automatisch aus jeder Zielliste gelöscht; dieses Detail ist bei neuen Verwendungen gegen die aktuelle Projektion und Tests zu prüfen.
+`MergeInto` übernimmt den Zustand aus der Quelle in eine zum Zielkontext gehörende Instanz; die Quellinstanz selbst wird nicht einfach in den Parent-Graphen eingesetzt.
 
-Referenzbeispiele für die unterstützten Merge-Varianten liegen in der ObjectFlow-Testsuite `org.modellwerkstatt.objectflow.tests.ObjectFlowInfra.SessionAndMerge`. Anwendungsprojekte können zum Verständnis untersucht werden, sind aber keine zitierbare Spezifikation.
+| Merge-Form | Laufzeitfunktion | Verhalten und Ergebnis |
+| --- | --- | --- |
+| `entity` → `entity` | `mergeEntityIntoEntity` | Verwendet ein angegebenes Ziel oder sucht anhand des Quellschlüssels die vorhandene Session-Instanz. Fehlt beides, wird eine neue Instanz des konkreten Quelltyps erzeugt. Der Quellzustand wird in diese Instanz geladen und genau diese Zielinstanz zurückgegeben. |
+| `entity` → `list<>` | `mergeEntityIntoList` | Sucht in der Zielliste nach demselben Schlüssel. Ein Treffer wird aktualisiert; andernfalls wird eine neue integrierte Instanz angelegt und angehängt. Zurückgegeben wird das tatsächlich in der Zielliste befindliche Element. |
+| `list<>` → `list<>` | `mergeListIntoList` | Wendet den Entity-zu-Liste-Merge auf jedes Quellelement an und liefert die Liste der integrierten Zielinstanzen. Die Funktion entfernt von sich aus keine zusätzlichen Elemente, die nur in der Zielliste vorkommen. |
+| `ref` → `ref` | `mergeRefOnRef` | Integriert das referenzierte Quellobjekt wie eine Entity und setzt anschließend die Zielreferenz auf diese Instanz. Eine `null`-Quellreferenz leert die Zielreferenz. Das Ziel muss die Form `<Entity>.<Referenz>` besitzen; Opposite-Referenzen sind ausgeschlossen. |
+
+Bei einem Merge mit Session benötigt die Quelle einen gesetzten Schlüssel. Existiert zu diesem Schlüssel bereits eine Session-Instanz, bleibt deren Objektidentität erhalten; eine andere, ausdrücklich angegebene Zielinstanz wird abgelehnt. Ebenso müssen vorhandener Read-only- beziehungsweise Checked-out-Zustand und gewählter Integrationsmodus zusammenpassen. Die drei Modi bedeuten:
+
+- `(in session as readonly)` integriert in die aktuelle oder ausdrücklich angegebene Session als read-only,
+- `(in session as checkedout)` integriert als veränderbare, ausgecheckte Instanz und
+- `(do not consider session/rw-state)` erzeugt beziehungsweise aktualisiert das Ziel ohne Session-Identitätsprüfung und ohne Aufnahme in die Session.
+
+Für die weitere Verarbeitung ist stets der Rückgabewert des Merge-Ausdrucks zu verwenden. Nur er bezeichnet zuverlässig die bereits vorhandene oder neu erzeugte Zielinstanz. Ein Objektgraph wird bewusst in mehreren Schritten integriert: Root-Entity, enthaltene Listen und fachlich relevante Referenzen werden mit der jeweils passenden Merge-Form behandelt.
+
 
 ### Successor-Commands und weitere Ablaufmuster
 
 Ein Command kann Successor-Commands deklarieren. Sie modellieren einen fachlichen Folgeablauf, der aus dem Abschluss des aktuellen Commands hervorgeht. Davon zu unterscheiden ist `session queue next command`: Dieses Konzept plant gezielt einen Command nach erfolgreichem Commit des Session Owners.
+
+Ein Successor wird im Bereich `FINAL_OK_CONCLUSION` als `SuccessorCommandCall` modelliert. Mehrere Einträge werden in ihrer Reihenfolge geprüft; bedingte Varianten stehen zuerst und der letzte Eintrag ist der unbedingte Default. Der Ziel-Command erhält seine Argumente direkt aus dem Zustand des Vorgängers und muss zum Startzeitpunkt enabled und für den Benutzer erlaubt sein.
+
+Ein Rechnungsablauf kann nach dem Erzeugen unmittelbar in die passende weitere Bearbeitung wechseln:
+
+```objectflow
+FINAL OK_CONCLUSION:
+  rechnung.freigabeErforderlich : Rechnung freigeben(rechnung) // ensure cmd is enabled
+  -> : Rechnung bearbeiten(rechnung) // ensure cmd is enabled
+
+  func()->void {
+    # Rechnungen.checkin(rechnung);
+  }
+
+  selection(s)/push(es): rechnung
+```
+
+Das Beispiel ist Pseudocode. Der Ablauf unterscheidet sich wesentlich von zwei nacheinander gestarteten, unabhängigen Commands:
+
+1. `done` macht den Vorgänger bereit für `FINAL_OK`, dessen Ausführung wird wegen des Successors aber zunächst zurückgestellt.
+2. Die erste passende Successor-Bedingung bestimmt den Ziel-Command.
+3. Der Successor startet im selben UI-Container und ausdrücklich ohne neue Session. Er arbeitet daher am selben Objektgraphen und an denselben registrierten Session Operations.
+4. Erst wenn der Successor erfolgreich endet, laufen zuerst dessen und anschließend die zurückgestellte `FINAL_OK`-Logik des Vorgängers. Der äußerste Session Owner führt danach den gemeinsamen Commit aus.
+5. Abbruch oder Fehler des Successors werden auf den Vorgänger fortgesetzt; der Gesamtverbund erreicht dann keinen erfolgreichen Commit.
+
+Successors eignen sich damit für mehrere unmittelbar aufeinanderfolgende Oberflächen, die fachlich eine atomare Unit of Work bilden – beispielsweise Rechnung erzeugen und danach vervollständigen oder freigeben. Der Vorgänger muss ein `GRAPH_OWNER_CMD` beziehungsweise `GRAPH_OWNER_CMD_MODAL` sein; auch als Ziel sind Graph Owner vorgesehen. Eine weitere Successor-Kette am Ziel-Command wird nicht unterstützt.
+
+`session queue next command` setzt dagegen eine Commit-Grenze: Der aktuelle Session Owner wird zuerst vollständig abgeschlossen und persistiert, erst danach beginnt der geplante Command. Es ist deshalb die passendere Wahl, wenn der Folgeablauf den bereits committed Zustand benötigt oder eine eigenständige Unit of Work bilden soll.
 
 In bestehenden und historischen Modellen treten außerdem folgende Muster auf:
 
