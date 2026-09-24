@@ -920,7 +920,29 @@ Ein `run command` kann:
 
 Nach einem erfolgreichen `FINAL_OK` sind die dort gepushten Ausgabewerte im umgebenden Test verfügbar. So kann der Test nicht nur Seiteneffekte am Eingabeobjekt, sondern auch die expliziten Command-Ergebnisse prüfen. Ein fehlender erwarteter Page-Schritt, eine unerwartete nicht-optionale Page oder eine andere Conclusion macht den Test reproduzierbar fehlerhaft. Mit `FAIL IN` lässt sich zusätzlich festlegen, dass der gesamte simulierte Ablauf mit einer bestimmten Exception oder einem bestimmten Session-Problem enden muss.
 
-§ hier noch ein beispiel mit zwei pages in pseudo code § 
+Das folgende Pseudocode-Beispiel simuliert einen Rechnungs-Command mit zwei aufeinanderfolgenden Pages. Der Test bearbeitet zuerst die Kopfdaten, erzwingt die Conclusion für den Page-Wechsel und bestätigt anschließend die Positionen:
+
+```objectflow
+run command Rechnungen. Rechnung bearbeiten(rechnungsId)
+
+  expect page Kopfdaten (is optional page: false)
+    with the boundObject as rechnung
+    func()->void {
+      rechnung.bemerkung = "im Test gesetzt";
+    }
+    force conclusion Weiter
+
+  expect page Positionen (is optional page: false)
+    with the boundObject as rechnung
+    func()->void {
+      assert rechnung.positionen.isNotEmpty;
+      rechnung.positionen.first.menge = 2;
+    }
+    force conclusion Speichern
+
+// Nach FINAL_OK können gepushte Ausgabewerte geprüft werden.
+assert gespeicherteRechnungId == rechnungsId;
+```
 
 Die Testbeschreibung simuliert damit die Entscheidungen, die sonst ein Benutzer über die UI trifft. Die DataUX-Darstellung wird nicht benötigt. UI-abhängige Mechanismen wie `session queue next command` werden bei einer Ausführung ohne UI ignoriert.
 
@@ -939,7 +961,9 @@ Da Tests nicht committen, sollen persistenzwirksame Erwartungen gezielt über Te
 
 #### Repositories im Test ersetzen
 
-Ein ManMap-`Repository` kann über seine `superclass`-Rolle ein anderes Repository erweitern. Damit lässt sich zu einem produktiven Repository eine Testimplementierung modellieren, die einzelne Methoden überschreibt und beispielsweise kontrollierte Fake-Daten liefert. Wird in der von der Testsuite verwendeten `OFX Config` diese Testimplementierung anstelle der produktiven Implementierung instanziert (§ hier erklären - mit OFXConfigPrimary §), werden `OperationCall`s zur Laufzeit auf die passende konfigurierte Testkomponente aufgelöst.
+Ein ManMap-`Repository` kann über seine `superclass`-Rolle ein anderes Repository erweitern. Damit lässt sich zu einem produktiven Repository eine Testimplementierung modellieren, die einzelne Methoden überschreibt und beispielsweise kontrollierte Fake-Daten liefert. Die Vererbung allein ersetzt die produktive Komponente jedoch nicht: Durch Komponenten-Scanning können produktives Repository und Test-Repository gleichzeitig als kompatible Beans vorhanden sein.
+
+Die von der Testsuite verwendete `OFX Config` kennzeichnet deshalb die vollständig qualifizierte Klasse des Test-Repositories mit `primary instance` (`OFXConfigPrimary`). Daraus wird eine primäre Spring-Bean. Wird anschließend der Basistyp des produktiven Repositories benötigt, wählt die Komponentenauflösung die primäre Testimplementierung; `OperationCall`s bleiben unverändert und erreichen deren überschriebene Methoden. `OFXConfigPrimary` gehört ausschließlich in die Testkonfiguration beziehungsweise eine nur dort eingebundene Config-Section. Pro benötigtem Komponententyp darf nicht mehr als ein passender primärer Kandidat entstehen.
 
 Für dasselbe Basis-Repository können mehrere Test-Repositories existieren, etwa für einen leeren Datenbestand, einen typischen Erfolgsfall oder einen simulierten Fehler. Die jeweilige Testkonfiguration wählt genau die benötigte Implementierung aus. Dadurch bleiben Service und Command unverändert und werden trotzdem mit einem gezielt kontrollierten Repository-Verhalten ausgeführt. Die Vererbung allein aktiviert das Test-Repository nicht; entscheidend ist seine Instanziierung und Auswahl in der tatsächlich von der Testsuite referenzierten Konfiguration.
 
@@ -960,7 +984,7 @@ Wichtige Konfigurationsknoten sind:
 | konkrete Instanz | `OFXConfigInstance` | Deklariert eine benannte Laufzeitinstanz mit Klasse, Properties, Konstruktorargumenten und freien Werten |
 | Zusätzlicher Wert für Instanz | `OFXConfigInstanceValue` | Lifecycle-Konfiguration bzw. ein Lifecycle-Metadatum der Bean |
 | Property, Konstruktorargument oder Wert | `OFXConfigProperty`, `OFXConfigConstructorArg` | Versorgt eine Instanz mit benannten beziehungsweise typisierten Konfigurationswerten |
-| primäre Implementierung | `OFXConfigPrimary` | Bevorzugt eine Repository-Implementierung, wenn mehrere Kandidaten für das Repository vorhanden sind |
+| primäre Implementierung | `OFXConfigPrimary` | Bevorzugt eine Repository- oder Service-Implementierung, wenn mehrere kompatible Kandidaten vorhanden sind |
 | Laufzeit-Scanning | `ComponentsScanning` | Begrenzt die Spring-Framework Komponentensuche auf einen konfigurierten Package-Basisnamen |
 | Generierungszeit-Scanning | `GenTimeScanning` | Ermittelt Komponenten bereits bei der Generierung; importierte Modelle können ein- und Package-Bereiche ausgeschlossen werden, die Spring-Framework Komponentensuche wird nicht verwendet |
 
@@ -972,24 +996,32 @@ Services und Repositories werden über diese Konfiguration zu Laufzeitkomponente
 
 Die User Environment stellt den technischen und fachlichen Benutzerkontext einer laufenden Anwendung oder eines Jobs bereit. ObjectFlow-Ausdrücke können über die Session auf User Environment und User Service zugreifen. Typische Verwendungen sind Berechtigungsprüfung, Auswahl eines fachlichen Mandanten beziehungsweise Standorts und Auditinformationen.
 
+Bei einer interaktiven Anwendung ist [`isAuthenticated`](dataux.md#application-mit-appui-module-appuimodule) (`AppAuthenticationFunction`, FQ-Name `org.modellwerkstatt.dataux.structure.AppAuthenticationFunction`) der vorgesehene Initialisierungspunkt. Die Funktion erhält `session`, `userEnvironment`, `username` und `password` und liefert ein `boolean`. Sie authentifiziert den Benutzer und befüllt anschließend die User Environment selbst oder ruft dafür einen Service auf. Das Bereitstellen der Parameter allein setzt weder Benutzername noch Benutzer-ID automatisch.
 
-Relevant sind insbesondere: § vielleicht hier noch unterschied isAuthenticated und nicht erläutern. §
+| Verwendungskontext | Information oder Dienst | Relevante Methode | Vorgabe |
+| --- | --- | --- | --- |
+| nur in `isAuthenticated` oder einem von dort aufgerufenen Service | Benutzername | `userEnvironment.setUserName(username)` | Den von der Authentifizierung bestätigten Namen übernehmen |
+| nur in `isAuthenticated` oder einem von dort aufgerufenen Service | Benutzer-ID | `userEnvironment.setUserId(int)` | Fachliche beziehungsweise technische ID zum authentifizierten Benutzer ermitteln und setzen |
+| nur in `isAuthenticated` | Compact Mode | `userEnvironment.setCompactMode()` | Aktiviert die kompakte Darstellung für einen dazu geeigneten Client |
+| nur in `isAuthenticated` | Branding | `userEnvironment.setBrandingId(int)` | Wählt das zur Anmeldung beziehungsweise zum Mandanten gehörende Branding |
+| während der Anwendung nur lesend | Gerätedaten | `getDeviceName()`, `getDeviceSwName()`, `getDeviceId()` | Werden von der Laufzeit gesetzt; Anwendungslogik fragt sie nur ab |
+| auch nach der Anmeldung | dynamische Statusinformation | `userEnvironment.setDynamicStatusInfo(String)` | Kann laufenden fachlichen Kontext anzeigen; umfangreichere Benutzerlogik gehört in einen Service |
+| im Session-Kontext | User Service | `session.getUserServices()` | Liefert `IOFXUserServices`; die Application-Runtime stellt denselben Dienst über `getUserService()` bereit |
 
-§ wie heißen die methoden? Eigene spalte, setUsername setUserId nur in der Applikation bei isAuthenticated (oder services die darin aufgerufen werden! gerätename und sw und id wird von der laufzeit gesetzt, nur zur abfrage die getter nennen! compact mode auch nur in isAuthenticated setzen. Brinding ID auch nur bei isAuthenticated setzen. dynamic status info kann man immer setzen. nur setter interessant. App startup zeit nicht interessant. Tabelle also aufteilein in isAuthenticated und was man sonst machen kann. §
-| Information | Relevanz |
+Außerhalb der Authentifizierungsfunktion liefert der Ausdruck `session` (`Session`, FQ-Name `org.modellwerkstatt.objectflow.structure.Session`) die aktuelle ObjectFlow-Session. Innerhalb von `isAuthenticated` wird der gleich dargestellte Parameter durch `UserAuthSession` (`org.modellwerkstatt.objectflow.structure.UserAuthSession`) repräsentiert; `userEnvironment` ist dort ein `UserEnvironmentParameter`. Anwendungslogik soll den Kontext über diese Zugriffe lesen und keine eigene globale Benutzerinstanz führen.
+
+Für Rollen, Scopes und Identities stehen eigene DSL-Ausdrücke zur Verfügung: `StaticRoleReference`, `ScopeReference` und `IdentityReference`. Sie kapseln die generierten Zugriffe und deren Cache-Semantik. Anwendungscode soll diese Konzepte verwenden und keine eigenen String-Schlüssel für `getValue(...)` oder `getIdentity(...)` erfinden.
+
+Bei einem headless Batchjob wird `isAuthenticated` nicht ausgeführt; beim `BatchJobModule` ist diese Funktion nur für eine gegebenenfalls gestartete UI relevant. Die verwendete `OFX Config` muss deshalb eine `OFXConfigInstance` für eine Implementierung von `IOFXUserEnvironment` bereitstellen, üblicherweise `org.modellwerkstatt.objectflow.runtime.UserEnvironmentInformation`. Technischer Benutzername und Benutzer-ID werden dort mit `OFXConfigProperty` vorkonfiguriert. Zusätzlich benötigt der Job eine `IOFXUserServices`-Implementierung, beispielsweise `OFXSimpleUserServices`. Die Job-Laufzeit übernimmt beide Komponenten in die Sessions der Producer- und Consumer-Abläufe.
+
+| Konfigurationselement | Typische Job-Konfiguration |
 | --- | --- |
-| Benutzer-ID und Benutzername | Identifikation, Audit und benutzerbezogene Regeln |
-| Gerätename, Geräte-Software und Geräte-ID | Unterscheidung von Desktop-, Web- und MDE-Kontexten sowie Geräte-Audit |
-| Compact Mode | Kennzeichnet eine kompakte Darstellung für geeignete Clients |
-| Application-Startup-Zeit und Branding-ID | Laufzeitmetadaten für anwendungsweite Darstellung und Diagnose |
-| Dynamic Status Info | Vorhandene Laufzeitinformation; neue fachliche Logik soll dafür eher einen User Service verwenden |
-§ wichtig in der tabelle auch getUserService() §
+| `OFXConfigInstance` für `userEnv` | Klasse `org.modellwerkstatt.objectflow.runtime.UserEnvironmentInformation` |
+| `OFXConfigProperty` `userName` | Eindeutiger technischer Benutzername des Jobs |
+| `OFXConfigProperty` `userId` | Stabile technische Benutzer-ID, die unter anderem für Audit verwendet wird |
+| `OFXConfigInstance` für `userService` | Eine zur Laufzeit passende `IOFXUserServices`-Implementierung, für einfache headless Abläufe etwa `org.modellwerkstatt.objectflow.runtime.OFXSimpleUserServices` |
 
-Anwendungslogik können diese Daten über die Session (§konzeptname org.modellwerkstatt.objectflow.structure.Session$) lesen und nicht eine eigene globale Benutzerinstanz führen. Der Kontext ist veränderlich und an eine laufende Anwendung oder einen Job gebunden. Rollen- und Identity-Werte werden intern über stabile String-IDs adressiert; Anwendungscode soll dafür die generierten Rollen- und Identity-Zugriffe verwenden § konzeptnamen für die zugriffe? §, nicht eigene Cache-Schlüssel erfinden.
-
-Insbesondere bei Jobs muss er ausdrücklich initialisiert werden. § muss bei jobs der Benutzerkontext in der config initialisiert  werden? wie? §
-
-§ was kann man mit dem user service machen? §
+Der User Service bündelt benutzer- beziehungsweise laufzeitabhängige Infrastruktur. `IOFXUserServices` kann strukturierte Meldungen an den Core Reporter senden, Dokumente für Druck oder Ansicht rendern, Dateien anzeigen oder drucken und URLs öffnen. Welche dieser Funktionen tatsächlich verfügbar sind, hängt von der konfigurierten Implementierung und der Laufzeitumgebung ab; ein headless Job besitzt typischerweise weniger interaktive Fähigkeiten als eine Desktop-Anwendung.
 
 ### Rollen, Scopes und Identities
 
@@ -1005,7 +1037,7 @@ Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN
 
 Scopes sind nicht nur Berechtigungsflags, sondern liefern eine eingeschränkte Objektmenge. Sie können Parameter und lokale Variablen besitzen und Services beziehungsweise Repositories über `OperationCall` verwenden.
 
-Eine statische Rolle besitzt eine Funktion `is(userEnvironment) -> boolean` §konzeoptnamen angeben§. Diese Funktion kann den Benutzerkontext auswerten und über # (`OperationCall`) Services oder Repositories befragen. Über `is also / can also` §konzeoptnamen angeben§ lassen sich Rollen hierarchisch zusammensetzen: Erfüllt ein Benutzer eine übergeordnete Rolle, erfüllt er damit auch die eingeschlossenen Rollen. Dadurch bleiben Command-Berechtigungen stabil, auch wenn die konkrete Ermittlung später geändert wird.
+Eine statische Rolle (`StaticRole`) besitzt eine Funktion `is(userEnvironment) -> boolean` (`StaticRoleFunc`). Diese Funktion kann den Benutzerkontext auswerten und über `#` (`OperationCall`) Services oder Repositories befragen. Über `is also / can also` werden weitere Rollen mit `StaticRoleReference` referenziert und hierarchisch zusammengesetzt: Erfüllt ein Benutzer eine übergeordnete Rolle, erfüllt er damit auch die eingeschlossenen Rollen. Dadurch bleiben Command-Berechtigungen stabil, auch wenn die konkrete Ermittlung später geändert wird.
 
 Dasselbe Sprachmittel kann für lizenz-, mandanten- oder installationsabhängige Features verwendet werden. Eine statische Rolle prüft dann nicht eine organisatorische Benutzerrolle, sondern ob ein Feature im aktuellen fachlichen Kontext aktiviert ist. Features lassen sich hierarchisch zu Ausbaustufen bündeln und anschließend genauso in `CAN_OPEN_RO`, `CAN_OPEN_RW` oder `generally enabled` referenzieren wie klassische Rollen. Fachliche Rolle und Feature sollten trotz gleicher Technik in getrennten `RolesAndPermissions`-Roots und mit eindeutigen Namen modelliert werden.
 
@@ -1042,8 +1074,7 @@ Trace-Ausgaben sollen im Produktivbetrieb gezielt bleiben. Sensible fachliche od
 
 ### Serialisierung und Serdes
 
-Die ergänzende ObjectFlow-Serdes-Runtime stellt über `CONV` (§ fqname 
-§)typisierte Serializer und Deserializer bereit:
+Die ergänzende ObjectFlow-Serdes-Runtime stellt über `CONV` (`org.modellwerkstatt.objectflow.serdes.CONV`) typisierte Serializer und Deserializer bereit:
 
 | Fabrik | Format und Zweck |
 | --- | --- |
@@ -1052,7 +1083,9 @@ Die ergänzende ObjectFlow-Serdes-Runtime stellt über `CONV` (§ fqname
 | `CONV.stringSer(...)` | Lesbare strukturelle Darstellung, insbesondere für Diagnose und Tests |
 | `CONV.fopXmlSer()` | Spezialisierte XML-Ausgabe für Apache Formatting Objects Processor (FOP) |
 
-Die Implementierungen introspektiert jeweils die generierten ObjectFlow-Datenstrukturen. Unterstützt werden `Integer`, `BigDecimal`, `String`, `LocalDate`, `DateTime` und Statuswerte sowie verschachtelte Value Objects, Key References und Listen. Damit lassen sich sowohl flache DTOs als auch mehrstufige Objektgraphen mit Unterobjekten und Positionen serialisieren und wieder aufbauen. Virtuelle Properties (`OFXVPBase`) werden derzeit ausdrücklich nicht unterstützt. Gegenläufige Entity-Referenzen werden nicht als beliebig zyklischer Graph verfolgt § wie ist das in der implementierung org.modellwerkstatt.objectflow.sdservices realisiert §.
+Die Implementierungen introspektieren jeweils die generierten ObjectFlow-Datenstrukturen. Unterstützt werden `Integer`, `BigDecimal`, `String`, `LocalDate`, `DateTime` und Statuswerte sowie verschachtelte Value Objects, Key References und Listen. Damit lassen sich sowohl flache DTOs als auch mehrstufige Objektgraphen mit Unterobjekten und Positionen serialisieren und wieder aufbauen. Virtuelle Properties (`OFXVPBase`) werden derzeit ausdrücklich nicht unterstützt.
+
+Die Zyklusbehandlung besteht aus zwei getrennten Mechanismen. `MoWareEntityReflector` merkt sich beim Aufbau der Strukturmetadaten bereits untersuchte Typen und verwendet deren Feldbeschreibung erneut; rekursive Typdefinitionen lassen die Introspektion daher nicht endlos wachsen. Eine mit `OPPOSITE` markierte Key Reference wird nicht als weiteres Unterobjekt verfolgt, sondern nur über ihr Schlüsselfeld repräsentiert. Die eigentlichen JSON- und XML-Serializer führen dagegen keine Menge bereits besuchter Objektinstanzen und erzeugen keine Objekt-IDs oder Referenzmarker. Ein sonstiger Zyklus im konkreten Laufzeitgraphen wird daher nicht automatisch aufgelöst. Für Schnittstellen sind baumförmige DTOs beziehungsweise ein eindeutiger Besitzpfad zu verwenden; Rückrichtungen werden als Schlüssel modelliert.
 
 `IConvFormatOptions` steuert Datums-, Zeit- und Dezimalformate, Locale, die Abbildung zwischen Property- und externen Feldnamen sowie das Verhalten bei fehlenden oder leeren Werten. Wichtige Modi sind:
 
@@ -1063,7 +1096,7 @@ Die Implementierungen introspektiert jeweils die generierten ObjectFlow-Datenstr
 - `SIMPLE_ARRAYS_TO_DTO`: Einfache Arrayelemente werden auf kompakte DTO-Strukturen abgebildet.
 - `PRETTY`: Formatiert die Ausgabe lesbar; `DEBUG_TO_STDERR` ist nur für gezielte technische Diagnose vorgesehen.
 
-§ Standard CONV_DEFAULT_EN in IConvFormatOptions erwähnen §
+Für einfache Fälle steht `CONV.CONV_DEFAULT_EN` als fertige Implementierung von `IConvFormatOptions` (`org.modellwerkstatt.objectflow.serdes.IConvFormatOptions`) bereit. Sie verwendet englische Locale, `hh:mm:ss dd.MM.yy` für Zeitpunkte, `dd.MM.yy` für lokale Datumswerte, `#0.00` für Dezimalzahlen und aktiviert `ALL_PROPERTIES_NECESSARY`. Sobald eine Schnittstelle andere Formate, Feldnamen oder Null-Regeln benötigt, ist eine eigene `IConvFormatOptions`-Konfiguration vorzuziehen.
 
 Die generierte Datenstruktur ist dabei die maßgebliche Schemasicht: Zusätzliche Eingangsfelder dürfen vorhanden sein, während die Behandlung fehlender Felder von den gewählten Modi abhängt. Formatfehler, fehlende Pflichtfelder und strukturell unpassende JSON- oder XML-Daten führen zu `SerdesException`; technische Reflexions- und Sicherheitsfehler werden als RuntimeException weitergegeben. Serdes ersetzt keine fachliche Validierung des deserialisierten Graphen.
 
@@ -1176,10 +1209,22 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 | Tests | Run-Command-Page | `OFXRunCmdPage` | `org.modellwerkstatt.objectflow.structure.OFXRunCmdPage` |
 | Tests | Successor-Handler | `OFXRunCmdSuccessorHandler` | `org.modellwerkstatt.objectflow.structure.OFXRunCmdSuccessorHandler` |
 | Konfiguration | `OFX Config` | `OFXConfig` | `org.modellwerkstatt.objectflow.structure.OFXConfig` |
+| Konfiguration | Config-Section | `OFXConfigSection` | `org.modellwerkstatt.objectflow.structure.OFXConfigSection` |
+| Konfiguration | Section einbinden | `OFXConfigInclude` | `org.modellwerkstatt.objectflow.structure.OFXConfigInclude` |
+| Konfiguration | konkrete Instanz | `OFXConfigInstance` | `org.modellwerkstatt.objectflow.structure.OFXConfigInstance` |
+| Konfiguration | Instanz-Property | `OFXConfigProperty` | `org.modellwerkstatt.objectflow.structure.OFXConfigProperty` |
+| Konfiguration | `primary instance` | `OFXConfigPrimary` | `org.modellwerkstatt.objectflow.structure.OFXConfigPrimary` |
+| Benutzerkontext, DataUX | `isAuthenticated` | `AppAuthenticationFunction` | `org.modellwerkstatt.dataux.structure.AppAuthenticationFunction` |
+| Benutzerkontext | `session` in `isAuthenticated` | `UserAuthSession` | `org.modellwerkstatt.objectflow.structure.UserAuthSession` |
+| Benutzerkontext | `userEnvironment` in `isAuthenticated` | `UserEnvironmentParameter` | `org.modellwerkstatt.objectflow.structure.UserEnvironmentParameter` |
 | Berechtigungen | Roles and Permissions | `RolesAndPermissions` | `org.modellwerkstatt.objectflow.structure.RolesAndPermissions` |
 | Berechtigungen | static role | `StaticRole` | `org.modellwerkstatt.objectflow.structure.StaticRole` |
+| Berechtigungen | `is(userEnvironment)` | `StaticRoleFunc` | `org.modellwerkstatt.objectflow.structure.StaticRoleFunc` |
+| Berechtigungen | Rollenreferenz / `is also` | `StaticRoleReference` | `org.modellwerkstatt.objectflow.structure.StaticRoleReference` |
 | Berechtigungen | scope | `Scope` | `org.modellwerkstatt.objectflow.structure.Scope` |
+| Berechtigungen | Scope verwenden | `ScopeReference` | `org.modellwerkstatt.objectflow.structure.ScopeReference` |
 | Berechtigungen | identity | `Identity` | `org.modellwerkstatt.objectflow.structure.Identity` |
+| Berechtigungen | Identity lesen oder setzen | `IdentityReference` | `org.modellwerkstatt.objectflow.structure.IdentityReference` |
 | Ressourcen | Static Ressources | `StaticRessources` | `org.modellwerkstatt.objectflow.structure.StaticRessources` |
 | Ressourcen | Label | `Label` | `org.modellwerkstatt.objectflow.structure.Label` |
 | Ressourcen | Color | `Color` | `org.modellwerkstatt.objectflow.structure.Color` |
