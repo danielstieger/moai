@@ -615,16 +615,16 @@ conclusion label: Speichern & Beenden
 
 #### Conclusions mit SCAN/UPDATE oder GO/OK
 
-Mit `SCAN/UPDATE` (`SCAN_UPDATE`) und `GO/OK` (`GO_OK`) stehen zwei semantische Hotkeys zur Verfügung (Enum `org.modellwerkstatt.objectflow.structure.Hotkey`). Sie stehen nicht für eine bestimmte Tastaturtaste, sondern verbinden plattformspezifische Eingaben mit einer Page Conclusion. Auf derselben Page darf jeweils höchstens eine passende Conclusion angeboten werden, damit die Laufzeit das Ereignis eindeutig zuordnen kann.
+Mit `SCAN/UPDATE` (`SCAN_UPDATE`) und `GO/OK` (`GO_OK`) stehen zwei semantische Hotkeys zur Verfügung (Enum `org.modellwerkstatt.objectflow.structure.Hotkey`). Sie stehen nicht für eine bestimmte Tastaturtaste, sondern verbinden plattformspezifische Eingaben mit einer Page Conclusion. Auf derselben Page darf jeder Hotkey nur einmal verwendet werden. Dadurch ist sichergestellt, dass die Laufzeit das ausgelöste Ereignis eindeutig einer Conclusion zuordnen kann.
 
 `SCAN_UPDATE` unterstützt zwei typische Interaktionsformen:
 
-1. Auf einem MDE-Gerät startet eine Hardwaretaste den Scanner. Dessen Wert wird in das dafür vorgesehene Delegate einer `Delegate Form` übernommen. Dieses Delegate trägt die DataUX-Option `ISSUE UPDATE/SCANABLE` (`org.modellwerkstatt.dataux.structure.IssueUpdateDOption`). Anschließend löst die Plattform die mit `SCAN_UPDATE` ausgezeichnete Conclusion aus.
-2. Auf FX8- oder Turku-Oberflächen bewirkt dieselbe Delegate-Option, dass eine tatsächliche Inhaltsänderung unmittelbar als Update-Conclusion gemeldet wird. Die Conclusion kann daraufhin abhängige Daten nachladen, eine Ergebnisliste filtern, berechnete Werte aktualisieren oder mit `page <aktuelle Page>` die Ansicht neu aufbauen. Dadurch entsteht eine reaktive Oberfläche, ohne UI-spezifische Listener in die fachliche Logik zu schreiben.
+1. Auf einem MDE-Gerät startet eine Hardwaretaste den Scanner. Dessen Wert wird in das dafür vorgesehene Delegate einer `Delegate Form` übernommen. Dieses Delegate trägt die DataUX-Option `ISSUE UPDATE/SCANABLE` (`org.modellwerkstatt.dataux.structure.IssueUpdateDOption`). Anschließend wird die mit `SCAN_UPDATE` ausgezeichnete Conclusion ausgelöst.
+2. Auf FX8- oder Turku-Laufzeit bewirkt dieselbe Delegate-Option, dass eine tatsächliche Inhaltsänderung unmittelbar als Update-Conclusion gemeldet wird. Die Conclusion kann daraufhin abhängige Daten nachladen, eine Ergebnisliste filtern, berechnete Werte aktualisieren oder mit `page <aktuelle Page>` die Ansicht neu aufbauen. Dadurch entsteht eine reaktive Oberfläche, ohne UI-spezifische Listener in die fachliche Logik zu schreiben.
 
-Ein generisches Rechnungsbeispiel ist die Erfassung einer Artikelnummer: Nach dem Scan oder nach manueller Änderung lädt die `SCAN_UPDATE`-Conclusion die Artikeldaten, ergänzt Preis und Beschreibung und aktualisiert die Rechnungsposition. Die Conclusion sollte denselben fachlichen Service aufrufen, unabhängig davon, ob das Ereignis vom Scanner oder von einem Editor stammt. 
+Ein generisches Rechnungsbeispiel ist die Erfassung einer Artikelnummer: Nach dem Scan oder nach manueller Änderung lädt die `SCAN_UPDATE`-Conclusion die Artikeldaten, ergänzt Preis und Beschreibung und aktualisiert die Rechnungsposition. Die Conclusion kann also durch einen Scan-Vorgang oder durch manuelle Änderungen am Editor ausgelöst werden.  
 
-`GO_OK` funktioniert analog als plattformunabhängige Bedeutung für „weiter“ oder „bestätigen“. Vor allem MDE-Oberflächen ordnen diesem Hotkey eine besondere Bildschirm- oder Hardwaretaste zu. Die zugehörige Conclusion validiert beispielsweise die aktuelle Rechnungsposition und wechselt anschließend zur nächsten Page oder beendet den Schritt mit `done`. Auf Desktop-Oberflächen kann dasselbe Label anders dargestellt werden; der Command bleibt unverändert.
+`GO_OK` funktioniert analog als plattformunabhängige Bedeutung für „weiter“ oder „bestätigen“. Auf MDE-Oberflächen ist diesem Hotkey eine besondere Bildschirm- oder Hardwaretaste zugeordnet. Die zugehörige Conclusion validiert beispielsweise die aktuelle Rechnungsposition und wechselt anschließend zur nächsten Page oder beendet den Schritt mit `done`. Auf Desktop-Oberflächen wird dasselbe Label anders dargestellt; der Command bleibt unverändert.
 
 
 ### Selektion mit `pushSelection` setzen
@@ -899,9 +899,9 @@ Jeder `Simple Test` (`OFXTestMethod`) erhält eine eigene Session. Diese Session
 | `INCLUDE_SUIT` | `OFXTestSuitIncludeSuit` | Bindet eine weitere Testsuite einschließlich Start-/Ende-Logik ein |
 | `DONT_EXEC` | `OFXTestSuitNoExecOption` | Schließt einen ausgewählten Test von der normalen Ausführung aus |
 
-Testsuites lassen sich hierarchisch zusammensetzen. `INCLUDE_SUIT` kann eine andere Suite einschließlich ihrer Start-/Ende-Logik einbinden und über `exec tests` festlegen, ob auch deren Tests laufen. Damit kann eine Suite beispielsweise nur den gemeinsamen Datenbankaufbau einer Basissuite verwenden oder mehrere fachliche Suites zu einem Gesamtlauf aggregieren. `DEPENDENT_TEST` markiert einen Test, der nur als Abhängigkeit eines anderen Tests ausgeführt und nicht als selbstständiger Test angeboten werden soll.
+Testsuites lassen sich hierarchisch zusammensetzen. `INCLUDE_SUIT` kann eine andere Suite einschließlich ihrer Start-/Ende-Logik einbinden und über `exec tests` festlegen, ob auch deren Tests laufen. Damit kann eine Suite beispielsweise nur den gemeinsamen Datenbankaufbau einer Basissuite verwenden oder mehrere fachliche Suites zu einem Gesamtlauf aggregieren. `DEPENDENT_TEST` markiert einen Test, der nicht alleinig als selbständiger Test ausgeführt werden kann. Er wird von einem anderen Test verwendet.  
 
-Mit `FAIL IN` (`OFXTestFailInAttribue`) beschreibt ein Test einen erwarteten Fehler, optional mit erwarteter Exception-Klasse und enthaltenem Meldungstext. Dadurch können neben erfolgreichen Lese-, Speicher- und Session-Abläufen auch Preconditions, Transaktionsabbrüche und technische Fehler explizit geprüft werden. Für ManMap-nahe Tests sind getrennte Suites für Aufbau, Query- und Operatorverhalten, Session-Varianten, Schlüssel- und Referenzformen, Audit, BLOBs sowie benutzerdefiniertes SQL sinnvoll; eine übergeordnete Suite kann diese Varianten bündeln.
+Mit `FAIL IN` (`OFXTestFailInAttribue`) beschreibt ein Test einen erwarteten Fehler, optional mit erwarteter Exception-Klasse und enthaltenem Meldungstext. Dadurch können neben erfolgreichen Lese-, Speicher- und Session-Abläufen auch Preconditions, Transaktionsabbrüche und technische Fehler explizit geprüft werden. 
 
 ### Commands ohne UI ausführen
 
@@ -920,6 +920,8 @@ Ein `run command` kann:
 
 Nach einem erfolgreichen `FINAL_OK` sind die dort gepushten Ausgabewerte im umgebenden Test verfügbar. So kann der Test nicht nur Seiteneffekte am Eingabeobjekt, sondern auch die expliziten Command-Ergebnisse prüfen. Ein fehlender erwarteter Page-Schritt, eine unerwartete nicht-optionale Page oder eine andere Conclusion macht den Test reproduzierbar fehlerhaft. Mit `FAIL IN` lässt sich zusätzlich festlegen, dass der gesamte simulierte Ablauf mit einer bestimmten Exception oder einem bestimmten Session-Problem enden muss.
 
+§ hier noch ein beispiel mit zwei pages in pseudo code § 
+
 Die Testbeschreibung simuliert damit die Entscheidungen, die sonst ein Benutzer über die UI trifft. Die DataUX-Darstellung wird nicht benötigt. UI-abhängige Mechanismen wie `session queue next command` werden bei einer Ausführung ohne UI ignoriert.
 
 
@@ -931,14 +933,13 @@ ObjectFlow unterstützt insbesondere folgende Testformen:
 1. **Datenstruktur und Value Object:** Konstruktion, Berechnung, Gleichheit und Zustandsübergänge prüfen.
 2. **Service:** Domänenoperationen und ihre Preconditions mit konfigurierten Komponenten ausführen.
 3. **Repository und Session:** Laden, Checkout, Identity-Map und explizite Session-Integration prüfen.
-4. **Command:** Mit `run command` Initialisierung, Pages, Conclusions, Revert, Successors und finalen Abschluss testen.
-5. **Konfiguration:** Prüfen, ob die für den Ablauf benötigten Komponenten korrekt verdrahtet sind.
+4. **Command:** Mit `run command` Initialisierung, Pages, Conclusions, Revert, Successors und finalen Abschluss testen - eine Form von Integrationstest.
 
 Da Tests nicht committen, sollen persistenzwirksame Erwartungen gezielt über Testdatenaufbau, gelesenen Zustand und die registrierten beziehungsweise aufgerufenen Operationen geprüft werden.
 
 #### Repositories im Test ersetzen
 
-Ein ManMap-`Repository` kann über seine `superclass`-Rolle ein anderes Repository erweitern. Damit lässt sich zu einem produktiven Repository eine Testimplementierung modellieren, die einzelne Methoden überschreibt und beispielsweise kontrollierte Fake-Daten liefert. Wird in der von der Testsuite verwendeten `OFX Config` diese Testimplementierung anstelle der produktiven Implementierung instanziert, werden `OperationCall`s auf die passende konfigurierte Testkomponente aufgelöst.
+Ein ManMap-`Repository` kann über seine `superclass`-Rolle ein anderes Repository erweitern. Damit lässt sich zu einem produktiven Repository eine Testimplementierung modellieren, die einzelne Methoden überschreibt und beispielsweise kontrollierte Fake-Daten liefert. Wird in der von der Testsuite verwendeten `OFX Config` diese Testimplementierung anstelle der produktiven Implementierung instanziert (§ hier erklären - mit OFXConfigPrimary §), werden `OperationCall`s zur Laufzeit auf die passende konfigurierte Testkomponente aufgelöst.
 
 Für dasselbe Basis-Repository können mehrere Test-Repositories existieren, etwa für einen leeren Datenbestand, einen typischen Erfolgsfall oder einen simulierten Fehler. Die jeweilige Testkonfiguration wählt genau die benötigte Implementierung aus. Dadurch bleiben Service und Command unverändert und werden trotzdem mit einem gezielt kontrollierten Repository-Verhalten ausgeführt. Die Vererbung allein aktiviert das Test-Repository nicht; entscheidend ist seine Instanziierung und Auswahl in der tatsächlich von der Testsuite referenzierten Konfiguration.
 
@@ -946,25 +947,49 @@ Für dasselbe Basis-Repository können mehrere Test-Repositories existieren, etw
 
 ### Konfiguration mit `OFX Config`
 
-Eine `OFX Config` (`OFXConfig`) beschreibt die Laufzeitkomponenten und deren Abhängigkeiten. Konzeptionell entspricht sie einer modellierten, XML-generierenden IoC-Konfiguration: Komponenten werden bereitgestellt, Sections eingebunden und Properties überschrieben. Eine Dependency-Resolution-Strategie kann Komponenten anhand konfigurierter Packages finden.
+Eine `OFX Config` (`OFXConfig`) beschreibt die Laufzeitkomponenten und deren Abhängigkeiten. Konzeptionell entspricht sie einer modellierten Spring-Framework IoC-Konfiguration: Komponenten werden bereitgestellt, Sections eingebunden und Properties überschrieben. Eine Dependency-Resolution-Strategie kann Komponenten anhand konfigurierter Packages finden.
 
 Wichtige Konfigurationsknoten sind:
 
 | Aufgabe | Konzeptname | Bedeutung |
 | --- | --- | --- |
-| vollständige Konfiguration | `OFXConfig` | Ausführbarer Konfigurations-Root mit Komponenten und Dependency-Resolution-Strategie |
-| wiederverwendbarer Ausschnitt | `OFXConfigSection` | Bündelt gemeinsam verwendete Konfigurationselemente ohne selbst die Anwendungskonfiguration zu sein |
+| vollständige Konfiguration | `OFXConfig` | Konfigurations-Root mit Komponenten und Dependency-Resolution-Strategie |
+| wiederverwendbarer Ausschnitt | `OFXConfigSection` | Bündelt gemeinsam verwendete Konfigurationselemente zur Wiederverwendung |
 | Section einbinden | `OFXConfigInclude` | Referenziert eine Section und übernimmt deren Elemente |
-| eingebundene Property überschreiben | `OFXConfigPropOverwrite` | Ersetzt den Wert einer Property gezielt für das Include |
+| eingebundene Property überschreiben | `OFXConfigPropOverwrite` | Ersetzt den Wert einer Property gezielt für das Include; Überschreibung von Werten |
 | konkrete Instanz | `OFXConfigInstance` | Deklariert eine benannte Laufzeitinstanz mit Klasse, Properties, Konstruktorargumenten und freien Werten |
-| Property, Konstruktorargument oder Wert | `OFXConfigProperty`, `OFXConfigConstructorArg`, `OFXConfigInstanceValue` | Versorgt eine Instanz mit benannten beziehungsweise typisierten Konfigurationswerten |
-| primäre Implementierung | `OFXConfigPrimary` | Bevorzugt eine Implementierung, wenn mehrere Kandidaten für denselben Komponententyp vorhanden sind |
-| Laufzeit-Scanning | `ComponentsScanning` | Begrenzt die Komponentensuche auf einen konfigurierten Package-Basisnamen |
-| Generierungszeit-Scanning | `GenTimeScanning` | Ermittelt Komponenten bereits bei der Generierung; importierte Modelle können ein- und Package-Bereiche ausgeschlossen werden |
+| Zusätzlicher Wert für Instanz | `OFXConfigInstanceValue` | Lifecycle-Konfiguration bzw. ein Lifecycle-Metadatum der Bean |
+| Property, Konstruktorargument oder Wert | `OFXConfigProperty`, `OFXConfigConstructorArg` | Versorgt eine Instanz mit benannten beziehungsweise typisierten Konfigurationswerten |
+| primäre Implementierung | `OFXConfigPrimary` | Bevorzugt eine Repository-Implementierung, wenn mehrere Kandidaten für das Repository vorhanden sind |
+| Laufzeit-Scanning | `ComponentsScanning` | Begrenzt die Spring-Framework Komponentensuche auf einen konfigurierten Package-Basisnamen |
+| Generierungszeit-Scanning | `GenTimeScanning` | Ermittelt Komponenten bereits bei der Generierung; importierte Modelle können ein- und Package-Bereiche ausgeschlossen werden, die Spring-Framework Komponentensuche wird nicht verwendet |
 
-Damit lassen sich gemeinsame Sections einbinden, einzelne Werte pro Anwendung oder Test überschreiben und unterschiedliche Konfigurationen für Entwicklung, Test und Deployment bilden. Für AI-Agenten sind die Konzeptnamen wichtig: Nicht jedes Element ist eine frei benannte Property; insbesondere Include, Override, Primary und beide Scanning-Varianten besitzen eigene Konzepte.
+Damit lassen sich gemeinsame Sections einbinden, einzelne Werte pro Anwendung oder Test überschreiben und unterschiedliche Konfigurationen für Entwicklung, Test und Deployment bilden. 
 
 Services und Repositories werden über diese Konfiguration zu Laufzeitkomponenten. Ein `OperationCall` löst die passende konfigurierte Instanz auf.
+
+### User Environment und User Service
+
+Die User Environment stellt den technischen und fachlichen Benutzerkontext einer laufenden Anwendung oder eines Jobs bereit. ObjectFlow-Ausdrücke können über die Session auf User Environment und User Service zugreifen. Typische Verwendungen sind Berechtigungsprüfung, Auswahl eines fachlichen Mandanten beziehungsweise Standorts und Auditinformationen.
+
+
+Relevant sind insbesondere: § vielleicht hier noch unterschied isAuthenticated und nicht erläutern. §
+
+§ wie heißen die methoden? Eigene spalte, setUsername setUserId nur in der Applikation bei isAuthenticated (oder services die darin aufgerufen werden! gerätename und sw und id wird von der laufzeit gesetzt, nur zur abfrage die getter nennen! compact mode auch nur in isAuthenticated setzen. Brinding ID auch nur bei isAuthenticated setzen. dynamic status info kann man immer setzen. nur setter interessant. App startup zeit nicht interessant. Tabelle also aufteilein in isAuthenticated und was man sonst machen kann. §
+| Information | Relevanz |
+| --- | --- |
+| Benutzer-ID und Benutzername | Identifikation, Audit und benutzerbezogene Regeln |
+| Gerätename, Geräte-Software und Geräte-ID | Unterscheidung von Desktop-, Web- und MDE-Kontexten sowie Geräte-Audit |
+| Compact Mode | Kennzeichnet eine kompakte Darstellung für geeignete Clients |
+| Application-Startup-Zeit und Branding-ID | Laufzeitmetadaten für anwendungsweite Darstellung und Diagnose |
+| Dynamic Status Info | Vorhandene Laufzeitinformation; neue fachliche Logik soll dafür eher einen User Service verwenden |
+§ wichtig in der tabelle auch getUserService() §
+
+Anwendungslogik können diese Daten über die Session (§konzeptname org.modellwerkstatt.objectflow.structure.Session$) lesen und nicht eine eigene globale Benutzerinstanz führen. Der Kontext ist veränderlich und an eine laufende Anwendung oder einen Job gebunden. Rollen- und Identity-Werte werden intern über stabile String-IDs adressiert; Anwendungscode soll dafür die generierten Rollen- und Identity-Zugriffe verwenden § konzeptnamen für die zugriffe? §, nicht eigene Cache-Schlüssel erfinden.
+
+Insbesondere bei Jobs muss er ausdrücklich initialisiert werden. § muss bei jobs der Benutzerkontext in der config initialisiert  werden? wie? §
+
+§ was kann man mit dem user service machen? §
 
 ### Rollen, Scopes und Identities
 
@@ -980,31 +1005,12 @@ Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN
 
 Scopes sind nicht nur Berechtigungsflags, sondern liefern eine eingeschränkte Objektmenge. Sie können Parameter und lokale Variablen besitzen und Services beziehungsweise Repositories über `OperationCall` verwenden.
 
-Eine statische Rolle besitzt eine Funktion `is(userEnvironment) -> boolean`. Diese Funktion kann den Benutzerkontext auswerten und über `OperationCall` Services oder Repositories befragen. Über `is also / can also` lassen sich Rollen hierarchisch zusammensetzen: Erfüllt ein Benutzer eine übergeordnete Rolle, erfüllt er damit auch die eingeschlossenen Rollen. Dadurch bleiben Command-Berechtigungen stabil, auch wenn die konkrete Ermittlung später geändert wird.
+Eine statische Rolle besitzt eine Funktion `is(userEnvironment) -> boolean` §konzeoptnamen angeben§. Diese Funktion kann den Benutzerkontext auswerten und über # (`OperationCall`) Services oder Repositories befragen. Über `is also / can also` §konzeoptnamen angeben§ lassen sich Rollen hierarchisch zusammensetzen: Erfüllt ein Benutzer eine übergeordnete Rolle, erfüllt er damit auch die eingeschlossenen Rollen. Dadurch bleiben Command-Berechtigungen stabil, auch wenn die konkrete Ermittlung später geändert wird.
 
 Dasselbe Sprachmittel kann für lizenz-, mandanten- oder installationsabhängige Features verwendet werden. Eine statische Rolle prüft dann nicht eine organisatorische Benutzerrolle, sondern ob ein Feature im aktuellen fachlichen Kontext aktiviert ist. Features lassen sich hierarchisch zu Ausbaustufen bündeln und anschließend genauso in `CAN_OPEN_RO`, `CAN_OPEN_RW` oder `generally enabled` referenzieren wie klassische Rollen. Fachliche Rolle und Feature sollten trotz gleicher Technik in getrennten `RolesAndPermissions`-Roots und mit eindeutigen Namen modelliert werden.
 
 Die Ergebnisse statischer Rollen werden in der User Environment gecacht. Ändert sich während einer Anmeldung der zugrunde liegende Benutzer-, Rollen- oder Featurekontext, muss der Rollencache mit `clearCachedValues(false)` invalidiert werden. Identitäten bleiben dabei erhalten; `clearCachedValues(true)` verwirft zusätzlich den Identity-Cache.
 
-### User Environment und User Service
-
-Die User Environment stellt den technischen und fachlichen Benutzerkontext einer laufenden Anwendung oder eines Jobs bereit. ObjectFlow-Ausdrücke können über die Session auf User Environment und User Service zugreifen. Typische Verwendungen sind Berechtigungsprüfung, Auswahl eines fachlichen Mandanten beziehungsweise Standorts und Auditinformationen.
-
-Die Standardimplementierung `org.modellwerkstatt.objectflow.runtime.UserEnvironmentInformation` hält insbesondere:
-
-| Information | Relevanz |
-| --- | --- |
-| Benutzer-ID und Benutzername | Identifikation, Audit und benutzerbezogene Regeln |
-| Sprache als `trans_<Index>` | Auswahl generierter Übersetzungen; andere Formate und `null` werden abgelehnt |
-| Rollen- und Identity-Caches | Zwischenspeicher für `StaticRole` und `Identity`; über `clearCachedValues(...)` gezielt zu invalidieren |
-| Gerätename, Geräte-Software und Geräte-ID | Unterscheidung von Desktop-, Web- und MDE-Kontexten sowie Geräte-Audit |
-| Compact Mode | Kennzeichnet eine kompakte Darstellung für geeignete Clients |
-| Application-Startup-Zeit und Branding-ID | Laufzeitmetadaten für anwendungsweite Darstellung und Diagnose |
-| Dynamic Status Info | Vorhandene Laufzeitinformation; neue fachliche Logik soll dafür eher einen User Service verwenden |
-
-Anwendungslogik soll diese Daten über `IOFXUserEnvironment` beziehungsweise die Session lesen und nicht eine eigene globale Benutzerinstanz führen. Der Kontext ist veränderlich und an eine laufende Anwendung oder einen Job gebunden. Rollen- und Identity-Werte werden intern über stabile String-IDs adressiert; Anwendungscode soll dafür die generierten Rollen- und Identity-Zugriffe verwenden, nicht eigene Cache-Schlüssel erfinden.
-
-Der Benutzerkontext ist Teil der Ausführung, ersetzt aber keine fachlichen Prüfungen. Insbesondere bei Jobs muss er ausdrücklich initialisiert werden.
 
 ### Statische Ressourcen
 
@@ -1036,16 +1042,17 @@ Trace-Ausgaben sollen im Produktivbetrieb gezielt bleiben. Sensible fachliche od
 
 ### Serialisierung und Serdes
 
-Die ergänzende ObjectFlow-Serdes-Runtime stellt über `CONV` typisierte Serializer und Deserializer bereit:
+Die ergänzende ObjectFlow-Serdes-Runtime stellt über `CONV` (§ fqname 
+§)typisierte Serializer und Deserializer bereit:
 
 | Fabrik | Format und Zweck |
 | --- | --- |
 | `CONV.jsonSerDes(...)` | JSON für einzelne Objektgraphen oder Listen am Wurzelknoten |
 | `CONV.xmlSerDes(...)` | XML für dieselben strukturierten Graphen |
 | `CONV.stringSer(...)` | Lesbare strukturelle Darstellung, insbesondere für Diagnose und Tests |
-| `CONV.fopXmlSer()` | Spezialisierte XML-Ausgabe für den vorhandenen FOP-Pfad |
+| `CONV.fopXmlSer()` | Spezialisierte XML-Ausgabe für Apache Formatting Objects Processor (FOP) |
 
-Die Implementierung unter `org.modellwerkstatt.objectflow.sdservices` introspektiert die generierten ObjectFlow-Datenstrukturen. Unterstützt werden `Integer`, `BigDecimal`, `String`, `LocalDate`, `DateTime` und Statuswerte sowie verschachtelte Value Objects, Key References und Listen. Damit lassen sich sowohl flache DTOs als auch mehrstufige Objektgraphen mit Unterobjekten und Positionen serialisieren und wieder aufbauen. Gegenläufige Entity-Referenzen werden nicht als beliebig zyklischer Graph verfolgt; das Datenmodell für eine Schnittstelle soll daher einen klaren Besitzpfad besitzen. Virtuelle Properties (`OFXVPBase`) werden derzeit ausdrücklich nicht unterstützt.
+Die Implementierungen introspektiert jeweils die generierten ObjectFlow-Datenstrukturen. Unterstützt werden `Integer`, `BigDecimal`, `String`, `LocalDate`, `DateTime` und Statuswerte sowie verschachtelte Value Objects, Key References und Listen. Damit lassen sich sowohl flache DTOs als auch mehrstufige Objektgraphen mit Unterobjekten und Positionen serialisieren und wieder aufbauen. Virtuelle Properties (`OFXVPBase`) werden derzeit ausdrücklich nicht unterstützt. Gegenläufige Entity-Referenzen werden nicht als beliebig zyklischer Graph verfolgt § wie ist das in der implementierung org.modellwerkstatt.objectflow.sdservices realisiert §.
 
 `IConvFormatOptions` steuert Datums-, Zeit- und Dezimalformate, Locale, die Abbildung zwischen Property- und externen Feldnamen sowie das Verhalten bei fehlenden oder leeren Werten. Wichtige Modi sind:
 
@@ -1055,6 +1062,8 @@ Die Implementierung unter `org.modellwerkstatt.objectflow.sdservices` introspekt
 - `NULL_ARRAY_TO_EMPTY`: Ein `null`-Array wird beim Deserialisieren als leere Liste behandelt.
 - `SIMPLE_ARRAYS_TO_DTO`: Einfache Arrayelemente werden auf kompakte DTO-Strukturen abgebildet.
 - `PRETTY`: Formatiert die Ausgabe lesbar; `DEBUG_TO_STDERR` ist nur für gezielte technische Diagnose vorgesehen.
+
+§ Standard CONV_DEFAULT_EN in IConvFormatOptions erwähnen §
 
 Die generierte Datenstruktur ist dabei die maßgebliche Schemasicht: Zusätzliche Eingangsfelder dürfen vorhanden sein, während die Behandlung fehlender Felder von den gewählten Modi abhängt. Formatfehler, fehlende Pflichtfelder und strukturell unpassende JSON- oder XML-Daten führen zu `SerdesException`; technische Reflexions- und Sicherheitsfehler werden als RuntimeException weitergegeben. Serdes ersetzt keine fachliche Validierung des deserialisierten Graphen.
 
