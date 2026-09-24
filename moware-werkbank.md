@@ -36,8 +36,6 @@ Die **modellwerkstatt MoWare-Werkbank** stellt die fachliche Gestaltung von Gesc
 
 **Langfristige Wartbarkeit und technische Flexibilität.** Das fachliche Wissen wird in den Modellen festgehalten. Generatoren und Laufzeitumgebungen bestimmen dessen technische Umsetzung. Diese Trennung ermöglicht es, fachliche Anforderungen und technische Infrastruktur weitgehend unabhängig weiterzuentwickeln. Ziel ist, bestehende Modelle langfristig zu nutzen und Anpassungen an Frameworks oder Ausführungsplattformen möglichst zentral umzusetzen.
 
-> **Redaktioneller Kommentar** Und welche Konsequenzen ergeben sich aus diesen Grundprenzipien konkret für die Entwicklung von Applikationen? Dies ist als Regeln festzuhalten die befolgt werden müssen!
-
 ## Zentrale Konzepte der MoWare-Werkbank
 
 Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimmt aber nicht sämtliche DDD-Konzepte. Diese Übersicht erfasst die zentralen Konzepte der drei MoWare-Sprachen. Sie beschreibt die erkennbare Verantwortung der Konzepte, ohne zusätzliche DDD-Regeln für die DSLs festzulegen.
@@ -271,6 +269,39 @@ Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion m
 4. **Mit Ant bauen und bereitstellen:** Anschließend wird Ant auf der Konsole ausgeführt. Die projektspezifische Builddatei und die gewählten Targets bestimmen den Build und die Bereitstellung. Sie müssen zur ausgewählten Laufzeitkonfiguration passen.
 
 5. **Ausführen und prüfen:** Die Anwendung wird in der durch die `OFXConfig` festgelegten Laufzeitumgebung gestartet und ihre Funktionsfähigkeit geprüft.
+
+## Grundprinzipien für die Applikationsentwicklung
+
+Für die Entwicklung von Applikationen gelten folgende Grundprinzipien:
+
+1. **Das fachliche Modell ist der Ausgangspunkt.**
+   Persistenter fachlicher Zustand wird mit Entities und Value Objects modelliert. Fachliche Regeln, Berechnungen und Zustandsübergänge gehören an die fachlichen Datenstrukturen oder in geeignete Services. DTOs dienen dagegen anwendungsfallbezogenen Daten, Projektionen, Suchen und Darstellungen. Fachliche Regeln sollen nicht in Benutzeroberflächen, Persistenzcode oder technische Laufzeitkomponenten verlagert werden.
+
+2. **Benötigte Objektgraphen werden bewusst und explizit geladen.**
+   Eine Beziehung zwischen fachlichen Objekten bedeutet nicht automatisch, dass die referenzierten Daten geladen sind. Automatisches Lazy Loading ist nicht möglich. Repository-Methoden müssen deshalb den für einen Anwendungsfall benötigten Objektgraphen gezielt aufbauen. Welche Daten geladen werden, ist Teil des Entwurfs des Anwendungsfalls.
+
+3. **Persistenz ist ebenfalls explizit.**
+   Eine fachliche Beziehung oder ein Mapping bedeutet nicht automatisch, dass ein vollständiger Objektgraph kaskadierend gespeichert wird. Check-in- und Delete-Operationen müssen ausdrücklich festlegen, welche Bestandteile gespeichert oder gelöscht werden. Fachmodell, Mapping und tatsächlich ausgeführte Speicheroperation sind getrennte Aspekte.
+
+4. **Read-only-Zugriff und Bearbeitung werden bewusst unterschieden.**
+   Daten für Suchen, Übersichten und Auswertungen sollen ohne Änderungsabsicht geladen werden. Zweckgebundene Lesemodelle werden vorzugsweise als DTOs modelliert. Soll eine Entity verändert werden, muss sie in einem dafür vorgesehenen bearbeitbaren Kontext geladen beziehungsweise ausgecheckt werden. Read-only-Projektionen dürfen nicht allein deshalb wie bearbeitbare Domänenobjekte behandelt werden, weil sie dieselbe Struktur wie eine Entity besitzen.
+
+5. **Session und Transaktion gehören zum Anwendungsablauf, nicht zu einzelnen Repository-Aufrufen.**
+   Repository-Methoden führen Datenzugriffsoperationen aus, bestimmen aber nicht selbst die fachliche Transaktionsgrenze. Der Session Owner – typischerweise ein `GRAPH_OWNER_CMD` – koordiniert Session und Transaktion. Speicher- und Löschoperationen werden als Session Operations registriert und erst beim erfolgreichen Abschluss ausgeführt und committed; bei einem Abbruch werden sie nicht ausgeführt.
+
+   Das gilt auch für datenbankveränderndes Custom SQL. `UPDATE`-, `DELETE`- oder andere `STATEMENT`-Operationen dürfen nicht unmittelbar ausgeführt werden, wenn ihre Wirkung zum erfolgreichen Abschluss des Anwendungsfalls gehört, sondern müssen in den Session-Operations-Ablauf eingebunden werden. Andernfalls könnten Änderungen bereits wirksam sein, obwohl der Benutzer den Graph Owner anschließend noch mit `ESC` abbricht.
+
+6. **Prüfen und Verändern sind möglichst klar zu trennen.**
+   Fachliche Voraussetzungen und Precondition-Prüfungen sollen grundsätzlich erfolgen, bevor ein Objektgraph verändert wird. Dadurch hinterlässt ein abgebrochener Vorgang möglichst keinen teilweise veränderten Zustand. Abweichungen davon müssen eine bewusste fachliche Bedeutung haben und dürfen nicht zufällig aus der Reihenfolge technischer Operationen entstehen.
+
+7. **Die Benutzeroberfläche bleibt möglichst „CheapCode“.**
+   DataUX beschreibt Bindung, Darstellung, Layout und Interaktionsmöglichkeiten. Fachliche Entscheidungen und schwer überprüfbare Geschäftsregeln gehören nicht in die Oberfläche. Dadurch können Oberflächen in kurzen Feedbackzyklen verändert und erprobt werden, ohne das fachliche Modell unnötig zu beeinflussen.
+
+8. **Fachliches Wissen soll unabhängig von der technischen Laufzeit bleiben.**
+    Modelle sollen möglichst keine unnötigen Abhängigkeiten von einem konkreten UI-Framework oder einer bestimmten Ausführungsplattform enthalten. Plattformunterschiede sollen, soweit von der Werkbank vorgesehen, von Generatoren und Laufzeitumgebungen behandelt werden. Plattformspezifische Modellierung ist nur dort sinnvoll, wo sich die fachliche oder ergonomische Anforderung tatsächlich unterscheidet.
+
+9. **Anwendungsfälle müssen überprüfbar bleiben.**
+    Fachliche Regeln und Abläufe sollen so modelliert werden, dass sie durch Beispiele und Tests nachvollzogen werden können. Besonders sorgfältig zu prüfen sind Änderungen an fachlichen Datenstrukturen und Geschäftsregeln, da Fehler dort häufig nicht allein durch technische Tests oder das Ausprobieren der Oberfläche erkennbar werden.
 
 
 ## Weiterführende Dokumentation

@@ -200,7 +200,7 @@ Der Session-weite Read-only- und Dirty-Zustand wird im Abschnitt [Session und Un
 
 ### Service-Komponenten
 
-Ein `Service` (`Service`) ist eine von der Laufzeit verwaltete Komponente. Services werden über die ObjectFlow-Konfiguration instanziiert und innerhalb einer Anwendung daher nur einmal erzeugt. Sie sind zustandslos zu implementieren: Aufrufübergreifender sowie benutzer- oder sessionbezogener Zustand darf nicht in Feldern eines Services gespeichert werden.
+Ein `Service` (`Service`) ist eine von der Laufzeit verwaltete Komponente. Services werden über die ObjectFlow-Konfiguration instanziiert und innerhalb einer Anwendung daher nur einmal erzeugt. Sie dürfen daher keinen veränderlichen Benutzer-/Vorgangszustand halte. Aufrufübergreifender sowie benutzer- oder sessionbezogener Zustand darf nicht in Feldern eines Services gespeichert werden. Anwendungsweite technische Zustände wie Caches, Nachschlagetabellen oder technische Clients sind in Ausnahmen erlaubt.
 
 Services bündeln vor allem:
 
