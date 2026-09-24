@@ -210,7 +210,11 @@ Services bündeln vor allem:
 - die Koordination mehrerer Repositories oder anderer Services,
 - Logik, die sowohl aus UI-Commands als auch aus Jobs und Tests benötigt wird.
 
-Für die Platzierung fachlicher Logik stehen vier Ebenen zur Verfügung. Nur zwei davon, allgemeiner Domänenservice und Anwendungsfallservice, werden technisch mit demselben ObjectFlow-Sprachkonzept `Service` modelliert. ObjectFlow besitzt keine getrennten Service-Untertypen für diese beiden Aufgaben; ihre Unterscheidung ergibt sich aus Verantwortung, Schnittstelle und Benennung. Datenstrukturmethoden und Commands sind dagegen eigene Modellierungsorte:
+Fachliche Logik in Services arbeitet primär am geladenen Domänenmodell. Sie ändert Werte und Zustände, erzeugt oder entfernt Objekte im Graphen, fasst Positionen zusammen und zerlegt sie wieder oder wählt, sortiert und gruppiert fachliche Listen. Solche Operationen werden mit `jetbrains.mps.baseLanguage` formuliert. Für Listen und Sequenzen soll ergänzend `jetbrains.mps.baseLanguage.collections` verwendet werden: Die Sprache bietet kompakte Operationen zum Filtern, Projizieren, Sortieren, Gruppieren, Aggregieren sowie zum Prüfen und Auswählen von Elementen. Das hält fachliche Transformationen kürzer und lesbarer als entsprechende Schleifen in BaseLanguage. Fachliche Validierung gehört ebenfalls zu dieser Logik; ihre konkreten Sprachmittel werden im Abschnitt [Preconditions, Validation, Guards und Exceptions](#preconditions-validation-guards-und-exceptions) beschrieben.
+
+Neben der Arbeit am Objektgraphen ist eine direkte Änderung persistierter Daten möglich. Dazu führt ein Service eine ManMap-Repository-Operation aus, deren SQL-Block als [`STATEMENT`](manmap.md#sql-query-und-sql-statement) modelliert ist, beispielsweise für ein gezieltes `UPDATE` oder `DELETE`. Als Session Operation ausgeführt nimmt das Statement an der Transaktion des Session Owners teil. 
+
+Für die Platzierung dieser fachlichen Logik stehen vier Ebenen zur Verfügung. Nur zwei davon, allgemeiner Domänenservice und Anwendungsfallservice, werden technisch mit demselben ObjectFlow-Sprachkonzept `Service` modelliert. ObjectFlow besitzt keine getrennten Service-Untertypen für diese beiden Aufgaben; ihre Unterscheidung ergibt sich aus Verantwortung, Schnittstelle und Benennung. Datenstrukturmethoden und Commands sind dagegen eigene Modellierungsorte:
 
 - **Datenstrukturmethode** – technisch eine BaseLanguage-Methode in einer Entity, einem Value Object oder DTO: allgemeines Verhalten eines einzelnen fachlichen Objekts oder Werts, ohne Infrastrukturzugriff.
 - **Allgemeiner Domänenservice** – technisch ein `Service`: wiederverwendbare Geschäftslogik, die keinem einzelnen Objekt natürlich zugeordnet werden kann oder mehrere Objekte verbindet.
@@ -393,7 +397,7 @@ Die Meldung erscheint typischerweise im allgemeinen Meldungsbereich oberhalb der
 
 ## Teil III – Commands und Anwendungsabläufe
 
-Ein `Command` (`Command`) modelliert einen ausführbaren Anwendungsfall oder einen abgegrenzten Teil einer Benutzerinteraktion. Er verbindet Eingaben, lokalen Ablaufzustand, fachliche Prüfungen, Pages und den erfolgreichen oder fehlerhaften Abschluss mit einer klaren Session-Grenze. Ein Command ist damit weder bloß eine UI-Aktion noch nur eine Methode: Er beschreibt den gesamten kontrollierten Ablauf zwischen Aufruf und Termination.
+Ein `Command` (`Command`) modelliert einen ausführbaren Anwendungsfall oder einen abgegrenzten Teil einer Benutzerinteraktion. Er verbindet Eingaben, lokalen Ablaufzustand, fachliche Prüfungen, Pages und den erfolgreichen oder fehlerhaften Abschluss mit einer klaren Session-Grenze. Ein Command ist damit weder bloß eine UI-Aktion noch nur eine Methode: Er beschreibt den gesamten kontrollierten Ablauf zwischen Aufruf und Termination. Der Name von Commands wird nicht Camel-Case geschrieben sondern darf Spaces enthalten.
 
 Bevor eine Command-Aktion gestartet werden kann, müssen ihre Parameter beziehungsweise Default-Selektionen verfügbar sein, alle Ausdrücke unter `generally enabled` `true` liefern und eine passende Command-Berechtigung erfüllt sein. Die Berechtigungen heißen konkret `CAN_OPEN_RO` für lesenden und `CAN_OPEN_RW` für ändernden Zugriff und werden jeweils mit einer Rolle verbunden. Eine Rollenprüfung kann zusätzlich Teil von `generally enabled` sein, soll die deklarierte Command-Berechtigung aber nicht ersetzen.
 
@@ -422,14 +426,14 @@ Typische Varianten lassen sich damit einheitlich lesen:
 
 ### Die vier Command-Typen
 
-Der Command-Typ bestimmt vor allem Eigentum und Abschluss der Session.
+Der Command-Typ bestimmt vor allem Eigentum und Abschluss der Session. Er prägt zugleich die typische visuelle Rolle, ohne ein bestimmtes Page-Pane technisch zu erzwingen.
 
-| Sichtbarer Typ | Session | Abschluss und Persistenz | Typischer Einsatz |
-| --- | --- | --- | --- |
-| `SEARCH_CMD` | Startet eine eigene Session | `FINAL_OK` beendet die Session ohne Commit; registrierte Session Operations werden nicht ausgeführt | Suche, Anzeige, Filterung und Read-only-Auswertung |
-| `GRAPH_OWNER_CMD` | Startet eine eigene Session und besitzt den bearbeiteten Graphen | Bei `FINAL_OK` werden Session Operations in einer Transaktion ausgeführt und committed | Bearbeitung eines vollständigen fachlichen Graphen |
-| `GRAPH_EDIT_CMD` | Übernimmt die Session seines Performers | Besitzt keinen eigenen Commit; erfolgreicher Abschluss kehrt zum Owner zurück | Teilbearbeitung und Benutzerinteraktion innerhalb eines vorhandenen Graphen |
-| `GRAPH_OWNER_CMD_MODAL` | Wie `GRAPH_OWNER_CMD`: eigene Session | Wie `GRAPH_OWNER_CMD`: eigener Commit bei `FINAL_OK` | Eigenständige Bearbeitung in einer modalen UI |
+| Sichtbarer Typ | Session | Abschluss und Persistenz | Typische visuelle Eigenschaften | Typischer Einsatz |
+| --- | --- | --- | --- | --- |
+| `SEARCH_CMD` | Startet eine eigene Session | `FINAL_OK` beendet die Session ohne Commit; registrierte Session Operations werden nicht ausgeführt | Such- und Filtermaske mit Ergebnisliste oder reine Leseansicht; Filter-DTOs dürfen editierbar sein, die gefundenen Domänenobjekte bleiben typischerweise read-only | Suche, Anzeige, Filterung und Read-only-Auswertung |
+| `GRAPH_OWNER_CMD` | Startet eine eigene Session und besitzt den bearbeiteten Graphen | Bei `FINAL_OK` werden Session Operations in einer Transaktion ausgeführt und committed | Meist eine eigenständige Übersicht oder Arbeitsansicht. Der Graph Owner hält Session und Navigation; die eigentliche editierbare Maske wird gewöhnlich durch einen `GRAPH_EDIT_CMD` geöffnet | Bearbeitung eines vollständigen fachlichen Graphen |
+| `GRAPH_EDIT_CMD` | Übernimmt die Session seines Performers | Besitzt keinen eigenen Commit; erfolgreicher Abschluss kehrt zum Owner zurück | Editierbare Page, häufig mit `Delegate Form`, für einen Teil oder eine konkrete Sicht des Owner-Graphen | Teilbearbeitung und Benutzerinteraktion innerhalb eines vorhandenen Graphen |
+| `GRAPH_OWNER_CMD_MODAL` | Wie `GRAPH_OWNER_CMD`: eigene Session | Wie `GRAPH_OWNER_CMD`: eigener Commit bei `FINAL_OK` | Eigenständiger, modal geöffneter Dialog; kann selbst editierbare Delegates enthalten | Eigenständige Bearbeitung in einer modalen UI |
 
 `GRAPH_OWNER_CMD_MODAL` unterscheidet sich fachlich und transaktional nicht vom normalen Graph Owner. Nur die Oberfläche ist modal.
 
@@ -608,6 +612,20 @@ conclusion label: Speichern & Beenden
     done  //run FINAL_OK_CONCLUSION
   }
 ```
+
+#### Conclusions mit SCAN/UPDATE oder GO/OK
+
+Mit `SCAN/UPDATE` (`SCAN_UPDATE`) und `GO/OK` (`GO_OK`) stehen zwei semantische Hotkeys zur Verfügung (Enum `org.modellwerkstatt.objectflow.structure.Hotkey`). Sie stehen nicht für eine bestimmte Tastaturtaste, sondern verbinden plattformspezifische Eingaben mit einer Page Conclusion. Auf derselben Page darf jeweils höchstens eine passende Conclusion angeboten werden, damit die Laufzeit das Ereignis eindeutig zuordnen kann.
+
+`SCAN_UPDATE` unterstützt zwei typische Interaktionsformen:
+
+1. Auf einem MDE-Gerät startet eine Hardwaretaste den Scanner. Dessen Wert wird in das dafür vorgesehene Delegate einer `Delegate Form` übernommen. Dieses Delegate trägt die DataUX-Option `ISSUE UPDATE/SCANABLE` (`org.modellwerkstatt.dataux.structure.IssueUpdateDOption`). Anschließend löst die Plattform die mit `SCAN_UPDATE` ausgezeichnete Conclusion aus.
+2. Auf FX8- oder Turku-Oberflächen bewirkt dieselbe Delegate-Option, dass eine tatsächliche Inhaltsänderung unmittelbar als Update-Conclusion gemeldet wird. Die Conclusion kann daraufhin abhängige Daten nachladen, eine Ergebnisliste filtern, berechnete Werte aktualisieren oder mit `page <aktuelle Page>` die Ansicht neu aufbauen. Dadurch entsteht eine reaktive Oberfläche, ohne UI-spezifische Listener in die fachliche Logik zu schreiben.
+
+Ein generisches Rechnungsbeispiel ist die Erfassung einer Artikelnummer: Nach dem Scan oder nach manueller Änderung lädt die `SCAN_UPDATE`-Conclusion die Artikeldaten, ergänzt Preis und Beschreibung und aktualisiert die Rechnungsposition. Die Conclusion sollte denselben fachlichen Service aufrufen, unabhängig davon, ob das Ereignis vom Scanner oder von einem Editor stammt. 
+
+`GO_OK` funktioniert analog als plattformunabhängige Bedeutung für „weiter“ oder „bestätigen“. Vor allem MDE-Oberflächen ordnen diesem Hotkey eine besondere Bildschirm- oder Hardwaretaste zu. Die zugehörige Conclusion validiert beispielsweise die aktuelle Rechnungsposition und wechselt anschließend zur nächsten Page oder beendet den Schritt mit `done`. Auf Desktop-Oberflächen kann dasselbe Label anders dargestellt werden; der Command bleibt unverändert.
+
 
 ### Selektion mit `pushSelection` setzen
 
@@ -857,6 +875,8 @@ Damit deckt die normale Command- und Action-Infrastruktur viele interaktive Stap
 
 Eine `OFX Test Suit` (`OFXTestSuit`) ist eine eigenständig ausführbare Testsuite. Sie referenziert eine `OFX Config`, stellt konfigurierte Komponenten bereit und kann Start-/Ende-Logik sowie mehrere `Simple Test`s enthalten.
 
+Die eigene Test-DSL ist der Ersatz für JUnit. Sie ist für Integrationstests auf derselben Abstraktionsebene wie ObjectFlow gedacht: Komponenten werden über eine echte `OFX Config` aufgelöst, jeder Test erhält einen definierten Session- und Benutzerkontext, Repository- und Serviceaufrufe verwenden `OperationCall`, und Commands können mitsamt Pages, Conclusions, Successors und Problembehandlung ohne UI ausgeführt werden. `OFXTestSuit` ist immer vorzuziehen, da die Semantik der ObjectFlow-, ManMap- oder Command-Laufzeit so Teil der Tests ist.
+
 | Bestandteil | Aufgabe |
 | --- | --- |
 | Configuration | Wählt Komponenten und Laufzeitkonfiguration für den Test |
@@ -879,6 +899,10 @@ Jeder `Simple Test` (`OFXTestMethod`) erhält eine eigene Session. Diese Session
 | `INCLUDE_SUIT` | `OFXTestSuitIncludeSuit` | Bindet eine weitere Testsuite einschließlich Start-/Ende-Logik ein |
 | `DONT_EXEC` | `OFXTestSuitNoExecOption` | Schließt einen ausgewählten Test von der normalen Ausführung aus |
 
+Testsuites lassen sich hierarchisch zusammensetzen. `INCLUDE_SUIT` kann eine andere Suite einschließlich ihrer Start-/Ende-Logik einbinden und über `exec tests` festlegen, ob auch deren Tests laufen. Damit kann eine Suite beispielsweise nur den gemeinsamen Datenbankaufbau einer Basissuite verwenden oder mehrere fachliche Suites zu einem Gesamtlauf aggregieren. `DEPENDENT_TEST` markiert einen Test, der nur als Abhängigkeit eines anderen Tests ausgeführt und nicht als selbstständiger Test angeboten werden soll.
+
+Mit `FAIL IN` (`OFXTestFailInAttribue`) beschreibt ein Test einen erwarteten Fehler, optional mit erwarteter Exception-Klasse und enthaltenem Meldungstext. Dadurch können neben erfolgreichen Lese-, Speicher- und Session-Abläufen auch Preconditions, Transaktionsabbrüche und technische Fehler explizit geprüft werden. Für ManMap-nahe Tests sind getrennte Suites für Aufbau, Query- und Operatorverhalten, Session-Varianten, Schlüssel- und Referenzformen, Audit, BLOBs sowie benutzerdefiniertes SQL sinnvoll; eine übergeordnete Suite kann diese Varianten bündeln.
+
 ### Commands ohne UI ausführen
 
 `run command` (`OFXRunCmd`) führt einen Command ohne Benutzeroberfläche aus. Das ist zentral, um nicht nur einzelne Methoden, sondern einen vollständigen Anwendungsablauf zu testen.
@@ -886,13 +910,19 @@ Jeder `Simple Test` (`OFXTestMethod`) erhält eine eigene Session. Diese Session
 Ein `run command` kann:
 
 - den Command mit Argumenten starten,
-- für erwartete Pages jeweils eine Conclusion angeben,
-- vor einer Conclusion Testlogik ausführen,
-- optionale Pages kennzeichnen,
-- Successor-Commands mit eigenen Page-Antworten behandeln,
-- auf die gebundenen Page-Objekte zugreifen.
+- die erwarteten Pages in ihrer Ablaufreihenfolge beschreiben und jeweils eine Conclusion erzwingen,
+- in `before conclude` Werte setzen oder Assertions ausführen,
+- das gebundene Page-Objekt unter einem lokalen Namen verfügbar machen; in diesem Block stehen auch `getSelected()` und `pushSelection()` zur Verfügung,
+- eine Page als optional kennzeichnen, wenn sie abhängig vom getesteten Pfad erscheinen darf,
+- neben einer regulären Conclusion auch den Benutzerabbruch erzwingen,
+- einen innerhalb der Page gestarteten Child-Command wiederum mit `run command` beantworten,
+- Successor-Commands über `when successor command ...` samt eigener Page-Abfolge behandeln.
+
+Nach einem erfolgreichen `FINAL_OK` sind die dort gepushten Ausgabewerte im umgebenden Test verfügbar. So kann der Test nicht nur Seiteneffekte am Eingabeobjekt, sondern auch die expliziten Command-Ergebnisse prüfen. Ein fehlender erwarteter Page-Schritt, eine unerwartete nicht-optionale Page oder eine andere Conclusion macht den Test reproduzierbar fehlerhaft. Mit `FAIL IN` lässt sich zusätzlich festlegen, dass der gesamte simulierte Ablauf mit einer bestimmten Exception oder einem bestimmten Session-Problem enden muss.
 
 Die Testbeschreibung simuliert damit die Entscheidungen, die sonst ein Benutzer über die UI trifft. Die DataUX-Darstellung wird nicht benötigt. UI-abhängige Mechanismen wie `session queue next command` werden bei einer Ausführung ohne UI ignoriert.
+
+
 
 ### Typische Testebenen
 
@@ -918,13 +948,21 @@ Für dasselbe Basis-Repository können mehrere Test-Repositories existieren, etw
 
 Eine `OFX Config` (`OFXConfig`) beschreibt die Laufzeitkomponenten und deren Abhängigkeiten. Konzeptionell entspricht sie einer modellierten, XML-generierenden IoC-Konfiguration: Komponenten werden bereitgestellt, Sections eingebunden und Properties überschrieben. Eine Dependency-Resolution-Strategie kann Komponenten anhand konfigurierter Packages finden.
 
-Wichtige Möglichkeiten sind:
+Wichtige Konfigurationsknoten sind:
 
-- wiederverwendbare Konfigurations-Sections einbinden,
-- Properties einer eingebundenen Section überschreiben,
-- eine primäre Implementierung gegenüber anderen Kandidaten auswählen,
-- Komponenten-Scanning für Packages konfigurieren,
-- unterschiedliche Konfigurationen für Entwicklung, Test und Deployment bereitstellen.
+| Aufgabe | Konzeptname | Bedeutung |
+| --- | --- | --- |
+| vollständige Konfiguration | `OFXConfig` | Ausführbarer Konfigurations-Root mit Komponenten und Dependency-Resolution-Strategie |
+| wiederverwendbarer Ausschnitt | `OFXConfigSection` | Bündelt gemeinsam verwendete Konfigurationselemente ohne selbst die Anwendungskonfiguration zu sein |
+| Section einbinden | `OFXConfigInclude` | Referenziert eine Section und übernimmt deren Elemente |
+| eingebundene Property überschreiben | `OFXConfigPropOverwrite` | Ersetzt den Wert einer Property gezielt für das Include |
+| konkrete Instanz | `OFXConfigInstance` | Deklariert eine benannte Laufzeitinstanz mit Klasse, Properties, Konstruktorargumenten und freien Werten |
+| Property, Konstruktorargument oder Wert | `OFXConfigProperty`, `OFXConfigConstructorArg`, `OFXConfigInstanceValue` | Versorgt eine Instanz mit benannten beziehungsweise typisierten Konfigurationswerten |
+| primäre Implementierung | `OFXConfigPrimary` | Bevorzugt eine Implementierung, wenn mehrere Kandidaten für denselben Komponententyp vorhanden sind |
+| Laufzeit-Scanning | `ComponentsScanning` | Begrenzt die Komponentensuche auf einen konfigurierten Package-Basisnamen |
+| Generierungszeit-Scanning | `GenTimeScanning` | Ermittelt Komponenten bereits bei der Generierung; importierte Modelle können ein- und Package-Bereiche ausgeschlossen werden |
+
+Damit lassen sich gemeinsame Sections einbinden, einzelne Werte pro Anwendung oder Test überschreiben und unterschiedliche Konfigurationen für Entwicklung, Test und Deployment bilden. Für AI-Agenten sind die Konzeptnamen wichtig: Nicht jedes Element ist eine frei benannte Property; insbesondere Include, Override, Primary und beide Scanning-Varianten besitzen eigene Konzepte.
 
 Services und Repositories werden über diese Konfiguration zu Laufzeitkomponenten. Ein `OperationCall` löst die passende konfigurierte Instanz auf.
 
@@ -942,9 +980,29 @@ Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN
 
 Scopes sind nicht nur Berechtigungsflags, sondern liefern eine eingeschränkte Objektmenge. Sie können Parameter und lokale Variablen besitzen und Services beziehungsweise Repositories über `OperationCall` verwenden.
 
+Eine statische Rolle besitzt eine Funktion `is(userEnvironment) -> boolean`. Diese Funktion kann den Benutzerkontext auswerten und über `OperationCall` Services oder Repositories befragen. Über `is also / can also` lassen sich Rollen hierarchisch zusammensetzen: Erfüllt ein Benutzer eine übergeordnete Rolle, erfüllt er damit auch die eingeschlossenen Rollen. Dadurch bleiben Command-Berechtigungen stabil, auch wenn die konkrete Ermittlung später geändert wird.
+
+Dasselbe Sprachmittel kann für lizenz-, mandanten- oder installationsabhängige Features verwendet werden. Eine statische Rolle prüft dann nicht eine organisatorische Benutzerrolle, sondern ob ein Feature im aktuellen fachlichen Kontext aktiviert ist. Features lassen sich hierarchisch zu Ausbaustufen bündeln und anschließend genauso in `CAN_OPEN_RO`, `CAN_OPEN_RW` oder `generally enabled` referenzieren wie klassische Rollen. Fachliche Rolle und Feature sollten trotz gleicher Technik in getrennten `RolesAndPermissions`-Roots und mit eindeutigen Namen modelliert werden.
+
+Die Ergebnisse statischer Rollen werden in der User Environment gecacht. Ändert sich während einer Anmeldung der zugrunde liegende Benutzer-, Rollen- oder Featurekontext, muss der Rollencache mit `clearCachedValues(false)` invalidiert werden. Identitäten bleiben dabei erhalten; `clearCachedValues(true)` verwirft zusätzlich den Identity-Cache.
+
 ### User Environment und User Service
 
 Die User Environment stellt den technischen und fachlichen Benutzerkontext einer laufenden Anwendung oder eines Jobs bereit. ObjectFlow-Ausdrücke können über die Session auf User Environment und User Service zugreifen. Typische Verwendungen sind Berechtigungsprüfung, Auswahl eines fachlichen Mandanten beziehungsweise Standorts und Auditinformationen.
+
+Die Standardimplementierung `org.modellwerkstatt.objectflow.runtime.UserEnvironmentInformation` hält insbesondere:
+
+| Information | Relevanz |
+| --- | --- |
+| Benutzer-ID und Benutzername | Identifikation, Audit und benutzerbezogene Regeln |
+| Sprache als `trans_<Index>` | Auswahl generierter Übersetzungen; andere Formate und `null` werden abgelehnt |
+| Rollen- und Identity-Caches | Zwischenspeicher für `StaticRole` und `Identity`; über `clearCachedValues(...)` gezielt zu invalidieren |
+| Gerätename, Geräte-Software und Geräte-ID | Unterscheidung von Desktop-, Web- und MDE-Kontexten sowie Geräte-Audit |
+| Compact Mode | Kennzeichnet eine kompakte Darstellung für geeignete Clients |
+| Application-Startup-Zeit und Branding-ID | Laufzeitmetadaten für anwendungsweite Darstellung und Diagnose |
+| Dynamic Status Info | Vorhandene Laufzeitinformation; neue fachliche Logik soll dafür eher einen User Service verwenden |
+
+Anwendungslogik soll diese Daten über `IOFXUserEnvironment` beziehungsweise die Session lesen und nicht eine eigene globale Benutzerinstanz führen. Der Kontext ist veränderlich und an eine laufende Anwendung oder einen Job gebunden. Rollen- und Identity-Werte werden intern über stabile String-IDs adressiert; Anwendungscode soll dafür die generierten Rollen- und Identity-Zugriffe verwenden, nicht eigene Cache-Schlüssel erfinden.
 
 Der Benutzerkontext ist Teil der Ausführung, ersetzt aber keine fachlichen Prüfungen. Insbesondere bei Jobs muss er ausdrücklich initialisiert werden.
 
@@ -955,6 +1013,12 @@ Der Benutzerkontext ist Teil der Ausführung, ersetzt aber keine fachlichen Prü
 - Ein Label (`Label`) kann mehrere plattformspezifische Spezifikationen besitzen.
 - Eine Farbe (`Color`) deklariert einen benannten Farbwert.
 - Statuswerte, Commands und UI-Elemente können diese Ressourcen referenzieren.
+
+Ein `StaticRessources`-Root kann über `extends` einen vorhandenen Ressourcensatz erweitern. Zusätzlich deklariert er Plattformen entweder direkt mit `PlatformDeclaration` oder als Ableitung einer vorhandenen Plattform mit `PlatformExtended`. Dadurch kann ein anwendungsspezifischer Ressourcensatz die allgemeinen Plattformbegriffe übernehmen, ohne deren Labels zu kopieren.
+
+Jedes `Label` besitzt eine oder mehrere `LabelSpecification`-Varianten. Üblicherweise gibt es eine Default-Spezifikation und zusätzliche Spezifikationen mit einer Referenz auf eine bestimmte Plattform. Pro Variante können Text, Icon, Hotkey und Darstellungsoptionen abweichen. Bei der Generierung beziehungsweise Darstellung wird die zur aktiven Plattform passende Spezifikation verwendet; fehlt sie, dient die Default-Spezifikation als Fallback. So kann dieselbe fachliche Aktion auf einer Desktop-Oberfläche beispielsweise einen beschrifteten Button mit Tastenkürzel und auf einer mobilen Plattform einen kompakten Icon-Button oder einen semantischen Hotkey wie `SCAN_UPDATE` erhalten.
+
+Farben sind ebenfalls benannte Ressourcen und können zentral von Statuswerten, Commands und UI-Elementen referenziert werden. Plattformunabhängige fachliche Namen sollen stabil bleiben; Unterschiede zwischen Clients gehören in die Spezifikationen, nicht in duplizierte Commands.
 
 Ressourcen halten wiederkehrende Darstellungsvorgaben zentral. Fachliche Zustände und Entscheidungen bleiben davon getrennt.
 
@@ -972,40 +1036,27 @@ Trace-Ausgaben sollen im Produktivbetrieb gezielt bleiben. Sensible fachliche od
 
 ### Serialisierung und Serdes
 
-Die ergänzende ObjectFlow-Serdes-Sprache stellt mit `CONV` Konvertierungs- und Serialisierungsmöglichkeiten bereit, beispielsweise für JSON. Projektspezifische Konverter können Properties auswählen, verändern oder besonders formatieren. Die genaue Menge verfügbarer Serdes-Konzepte ist versions- und projektspezifisch und muss vor einer neuen Verwendung in der aktuell geladenen Sprache geprüft werden.
+Die ergänzende ObjectFlow-Serdes-Runtime stellt über `CONV` typisierte Serializer und Deserializer bereit:
 
-Serialisierung ist kein Ersatz für DTO-Modellierung. Ein explizites DTO bleibt sinnvoll, wenn eine Schnittstelle nur einen stabilen Ausschnitt des fachlichen Modells veröffentlichen soll.
+| Fabrik | Format und Zweck |
+| --- | --- |
+| `CONV.jsonSerDes(...)` | JSON für einzelne Objektgraphen oder Listen am Wurzelknoten |
+| `CONV.xmlSerDes(...)` | XML für dieselben strukturierten Graphen |
+| `CONV.stringSer(...)` | Lesbare strukturelle Darstellung, insbesondere für Diagnose und Tests |
+| `CONV.fopXmlSer()` | Spezialisierte XML-Ausgabe für den vorhandenen FOP-Pfad |
 
+Die Implementierung unter `org.modellwerkstatt.objectflow.sdservices` introspektiert die generierten ObjectFlow-Datenstrukturen. Unterstützt werden `Integer`, `BigDecimal`, `String`, `LocalDate`, `DateTime` und Statuswerte sowie verschachtelte Value Objects, Key References und Listen. Damit lassen sich sowohl flache DTOs als auch mehrstufige Objektgraphen mit Unterobjekten und Positionen serialisieren und wieder aufbauen. Gegenläufige Entity-Referenzen werden nicht als beliebig zyklischer Graph verfolgt; das Datenmodell für eine Schnittstelle soll daher einen klaren Besitzpfad besitzen. Virtuelle Properties (`OFXVPBase`) werden derzeit ausdrücklich nicht unterstützt.
 
-## Durchgängige Abläufe
+`IConvFormatOptions` steuert Datums-, Zeit- und Dezimalformate, Locale, die Abbildung zwischen Property- und externen Feldnamen sowie das Verhalten bei fehlenden oder leeren Werten. Wichtige Modi sind:
 
-### Rechnung suchen und bearbeiten
+- `ALL_PROPERTIES_NECESSARY`: Alle durch die ObjectFlow-Struktur vorgegebenen Properties müssen in der Eingabe vorkommen.
+- `SET_MISSING_PROPERTIES_NULL`: Fehlende Eingabefelder werden auf `null` gesetzt.
+- `NULL_PROPERTIES_NO_SER`: Properties mit `null` werden beim Serialisieren ausgelassen.
+- `NULL_ARRAY_TO_EMPTY`: Ein `null`-Array wird beim Deserialisieren als leere Liste behandelt.
+- `SIMPLE_ARRAYS_TO_DTO`: Einfache Arrayelemente werden auf kompakte DTO-Strukturen abgebildet.
+- `PRETTY`: Formatiert die Ausgabe lesbar; `DEBUG_TO_STDERR` ist nur für gezielte technische Diagnose vorgesehen.
 
-1. Ein `SEARCH_CMD` erzeugt ein Filter-DTO und zeigt seine erste Page.
-2. Eine Page Conclusion ruft eine `READONLY`-Repository-Methode per `OperationCall` auf.
-3. Das Repository liefert read-only Ergebnis-DTOs; eine Tabelle zeigt sie an.
-4. Eine Aktion startet einen `GRAPH_OWNER_CMD` mit der ausgewählten Rechnungs-ID.
-5. Dessen `command init` lädt die Rechnung und ihre Positionen per Checkout.
-6. Ein `GRAPH_EDIT_CMD` bearbeitet eine Position innerhalb derselben Session.
-7. Der Owner registriert die Check-in-Operationen.
-8. Seine `FINAL_OK`-Funktion läuft; danach werden die Operationen in Registrierungsreihenfolge innerhalb einer Transaktion ausgeführt und committed.
-
-### Suchergebnis nach Child-Command aktualisieren
-
-1. Der Such-Command verwendet `NEWSTYLE_CMD_TERM_HANDLING`.
-2. Ein Child-Command bearbeitet oder erzeugt eine Entity und pusht sie bei erfolgreichem Abschluss.
-3. Der Termination-Handler des Such-Commands erhält das gepushte Objekt.
-4. `session merge` integriert dessen Werte explizit in das passende Suchergebnis beziehungsweise ergänzt ein neues Ergebnis.
-5. Die Selektion wird ausdrücklich auf das integrierte Objekt gesetzt.
-
-### Command in einer Testsuite ausführen
-
-1. Die `OFX Test Suit` wählt eine Testkonfiguration.
-2. Ein `Simple Test` startet mit einer eigenen, nicht commitfähigen Test-Session.
-3. `run command` ruft den zu prüfenden Command mit definierten Parametern auf.
-4. Für jede erwartete Page wählt der Test eine Conclusion und prüft bei Bedarf das gebundene Objekt.
-5. Successor-Commands werden über Successor-Handler beantwortet.
-6. Nach dem Test wird die Session verworfen; `on shutdown` läuft nach dem letzten Test.
+Die generierte Datenstruktur ist dabei die maßgebliche Schemasicht: Zusätzliche Eingangsfelder dürfen vorhanden sein, während die Behandlung fehlender Felder von den gewählten Modi abhängt. Formatfehler, fehlende Pflichtfelder und strukturell unpassende JSON- oder XML-Daten führen zu `SerdesException`; technische Reflexions- und Sicherheitsfehler werden als RuntimeException weitergegeben. Serdes ersetzt keine fachliche Validierung des deserialisierten Graphen.
 
 
 ## Häufige Fehler und Diagnose
