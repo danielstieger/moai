@@ -1,29 +1,33 @@
-# DataUX (org.modellwerkstatt.dataux) - Benutzeroberflächen und ausführbare Module
+# DataUX (org.modellwerkstatt.dataux) – Benutzeroberflächen und ausführbare Module
 
 ## Modellierungsumfang und Ausdrucksmöglichkeiten
 
-`org.modellwerkstatt.dataux` ist eine der drei domänenspezifischen Sprachen der **modellwerkstatt moware werkbank**. Sie beschreibt Benutzeroberflächen und den ausführbaren Rahmen von Anwendungen und Batchjobs. (Im Folgenden bezeichnet **Name** die Bezeichnung, die in MPS typischerweise sichtbar ist oder eingegeben wird. Der **Konzeptname** ist die technische AST-Bezeichnung und steht jeweils in Klammern. Bei einem DataUX-Konzept genügt dort der kurze Konzeptname; gehört das angesprochene Konzept zu einer anderen DSL, steht in Klammern immer dessen **FQ-Name**. Die Konzepttabellen führen FQ-Namen zusätzlich explizit auf – primär für KI-Agenten.)
+`org.modellwerkstatt.dataux` ist eine der drei domänenspezifischen Sprachen der **modellwerkstatt MoWare-Werkbank**. Sie beschreibt Benutzeroberflächen und den ausführbaren Rahmen von Anwendungen und Batchjobs.
 
 DataUX verbindet zwei Aufgabenbereiche:
 
-1. **UI-Modellierung:** Eine Oberfläche wird aus fachlich gebundenen `Page Pane`s (`PagePane`), Formularen, Tabellen, Layouts und Aktionen aufgebaut.
-2. **Application / Batchjob:** Ausführbare Module konfigurieren den Start und das Ende einer Anwendung, Authentifizierung, Navigation beziehungsweise Batch-Verarbeitung und die zugehörige Laufzeitkonfiguration.
+1. **UI-Modellierung:** Eine Oberfläche wird aus einem fachlich gebundenen `Page Pane` (`PagePane`) sowie Formularen, Tabellen, Layouts und Aktionen aufgebaut.
+2. **Anwendung und Batchjob:** Ausführbare Module konfigurieren den Start und das Ende einer Anwendung, Authentifizierung, Navigation beziehungsweise Batch-Verarbeitung und die zugehörige Laufzeitkonfiguration.
 
 Die Sprache beschreibt vor allem, **welche fachlichen Daten wie visualisiert werden**. Generator und Laufzeit übernehmen die technische Umsetzung. An dafür vorgesehenen Stellen können BaseLanguage-Ausdrücke eingebettet werden, etwa für Beschriftungen, Farben, Bedingungen, Command-Argumente oder Lebenszykluslogik.
+
+### Schreibkonventionen
+
+Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der **Konzeptname** bezeichnet das technische AST-Konzept; der **FQ-Name** ist dessen vollständig qualifizierter Name. Die Kapitellandkarten führen alle drei Bezeichnungen zusammen; bei dort fehlenden Konzepten ergänzt der Fließtext beim ersten Auftreten den Konzeptnamen beziehungsweise bei Konzepten aus anderen Sprachen den FQ-Namen in Klammern und verwendet danach nur noch den Namen.
 
 ## Teil I – UI-Modellierung
 
 ### Page Panes
 
-Eine ObjectFlow-`Page` gehört zu einem `Command` und beschreibt eine Seite seines Interaktionsablaufs. Ein `Page Pane` (`PagePane`) ist das Gegenstück auf der UI-Seite: Es beschreibt den sichtbaren Inhalt dieser Page.
+Eine ObjectFlow-`Page` (`org.modellwerkstatt.objectflow.structure.PageCrtl`) gehört zu einem ObjectFlow-`Command` (`org.modellwerkstatt.objectflow.structure.Command`) und beschreibt eine Seite seines Interaktionsablaufs. Ein `Page Pane` ist das Gegenstück auf der UI-Seite: Es beschreibt den sichtbaren Inhalt dieser Page.
 
 Ein `Page Pane` besitzt genau ein oberstes UI-Element. Dieses kann unmittelbar ein `Delegate Form` (`DelegateForm`) oder eine `Table` (`Table`) sein. Sollen mehrere Elemente kombiniert werden, bildet ein `Grid Layout` (`GridLayout`) oder `Tab Layout` (`TabLayout`) das oberste Element. Zusätzlich kann das `Page Pane` Menüeinträge enthalten.
 
 Die Page stellt die Daten bereit; das `Page Pane` stellt sie dar. Eine UI-Bindung lädt keine Daten nach. Benötigte Referenzen und Listen müssen bereits durch den Command beziehungsweise seine Repositories geladen und an die Page übergeben worden sein.
 
-#### Konzeptlandkarte der UI-Komposition
+#### Kapitellandkarte: UI-Komposition
 
-| Name | Konzeptname | FQ-Name | Rolle |
+| Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
 | `Page Pane` | `PagePane` | `org.modellwerkstatt.dataux.structure.PagePane` | UI-Beschreibung für eine ObjectFlow-Page mit genau einem obersten UI-Element |
 | `Delegate Form` | `DelegateForm` | `org.modellwerkstatt.dataux.structure.DelegateForm` | Formular aus typgerechten Property-Delegates |
@@ -80,13 +84,13 @@ Das Detailformular muss nicht wissen, aus welcher Tabelle die Selektion stammt. 
 
 ### Formulare, Tabellen und Delegates
 
-Ein `Delegate Form` (`DelegateForm`) beschreibt ein Formular. Seine Bindung bestimmt das dargestellte Objekt, seine Delegates bestimmen die sichtbaren Felder und seine Spaltengewichte deren horizontale Aufteilung. Eine `Table` (`Table`) beschreibt eine Objektliste; ihre Delegates bilden die Spalten.
+Ein `Delegate Form` beschreibt ein Formular. Seine Bindung bestimmt das dargestellte Objekt, seine Delegates bestimmen die sichtbaren Felder und seine Spaltengewichte deren horizontale Aufteilung. Eine `Table` beschreibt eine Objektliste; ihre Delegates bilden die Spalten.
 
 Der Delegate-Typ folgt dem fachlichen Property-Typ. Ein Delegate ersetzt keine fachliche Validierung. Fachliche Regeln gehören in das Domänenmodell beziehungsweise in Services und Commands; Delegate- und Formularoptionen steuern Darstellung und Interaktion.
 
-#### Konzeptlandkarte der Delegates
+#### Kapitellandkarte: Delegates
 
-| Name | Konzeptname | FQ-Name | Typischer Zweck |
+| Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
 | `String` | `StringDelegate` | `org.modellwerkstatt.dataux.structure.StringDelegate` | Text-Property |
 | `Integer` | `IntegerDelegate` | `org.modellwerkstatt.dataux.structure.IntegerDelegate` | Ganzzahlige Property |
@@ -136,7 +140,7 @@ Weitere Delegate-Optionen steuern unter anderem Ausrichtung, mehrzeilige Darstel
 
 ### Layouts, Tabs und Wiederverwendung
 
-Ein `Grid Layout` (`GridLayout`) ordnet UI-Elemente in Zeilen und Spalten an. Zeilen- und Spaltengewichte bestimmen die Größenverteilung. Die sichtbaren Gewichte `-1`, `1*`, `2*`, `3*`, `4*` und `5*` werden durch `MinWeight`, `OneWeight`, `TwoWeight`, `ThreeWeight`, `FourWeight` und `FiveWeight` repräsentiert. So kann beispielsweise eine Tabelle links und ein Formular rechts oder ein kompaktes Suchformular oberhalb einer flexiblen Ergebnistabelle stehen. Dieselben Gewichte werden auch im `Delegate Form` als Spaltengewichte verwendet, dort jedoch ohne `MinWeight`.
+Ein `Grid Layout` ordnet UI-Elemente in Zeilen und Spalten an. Zeilen- und Spaltengewichte bestimmen die Größenverteilung. Die sichtbaren Gewichte `-1`, `1*`, `2*`, `3*`, `4*` und `5*` werden durch `MinWeight`, `OneWeight`, `TwoWeight`, `ThreeWeight`, `FourWeight` und `FiveWeight` repräsentiert. So kann beispielsweise eine Tabelle links und ein Formular rechts oder ein kompaktes Suchformular oberhalb einer flexiblen Ergebnistabelle stehen. Dieselben Gewichte werden auch im `Delegate Form` als Spaltengewichte verwendet, dort jedoch ohne `MinWeight`.
 
 Für ein `Grid Layout` stehen insbesondere folgende Optionen zur Verfügung:
 
@@ -145,7 +149,7 @@ Für ein `Grid Layout` stehen insbesondere folgende Optionen zur Verfügung:
 | `FLEXIBLE` | `FlexibleOption` | `org.modellwerkstatt.dataux.structure.FlexibleOption` | Erlaubt eine flexible Größenanpassung |
 | `FOCUS FORWARD 2` | `SkipFocusOption` | `org.modellwerkstatt.dataux.structure.SkipFocusOption` | Verschiebt den initialen Fokus auf ein späteres Element |
 
-Ein `Tab Layout` (`TabLayout`) enthält mindestens einen `Tab` (`Tab`). Jeder Tab besitzt eine als Ausdruck modellierte Beschriftung und genau ein UI-Element.
+Ein `Tab Layout` enthält mindestens einen `Tab` (`Tab`). Jeder Tab besitzt eine als Ausdruck modellierte Beschriftung und genau ein UI-Element.
 
 Mit `Include` (`Include`) wird ein bereits deklariertes bindbares UI-Element wiederverwendet. Die Einbindung muss zur Datenbindung des umgebenden Kontexts passen. Sie erzeugt weder zusätzliche Daten noch einen unabhängigen Selektionsraum. Eine explizite Bindung am Include oder am eingebundenen Element kann den geerbten Kontext gezielt anpassen.
 
@@ -155,14 +159,14 @@ Die Zielgeräte sind bei der Layoutwahl ausdrücklich mitzudenken. Eine breite D
 
 ### Menüs und Command-Aktionen
 
-Ein `Page Pane` (`PagePane`) und eine `Table` (`Table`) besitzen Menüs, deren fachlicher Bezug unterschiedlich ist:
+Ein `Page Pane` und eine `Table` besitzen Menüs, deren fachlicher Bezug unterschiedlich ist:
 
 - Das Menü einer Tabelle richtet sich vor allem an die gebundenen Tabellenobjekte. Seine Aktionen arbeiten typischerweise mit der aktuell ausgewählten Zeile oder mit mehreren ausgewählten Zeilen.
 - Das Menü eines `Page Pane`s gehört zum gesamten Seitenkontext. Seine Aktionen betreffen daher eher das gebundene Wurzelobjekt, den vollständigen Aggregatgraphen oder den übergreifenden Ablauf der Page.
 
-Auch für ein `Custom UI Element` (`CustomElement`) kann ein Menü modelliert werden. Ob und wie es sichtbar und bedienbar ist, hängt jedoch davon ab, ob die konkrete UI-Laufzeitkomponente diese Menüintegration unterstützt. Ein `Include` (`Include`) kann eigene Menüeinträge angeben und damit das Menü des eingebundenen Elements am jeweiligen Verwendungsort überschreiben. Das ist insbesondere beim Einbinden einer Tabelle oder eines Custom Elements nützlich.
+Auch für ein `Custom UI Element` kann ein Menü modelliert werden. Ob und wie es sichtbar und bedienbar ist, hängt jedoch davon ab, ob die konkrete UI-Laufzeitkomponente diese Menüintegration unterstützt. Ein `Include` kann eigene Menüeinträge angeben und damit das Menü des eingebundenen Elements am jeweiligen Verwendungsort überschreiben. Das ist insbesondere beim Einbinden einer Tabelle oder eines Custom Elements nützlich.
 
-#### Konzeptlandkarte der Menüs
+#### Kapitellandkarte: Menüs
 
 | Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
@@ -193,40 +197,30 @@ Eine `Compound Action` (`MenuCompoundAction`) verbindet einen `GRAPH_OWNER` opti
 
 Damit kann beispielsweise aus einem Suchergebnis heraus eine Aktion auf einem vollständigen Aggregat ausgeführt werden: Der `GRAPH_OWNER` öffnet das ausgewählte Objekt, lädt den Aggregatgraphen vollständig und stellt die Session bereit. Anschließend führt der `GRAPH_EDIT` die fachliche Änderung aus. Dessen Conclusion bestätigt die Änderung; die Conclusion des Owners speichert und schließt den Aggregatgraphen. Ohne nachgelagerten `GRAPH_EDIT` eignet sich dasselbe Muster auch dazu, einen `GRAPH_OWNER` vollständig ohne UI auszuführen.
 
-`PageConclusionReference` verweist dabei auf eine Abschlussart, d.h. das `Command` muss diese Conclusion deklarieren; `USER_CANCEL` (`PageConclusionOptionUserCancel`) modelliert einen Abbruch des Commands mit "cancel" (Analog einem Benutzerabbruch).
+`PageConclusionReference` verweist dabei auf eine Abschlussart, d. h., das `Command` muss diese Conclusion deklarieren. `USER_CANCEL` (`PageConclusionOptionUserCancel`) modelliert einen Abbruch des Commands mit `cancel`, analog zu einem Benutzerabbruch.
 
 ### Typischer UI-Modellierungsablauf
 
 1. Der ObjectFlow-Command und seine Pages legen fest, welche Daten und Aktionen der Ablauf benötigt.
 2. Für jede Page wird der Root-Typ der UI bestimmt.
-3. Das `Page Pane` (`PagePane`) erhält diesen Entity- oder DTO-Typ als Bindungskontext.
+3. Das `Page Pane` erhält diesen Entity- oder DTO-Typ als Bindungskontext.
 4. Das oberste UI-Element wird gewählt: Formular, Tabelle oder Layout.
 5. Formulare und Tabellen werden an Typen beziehungsweise geeignete Properties gebunden.
 6. Tabellen können über die Auswahl ihrer Zeilen Selektionen für weitere UI-Komponenten bestimmen.
 7. Typgerechte Delegates beschreiben Felder und Tabellenspalten.
 8. Menüs rufen Commands mit Argumenten aus dem aktuellen Bindungs- und Selektionskontext auf.
 
-## Teil II – Application / Batchjob
+## Teil II – Anwendung und Batchjob
 
 `AppUI Module` (`AppUiModule`) und `BatchJob Module` (`BatchJobModule`) sind ausführbare Einstiegspunkte. Die fachlichen Anwendungsfälle verbleiben in Commands, Services und Repositories.
 
 Die Referenz `configuration` dient ausschließlich dem Start mit FX8, aus MPS oder im Standalone-Betrieb; im regulär bereitgestellten Laufzeitkontext ist sie nicht die Anwendungskonfiguration. Die in beiden Konzepten noch vorhandenen Bereiche `onStartup` und `onShutdown` sind nicht mehr zu verwenden (Deprecated).
 
-### Application mit `AppUI Module` (`AppUiModule`)
+### Anwendung mit `AppUI Module`
 
-Ein `AppUI Module` (`AppUiModule`) beschreibt eine interaktive Anwendung. Neben Benutzerkontext und Modulmetadaten besitzt es Navigation und Einstiegspunkte:
+Ein `AppUI Module` beschreibt eine interaktive Anwendung. Neben Benutzerkontext und Modulmetadaten besitzt es Navigation und Einstiegspunkte:
 
-- `mainMenu` bildet das fachliche Start- beziehungsweise Hauptmenü.
-- `extrasMenu` nimmt ergänzende, seltener benötigte Funktionen auf.
-- `helpMenu` bündelt Hilfe- und Dokumentationsaktionen.
-- `Tile` (`AppTile`) sind die Kacheln/Schaltflächen auf der Startoberfläche mit einer `Action` (`MenuAction`) sowie optional dynamischem Text und dynamischer Farbe.
-- `tileInit` (`TileInitFunction`) initialisiert Werte, die für Tiles benötigt werden.
-- Ein optionaler Start-Command (`StartupCommandCall`) kann beim Start aufgerufen und über einen Ausdruck aktiviert werden.
-- `VERSION` (`OptVersion`) und `OFFICIAL NAME` (`OptOfficialAppName`) beschreiben Modulmetadaten.
-
-Die Funktion `isAuthenticated` (`AppAuthenticationFunction`) ist der vorgesehene Ort, um den Benutzerkontext des AppUI-Moduls zu initialisieren. Die Funktion erledigt das nicht automatisch: In ihrem Funktionskörper muss ausdrücklich modelliert werden, dass der von der Laufzeit gelieferte Benutzername in die `userEnvironment` übernommen und die zugehörige Benutzer-ID gesetzt wird. Diese ID wird üblicherweise über einen Service oder ein Repository zum Benutzernamen ermittelt und nicht als Konstante hinterlegt. Je nach Laufzeit stammt der Benutzername beispielsweise aus einer OAuth-Anmeldung oder aus einer Login-Maske. Authentifizierung und fachliche Berechtigungsprüfung bleiben trotzdem getrennte Aufgaben.
-
-#### Konzeptlandkarte der Anwendung
+#### Kapitellandkarte: Anwendung
 
 | Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
@@ -235,6 +229,16 @@ Die Funktion `isAuthenticated` (`AppAuthenticationFunction`) ist der vorgesehene
 | `tileInit` | `TileInitFunction` | `org.modellwerkstatt.dataux.structure.TileInitFunction` | Initialisiert den Tile-Zustand |
 | kein eigener Alias | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` | Bedingter Command-Aufruf beim Anwendungsstart |
 | `Action` | `MenuAction` | `org.modellwerkstatt.dataux.structure.MenuAction` | Verknüpft Menü oder Tile mit einem ObjectFlow-Command |
+
+- `mainMenu` bildet das fachliche Start- beziehungsweise Hauptmenü.
+- `extrasMenu` nimmt ergänzende, seltener benötigte Funktionen auf.
+- `helpMenu` bündelt Hilfe- und Dokumentationsaktionen.
+- `Tile` (`AppTile`) sind die Kacheln/Schaltflächen auf der Startoberfläche mit einer `Action` sowie optional dynamischem Text und dynamischer Farbe.
+- `tileInit` (`TileInitFunction`) initialisiert Werte, die für Tiles benötigt werden.
+- Ein optionaler Start-Command (`StartupCommandCall`) kann beim Start aufgerufen und über einen Ausdruck aktiviert werden.
+- `VERSION` (`OptVersion`) und `OFFICIAL NAME` (`OptOfficialAppName`) beschreiben Modulmetadaten.
+
+Die Funktion `isAuthenticated` (`AppAuthenticationFunction`) ist der vorgesehene Ort, um den Benutzerkontext des AppUI-Moduls zu initialisieren. Die Funktion erledigt das nicht automatisch: In ihrem Funktionskörper muss ausdrücklich modelliert werden, dass der von der Laufzeit gelieferte Benutzername in die `userEnvironment` übernommen und die zugehörige Benutzer-ID gesetzt wird. Diese ID wird üblicherweise über einen Service oder ein Repository zum Benutzernamen ermittelt und nicht als Konstante hinterlegt. Je nach Laufzeit stammt der Benutzername beispielsweise aus einer OAuth-Anmeldung oder aus einer Login-Maske. Authentifizierung und fachliche Berechtigungsprüfung bleiben trotzdem getrennte Aufgaben.
 
 Das Modul stellt die Navigation bereit; der Command besitzt den fachlichen Ablauf und seine Pages, und die zugeordneten `Page Pane`s beschreiben deren Oberfläche:
 
@@ -250,11 +254,11 @@ Der Benutzerkontext wird zentral am Modul initialisiert. Fachliche Berechtigunge
 
 #### Tiles und dynamische Darstellung
 
-Tiles bilden die Startoberfläche der Anwendung. Sie werden nach dem Applikationsstart sowie immer dann angezeigt, wenn kein Command mehr geöffnet beziehungsweise in Ausführung ist. Damit bieten sie zugleich Einstiegspunkte und eine kompakte Übersicht über den aktuellen Arbeitsstand.
+Tiles bilden die Startoberfläche der Anwendung. Sie werden nach dem Anwendungsstart sowie immer dann angezeigt, wenn kein Command mehr geöffnet beziehungsweise in Ausführung ist. Damit bieten sie zugleich Einstiegspunkte und eine kompakte Übersicht über den aktuellen Arbeitsstand.
 
-`tileInit` (`TileInitFunction`) bereitet den gemeinsamen Zustand dieser Startoberfläche vor. Die Funktion kann beispielsweise offene Aufgaben laden, Kennzahlen berechnen oder Daten für mehrere Tiles organisieren. Die einzelnen Tiles verwenden diese vorbereiteten Werte anschließend für dynamische Beschriftungen und Farben. So können sie den Anwendungsnutzern nicht nur eine Aktion anbieten, sondern unmittelbar relevante Informationen anzeigen.
+`tileInit` bereitet den gemeinsamen Zustand dieser Startoberfläche vor. Die Funktion kann beispielsweise offene Aufgaben laden, Kennzahlen berechnen oder Daten für mehrere Tiles organisieren. Die einzelnen Tiles verwenden diese vorbereiteten Werte anschließend für dynamische Beschriftungen und Farben. So können sie den Anwendungsnutzern nicht nur eine Aktion anbieten, sondern unmittelbar relevante Informationen anzeigen.
 
-Ein `Tile` (`AppTile`) kann Beschriftung und Farbe über BaseLanguage-Ausdrücke dynamisch bestimmen. Typische Anwendungsfälle für eingebettete Ausdrücke sind:
+Ein `Tile` kann Beschriftung und Farbe über BaseLanguage-Ausdrücke dynamisch bestimmen. Typische Anwendungsfälle für eingebettete Ausdrücke sind:
 
 - dynamische Labels und Tile-Texte,
 - Farben und Hervorhebungen,
@@ -265,10 +269,17 @@ Welche Variablen sichtbar sind und welcher Ergebnistyp erwartet wird, hängt von
 
 Diese Ausdrücke sollen Darstellungs- und Interaktionslogik enthalten. Fachliche Berechnungen und Regeln bleiben in den zuständigen Entities, Value Objects, Services oder Commands und werden von dort aufgerufen. `tileInit` darf solche fachlichen Fähigkeiten aufrufen und ihre Ergebnisse für die Darstellung aufbereiten.
 
+### Batchjob mit `BatchJob Module`
 
-### Batchjob mit `BatchJob Module` (`BatchJobModule`)
+Ein `BatchJob Module` beschreibt eine ausführbare Hintergrundverarbeitung. Sein Kern sind ObjectFlow-Producer/Consumer-Paare (`org.modellwerkstatt.objectflow.structure.OFXProducerConsumerPair`). Mehrere Paare können in einem Modul zusammengefasst und jeweils separat geplant und parallelisiert werden.
 
-Ein `BatchJob Module` (`BatchJobModule`) beschreibt eine ausführbare Hintergrundverarbeitung. Sein Kern sind ObjectFlow-Producer/Consumer-Paare (`org.modellwerkstatt.objectflow.structure.OFXProducerConsumerPair`). Mehrere Paare können in einem Modul zusammengefasst und jeweils separat geplant und parallelisiert werden.
+#### Kapitellandkarte: Batchjob
+
+| Name | Konzeptname | FQ-Name | Aufgabe |
+| --- | --- | --- | --- |
+| `BatchJob Module` | `BatchJobModule` | `org.modellwerkstatt.dataux.structure.BatchJobModule` | Definiert eine ausführbare Hintergrundverarbeitung. |
+| Producer/Consumer-Paar | `OFXProducerConsumerPair` | `org.modellwerkstatt.objectflow.structure.OFXProducerConsumerPair` | Ermittelt und verarbeitet typisierte Arbeitseinheiten. |
+| Exception-Strategie | `OFXExceptionStrategy` | `org.modellwerkstatt.objectflow.structure.OFXExceptionStrategy` | Legt die Reaktion auf technische Verarbeitungsfehler fest. |
 
 Jedes Pair folgt einer Inbox-Denkweise:
 
@@ -305,9 +316,9 @@ Bei mehreren gleichzeitig fehlschlagenden Consumern wartet die Laufzeit, bis kei
 
 Die Exception-Strategie ersetzt keine fachliche Problembehandlung innerhalb des verarbeiteten Commands. Die Laufzeit setzt außerdem kein fachliches Verarbeitungstimeout für ein einzelnes Inbox-Element. Blockierende Zugriffe auf externe Datenbanken, Dateitransfers oder entfernte Dienste müssen daher eigene Verbindungs- und Lese-Timeouts besitzen; andernfalls können sie einen Consumer dauerhaft binden und auch das Herunterfahren verzögern.
 
-#### Konzeptlandkarte der Batch-Optionen
+#### Kapitellandkarte: Batchoptionen
 
-| Name | Konzeptname | FQ-Name | Bedeutung |
+| Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
 | `CRON` | `OptCronPairExp` | `org.modellwerkstatt.dataux.structure.OptCronPairExp` | Zeitplan für ein referenziertes Producer/Consumer-Paar |
 | `DELAY` | `OptDelayPair` | `org.modellwerkstatt.dataux.structure.OptDelayPair` | Wartezeit zwischen vollständigen Durchläufen eines referenzierten Pairs |
@@ -366,13 +377,11 @@ Die Job-Laufzeit stellt für jedes Pair unter anderem folgende Werte bereit:
 
 Das HTML-Dashboard dient der lesenden Betriebsübersicht. Die aktiven Operationen — Producer manuell starten, Producer aktivieren oder deaktivieren, Jobtimer stoppen oder starten, Timerzustand neu aufbauen und detailliertes Tracing aktivieren — werden über die JMX-Schnittstelle angeboten. Ein Timerstopp oder deaktivierter Producer ist deshalb im Monitoring von einem fachlich leeren Lauf und von einem technischen Fehler zu unterscheiden.
 
+### Wahl zwischen Anwendung und Batchjob
 
-### Wahl zwischen Application und Batchjob
-
-Ein `AppUI Module` (`AppUiModule`) ist passend, wenn Benutzer über Menüs, Tiles und Pages mit Commands interagieren. Ein `BatchJob Module` (`BatchJobModule`) ist passend, wenn Arbeit automatisch, zeitgesteuert oder in Producer/Consumer-Strukturen verarbeitet wird.
+Ein `AppUI Module` ist passend, wenn Benutzer über Menüs, Tiles und Pages mit Commands interagieren. Ein `BatchJob Module` ist passend, wenn Arbeit automatisch, zeitgesteuert oder in Producer/Consumer-Strukturen verarbeitet wird.
 
 Beide Modulformen können dieselben fachlichen Services und Repositories verwenden. UI und Batch sollten die fachliche Logik nicht duplizieren, sondern unterschiedliche Einstiegspunkte in dieselben fachlichen Fähigkeiten bilden.
-
 
 ## Durchgängige Abläufe
 
@@ -392,7 +401,6 @@ Beide Modulformen können dieselben fachlichen Services und Repositories verwend
 3. Ein Command verarbeitet jeweils eine Arbeitseinheit und kann definierte Pages besitzen.
 4. Bei `RUN_IN_CONSOLE` wird keine UI instanziiert.
 5. Wird der Batchjob in eine Anwendung eingebunden, können vorhandene Pages durch passende `Page Pane`s sichtbar gemacht werden.
-
 
 ## Häufige Fehler und Diagnose
 
@@ -417,6 +425,12 @@ Beide Modulformen können dieselben fachlichen Services und Repositories verwend
 - **Exception-Strategie als fachliche Fehlerbehandlung behandeln:** Sie steuert den technischen Umgang mit Ausnahmen, nicht die Domänenentscheidung.
 - **Desktop-Layout unverändert mobil verwenden:** Unterschiedliche Geräteklassen benötigen häufig eigene `Page Pane`s oder Anwendungsmodule.
 - **Name und Konzeptname verwechseln:** Name, Konzeptname und FQ-Name nach der eingangs festgelegten Schreibweise unterscheiden.
+
+## Weiterführende Dokumentation
+
+- [MoWare-Werkbank im Überblick](moware-werkbank.md)
+- [ObjectFlow – Fachliches Modell, Services und Anwendungsabläufe](objectflow.md)
+- [ManMap – Persistenz und Lesemodelle](manmap.md)
 
 ## Konzeptindex für Agenten
 
@@ -481,10 +495,10 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konz
 | Menü | `- - - -` | `MenuSeparator` | `org.modellwerkstatt.dataux.structure.MenuSeparator` |
 | Menüargument | `getSelected()` | `SelectedObject` | `org.modellwerkstatt.objectflow.structure.SelectedObject` |
 | Menüargument | `getSelectedObjects()` | `SelectedList` | `org.modellwerkstatt.objectflow.structure.SelectedList` |
-| Application | `AppUI Module` | `AppUiModule` | `org.modellwerkstatt.dataux.structure.AppUiModule` |
-| Application | `Tile` | `AppTile` | `org.modellwerkstatt.dataux.structure.AppTile` |
-| Application | `tileInit` | `TileInitFunction` | `org.modellwerkstatt.dataux.structure.TileInitFunction` |
-| Application | kein eigener Alias | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` |
+| Anwendung | `AppUI Module` | `AppUiModule` | `org.modellwerkstatt.dataux.structure.AppUiModule` |
+| Anwendung | `Tile` | `AppTile` | `org.modellwerkstatt.dataux.structure.AppTile` |
+| Anwendung | `tileInit` | `TileInitFunction` | `org.modellwerkstatt.dataux.structure.TileInitFunction` |
+| Anwendung | kein eigener Alias | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` |
 | Modul | `isAuthenticated` | `AppAuthenticationFunction` | `org.modellwerkstatt.dataux.structure.AppAuthenticationFunction` |
 | Moduloption | `VERSION` | `OptVersion` | `org.modellwerkstatt.dataux.structure.OptVersion` |
 | Moduloption | `OFFICIAL NAME` | `OptOfficialAppName` | `org.modellwerkstatt.dataux.structure.OptOfficialAppName` |
@@ -497,3 +511,7 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konz
 | Batchoption | `DEPENDENT_CONSECUTIVE` | `OptBatchDependent` | `org.modellwerkstatt.dataux.structure.OptBatchDependent` |
 | Batchoption | `RUN_IN_CONSOLE` | `OptRunInConsole` | `org.modellwerkstatt.dataux.structure.OptRunInConsole` |
 | Batchoption | kein eigener Alias | `OptIncludeBatchUi` | `org.modellwerkstatt.dataux.structure.OptIncludeBatchUi` |
+
+## Dokumentstand
+
+Diese Dokumentation beschreibt DataUX, Stand September 2026, auf Basis von JetBrains MPS 2026.1.

@@ -2,21 +2,35 @@
 
 ## Modellierungsumfang und Ausdrucksmöglichkeiten
 
-`org.modellwerkstatt.objectflow` ist eine der drei domänenspezifischen Sprachen der **modellwerkstatt moware werkbank**. Sie beschreibt fachliche Datenstrukturen, Domänen- und Anwendungslogik sowie die Abläufe, in denen Benutzer, Batchjobs und Tests diese Logik ausführen.
+`org.modellwerkstatt.objectflow` ist eine der drei domänenspezifischen Sprachen der **modellwerkstatt MoWare-Werkbank**. Sie beschreibt fachliche Datenstrukturen, Domänen- und Anwendungslogik sowie die Abläufe, in denen Benutzer, Batchjobs und Tests diese Logik ausführen.
+
 ObjectFlow verbindet fünf Aufgabenbereiche:
 
-1. **Datenmodellierung:** `Entity`, `Value Object` und `DTO` beschreiben fachliche Objekte, Werte und anwendungsbezogene Datencontainer.
-2. **Domänenlogik:** Zustandsübergänge, Berechnungen und fachliche Prüfungen liegen in den Datenstrukturen selbst oder häufig in zustandslosen `Service`-Komponenten.
-3. **Anwendungsabläufe:** `Command`s modellieren die mögliche Interaktion mit dem Endanwender. Sie können mehrere Pages mit Conclusions beinhalten, verwalten die Session und koordinieren Services und Repositories.
-4. **Tests:** `OFX Test Suit`s führen fachliche Tests und vollständige Commands ohne Benutzeroberfläche aus.
+1. **Datenmodellierung:** `Entity` (`Entity`), `Value Object` (`ValueObject`) und `DTO` (`DTO`) beschreiben fachliche Objekte, Werte und anwendungsbezogene Datencontainer.
+2. **Domänenlogik:** Zustandsübergänge, Berechnungen und fachliche Prüfungen liegen in den Datenstrukturen selbst oder häufig in einem zustandslosen `Service` (`Service`).
+3. **Anwendungsabläufe:** Ein `Command` (`Command`) modelliert die mögliche Interaktion mit dem Endanwender. Commands können mehrere Pages mit Conclusions beinhalten, verwalten die Session und koordinieren Services und Repositories.
+4. **Tests:** Eine `OFX Test Suit` (`OFXTestSuit`) führt fachliche Tests und vollständige Commands ohne Benutzeroberfläche aus.
 5. **Querschnitt:** Konfiguration, Rollen und Berechtigungen, statische Ressourcen, Logging und Serialisierung ergänzen die fachlichen Bausteine.
 
-Im Folgenden bezeichnet **Name** die Bezeichnung, die in MPS typischerweise sichtbar ist oder eingegeben wird. Der **Konzeptname** ist die technische AST-Bezeichnung und steht jeweils in Klammern. Bei einem ObjectFlow-Konzept genügt dort der kurze Konzeptname; gehört das angesprochene Konzept zu einer anderen DSL, steht in Klammern dessen **FQ-Name**. Die Konzepttabellen führen FQ-Namen zusätzlich explizit auf – primär für KI-Agenten.
+### Schreibkonventionen
+
+Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der **Konzeptname** bezeichnet das technische AST-Konzept; der **FQ-Name** ist dessen vollständig qualifizierter Name. Die Kapitellandkarten führen alle drei Bezeichnungen zusammen; bei dort fehlenden Konzepten ergänzt der Fließtext beim ersten Auftreten den Konzeptnamen beziehungsweise bei Konzepten aus anderen Sprachen den FQ-Namen in Klammern und verwendet danach nur noch den Namen.
 
 Die Dokumentation beschreibt beobachtete und technisch bestätigte Praxis. Sie legt keine zusätzliche, von der Sprache nicht erzwungene Architektur fest. Wo sich aus bestehenden Anwendungen wiederkehrende Empfehlungen ergeben, werden diese als solche benannt.
 
-
 ## Teil I – Fachliche Datenmodellierung
+
+Dieser Teil beschreibt die fachlichen Datenstrukturen, ihre Properties, Beziehungen, Statuswerte und das Verhalten direkt an den Datenstrukturen.
+
+### Kapitellandkarte: Fachliche Datenmodellierung
+
+| Name | Konzeptname | FQ-Name | Aufgabe |
+| --- | --- | --- | --- |
+| `Entity` | `Entity` | `org.modellwerkstatt.objectflow.structure.Entity` | Beschreibt ein fachliches Objekt mit Identität und Lebenszyklus. |
+| `Value Object` | `ValueObject` | `org.modellwerkstatt.objectflow.structure.ValueObject` | Beschreibt einen fachlichen Wert ohne eigene Identität. |
+| `DTO` | `DTO` | `org.modellwerkstatt.objectflow.structure.DTO` | Transportiert anwendungsbezogene Daten, Projektionen oder Suchkriterien. |
+| Business Property | `BusinessProperty` | `org.modellwerkstatt.objectflow.structure.BusinessProperty` | Definiert eine fachliche Eigenschaft einer Datenstruktur. |
+| Status | `StatusDeclaration` | `org.modellwerkstatt.objectflow.structure.StatusDeclaration` | Deklariert einen fachlichen Statustyp und dessen Werte. |
 
 ### Entity, Value Object und DTO
 
@@ -29,12 +43,6 @@ ObjectFlow bildet fachliche Datenstrukturen mit `Entity`, `Value Object` und `DT
 Fachliche Modelle bestehen typischerweise nicht aus isolierten Objekten, sondern aus Graphen. Eine Rechnung kann beispielsweise eine Liste von Rechnungspositionen referenzieren; Rechnung und Positionen können ihrerseits Value Objects wie Geldbetrag, Anschrift oder Gültigkeit verwenden. Referenzen drücken dabei den fachlichen Zusammenhang aus, Listen eine geordnete Menge gleichartiger Bestandteile.
 
 Die drei rootfähigen Datenstrukturen besitzen Business Properties und können zusätzlich Konstruktoren und Methoden (BaseLanguage-Member) enthalten.
-
-| Name | Konzeptname | Primärer Zweck | Identität und Lebenszyklus |
-| --- | --- | --- | --- |
-| `Entity` | `Entity` | Fachliches Objekt, das typischerweise über ManMap persistiert und innerhalb einer Session bearbeitet wird | Besitzt eine fachliche oder technische Identität; Gleichheit wird nicht nur aus allen Werten abgeleitet |
-| `Value Object` | `ValueObject` | Zusammengesetzter fachlicher Wert, beispielsweise Geldbetrag oder zusammengesetzter Schlüssel | Keine eigenständige Entity-Identität; ausgewählte Properties können die Wertgleichheit bestimmen |
-| `DTO` | `DTO` | Datencontainer für Suche, Darstellung, Aggregation oder Übergabe von Daten zwischen Abläufen | Nicht selbst als persistentes Domänenobjekt gedacht; konkretes Read-only- und Session-Verhalten hängt von seiner Erzeugung ab |
 
 Die Modellierung einer Entity oder eines fachlichen Objektgraphen bewirkt noch keine Persistenz. Tabellen, Schlüssel, Referenzen sowie Lade- und Speicheroperationen werden mit `org.modellwerkstatt.manmap` beschrieben; die Einzelheiten stehen in [manmap.md](manmap.md).
 
@@ -105,7 +113,6 @@ Für eine Rechnung könnte beispielsweise `offenerBetrag` als virtuelle, nur les
 
 Ein `Value Object` kann über `equal properties` (`EqualPropertyReference`) festlegen, welche seiner Business Properties die Wertgleichheit bestimmen. Das ist insbesondere für zusammengesetzte Schlüssel und fachliche Werte nützlich. Die ausgewählten Properties sollen gemeinsam den fachlichen Wert repräsentieren; technische oder nur darstellungsbezogene Properties gehören üblicherweise nicht dazu.
 
-
 ### Null-Werte in Datenstrukturen
 
 Anders als bei standard Java-Klassen werden die Properties von Datenstrukturen initialisiert. `string` beginnt als leere Zeichenkette, `int` als `0`, `BigDecimal` als `0.0`, ein Status mit seinem Default- beziehungsweise `ON_CREATION`-Element und eine Liste als leere Liste. Anwendungscode soll diese Werte deshalb nicht vorsorglich durch `null` ersetzen; insbesondere Listen werden als leere Listen verwendet.
@@ -113,7 +120,6 @@ Anders als bei standard Java-Klassen werden die Properties von Datenstrukturen i
 Das bedeutet nicht, dass jeder enthaltene Referenzwert immer gesetzt ist. Datum/Zeit sowie Beziehungen zu Entities, Value Objects und DTOs können fachlich fehlen; auch die Laufzeit-Setter der Referenztypen unterstützen optionale Werte. `null` soll dann ausdrücklich „kein Wert vorhanden“ bedeuten und nicht als Ersatz für einen regulären Zustand dienen. `int` kann als primitiver Typ nicht `null` sein. In DataUX kennzeichnet die Delegate-Option `OPTIONAL`, dass ein Eingabewert fehlen darf; ohne diese Option setzt die Oberfläche einen erforderlichen Wert durch.
 
 Der ObjectFlow ersetzt allgemeine Gleichheits- und Ungleichheitsausdrücke durch einen null-sicheren Vergleich: Zwei `null`-Werte gelten als gleich, genau ein `null`-Wert als ungleich; andernfalls wird `equals` verwendet. Die Laufzeit stellt zusätzlich einen null-sicheren `BigDecimal`-Vergleich über `compareTo` bereit, wenn die fachliche Gleichheit unabhängig von der Skala sein soll. Diese Hilfen verhindern NullPointerExceptions beim Vergleichen, ersetzen aber keine bewusste fachliche Entscheidung über optionale Werte.
-
 
 ### Beziehungen und Objektgraphen
 
@@ -132,11 +138,7 @@ Der erste Ausdruck lädt die Kunden-Entity gezielt über das Repository. Der zwe
 
 Auf `rechnung.kunde` direkt zuzugreifen setzt dagegen voraus, dass die Kundenreferenz von der ursprünglichen Query mitgeladen wurde. Fehlt der entsprechende Reference Join, löst der Zugriff `OFXNotInitializedException` aus. Die Wahl ist deshalb bewusst zu treffen: Entweder lädt die ursprüngliche Query die benötigte Beziehung mit, oder der Ablauf verwendet zunächst `#Key` und lädt die Entity über einen passenden Entity-Mapper.
 
-Mit `isNullKey` (`IsNull`) lässt sich prüfen, ob ein solcher Referenzschlüssel fachlich nicht gesetzt ist:
-
-```text
-rechnung.kunde#Key.isNullKey
-```
+Mit `isNullKey` (`IsNull`), beispielsweise `rechnung.kunde#Key.isNullKey`, lässt sich prüfen, ob ein solcher Referenzschlüssel fachlich nicht gesetzt ist.
 
 Die Prüfung kennt die ObjectFlow/ManMap-Semantik leerer Schlüssel und ist deshalb aussagekräftiger als ein bloßer Vergleich mit Java-`null`: Auch die Leerwerte einfacher Schlüssel und die Bestandteile eines zusammengesetzten Value-Object-Schlüssels werden berücksichtigt. Das ist besonders bei optionalen Beziehungen sinnvoll, bevor der Schlüssel an ein Repository übergeben oder ein Bestandteil des Schlüssels gelesen wird. `isNullKey` prüft den Schlüssel; es prüft nicht, ob das referenzierte Objekt bereits geladen wurde.
 
@@ -198,9 +200,24 @@ Der Session-weite Read-only- und Dirty-Zustand wird im Abschnitt [Session und Un
 
 ## Teil II – Services und Domänenlogik
 
+Dieser Teil beschreibt zustandslose Service-Komponenten, Komponentenaufrufe, fachliche Prüfungen und wiederverwendbare Domänenlogik.
+
+### Kapitellandkarte: Services und Domänenlogik
+
+| Name | Konzeptname | FQ-Name | Aufgabe |
+| --- | --- | --- | --- |
+| `Service` | `Service` | `org.modellwerkstatt.objectflow.structure.Service` | Bündelt zustandslose fachliche oder anwendungsbezogene Operationen. |
+| service method | `ServiceInstanceMethodDeclaration` | `org.modellwerkstatt.objectflow.structure.ServiceInstanceMethodDeclaration` | Deklariert eine Operation eines Services. |
+| `#` | `OperationCall` | `org.modellwerkstatt.objectflow.structure.OperationCall` | Ruft eine konfigurierte Service- oder Repository-Komponente auf. |
+| session operation add | `SessionOperationAdd` | `org.modellwerkstatt.objectflow.structure.SessionOperationAdd` | Registriert einen Komponentenaufruf zur späteren Ausführung. |
+| precondition | `Precondition` | `org.modellwerkstatt.objectflow.structure.Precondition` | Beschreibt eine fachlich korrigierbare Voraussetzung. |
+| validation | `ValidationStatement` | `org.modellwerkstatt.objectflow.structure.ValidationStatement` | Sammelt mehrere verletzte Preconditions. |
+| guard | `Guard` | `org.modellwerkstatt.objectflow.structure.Guard` | Bricht einen Ablauf bei einer technischen Schutzverletzung ab. |
+| formatierter String | `StringFormatString` | `org.modellwerkstatt.objectflow.structure.StringFormatString` | Erzeugt typisiert formatierte Meldungs- und Darstellungstexte. |
+
 ### Service-Komponenten
 
-Ein `Service` (`Service`) ist eine von der Laufzeit verwaltete Komponente. Services werden über die ObjectFlow-Konfiguration instanziiert und innerhalb einer Anwendung daher nur einmal erzeugt. Sie dürfen daher keinen veränderlichen Benutzer-/Vorgangszustand halte. Aufrufübergreifender sowie benutzer- oder sessionbezogener Zustand darf nicht in Feldern eines Services gespeichert werden. Anwendungsweite technische Zustände wie Caches, Nachschlagetabellen oder technische Clients sind in Ausnahmen erlaubt.
+Ein `Service` ist eine von der Laufzeit verwaltete Komponente. Services werden über die ObjectFlow-Konfiguration instanziiert und innerhalb einer Anwendung daher nur einmal erzeugt. Sie dürfen daher keinen veränderlichen Benutzer- oder Vorgangszustand halten. Aufrufübergreifender sowie benutzer- oder sessionbezogener Zustand darf nicht in Feldern eines Services gespeichert werden. Anwendungsweite technische Zustände wie Caches, Nachschlagetabellen oder technische Clients sind in Ausnahmefällen erlaubt.
 
 Services bündeln vor allem:
 
@@ -212,7 +229,7 @@ Services bündeln vor allem:
 
 Fachliche Logik in Services arbeitet primär am geladenen Domänenmodell. Sie ändert Werte und Zustände, erzeugt oder entfernt Objekte im Graphen, fasst Positionen zusammen und zerlegt sie wieder oder wählt, sortiert und gruppiert fachliche Listen. Solche Operationen werden mit `jetbrains.mps.baseLanguage` formuliert. Für Listen und Sequenzen soll ergänzend `jetbrains.mps.baseLanguage.collections` verwendet werden: Die Sprache bietet kompakte Operationen zum Filtern, Projizieren, Sortieren, Gruppieren, Aggregieren sowie zum Prüfen und Auswählen von Elementen. Das hält fachliche Transformationen kürzer und lesbarer als entsprechende Schleifen in BaseLanguage. Fachliche Validierung gehört ebenfalls zu dieser Logik; ihre konkreten Sprachmittel werden im Abschnitt [Preconditions, Validation, Guards und Exceptions](#preconditions-validation-guards-und-exceptions) beschrieben.
 
-Neben der Arbeit am Objektgraphen ist eine direkte Änderung persistierter Daten möglich. Dazu führt ein Service eine ManMap-Repository-Operation aus, deren SQL-Block als [`STATEMENT`](manmap.md#sql-query-und-sql-statement) modelliert ist, beispielsweise für ein gezieltes `UPDATE` oder `DELETE`. Als Session Operation ausgeführt nimmt das Statement an der Transaktion des Session Owners teil. 
+Neben der Arbeit am Objektgraphen ist eine direkte Änderung persistierter Daten möglich. Dazu führt ein Service eine ManMap-Repository-Operation aus, deren SQL-Block als [`STATEMENT`](manmap.md#sql-query-und-sql-statement) modelliert ist, beispielsweise für ein gezieltes `UPDATE` oder `DELETE`. Als Session-Operation ausgeführt nimmt das Statement an der Transaktion des Session Owners teil.
 
 Für die Platzierung dieser fachlichen Logik stehen vier Ebenen zur Verfügung. Nur zwei davon, allgemeiner Domänenservice und Anwendungsfallservice, werden technisch mit demselben ObjectFlow-Sprachkonzept `Service` modelliert. ObjectFlow besitzt keine getrennten Service-Untertypen für diese beiden Aufgaben; ihre Unterscheidung ergibt sich aus Verantwortung, Schnittstelle und Benennung. Datenstrukturmethoden und Commands sind dagegen eigene Modellierungsorte:
 
@@ -223,33 +240,33 @@ Für die Platzierung dieser fachlichen Logik stehen vier Ebenen zur Verfügung. 
 
 Eine grundsätzlich gültige Domänenregel liegt damit in einer Entity, einem Value Object oder einem allgemeinen Domänenservice. Eine Prüfung, die zu einer Service-Operation gehört und in allen Aufrufkontexten gelten soll, kann als Precondition der Service Method modelliert werden. Eine rein use-case- oder interaktionsbezogene Prüfung gehört hingegen in den Anwendungsfallservice beziehungsweise Command und seine Page Conclusions.
 
-### Service Methods
+### Service-Methoden
 
 Eine Service Method (`ServiceInstanceMethodDeclaration`) besitzt Parameter, Rückgabetyp, Body und optional Preconditions. Zwei Methodenoptionen verändern ihre technische Verwendung:
 
 | Name | Konzeptname | Bedeutung |
 | --- | --- | --- |
 | `API_METHOD` | `SimdApiMethod` | Kennzeichnet eine für die API-Integration vorgesehene Service Method |
-| `TO_SESSION_OPS` | `SimdToSessionOps` | Der Aufruf wird im passenden Session-Kontext nicht sofort ausgeführt, sondern als Session Operation registriert |
+| `TO_SESSION_OPS` | `SimdToSessionOps` | Der Aufruf wird im passenden Session-Kontext nicht sofort ausgeführt, sondern als Session-Operation registriert |
 
 Eine Methode mit `TO_SESSION_OPS` darf keine Preconditions besitzen. Eine solche Precondition würde erst während der Transaktionsausführung geprüft; die Laufzeit lehnt diese Kombination mit einer RuntimeException ab.
 
 ### Komponenten mit `#` aufrufen
 
-Service- und Repository-Methoden werden mit dem Komponentenaufruf `#` (`OperationCall`) aufgerufen. Er ist nicht nur eine kürzere Schreibweise für einen Java-Methodenaufruf: Er kennt die konfigurierte Komponenteninstanz, die aktuelle Session und die Methodenart. Dadurch kann die Laufzeit entscheiden, ob der Aufruf sofort erfolgt oder als Session Operation registriert wird.
+Service- und Repository-Methoden werden mit dem Komponentenaufruf `#` aufgerufen. Er ist nicht nur eine kürzere Schreibweise für einen Java-Methodenaufruf: Er kennt die konfigurierte Komponenteninstanz, die aktuelle Session und die Methodenart. Dadurch kann die Laufzeit entscheiden, ob der Aufruf sofort erfolgt oder als Session-Operation registriert wird.
 
 | Ziel des `OperationCall` | Typisches Verhalten |
 | --- | --- |
 | Normale Service Method | Wird unmittelbar ausgeführt |
-| Service Method mit `TO_SESSION_OPS` | Wird im transaktionsfähigen Abschlusskontext als Session Operation registriert |
+| Service Method mit `TO_SESSION_OPS` | Wird im transaktionsfähigen Abschlusskontext als Session-Operation registriert |
 | ManMap-`READONLY`-Methode | Wird unmittelbar in der aktuellen Session ausgeführt |
 | ManMap-`CHECKOUT`-Methode | Wird unmittelbar ausgeführt und integriert geladene Entities veränderbar in die Session |
-| ManMap-`CHECKIN`- oder `DELETE`-Methode in `FINAL_OK` | Wird automatisch als Session Operation registriert |
+| ManMap-`CHECKIN`- oder `DELETE`-Methode in `FINAL_OK` | Wird automatisch als Session-Operation registriert |
 | Dafür vorgesehener Aufruf in `FINAL_CANCEL` | Wird als Cancel-/Marker- beziehungsweise Journal-Operation in dem dafür vorgesehenen Cancel-Transaktionskontext behandelt |
 
 Für normale fachliche Aufrufe ist `OperationCall` zu verwenden. Ein direkter Java-Aufruf ist nicht möglich. Er würde die Komponenten-, Session- und Transaktionssemantik umgehen.
 
-### Explizite Session Operations
+### Explizite Session-Operationen
 
 Mit `session operation add` (`SessionOperationAdd`) kann ein `OperationCall` ausdrücklich auf dem Operation Stack der aktuellen Session registriert werden. Der Aufruf wird dabei noch nicht ausgeführt.
 
@@ -291,7 +308,7 @@ Alle Teile außer `condition` und Problemtext sind optional. Mehrere Optionen we
 
 Nach dem Schrägstrich kann eine vorhandene Exception als Ausdruck weitergereicht werden. Sie bleibt dadurch als technische Ursache und mit ihrem Stacktrace am fachlichen Problem erhalten. Die anschließenden optionalen Schlüssel/Wert-Paare sind `LogStatementProperty`-Einträge. Sie ergänzen den Problembericht und die Diagnoseprotokollierung um strukturierte Werte, ohne den Benutzertext mit technischen Details zu überladen.
 
-Wird eine Precondition während der Bearbeitung einer bereits angezeigten Page verletzt, wird nur die gerade ausgeführte Aktion unterbrochen. Die aktuelle Page und ihr `Page Pane` bleiben sichtbar. Der Benutzer kann seine Eingaben korrigieren, eine andere Page Conclusion wählen oder einen in den Menüs angebotenen Command zur Korrektur starten. Dasselbe gilt für einen `validation`-Block, nachdem alle enthaltenen Probleme gesammelt und angezeigt wurden.
+Wird eine Precondition während der Bearbeitung einer bereits angezeigten Page verletzt, wird nur die gerade ausgeführte Aktion unterbrochen. Die aktuelle Page und ihr DataUX-`Page Pane` (`org.modellwerkstatt.dataux.structure.PagePane`) bleiben sichtbar. Der Benutzer kann seine Eingaben korrigieren, eine andere Page Conclusion wählen oder einen in den Menüs angebotenen Command zur Korrektur starten. Dasselbe gilt für einen `validation`-Block, nachdem alle enthaltenen Probleme gesammelt und angezeigt wurden.
 
 Eine Precondition kann zusätzlich einen Command als Korrekturaktion anbieten. Nach einer fehlgeschlagenen Prüfung kann der Benutzer dadurch über eine Schaltfläche direkt eine Korrektur starten.
 
@@ -394,10 +411,23 @@ Innerhalb des bereits prüfenden `if`-Zweigs ist kein weiterer boolescher Ausdru
 
 Die Meldung erscheint typischerweise im allgemeinen Meldungsbereich oberhalb der Page und nicht unmittelbar am Feld. Durch `requestFocus()` steht der Cursor nach der Meldung dennoch an der richtigen Eingabestelle. Die Reihenfolge ist wesentlich: Wird die Precondition zuerst ausgelöst, erreicht der unterbrochene Programmfluss die Fokusanforderung nicht mehr.
 
-
 ## Teil III – Commands und Anwendungsabläufe
 
-Ein `Command` (`Command`) modelliert einen ausführbaren Anwendungsfall oder einen abgegrenzten Teil einer Benutzerinteraktion. Er verbindet Eingaben, lokalen Ablaufzustand, fachliche Prüfungen, Pages und den erfolgreichen oder fehlerhaften Abschluss mit einer klaren Session-Grenze. Ein Command ist damit weder bloß eine UI-Aktion noch nur eine Methode: Er beschreibt den gesamten kontrollierten Ablauf zwischen Aufruf und Termination. Der Name von Commands wird nicht Camel-Case geschrieben sondern darf Spaces enthalten.
+Dieser Teil beschreibt ausführbare Anwendungsfälle, ihre Pages, Abschlüsse, Sessions und die Koordination aufeinanderfolgender Commands.
+
+### Kapitellandkarte: Commands und Anwendungsabläufe
+
+| Name | Konzeptname | FQ-Name | Aufgabe |
+| --- | --- | --- | --- |
+| `Command` | `Command` | `org.modellwerkstatt.objectflow.structure.Command` | Modelliert einen ausführbaren Anwendungsfall. |
+| Page | `PageCrtl` | `org.modellwerkstatt.objectflow.structure.PageCrtl` | Beschreibt einen Interaktionsschritt eines Commands. |
+| Page Conclusion | `PageConclusion` | `org.modellwerkstatt.objectflow.structure.PageConclusion` | Verarbeitet den Abschluss einer Page und steuert den weiteren Ablauf. |
+| `done` | `DoneCommand` | `org.modellwerkstatt.objectflow.structure.DoneCommand` | Wechselt in den erfolgreichen Command-Abschluss. |
+| session | `Session` | `org.modellwerkstatt.objectflow.structure.Session` | Hält Identity Map, Operationen und den Zustand einer Unit of Work. |
+| session merge | `MergeInto` | `org.modellwerkstatt.objectflow.structure.MergeInto` | Übernimmt Objekte gezielt in eine übergeordnete Session. |
+| session queue next command | `SessionQueueNextCommand` | `org.modellwerkstatt.objectflow.structure.SessionQueueNextCommand` | Plant einen Command nach erfolgreichem Commit ein. |
+
+Ein `Command` modelliert einen ausführbaren Anwendungsfall oder einen abgegrenzten Teil einer Benutzerinteraktion. Er verbindet Eingaben, lokalen Ablaufzustand, fachliche Prüfungen, Pages und den erfolgreichen oder fehlerhaften Abschluss mit einer klaren Session-Grenze. Ein Command ist damit weder bloß eine UI-Aktion noch nur eine Methode: Er beschreibt den gesamten kontrollierten Ablauf zwischen Aufruf und Termination. Der Name von Commands wird nicht in CamelCase geschrieben, sondern darf Leerzeichen enthalten.
 
 Bevor eine Command-Aktion gestartet werden kann, müssen ihre Parameter beziehungsweise Default-Selektionen verfügbar sein, alle Ausdrücke unter `generally enabled` `true` liefern und eine passende Command-Berechtigung erfüllt sein. Die Berechtigungen heißen konkret `CAN_OPEN_RO` für lesenden und `CAN_OPEN_RW` für ändernden Zugriff und werden jeweils mit einer Rolle verbunden. Eine Rollenprüfung kann zusätzlich Teil von `generally enabled` sein, soll die deklarierte Command-Berechtigung aber nicht ersetzen.
 
@@ -423,21 +453,20 @@ Typische Varianten lassen sich damit einheitlich lesen:
 | Precondition in einer Conclusion | Standardmäßig werden Editorwerte übernommen → Conclusion startet → Prüfung schlägt fehl → aktuelle Page bleibt zur Korrektur sichtbar |
 | `done` in `command init` | Ein interaktionsloser oder bereits entscheidbarer Pfad überspringt alle Pages und führt `FINAL_OK` aus; ein anderer Zweig kann mit `page <Name>` dynamisch eine der vorhandenen Pages wählen |
 
-
 ### Die vier Command-Typen
 
 Der Command-Typ bestimmt vor allem Eigentum und Abschluss der Session. Er prägt zugleich die typische visuelle Rolle, ohne ein bestimmtes Page-Pane technisch zu erzwingen.
 
 | Sichtbarer Typ | Session | Abschluss und Persistenz | Typische visuelle Eigenschaften | Typischer Einsatz |
 | --- | --- | --- | --- | --- |
-| `SEARCH_CMD` | Startet eine eigene Session | `FINAL_OK` beendet die Session ohne Commit; registrierte Session Operations werden nicht ausgeführt | Such- und Filtermaske mit Ergebnisliste oder reine Leseansicht; Filter-DTOs dürfen editierbar sein, die gefundenen Domänenobjekte bleiben typischerweise read-only | Suche, Anzeige, Filterung und Read-only-Auswertung |
-| `GRAPH_OWNER_CMD` | Startet eine eigene Session und besitzt den bearbeiteten Graphen | Bei `FINAL_OK` werden Session Operations in einer Transaktion ausgeführt und committed | Meist eine eigenständige Übersicht oder Arbeitsansicht. Der Graph Owner hält Session und Navigation; die eigentliche editierbare Maske wird gewöhnlich durch einen `GRAPH_EDIT_CMD` geöffnet | Bearbeitung eines vollständigen fachlichen Graphen |
-| `GRAPH_EDIT_CMD` | Übernimmt die Session seines Performers | Besitzt keinen eigenen Commit; erfolgreicher Abschluss kehrt zum Owner zurück | Editierbare Page, häufig mit `Delegate Form`, für einen Teil oder eine konkrete Sicht des Owner-Graphen | Teilbearbeitung und Benutzerinteraktion innerhalb eines vorhandenen Graphen |
+| `SEARCH_CMD` | Startet eine eigene Session | `FINAL_OK` beendet die Session ohne Commit; registrierte Session-Operationen werden nicht ausgeführt | Such- und Filtermaske mit Ergebnisliste oder reine Leseansicht; Filter-DTOs dürfen editierbar sein, die gefundenen Domänenobjekte bleiben typischerweise read-only | Suche, Anzeige, Filterung und Read-only-Auswertung |
+| `GRAPH_OWNER_CMD` | Startet eine eigene Session und besitzt den bearbeiteten Graphen | Bei `FINAL_OK` werden Session-Operationen in einer Transaktion ausgeführt und committed | Meist eine eigenständige Übersicht oder Arbeitsansicht. Der Graph Owner hält Session und Navigation; die eigentliche editierbare Maske wird gewöhnlich durch einen `GRAPH_EDIT_CMD` geöffnet | Bearbeitung eines vollständigen fachlichen Graphen |
+| `GRAPH_EDIT_CMD` | Übernimmt die Session seines Performers | Besitzt keinen eigenen Commit; erfolgreicher Abschluss kehrt zum Owner zurück | Editierbare Page, häufig mit DataUX-`Delegate Form` (`org.modellwerkstatt.dataux.structure.DelegateForm`), für einen Teil oder eine konkrete Sicht des Owner-Graphen | Teilbearbeitung und Benutzerinteraktion innerhalb eines vorhandenen Graphen |
 | `GRAPH_OWNER_CMD_MODAL` | Wie `GRAPH_OWNER_CMD`: eigene Session | Wie `GRAPH_OWNER_CMD`: eigener Commit bei `FINAL_OK` | Eigenständiger, modal geöffneter Dialog; kann selbst editierbare Delegates enthalten | Eigenständige Bearbeitung in einer modalen UI |
 
 `GRAPH_OWNER_CMD_MODAL` unterscheidet sich fachlich und transaktional nicht vom normalen Graph Owner. Nur die Oberfläche ist modal.
 
-Ein `GRAPH_EDIT_CMD` kann technisch Session Operations registrieren. Diese werden bei einem Abbruch des Child-Commands jedoch nicht wieder vom Operation Stack entfernt. In der beobachteten Praxis sollen `GRAPH_EDIT_CMD`s deshalb keine Session Operations registrieren; der Session Owner übernimmt deren Registrierung.
+Ein `GRAPH_EDIT_CMD` kann technisch Session-Operationen registrieren. Diese werden bei einem Abbruch des Child-Commands jedoch nicht wieder vom Operation Stack entfernt. In der beobachteten Praxis sollen `GRAPH_EDIT_CMD`s deshalb keine Session-Operationen registrieren; der Session Owner übernimmt deren Registrierung.
 
 ### Aufbau eines Commands
 
@@ -560,7 +589,6 @@ Repository- und Property-Namen sind hier Pseudocode; wesentlich ist die Aufteilu
 
 Eine Page besitzt mindestens einen `PagePaneActionProviderLink`. Ein unbedingter Link wird als `-> : PagePane` projiziert; ein bedingter Link als `<Bedingung> : PagePane`. Die Links werden in ihrer modellierten Reihenfolge ausgewertet. Damit kann dieselbe fachliche Page beispielsweise für unterschiedliche Geräteklassen oder für Administratoren und reguläre Benutzer verschiedene Oberflächen auswählen. Bedingungen sollen sich möglichst eindeutig verhalten; der verpflichtende unbedingte Default-Link steht als letztes Element der Liste. Die fachliche Logik bleibt trotz unterschiedlicher Darstellung in derselben Page und demselben Command.
 
-
 #### Termination Handler
 
 Ein `PageCmdTermHandler` wird ausgeführt, wenn während der Page ein weiterer Command beendet wurde. `ChildCmdTerminated` reagiert auf echte Child-Commands; `AnyCmdTerminated` kann auch andere passende Terminationen erfassen. Ein optionaler Classifier filtert nach dem Typ des gepushten Objekts. Je nach Variante erhält die Funktion Informationen darüber, ob der beendete Command erfolgreich war, ob er ein Child war und welches Objekt gepusht wurde.
@@ -592,26 +620,9 @@ Eine `PageConclusion` besitzt ein Label, eine optionale `enabledWhen`-Bedingung,
 Innerhalb der Conclusion steuern zwei spezielle Statements den weiteren Ablauf:
 
 - `page <Name>` (`PageCommand`) wechselt auf die angegebene Page und führt deren Page Init aus. Ein Verweis auf die aktuelle Page wirkt als Refresh.
-- `done` (`DoneCommand`) beendet den interaktiven Teil erfolgreich und führt `FINAL_OK_CONCLUSION` aus.
+- `done` beendet den interaktiven Teil erfolgreich und führt `FINAL_OK_CONCLUSION` aus.
 
 Preconditions in einer Conclusion prüfen die vom Editor übernommenen Eingaben unmittelbar vor dem Übergang. Ein `GRAPH_EDIT_CMD` kann so seine Teilbearbeitung vor `done` prüfen; ein `GRAPH_OWNER_CMD` kann vor `done` die Voraussetzungen für das anschließende Registrieren und Ausführen der Speicheroperationen absichern. Ohne `page` oder `done` bleibt der Command auf der aktuellen Page. Schlägt eine Precondition fehl, endet die Conclusion an dieser Stelle ebenfalls ohne Übergang: Die Page bleibt sichtbar und der Benutzer kann anhand der Meldung korrigieren oder eine andere Aktion wählen.
-
-Zwei häufige Muster sind eine Aktualisieren-Conclusion im `SEARCH_CMD` und eine Speichern-&-Beenden-Conclusion im `GRAPH_OWNER_CMD`:
-
-```objectflow
-
-// GRAPH_OWNER_CMD
-conclusion label: Speichern & Beenden
-  func()->void {
-
-    validation {
-      precondition rechnung.positionen.isNotEmpty : 'Mindestens eine Position ist erforderlich.';
-      precondition rechnung.summe.signum() >= 0 : 'Die Rechnungssumme darf nicht negativ sein.';
-    }
-
-    done  //run FINAL_OK_CONCLUSION
-  }
-```
 
 #### Conclusions mit SCAN/UPDATE oder GO/OK
 
@@ -626,7 +637,6 @@ Ein generisches Rechnungsbeispiel ist die Erfassung einer Artikelnummer: Nach de
 
 `GO_OK` funktioniert analog als plattformunabhängige Bedeutung für „weiter“ oder „bestätigen“. Auf MDE-Oberflächen ist diesem Hotkey eine besondere Bildschirm- oder Hardwaretaste zugeordnet. Die zugehörige Conclusion validiert beispielsweise die aktuelle Rechnungsposition und wechselt anschließend zur nächsten Page oder beendet den Schritt mit `done`. Auf Desktop-Oberflächen wird dasselbe Label anders dargestellt; der Command bleibt unverändert.
 
-
 ### Selektion mit `pushSelection` setzen
 
 `pushSelection(<Objekt>);` (`PushObject`) legt ein Objekt oder mehrere Objekte als Selektion im aktuellen Selektionskontext ab. Zulässig sind eine Entity, ein DTO oder eine Liste solcher Objekte. Das Statement beendet den Command nicht; es beeinflusst ausschließlich die Selektion, die nachfolgende UI- beziehungsweise Command-Schritte sehen.
@@ -639,30 +649,13 @@ Die DSL erlaubt `pushSelection` nur
 
 Damit ist `pushSelection` in einem Termination-Handler zwar sprachseitig zulässig, aber meist nicht erwünscht. Die bestehende Selektion soll meist beibehalten werden. 
 
-
 ### `FINAL_OK`, `FINAL_CANCEL` und `FINAL_USER_CANCEL`
 
-`FINAL_OK` bezeichnet den erfolgreichen Abschluss eines Commands. Beim Session Owner entsteht daraus folgende Reihenfolge:
+`FINAL_OK` bezeichnet den erfolgreichen Abschluss eines Commands. Beim Session Owner läuft zunächst die `FINAL_OK`-Funktion. Danach startet die gemeinsame Datenbanktransaktion, die Session-Operationen werden in Registrierungsreihenfolge ausgeführt und die Transaktion wird committed. Abschließend wird das Root-Objekt des Aggregats gepusht.
 
-```text
-FINAL-OK-Funktion
-        │
-        ▼
- gemeinsame Datenbanktransaktion starten
-        │
-        ▼
- Session Operations in Registrierungsreihenfolge ausführen
-        │
-        ▼
- Commit
-        │
-        ▼
- Root Objekt des Aggregates pushen
-```
+Schlägt eine Session-Operation fehl, wird die Transaktion nicht committed. Ein `SEARCH_CMD` durchläuft zwar ebenfalls seinen erfolgreichen Command-Abschluss, seine Session wird anschließend aber ausdrücklich nicht committed.
 
-Schlägt eine Session Operation fehl, wird die Transaktion nicht committed. Ein `SEARCH_CMD` durchläuft zwar ebenfalls seinen erfolgreichen Command-Abschluss, seine Session wird anschließend aber ausdrücklich nicht committed.
-
-`FINAL_CANCEL` ist ein vom Command beziehungsweise System ausgelöster Abbruch. Guards und Exceptions führen in diesen Abschluss. Registrierte normale Session Operations werden nicht als erfolgreicher Check-in ausgeführt. Für Fehlerstatus, Marker oder Journale stehen gesonderte Cancel-Operationen zur Verfügung, die in einem dafür vorgesehenen privaten Transaktionskontext ausgeführt werden.
+`FINAL_CANCEL` ist ein vom Command beziehungsweise System ausgelöster Abbruch. Guards und Exceptions führen in diesen Abschluss. Registrierte normale Session-Operationen werden nicht als erfolgreicher Check-in ausgeführt. Für Fehlerstatus, Marker oder Journale stehen gesonderte Cancel-Operationen zur Verfügung, die in einem dafür vorgesehenen privaten Transaktionskontext ausgeführt werden.
 
 `FINAL_USER_CANCEL` entsteht durch eine bewusste Benutzeraktion, insbesondere Escape, Zurück oder Schließen. Die Command-Option `NO_ESC` deaktiviert den Abbruch über Escape.
 
@@ -674,7 +667,7 @@ Bei Listen hängt diese Revert-Kopie von der Veränderbarkeit ihrer Elemente ab:
 
 - Bei `FINAL_CANCEL` und `FINAL_USER_CANCEL` wird der ursprüngliche Zustand wiederhergestellt.
 - Wird die Wurzel eines Graphen angegeben, wird der gesamte darunterliegende Objekt-Graph zurückgesetzt.
-- Session Operations eines abgebrochenen `GRAPH_EDIT_CMD` werden durch Revert nicht aus dem Stack entfernt.
+- Session-Operationen eines abgebrochenen `GRAPH_EDIT_CMD` werden durch Revert nicht aus dem Stack entfernt.
 
 Revert ist ausdrücklich auf die unter `revert on FINAL_ / USER_CANCEL` aufgeführten Parameter und Variablen begrenzt. Das ist bei einem `GRAPH_EDIT_CMD` besonders wichtig, weil er in der Session seines Parent-Commands arbeitet: Verändert das Child einen gemeinsam genutzten Graphen und ist dessen Wurzel beim Child nicht als Revert-Objekt angegeben, bleiben diese In-Memory-Änderungen auch nach einem Benutzerabbruch des Childs im Parent sichtbar. Sollen sämtliche Änderungen des Childs verworfen werden, wird deshalb die gemeinsam bearbeitete Graph-Wurzel als Revert-Objekt des Child-Commands angegeben.
 
@@ -722,22 +715,6 @@ Fehlt ein optionaler String oder Status Parameter, liefert die Laufzeit `null`; 
 
 Die ObjectFlow-Session begleitet den Command-Ablauf und hält die geladenen beziehungsweise neu integrierten Objekte. Sie ist längerlebig als die Datenbanktransaktion des abschließenden Check-ins.
 
-```text
-Session Owner startet
-        │
-        ├── Entities read-only laden
-        ├── Entities auschecken
-        ├── Graph bearbeiten
-        ├── GRAPH_EDIT-Commands ausführen
-        └── Session Operations registrieren
-                    │
-                    ▼
-                 FINAL_OK
-                    │
-                    ▼
-       kurze Datenbanktransaktion + Commit
-```
-
 Das Konzept `session` (`Session`) gibt bei Bedarf direkten Zugriff auf Interna der aktuellen Session. Es ist für Fälle gedacht, die durch die höherwertigen Sprachkonzepte nicht abgedeckt werden. Direkter Session-Zugriff erhöht die Kopplung an die Laufzeit und sollte deshalb gezielt bleiben.
 
 Neu erzeugte Entities müssen Teil der Session werden, bevor Session- und UI-Mechanismen sie als bearbeiteten Graphen behandeln können. Dafür stellt die Session `session.ensureInSession(<Entity>)` bereit.
@@ -777,7 +754,7 @@ Die Varianten mit Entities liefern die tatsächlichen Session-Instanzen und mach
 
 ### Command nach dem Commit einplanen
 
-`session queue next command` (`SessionQueueNextCommand`) plant einen Command für die Zeit nach dem erfolgreichen Abschluss des Session Owners. Der geplante Command startet erst, wenn Session Operations und Commit erfolgreich abgeschlossen sind.
+`session queue next command` (`SessionQueueNextCommand`) plant einen Command für die Zeit nach dem erfolgreichen Abschluss des Session Owners. Der geplante Command startet erst, wenn Session-Operationen und Commit erfolgreich abgeschlossen sind.
 
 - Bei `FINAL_CANCEL` wird er nicht gestartet.
 - Bei fehlgeschlagenem Commit wird er nicht gestartet.
@@ -814,7 +791,6 @@ Bei einem Merge mit Session benötigt die Quelle einen gesetzten Schlüssel. Exi
 
 Für die weitere Verarbeitung ist stets der Rückgabewert des Merge-Ausdrucks zu verwenden. Nur er bezeichnet zuverlässig die bereits vorhandene oder neu erzeugte Zielinstanz. Ein Objektgraph wird bewusst in mehreren Schritten integriert: Root-Entity, enthaltene Listen und fachlich relevante Referenzen werden mit der jeweils passenden Merge-Form behandelt.
 
-
 ### Successor-Commands
 
 Ein Command kann Successor-Commands deklarieren. Sie modellieren einen fachlichen Folgeablauf, der aus dem Abschluss des aktuellen Commands hervorgeht. Davon zu unterscheiden ist `session queue next command`: Dieses Konzept plant gezielt einen Command nach erfolgreichem Commit des Session Owners.
@@ -839,7 +815,7 @@ Das Beispiel ist Pseudocode. Der Ablauf unterscheidet sich wesentlich von zwei n
 
 1. `done` macht den Vorgänger bereit für `FINAL_OK`, dessen Ausführung wird wegen des Successors aber zunächst zurückgestellt.
 2. Die erste passende Successor-Bedingung bestimmt den Ziel-Command.
-3. Der Successor startet im selben UI-Container und ausdrücklich ohne neue Session. Er arbeitet daher am selben Objektgraphen und an denselben registrierten Session Operations.
+3. Der Successor startet im selben UI-Container und ausdrücklich ohne neue Session. Er arbeitet daher am selben Objektgraphen und an denselben registrierten Session-Operationen.
 4. Erst wenn der Successor erfolgreich endet, laufen zuerst dessen und anschließend die zurückgestellte `FINAL_OK`-Logik des Vorgängers. Der äußerste Session Owner führt danach den gemeinsamen Commit aus.
 5. Abbruch oder Fehler des Successors werden auf den Vorgänger fortgesetzt; der Gesamtverbund erreicht dann keinen erfolgreichen Commit.
 
@@ -847,12 +823,11 @@ Successors eignen sich damit für mehrere unmittelbar aufeinanderfolgende Oberfl
 
 `session queue next command` setzt dagegen eine Commit-Grenze: Der aktuelle Session Owner wird zuerst vollständig abgeschlossen und persistiert, erst danach beginnt der geplante Command. Es ist deshalb die passendere Wahl, wenn der Folgeablauf den bereits committed Zustand benötigt oder eine eigenständige Unit of Work bilden soll.
 
-
 ### Mehrfachausführung von GRAPH_OWNER / GRAPH_EDIT
 
-Wählt ein Benutzer in einer DataUX-Tabelle mehrere Zeilen aus, kann eine gewöhnliche `Action` denselben Command automatisch nacheinander für jede ausgewählte Zeile starten. Der Command bleibt dabei auf genau ein Objekt ausgerichtet: Ein Parameter oder ein ausdrücklich an der Action angegebenes Argument verwendet `getSelected(Typ)` (`SelectedObject`). Vor jedem Einzellauf ersetzt die Laufzeit die aktuelle Auswahl vorübergehend durch das nächste Tabellenobjekt und berechnet damit die Argumente erneut. Im Command ist deshalb weder eine Schleife noch ein Listenparameter erforderlich.
+Wählt ein Benutzer in einer DataUX-Tabelle mehrere Zeilen aus, kann eine gewöhnliche DataUX-`Action` (`org.modellwerkstatt.dataux.structure.MenuAction`) denselben Command automatisch nacheinander für jede ausgewählte Zeile starten. Der Command bleibt dabei auf genau ein Objekt ausgerichtet: Ein Parameter oder ein ausdrücklich an der Action angegebenes Argument verwendet `getSelected(Typ)`. Vor jedem Einzellauf ersetzt die Laufzeit die aktuelle Auswahl vorübergehend durch das nächste Tabellenobjekt und berechnet damit die Argumente erneut. Im Command ist deshalb weder eine Schleife noch ein Listenparameter erforderlich.
 
-Diese automatische Mehrfachausführung wird nur angeboten, wenn die Action tatsächlich von der gebundenen Tabellenselektion abhängt. Bei einer Tabellenaction muss mindestens ein verwendetes `getSelected(Typ)` genau zum Zeilentyp der Tabelle passen. Enthält die Action beziehungsweise die Default-Parametrisierung dagegen `getSelectedObjects()` (`SelectedList`), behandelt die Laufzeit die gesamte Auswahl als ein einziges Argument und aktiviert die beschriebene Einzelausführung nicht. Commands mit Successors werden ebenfalls nicht auf diese Weise mehrfach gestartet.
+Diese automatische Mehrfachausführung wird nur angeboten, wenn die Action tatsächlich von der gebundenen Tabellenselektion abhängt. Bei einer Tabellenaction muss mindestens ein verwendetes `getSelected(Typ)` genau zum Zeilentyp der Tabelle passen. Enthält die Action beziehungsweise die Default-Parametrisierung dagegen `getSelectedObjects()`, behandelt die Laufzeit die gesamte Auswahl als ein einziges Argument und aktiviert die beschriebene Einzelausführung nicht. Commands mit Successors werden ebenfalls nicht auf diese Weise mehrfach gestartet.
 
 Die konkrete Command-Form bestimmt, ob eine normale Action potentiell mehrfach ausführbar ist:
 
@@ -868,12 +843,23 @@ Das Weiterlaufen eines page-losen `GRAPH_OWNER_CMD` bezieht sich auf einen regul
 
 Damit deckt die normale Command- und Action-Infrastruktur viele interaktive Stapelanforderungen bereits ab. Ein eigener Sammel-Command mit `getSelectedObjects()` ist erst nötig, wenn die Auswahl als Ganzes fachlich ausgewertet werden muss, eine gemeinsame Fortschritts- oder Ergebnislogik verlangt wird oder alle Elemente ausdrücklich in einer selbst definierten Gesamtoperation koordiniert werden sollen.
 
+## Teil IV – Tests mit ObjectFlow
 
-## Teil IV – Testing mit ObjectFlow
+Dieser Teil beschreibt Integrationstests auf der Abstraktionsebene der ObjectFlow-, ManMap- und Command-Laufzeit.
+
+### Kapitellandkarte: Tests
+
+| Name | Konzeptname | FQ-Name | Aufgabe |
+| --- | --- | --- | --- |
+| `OFX Test Suit` | `OFXTestSuit` | `org.modellwerkstatt.objectflow.structure.OFXTestSuit` | Definiert eine ausführbare Testsuite mit eigener Konfiguration. |
+| `Simple Test` | `OFXTestMethod` | `org.modellwerkstatt.objectflow.structure.OFXTestMethod` | Beschreibt einen Test mit eigener ObjectFlow-Session. |
+| `run command` | `OFXRunCmd` | `org.modellwerkstatt.objectflow.structure.OFXRunCmd` | Führt einen vollständigen Command ohne Benutzeroberfläche aus. |
+| Run-Command-Page | `OFXRunCmdPage` | `org.modellwerkstatt.objectflow.structure.OFXRunCmdPage` | Beschreibt eine erwartete Page und ihre erzwungene Conclusion. |
+| Successor-Handler | `OFXRunCmdSuccessorHandler` | `org.modellwerkstatt.objectflow.structure.OFXRunCmdSuccessorHandler` | Behandelt einen erwarteten Successor-Command im Test. |
 
 ### `OFX Test Suit`
 
-Eine `OFX Test Suit` (`OFXTestSuit`) ist eine eigenständig ausführbare Testsuite. Sie referenziert eine `OFX Config`, stellt konfigurierte Komponenten bereit und kann Start-/Ende-Logik sowie mehrere `Simple Test`s enthalten.
+Eine `OFX Test Suit` ist eine eigenständig ausführbare Testsuite. Sie referenziert eine `OFX Config`, stellt konfigurierte Komponenten bereit und kann Start-/Ende-Logik sowie mehrere `Simple Test`s enthalten.
 
 Die eigene Test-DSL ist der Ersatz für JUnit. Sie ist für Integrationstests auf derselben Abstraktionsebene wie ObjectFlow gedacht: Komponenten werden über eine echte `OFX Config` aufgelöst, jeder Test erhält einen definierten Session- und Benutzerkontext, Repository- und Serviceaufrufe verwenden `OperationCall`, und Commands können mitsamt Pages, Conclusions, Successors und Problembehandlung ohne UI ausgeführt werden. `OFXTestSuit` ist immer vorzuziehen, da die Semantik der ObjectFlow-, ManMap- oder Command-Laufzeit so Teil der Tests ist.
 
@@ -946,8 +932,6 @@ assert gespeicherteRechnungId == rechnungsId;
 
 Die Testbeschreibung simuliert damit die Entscheidungen, die sonst ein Benutzer über die UI trifft. Die DataUX-Darstellung wird nicht benötigt. UI-abhängige Mechanismen wie `session queue next command` werden bei einer Ausführung ohne UI ignoriert.
 
-
-
 ### Typische Testebenen
 
 ObjectFlow unterstützt insbesondere folgende Testformen:
@@ -968,6 +952,18 @@ Die von der Testsuite verwendete `OFX Config` kennzeichnet deshalb die vollstän
 Für dasselbe Basis-Repository können mehrere Test-Repositories existieren, etwa für einen leeren Datenbestand, einen typischen Erfolgsfall oder einen simulierten Fehler. Die jeweilige Testkonfiguration wählt genau die benötigte Implementierung aus. Dadurch bleiben Service und Command unverändert und werden trotzdem mit einem gezielt kontrollierten Repository-Verhalten ausgeführt. Die Vererbung allein aktiviert das Test-Repository nicht; entscheidend ist seine Instanziierung und Auswahl in der tatsächlich von der Testsuite referenzierten Konfiguration.
 
 ## Teil V – Querschnittsthemen
+
+Dieser Teil beschreibt Konfiguration, Benutzerkontext, Berechtigungen, gemeinsame Ressourcen, Logging und Serialisierung.
+
+### Kapitellandkarte: Querschnittsthemen
+
+| Name | Konzeptname | FQ-Name | Aufgabe |
+| --- | --- | --- | --- |
+| `OFX Config` | `OFXConfig` | `org.modellwerkstatt.objectflow.structure.OFXConfig` | Konfiguriert Laufzeitkomponenten und ihre Abhängigkeiten. |
+| `isAuthenticated` | `AppAuthenticationFunction` | `org.modellwerkstatt.dataux.structure.AppAuthenticationFunction` | Initialisiert in einer interaktiven Anwendung den Benutzerkontext. |
+| Roles and Permissions | `RolesAndPermissions` | `org.modellwerkstatt.objectflow.structure.RolesAndPermissions` | Bündelt Rollen, Scopes und Identities. |
+| Static Ressources | `StaticRessources` | `org.modellwerkstatt.objectflow.structure.StaticRessources` | Bündelt wiederverwendbare Bezeichnungen und Farben. |
+| log | `LogStatement` | `org.modellwerkstatt.objectflow.structure.LogStatement` | Schreibt strukturierte technische und fachliche Diagnoseinformationen. |
 
 ### Konfiguration mit `OFX Config`
 
@@ -996,7 +992,7 @@ Services und Repositories werden über diese Konfiguration zu Laufzeitkomponente
 
 Die User Environment stellt den technischen und fachlichen Benutzerkontext einer laufenden Anwendung oder eines Jobs bereit. ObjectFlow-Ausdrücke können über die Session auf User Environment und User Service zugreifen. Typische Verwendungen sind Berechtigungsprüfung, Auswahl eines fachlichen Mandanten beziehungsweise Standorts und Auditinformationen.
 
-Bei einer interaktiven Anwendung ist [`isAuthenticated`](dataux.md#application-mit-appui-module-appuimodule) (`AppAuthenticationFunction`, FQ-Name `org.modellwerkstatt.dataux.structure.AppAuthenticationFunction`) der vorgesehene Initialisierungspunkt. Die Funktion erhält `session`, `userEnvironment`, `username` und `password` und liefert ein `boolean`. Sie authentifiziert den Benutzer und befüllt anschließend die User Environment selbst oder ruft dafür einen Service auf. Das Bereitstellen der Parameter allein setzt weder Benutzername noch Benutzer-ID automatisch.
+Bei einer interaktiven Anwendung ist [`isAuthenticated`](dataux.md#anwendung-mit-appui-module) der vorgesehene Initialisierungspunkt. Die Funktion erhält `session`, `userEnvironment`, `username` und `password` und liefert ein `boolean`. Sie authentifiziert den Benutzer und befüllt anschließend die User Environment selbst oder ruft dafür einen Service auf. Das Bereitstellen der Parameter allein setzt weder Benutzername noch Benutzer-ID automatisch.
 
 | Verwendungskontext | Information oder Dienst | Relevante Methode | Vorgabe |
 | --- | --- | --- | --- |
@@ -1006,7 +1002,7 @@ Bei einer interaktiven Anwendung ist [`isAuthenticated`](dataux.md#application-m
 | nur in `isAuthenticated` | Branding | `userEnvironment.setBrandingId(int)` | Wählt das zur Anmeldung beziehungsweise zum Mandanten gehörende Branding |
 | während der Anwendung nur lesend | Gerätedaten | `getDeviceName()`, `getDeviceSwName()`, `getDeviceId()` | Werden von der Laufzeit gesetzt; Anwendungslogik fragt sie nur ab |
 | auch nach der Anmeldung | dynamische Statusinformation | `userEnvironment.setDynamicStatusInfo(String)` | Kann laufenden fachlichen Kontext anzeigen; umfangreichere Benutzerlogik gehört in einen Service |
-| im Session-Kontext | User Service | `session.getUserServices()` | Liefert `IOFXUserServices`; die Application-Runtime stellt denselben Dienst über `getUserService()` bereit |
+| im Session-Kontext | User Service | `session.getUserServices()` | Liefert `IOFXUserServices`; die Anwendungs-Laufzeit stellt denselben Dienst über `getUserService()` bereit |
 
 Außerhalb der Authentifizierungsfunktion liefert der Ausdruck `session` (`Session`, FQ-Name `org.modellwerkstatt.objectflow.structure.Session`) die aktuelle ObjectFlow-Session. Innerhalb von `isAuthenticated` wird der gleich dargestellte Parameter durch `UserAuthSession` (`org.modellwerkstatt.objectflow.structure.UserAuthSession`) repräsentiert; `userEnvironment` ist dort ein `UserEnvironmentParameter`. Anwendungslogik soll den Kontext über diese Zugriffe lesen und keine eigene globale Benutzerinstanz führen.
 
@@ -1037,12 +1033,11 @@ Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN
 
 Scopes sind nicht nur Berechtigungsflags, sondern liefern eine eingeschränkte Objektmenge. Sie können Parameter und lokale Variablen besitzen und Services beziehungsweise Repositories über `OperationCall` verwenden.
 
-Eine statische Rolle (`StaticRole`) besitzt eine Funktion `is(userEnvironment) -> boolean` (`StaticRoleFunc`). Diese Funktion kann den Benutzerkontext auswerten und über `#` (`OperationCall`) Services oder Repositories befragen. Über `is also / can also` werden weitere Rollen mit `StaticRoleReference` referenziert und hierarchisch zusammengesetzt: Erfüllt ein Benutzer eine übergeordnete Rolle, erfüllt er damit auch die eingeschlossenen Rollen. Dadurch bleiben Command-Berechtigungen stabil, auch wenn die konkrete Ermittlung später geändert wird.
+Eine statische Rolle (`StaticRole`) besitzt eine Funktion `is(userEnvironment) -> boolean` (`StaticRoleFunc`). Diese Funktion kann den Benutzerkontext auswerten und über `#` Services oder Repositories befragen. Über `is also / can also` werden weitere Rollen mit `StaticRoleReference` referenziert und hierarchisch zusammengesetzt: Erfüllt ein Benutzer eine übergeordnete Rolle, erfüllt er damit auch die eingeschlossenen Rollen. Dadurch bleiben Command-Berechtigungen stabil, auch wenn die konkrete Ermittlung später geändert wird.
 
 Dasselbe Sprachmittel kann für lizenz-, mandanten- oder installationsabhängige Features verwendet werden. Eine statische Rolle prüft dann nicht eine organisatorische Benutzerrolle, sondern ob ein Feature im aktuellen fachlichen Kontext aktiviert ist. Features lassen sich hierarchisch zu Ausbaustufen bündeln und anschließend genauso in `CAN_OPEN_RO`, `CAN_OPEN_RW` oder `generally enabled` referenzieren wie klassische Rollen. Fachliche Rolle und Feature sollten trotz gleicher Technik in getrennten `RolesAndPermissions`-Roots und mit eindeutigen Namen modelliert werden.
 
 Die Ergebnisse statischer Rollen werden in der User Environment gecacht. Ändert sich während einer Anmeldung der zugrunde liegende Benutzer-, Rollen- oder Featurekontext, muss der Rollencache mit `clearCachedValues(false)` invalidiert werden. Identitäten bleiben dabei erhalten; `clearCachedValues(true)` verwirft zusätzlich den Identity-Cache.
-
 
 ### Statische Ressourcen
 
@@ -1100,7 +1095,6 @@ Für einfache Fälle steht `CONV.CONV_DEFAULT_EN` als fertige Implementierung vo
 
 Die generierte Datenstruktur ist dabei die maßgebliche Schemasicht: Zusätzliche Eingangsfelder dürfen vorhanden sein, während die Behandlung fehlender Felder von den gewählten Modi abhängt. Formatfehler, fehlende Pflichtfelder und strukturell unpassende JSON- oder XML-Daten führen zu `SerdesException`; technische Reflexions- und Sicherheitsfehler werden als RuntimeException weitergegeben. Serdes ersetzt keine fachliche Validierung des deserialisierten Graphen.
 
-
 ## Häufige Fehler und Diagnose
 
 - **Service oder Repository direkt als Java-Objekt aufrufen:** Dadurch wird die Komponenten-, Session- und Transaktionssemantik von `OperationCall` umgangen.
@@ -1137,6 +1131,11 @@ Die generierte Datenstruktur ist dabei die maßgebliche Schemasicht: Zusätzlich
 - **`#Meta` als fachliche Validierung verwenden:** Deaktivierte oder eingeschränkte UI-Eingaben ersetzen keine serverseitige Precondition oder Validierung.
 - **Name und Konzeptname verwechseln:** Name, Konzeptname und FQ-Name nach der eingangs festgelegten Schreibweise unterscheiden.
 
+## Weiterführende Dokumentation
+
+- [MoWare-Werkbank im Überblick](moware-werkbank.md)
+- [ManMap – Persistenz und Lesemodelle](manmap.md)
+- [DataUX – Benutzeroberflächen und ausführbare Module](dataux.md)
 
 ## Konzeptindex für Agenten
 
@@ -1229,3 +1228,7 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 | Ressourcen | Label | `Label` | `org.modellwerkstatt.objectflow.structure.Label` |
 | Ressourcen | Color | `Color` | `org.modellwerkstatt.objectflow.structure.Color` |
 | Observability | log | `LogStatement` | `org.modellwerkstatt.objectflow.structure.LogStatement` |
+
+## Dokumentstand
+
+Diese Dokumentation beschreibt ObjectFlow, Stand September 2026, auf Basis von JetBrains MPS 2026.1.
