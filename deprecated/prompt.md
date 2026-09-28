@@ -13,7 +13,7 @@
   - json plugin manifest
   - ? 
 
-- Readme anpassen
+- Readme anpassen.. 
 - Erster Testlauf für PetClinic. Was ist in der Doku zu Verbessern, was in den beteiligten dsl skills. Welche Verbesserungen hätten positive Konsquenzen? Was bietet sich an? Lass uns das erst diskutieren.    
 
 

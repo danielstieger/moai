@@ -26,6 +26,7 @@ Rules that, if violated, make the AST fail structural / assignability / typesyst
 
 ## Method Bodies
 * **Mandatory Body**: Interface and abstract methods still require an empty `StatementList` in the `body` role.
+* **Implicit Return**: The final expression of a method is returned implicitly; do not add a `ReturnStatement` solely for that result.
 
 ## Variable Declarations
 * `LocalVariableDeclaration` must be wrapped in `LocalVariableDeclarationStatement` in method bodies.
