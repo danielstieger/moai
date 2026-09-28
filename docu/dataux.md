@@ -11,6 +11,8 @@ DataUX verbindet zwei Aufgabenbereiche:
 
 Die Sprache beschreibt vor allem, **welche fachlichen Daten wie visualisiert werden**. Generator und Laufzeit übernehmen die technische Umsetzung. An dafür vorgesehenen Stellen können BaseLanguage-Ausdrücke eingebettet werden, etwa für Beschriftungen, Farben, Bedingungen, Command-Argumente oder Lebenszykluslogik.
 
+§ können wir hier noch erwähnen, dass es eine ApiDescription gibt, die ist nicht mehr zu verwenden! Deprecaterd §
+
 ### Schreibkonventionen
 
 Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der **Konzeptname** bezeichnet das technische AST-Konzept; der **FQ-Name** ist dessen vollständig qualifizierter Name. Die Kapitellandkarten führen alle drei Bezeichnungen zusammen; bei dort fehlenden Konzepten ergänzt der Fließtext beim ersten Auftreten den Konzeptnamen beziehungsweise bei Konzepten aus anderen Sprachen den FQ-Namen in Klammern und verwendet danach nur noch den Namen.
