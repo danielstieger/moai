@@ -96,7 +96,7 @@ Der Editor schränkt den Typ einer Business Property bewusst ein. Die folgende L
 | deklarierte Entity | `org.modellwerkstatt.objectflow.structure.Entity` | Referenziert eine sichtbare ObjectFlow-Entity und bildet eine Beziehung im fachlichen Objektgraphen. |
 | deklariertes Value Object | `org.modellwerkstatt.objectflow.structure.ValueObject` | Verwendet einen sichtbaren zusammengesetzten fachlichen Wert. |
 | deklariertes DTO | `org.modellwerkstatt.objectflow.structure.DTO` | Referenziert einen sichtbaren anwendungsbezogenen Datencontainer. |
-| `list<T>` | `jetbrains.mps.baseLanguage.collections.structure.ListType` | Modelliert eine Liste. Der Elementtyp `T` soll wiederum ein für die fachliche Datenstruktur geeigneter Typ sein. |
+| `list<T>` | `jetbrains.mps.baseLanguage.collections.structure.ListType` | Modelliert eine Liste. Der Elementtyp `T` kann wiederum eine Enität oder ein DTO sein. |
 | `byte[]` | `jetbrains.mps.baseLanguage.structure.ArrayType` mit `jetbrains.mps.baseLanguage.structure.ByteType` | Binärdaten, beispielsweise ein Dokument oder Bildinhalt. |
 
 ManMap-Persistenzoptionen an einer Business Property werden von ManMap ausgewertet. Ihre genaue Wirkung ist in [manmap.md](manmap.md) beschrieben.
@@ -242,29 +242,35 @@ Eine grundsätzlich gültige Domänenregel liegt damit in einer Entity, einem Va
 
 ### Service-Methoden
 
-Eine Service Method (`ServiceInstanceMethodDeclaration`) besitzt Parameter, Rückgabetyp, Body und optional Preconditions. Zwei Methodenoptionen verändern ihre technische Verwendung:
+Eine Service Method (`ServiceInstanceMethodDeclaration`) besitzt Parameter, Rückgabetyp, Body und optional Preconditions. Für ihre technische Verwendung stehen unter anderem diese beiden Optionen zur Verfügung:
 
 | Name | Konzeptname | Bedeutung |
 | --- | --- | --- |
-| `API_METHOD` | `SimdApiMethod` | Kennzeichnet eine für die API-Integration vorgesehene Service Method |
-| `TO_SESSION_OPS` | `SimdToSessionOps` | Der Aufruf wird im passenden Session-Kontext nicht sofort ausgeführt, sondern als Session-Operation registriert |
+| `API_METHOD` | `SimdApiMethod` | Kennzeichnet eine für die API-Integration vorgesehene Service Method; die Klassifikation eines `OperationCall` wird dadurch nicht verändert |
+| `TO_SESSION_OPS` | `SimdToSessionOps` | Kennzeichnet die Methode als Session-Operation; aufgeschoben wird ihr Aufruf jedoch nur in der `FINAL_OK` eines Commands |
 
 Eine Methode mit `TO_SESSION_OPS` darf keine Preconditions besitzen. Eine solche Precondition würde erst während der Transaktionsausführung geprüft; die Laufzeit lehnt diese Kombination mit einer RuntimeException ab.
 
 ### Komponenten mit `#` aufrufen
 
-Service- und Repository-Methoden werden mit dem Komponentenaufruf `#` aufgerufen. Er ist nicht nur eine kürzere Schreibweise für einen Java-Methodenaufruf: Er kennt die konfigurierte Komponenteninstanz, die aktuelle Session und die Methodenart. Dadurch kann die Laufzeit entscheiden, ob der Aufruf sofort erfolgt oder als Session-Operation registriert wird.
+Service- und Repository-Methoden müssen mit dem Komponentenaufruf `#` aufgerufen werden. Er ist nicht nur eine kürzere Schreibweise für einen Java-Methodenaufruf. Das Sprachkonzept referenziert die konfigurierte Komponente und ihre Methode und kann optional einen expliziten Session-Ausdruck enthalten. Entscheidend ist außerdem, ob der Aufruf im `FINAL_OK`-Kontext eines Commands verwendet wird.
 
 | Ziel des `OperationCall` | Typisches Verhalten |
 | --- | --- |
 | Normale Service Method | Wird unmittelbar ausgeführt |
-| Service Method mit `TO_SESSION_OPS` | Wird im transaktionsfähigen Abschlusskontext als Session-Operation registriert |
-| ManMap-`READONLY`-Methode | Wird unmittelbar in der aktuellen Session ausgeführt |
+| Service Method mit `TO_SESSION_OPS` außerhalb von `FINAL_OK` | Wird als normaler Serviceaufruf klassifiziert und nicht automatisch als Session-Operation registriert |
+| Service Method mit `TO_SESSION_OPS` in `FINAL_OK` | Wird als Session-Operation registriert, nicht sofort ausgeführt |
+| ManMap-`READONLY`-Methode | Wird unmittelbar mit der aktuellen Session ausgeführt |
 | ManMap-`CHECKOUT`-Methode | Wird unmittelbar ausgeführt und integriert geladene Entities veränderbar in die Session |
-| ManMap-`CHECKIN`- oder `DELETE`-Methode in `FINAL_OK` | Wird automatisch als Session-Operation registriert |
-| Dafür vorgesehener Aufruf in `FINAL_CANCEL` | Wird als Cancel-/Marker- beziehungsweise Journal-Operation in dem dafür vorgesehenen Cancel-Transaktionskontext behandelt |
+| ManMap-`CHECKIN`- oder `DELETE`-Methode außerhalb von `FINAL_OK` | Wird als Serviceaufruf klassifiziert und nicht automatisch als Session-Operation registriert |
+| ManMap-`CHECKIN`- oder `DELETE`-Methode in `FINAL_OK` | Wird als Session-Operation registriert |
+| Aufruf an der Position `cancelMarkerOperation` oder `cancelJournalOperation` im Command | Wird als dafür vorgesehene Cancel-Operation behandelt; eigene Transaktion, Session-Operations werden nicht abgearbeitet |
 
-Für normale fachliche Aufrufe ist `OperationCall` zu verwenden. Ein direkter Java-Aufruf ist nicht möglich. Er würde die Komponenten-, Session- und Transaktionssemantik umgehen.
+Ein beliebiger Aufruf innerhalb von `FINAL_CANCEL` ist damit noch keine Cancel-Operation. Dafür muss der `OperationCall` ausdrücklich in der strukturell vorgesehenen Marker- oder Journal-Position stehen.
+
+Für normale fachliche Aufrufe ist `OperationCall` zu verwenden. Ein direkter Java-Aufruf ist gar nicht möglich. Er würde die Komponenten-, Session- und Transaktionssemantik umgehen.
+
+Der optionale Session-Ausdruck eines `OperationCall` übergibt ausschließlich für diesen Aufruf eine Custom Session an die aufgerufene Komponente. Ohne diesen Ausdruck verwendet der Aufruf die Session des aktuellen Kontexts. Dies ermöglicht einen gezielten Session-Wechsel innerhalb eines bereits bestehenden Session-Kontexts, beispielsweise in einer Service Method. Eine weitere Service- oder Repository-Methode kann dadurch mit einer anderen Session ausgeführt werden. Damit lässt sich ein Objekt unabhängig von den bereits ausgecheckten Entities der aktuellen Session laden oder auschecken; insbesondere kann so ein Double-Checkout in derselben Session bewusst vermieden werden. Eine separat verwaltete Custom Session kann außerdem für eine kurze, eigenständige Transaktion verwendet werden, deren Commit nicht vom späteren Abschluss der äußeren Session abhängt. Der Session-Ausdruck soll sparsam eingesetzt werden, weil die Transaktionsgrenze am Aufruf nicht ohne Weiteres erkennbar ist. Ein Commit in der Custom Session wird durch einen späteren Abbruch der äußeren Session nicht zurückgenommen (zudem doppelter  Objektbestand, unterschiedliche Instanzen, etc.). 
 
 ### Explizite Session-Operationen
 
@@ -275,7 +281,7 @@ Das hat zwei wichtige Konsequenzen:
 1. Ein Rückgabewert oder eine durch den späteren Aufruf vorgenommene Änderung ist direkt nach `session operation add` noch nicht verfügbar.
 2. Wird beispielsweise beim späteren Insert eine Entity-ID vergeben, kann diese ID nicht unmittelbar nach der Registrierung ausgegeben oder verwendet werden.
 
-Service Methods mit `TO_SESSION_OPS` und passende ManMap-`CHECKIN`-/`DELETE`-Methoden übernehmen diese Registrierung automatisch, wenn sie in dem dafür vorgesehenen Kontext per `OperationCall` aufgerufen werden. Die zwei oben genannten Konsequenzen gelten dann ebenfalls.
+Service Methods mit `TO_SESSION_OPS` und passende ManMap-`CHECKIN`-/`DELETE`-Methoden übernehmen diese Registrierung automatisch, wenn sie in `FINAL_OK` per `OperationCall` aufgerufen werden. Die zwei oben genannten Konsequenzen gelten dann ebenfalls. In allen anderen Fällen ist `session operation add` zu verwenden, wenn der Aufruf bewusst erst beim erfolgreichen Abschluss des Session Owners ausgeführt werden und an dessen gemeinsamer Transaktion teilnehmen soll. Das ist nur sinnvoll, wenn sein Ergebnis nicht bereits im laufenden Programmfluss benötigt wird und der umgebende Session Owner die registrierten Operationen tatsächlich ausführt.
 
 ### Preconditions, Validation, Guards und Exceptions
 
@@ -427,7 +433,7 @@ Dieser Teil beschreibt ausführbare Anwendungsfälle, ihre Pages, Abschlüsse, S
 | session merge | `MergeInto` | `org.modellwerkstatt.objectflow.structure.MergeInto` | Übernimmt Objekte gezielt in eine übergeordnete Session. |
 | session queue next command | `SessionQueueNextCommand` | `org.modellwerkstatt.objectflow.structure.SessionQueueNextCommand` | Plant einen Command nach erfolgreichem Commit ein. |
 
-Ein `Command` modelliert einen ausführbaren Anwendungsfall oder einen abgegrenzten Teil einer Benutzerinteraktion. Er verbindet Eingaben, lokalen Ablaufzustand, fachliche Prüfungen, Pages und den erfolgreichen oder fehlerhaften Abschluss mit einer klaren Session-Grenze. Ein Command ist damit weder bloß eine UI-Aktion noch nur eine Methode: Er beschreibt den gesamten kontrollierten Ablauf zwischen Aufruf und Termination. Der Name von Commands wird nicht in CamelCase geschrieben, sondern darf Leerzeichen enthalten.
+Ein `Command` modelliert einen ausführbaren Anwendungsfall oder einen abgegrenzten Teil einer Benutzerinteraktion. Er verbindet Eingaben, lokalen Ablaufzustand, fachliche Prüfungen, Pages und den erfolgreichen oder fehlerhaften Abschluss mit einer klaren Session-Grenze. Ein Command ist damit weder bloß eine UI-Aktion noch nur eine Methode: Er beschreibt den gesamten kontrollierten Ablauf zwischen Aufruf und Termination. Der Name von Commands wird nicht in CamelCase geschrieben, sondern soll Leerzeichen enthalten!
 
 Bevor eine Command-Aktion gestartet werden kann, müssen ihre Parameter beziehungsweise Default-Selektionen verfügbar sein, alle Ausdrücke unter `generally enabled` `true` liefern und eine passende Command-Berechtigung erfüllt sein. Die Berechtigungen heißen konkret `CAN_OPEN_RO` für lesenden und `CAN_OPEN_RW` für ändernden Zugriff und werden jeweils mit einer Rolle verbunden. Eine Rollenprüfung kann zusätzlich Teil von `generally enabled` sein, soll die deklarierte Command-Berechtigung aber nicht ersetzen.
 
@@ -766,24 +772,35 @@ Jeder solche Übergang bildet eine klare Sicherungsgrenze: Erst der erfolgreiche
 
 ### Explizites Command-Termination-Handling und Session Merge
 
-Im alten Termination-Modus übernahm beziehungsweise ersetzte die Laufzeit gepushte Entities in einem `SEARCH_CMD` teilweise automatisch. Die Option `NEWSTYLE_CMD_TERM_HANDLING` deaktiviert diesen Automatismus.
+Im alten Termination-Modus übernahm beziehungsweise ersetzte die Laufzeit gepushte Entities in einem `SEARCH_CMD` teilweise automatisch. Die Option `NEWSTYLE_CMD_TERM_HANDLING` deaktiviert diesen Automatismus. Damit ist das `NEWSTYLE_CMD_TERM_HANDLING` das präferierte Pattern.
 
-Der Parent reagiert stattdessen in einem Command-Termination-Handler auf das beendete Child:
+Die Verarbeitung übernimmt stattdessen ein `cmdTermHandler` (`PageCmdTermHandler`) an einer Page des weiterhin aktiven Commands. Welcher Command auf eine Termination reagiert, hängt vom `CmdTermType` des Handlers ab:
+
+| `CmdTermType` | Ausgelöste Termination |
+| --- | --- |
+| `ChildCmdTerminated` | Nur die Termination eines Child-Commands; der Command mit dem Handler ist in diesem Fall dessen Parent |
+| `AnyCmdTerminated` | Auch andere Command-Terminationen, die an den Command-Container verteilt werden; der Handler kann unterscheiden, ob das beendete Command ein Child war |
+
+Ein Handler kann zusätzlich auf einen Classifier eingeschränkt werden. Dann verarbeitet er nur die dazu passenden gepushten Objekte. Der Ablauf lautet:
 
 1. Das Child pusht ein oder mehrere Objekte bei seinem Abschluss.
-2. Der Parent erhält diese Objekte im Termination-Handler.
-3. `session merge` (`MergeInto`) integriert die relevanten Werte explizit in ein Zielobjekt beziehungsweise eine Zielliste des Parent-Graphen.
+2. Ein für diese Termination passender Handler erhält die Abschlussinformation und gegebenenfalls die gepushten Objekte.
+3. `session merge` (`MergeInto`) integriert die relevanten Werte explizit in ein Zielobjekt beziehungsweise eine Zielliste des Graphen, zu dem der behandelnde Command gehört.
 
 `MergeInto` übernimmt den Zustand aus der Quelle in eine zum Zielkontext gehörende Instanz; die Quellinstanz selbst wird nicht einfach in den Parent-Graphen eingesetzt.
 
-| Merge-Form | Laufzeitfunktion | Verhalten und Ergebnis |
-| --- | --- | --- |
-| `entity` → `entity` | `mergeEntityIntoEntity` | Verwendet ein angegebenes Ziel oder sucht anhand des Quellschlüssels die vorhandene Session-Instanz. Fehlt beides, wird eine neue Instanz des konkreten Quelltyps erzeugt. Der Quellzustand wird in diese Instanz geladen und genau diese Zielinstanz zurückgegeben. |
-| `entity` → `list<>` | `mergeEntityIntoList` | Sucht in der Zielliste nach demselben Schlüssel. Ein Treffer wird aktualisiert; andernfalls wird eine neue integrierte Instanz angelegt und angehängt. Zurückgegeben wird das tatsächlich in der Zielliste befindliche Element. |
-| `list<>` → `list<>` | `mergeListIntoList` | Wendet den Entity-zu-Liste-Merge auf jedes Quellelement an und liefert die Liste der integrierten Zielinstanzen. Die Funktion entfernt von sich aus keine zusätzlichen Elemente, die nur in der Zielliste vorkommen. |
-| `ref` → `ref` | `mergeRefOnRef` | Integriert das referenzierte Quellobjekt wie eine Entity und setzt anschließend die Zielreferenz auf diese Instanz. Eine `null`-Quellreferenz leert die Zielreferenz. Das Ziel muss die Form `<Entity>.<Referenz>` besitzen; Opposite-Referenzen sind ausgeschlossen. |
+`sourceObjType` und `destObjType` verwenden beide die Enumeration `org.modellwerkstatt.objectflow.structure.MergeObjType` mit den Werten `entity`, `list` und `ref`. Zulässig sind genau diese Kombinationen:
 
-Bei einem Merge mit Session benötigt die Quelle einen gesetzten Schlüssel. Existiert zu diesem Schlüssel bereits eine Session-Instanz, bleibt deren Objektidentität erhalten; eine andere, ausdrücklich angegebene Zielinstanz wird abgelehnt. Ebenso müssen vorhandener Read-only- beziehungsweise Checked-out-Zustand und gewählter Integrationsmodus zusammenpassen. Die drei Modi bedeuten:
+| `sourceObjType` | `destObjType` | Verhalten und Ergebnis |
+| --- | --- | --- |
+| `entity` | `entity` | Verwendet ein angegebenes Ziel oder sucht anhand des Quellschlüssels die vorhandene Session-Instanz. Fehlt beides, wird eine neue Instanz des konkreten Quelltyps erzeugt. Der Quellzustand wird in die Zielinstanz geladen und genau diese Instanz zurückgegeben. |
+| `entity` | `list` | Sucht in der Zielliste nach demselben Schlüssel. Ein Treffer wird in derselben Instanz aktualisiert; andernfalls wird eine neue integrierte Instanz angelegt und angehängt. Zurückgegeben wird das tatsächlich in der Zielliste befindliche Element. |
+| `list` | `list` | Wendet den Entity-zu-Liste-Merge auf jedes Quellelement an und liefert die Liste der integrierten Zielinstanzen. Zusätzliche Elemente, die nur in der Zielliste vorkommen, werden nicht entfernt. |
+| `ref` | `ref` | Integriert das referenzierte Quellobjekt wie eine Entity und setzt anschließend die Zielreferenz auf diese Instanz. Eine `null`-Quellreferenz leert die Zielreferenz. Das Ziel muss die Form `<Entity>.<Referenz>` besitzen; Opposite-Referenzen sind ausgeschlossen. |
+
+Nicht unterstützt werden `entity` → `ref`, `list` → `entity`, `list` → `ref`, `ref` → `entity` und `ref` → `list`. Sobald `ref` beteiligt ist, ist ausschließlich `ref` → `ref` zulässig; eine Quelle vom Typ `list` benötigt immer auch ein Ziel vom Typ `list`.
+
+Bei einem Merge mit Session benötigt die Quelle einen gesetzten Schlüssel. Existiert zu diesem Schlüssel bereits eine Session-Instanz, wird nicht nur ihre Objektidentität beibehalten: Der Zustand der Quelle wird unmittelbar in genau diese vorhandene Zielinstanz geladen. Alle bereits bestehenden Referenzen auf das Ziel zeigen daher weiterhin auf dasselbe, nun aktualisierte Objekt. Eine andere, ausdrücklich angegebene Zielinstanz wird abgelehnt. Nur wenn weder ein passendes Ziel noch eine passende Session- beziehungsweise Listeninstanz existiert, wird eine neue Instanz erzeugt. Ebenso müssen vorhandener Read-only- beziehungsweise Checked-out-Zustand und gewählter Integrationsmodus zusammenpassen. Die drei Modi bedeuten:
 
 - `(in session as readonly)` integriert in die aktuelle oder ausdrücklich angegebene Session als read-only,
 - `(in session as checkedout)` integriert als veränderbare, ausgecheckte Instanz und
@@ -1080,7 +1097,8 @@ Die ergänzende ObjectFlow-Serdes-Runtime stellt über `CONV` (`org.modellwerkst
 
 Die Implementierungen introspektieren jeweils die generierten ObjectFlow-Datenstrukturen. Unterstützt werden `Integer`, `BigDecimal`, `String`, `LocalDate`, `DateTime` und Statuswerte sowie verschachtelte Value Objects, Key References und Listen. Damit lassen sich sowohl flache DTOs als auch mehrstufige Objektgraphen mit Unterobjekten und Positionen serialisieren und wieder aufbauen. Virtuelle Properties (`OFXVPBase`) werden derzeit ausdrücklich nicht unterstützt.
 
-Die Zyklusbehandlung besteht aus zwei getrennten Mechanismen. `MoWareEntityReflector` merkt sich beim Aufbau der Strukturmetadaten bereits untersuchte Typen und verwendet deren Feldbeschreibung erneut; rekursive Typdefinitionen lassen die Introspektion daher nicht endlos wachsen. Eine mit `OPPOSITE` markierte Key Reference wird nicht als weiteres Unterobjekt verfolgt, sondern nur über ihr Schlüsselfeld repräsentiert. Die eigentlichen JSON- und XML-Serializer führen dagegen keine Menge bereits besuchter Objektinstanzen und erzeugen keine Objekt-IDs oder Referenzmarker. Ein sonstiger Zyklus im konkreten Laufzeitgraphen wird daher nicht automatisch aufgelöst. Für Schnittstellen sind baumförmige DTOs beziehungsweise ein eindeutiger Besitzpfad zu verwenden; Rückrichtungen werden als Schlüssel modelliert.
+
+Eine Zyklusbehandlung ist automatisch vorgesehen. Eine mit `OPPOSITE` markierte Key Reference wird nicht als weiteres Unterobjekt verfolgt, sondern nur über ihr Schlüsselfeld repräsentiert. Die eigentlichen JSON- und XML-Serializer führen dagegen keine Menge bereits besuchter Objektinstanzen und erzeugen keine Objekt-IDs oder Referenzmarker. Ein sonstiger Zyklus im konkreten Laufzeitgraphen wird daher nicht automatisch aufgelöst.
 
 `IConvFormatOptions` steuert Datums-, Zeit- und Dezimalformate, Locale, die Abbildung zwischen Property- und externen Feldnamen sowie das Verhalten bei fehlenden oder leeren Werten. Wichtige Modi sind:
 
