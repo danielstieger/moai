@@ -1,0 +1,19 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.FieldMapping",
+  "references": [
+    { "role": "property", "target": "$TARGET_PROPERTY$" }
+  ],
+  "children": [
+    {
+      "role": "fieldName",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+          "properties": [
+            { "name": "value", "value": "$TARGET_COLUMN$" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,7 @@
 {
   "concept": "org.modellwerkstatt.manmap.structure.PersistenceDescription",
   "properties": [
-    { "name": "name", "value": "<persistence-name>" },
-    { "name": "virtualPackage", "value": "<virtual-package>" }
-  ],
-  "references": [],
-  "children": []
+    { "name": "name", "value": "$TARGET_PERSISTENCE_NAME$" },
+    { "name": "virtualPackage", "value": "$TARGET_VIRTUAL_PACKAGE$" }
+  ]
 }

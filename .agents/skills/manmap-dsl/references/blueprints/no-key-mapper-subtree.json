@@ -1,16 +1,10 @@
 {
   "concept": "org.modellwerkstatt.manmap.structure.NoKeyMapperField",
   "properties": [
-    {
-      "name": "name",
-      "value": "<mapper-name>"
-    }
+    { "name": "name", "value": "$TARGET_MAPPER_NAME$" }
   ],
   "references": [
-    {
-      "role": "classConcept",
-      "target": "<dto-class-node-ref>"
-    }
+    { "role": "classConcept", "target": "$TARGET_RESULT_DTO$" }
   ],
   "children": [
     {
@@ -19,10 +13,7 @@
         {
           "concept": "org.modellwerkstatt.manmap.structure.FieldMapping",
           "references": [
-            {
-              "role": "property",
-              "target": "<dto-property-node-ref>"
-            }
+            { "role": "property", "target": "$TARGET_DTO_PROPERTY$" }
           ],
           "children": [
             {
@@ -31,10 +22,7 @@
                 {
                   "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
                   "properties": [
-                    {
-                      "name": "value",
-                      "value": "<sql-result-column-or-alias>"
-                    }
+                    { "name": "value", "value": "$TARGET_SQL_COLUMN_OR_ALIAS$" }
                   ]
                 }
               ]

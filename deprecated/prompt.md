@@ -1,24 +1,18 @@
-  
-
-TODO:
-- Git-Submodule und portables Plugin
-- Fehler und Problemprotokoll ersrtellen (oder leer, wen keine Probleme!); Löse Widersprüche nicht stillschweigend auf.
-
-
-  Verwende den Skill `mps-dsl-memory` für org.modellwerkstatt.manmap
+  Verwende den Skill `mps-dsl-memory` für org.modellwerkstatt.objectflow
   
 
   Nutze dabei folgende Quellen:
 
   1. Die aktuell über MPS MCP erreichbare Sprache
-     - `org.modellwerkstatt.manmap` als technische Quelle der Wahrheit für:
+     - `org.modellwerkstatt.objectflow` als technische Quelle der Wahrheit für:
      - Die global geladene Solution `org.modellwerkstatt.dataux.tests` (wird immer mit ausgeliefert! darf zitiert werden!)
      - Das offene Beispielprojekt (wird nicht ausgeliefert, steht später nicht zu Verfügung und darf nicht zitiert werden.)
+     - English als Sprache verwenden. Nur die Doku in /docu bleibt deutsch. 
 
   2. Die Dokumentation `manmap.md`, `objectflow.md`, `dataux.md` und die Übersicht `moware-werkbank.md` im Verzeichnius docu
      - Dort wird sehr vieles erläutert (fachliche Semantik, Laufzeitverhalten, Einschränkungen, typische Anwendungsfälle, Best Practices, Fehlerbilder und Diagnose, Zuständigkeiten der DSLs , Zusammenspiel der DSLs. 
      - Die Doku steht immer zur Verfügung, darf Referenziert und Verlinkt werden.
-     - Wichtiges und Zentrales für das mps-dsl-memory kann auch direkt übernommen werden. Der Skill soll die Dokumentation aber nicht generell duplizieren, sondern für Agenten operationalisieren: Navigation, kritische Regeln, Workflows, Gotchas, überprüfte Beispielreferenzen und portable JSON-Blueprints.
+     - Wichtiges und Zentrales für das mps-dsl-memory dieser DSL kann auch direkt übernommen werden. Der Skill soll die Dokumentation aber nicht generell duplizieren, sondern für Agenten operationalisieren: Navigation, kritische Regeln, Workflows, Gotchas, überprüfte Beispielreferenzen und portable JSON-Blueprints.
      - Die Dokumentation darf nicht verändert werden. 
 
 
@@ -50,3 +44,37 @@ TODO:
   Node-IDs, Modellreferenzen und fachliche Bezeichner des fremden Projekts dürfen
   dabei nicht übernommen werden.
  
+
+ # Verlinkung und Nachvollziehbarkeit der Dokumentation
+
+  Die Dokumentation soll nicht nur gesammelt in der zentralen `SKILL.md`
+  aufgeführt werden.
+
+  - Verlinke jede zentrale fachliche Regel, Laufzeitaussage, Einschränkung,
+    Best Practice und Diagnoseanweisung möglichst direkt mit dem passenden
+    Abschnitt in `/docu`.
+  - Verwende relative Markdown-Links, nach Möglichkeit einschließlich des
+    Abschnittsankers.
+  - Setze kontextbezogene Links insbesondere in:
+    - `references/concepts.md`
+    - `references/workflows.md`
+    - `references/gotchas.md`
+  - Die zentrale `SKILL.md` soll weiterhin kompakt bleiben und eine
+    Dokumentationsübersicht enthalten.
+  - Die Dokumentation darf nicht großflächig wiedergegeben werden. Formuliere
+    stattdessen eine kurze operationale Regel und verlinke unmittelbar die
+    ausführliche Begründung oder Semantik.
+  - Ein bloßer Sammellink pro Dokument genügt nicht.
+  - Erstelle abschließend eine Quellenabdeckung: Für jede wichtige
+    Themenfamilie muss erkennbar sein, welche Dokumentationsdatei und welcher
+    Abschnitt verwendet wurden.
+
+  Prüfe zum Abschluss:
+
+  1. Alle Links sind relativ und zeigen auf vorhandene Dateien.
+  2. Die zentralen operationalen Aussagen besitzen passende Quellenlinks.
+  3. Keine Dokumentation wurde verändert.
+  4. Das Problemprotokoll nennt fehlende, widersprüchliche oder nicht eindeutig
+     zuordenbare Dokumentationsaussagen ausdrücklich.
+
+ WICHTIG: Fehler und Problemprotokoll ersrtellen (oder leer, wen keine Probleme!); Löse Widersprüche nicht stillschweigend auf! Frage nach! 

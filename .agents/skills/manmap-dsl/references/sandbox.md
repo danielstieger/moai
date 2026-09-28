@@ -1,38 +1,44 @@
-# Dataux ManMap Examples
+# Shipped Examples and Verification Anchors
 
-## Primary Model
+Despite this file's conventional name, these are package-shipped test models, not assumptions about editor state or a target application. They belong to the guaranteed module `3c6ef8ca-6366-4c8b-8839-0277eaca1f7e(org.modellwerkstatt.dataux.tests)` and may be cited and inspected read-only.
 
-`r:38200fa4-ed1e-4f5b-bf14-ca3dff023767(org.modellwerkstatt.objectflow.tests.manmap.Domain)` is the broadest example. It contains 16 mapped entities, 87 field mappings, references, embedded/list/include mappings, repository methods, joins, custom SQL, save/delete operations, and C2 SQL.
+## Clean Root Anchors
 
-Representative roots:
+These roots resolved and returned `no problems found` from `mps_mcp_check_root_node_problems` during generation:
 
-- `PersDesc`: `r:38200fa4-ed1e-4f5b-bf14-ca3dff023767(org.modellwerkstatt.objectflow.tests.manmap.Domain)/8078003855688249945`
-- `NewInvoicePosDesc`: `r:38200fa4-ed1e-4f5b-bf14-ca3dff023767(org.modellwerkstatt.objectflow.tests.manmap.Domain)/5435761382090956033`
-- `RepoInvoice`: `r:38200fa4-ed1e-4f5b-bf14-ca3dff023767(org.modellwerkstatt.objectflow.tests.manmap.Domain)/3498864448993201631`
-- `C2SqlRepo`: `r:38200fa4-ed1e-4f5b-bf14-ca3dff023767(org.modellwerkstatt.objectflow.tests.manmap.Domain)/798898777369858633`
+| Purpose | Root reference |
+| --- | --- |
+| Broad persistence mapping | `r:38200fa4-ed1e-4f5b-bf14-ca3dff023767(org.modellwerkstatt.objectflow.tests.manmap.Domain)/8078003855688249945` (`PersDesc`) |
+| Compact end-to-end persistence mapping | `r:3fd71311-ae9c-4a95-889b-8542e84d2ec1(org.modellwerkstatt.objectflow.tests.OrderDocument)/5788629615580249756` (`DefaultPd`) |
+| Compact repository | `r:3fd71311-ae9c-4a95-889b-8542e84d2ec1(org.modellwerkstatt.objectflow.tests.OrderDocument)/3498864448993201879` (`ORDERDOCUMENTS`) |
+| Save/delete and audit repository | `r:38200fa4-ed1e-4f5b-bf14-ca3dff023767(org.modellwerkstatt.objectflow.tests.manmap.Domain)/3498864448993201739` (`RepoAccountAudit`) |
+| No-key persistence mapping | `r:b291b2f5-a194-4e43-aecb-36ae047ab7b5(org.modellwerkstatt.objectflow.tests.manmap.XNokeys)/2428815495442616998` (`NKPersistanceDescription`) |
 
-Use `mps_mcp_print_node(deep=true)` only for the smallest relevant root or method subtree. `RepoInvoice` is deliberately comprehensive and very large.
+Re-check a root before treating it as clean after package upgrades.
 
-## Specialized Models
+## Focused Node Anchors
 
-No-key and DTO result mapping:
+Use focused deep prints rather than printing a multi-megabyte repository root:
 
-- Model: `r:b291b2f5-a194-4e43-aecb-36ae047ab7b5(org.modellwerkstatt.objectflow.tests.manmap.XNokeys)`
-- Persistence root: `r:b291b2f5-a194-4e43-aecb-36ae047ab7b5(org.modellwerkstatt.objectflow.tests.manmap.XNokeys)/2428815495442616998`
-- Repository root: `r:b291b2f5-a194-4e43-aecb-36ae047ab7b5(org.modellwerkstatt.objectflow.tests.manmap.XNokeys)/3498864448993201819`
+| Shape | Node reference |
+| --- | --- |
+| Entity mapping with optimistic option, fields, embedded mapping, and list mapping | `r:3fd71311-ae9c-4a95-889b-8542e84d2ec1(org.modellwerkstatt.objectflow.tests.OrderDocument)/5788629615580249768` |
+| Field mapping | `r:3fd71311-ae9c-4a95-889b-8542e84d2ec1(org.modellwerkstatt.objectflow.tests.OrderDocument)/5788629615580249910` |
+| Embedded value-object mapping | `r:3fd71311-ae9c-4a95-889b-8542e84d2ec1(org.modellwerkstatt.objectflow.tests.OrderDocument)/5788629615580249790` |
+| Key-only list mapping | `r:3fd71311-ae9c-4a95-889b-8542e84d2ec1(org.modellwerkstatt.objectflow.tests.OrderDocument)/5788629615580249800` |
+| Read-only mapped `get` query | `r:b291b2f5-a194-4e43-aecb-36ae047ab7b5(org.modellwerkstatt.objectflow.tests.manmap.XNokeys)/2428815495460955444` |
+| Save statement | `r:38200fa4-ed1e-4f5b-bf14-ca3dff023767(org.modellwerkstatt.objectflow.tests.manmap.Domain)/8078003855688249815` |
+| Delete statement | `r:38200fa4-ed1e-4f5b-bf14-ca3dff023767(org.modellwerkstatt.objectflow.tests.manmap.Domain)/995084002912093027` |
+| Direct SQL block | `r:38200fa4-ed1e-4f5b-bf14-ca3dff023767(org.modellwerkstatt.objectflow.tests.manmap.Domain)/1480444990479808861` |
+| No-key mapper | `r:b291b2f5-a194-4e43-aecb-36ae047ab7b5(org.modellwerkstatt.objectflow.tests.manmap.XNokeys)/781751828141699450` |
+| Reusable row mapper | `r:38200fa4-ed1e-4f5b-bf14-ca3dff023767(org.modellwerkstatt.objectflow.tests.manmap.Domain)/1538415634284477467` |
 
-Compact blob/list mapping:
+The focused references were verified to resolve. They are examples only: do not copy their internal target references into application models.
 
-- Model: `r:77e4d07f-295e-4cf2-8e95-a300af89b0b0(org.modellwerkstatt.objectflow.tests.manmap.ZMixedNewer)`
-- Persistence root: `r:77e4d07f-295e-4cf2-8e95-a300af89b0b0(org.modellwerkstatt.objectflow.tests.manmap.ZMixedNewer)/1273212173384952708`
-- Repository root: `r:77e4d07f-295e-4cf2-8e95-a300af89b0b0(org.modellwerkstatt.objectflow.tests.manmap.ZMixedNewer)/3498864448993201851`
+## Navigation Procedure
 
-Small end-to-end order example:
-
-- Model: `r:3fd71311-ae9c-4a95-889b-8542e84d2ec1(org.modellwerkstatt.objectflow.tests.OrderDocument)`
-- Persistence root: `r:3fd71311-ae9c-4a95-889b-8542e84d2ec1(org.modellwerkstatt.objectflow.tests.OrderDocument)/5788629615580249756`
-- Repository root: `r:3fd71311-ae9c-4a95-889b-8542e84d2ec1(org.modellwerkstatt.objectflow.tests.OrderDocument)/3498864448993201879`
-
-## Reference Targets
-
-Mapping references normally target ObjectFlow/BaseLanguage class and property declaration nodes in the same consumer model. Query/save nodes then reference `EntityMapping`, `ReferenceMapping`, `ListMapping`, or `AdditionalTableName` nodes from a persistence root. Harvest those persistent refs from the target model with shallow project structure or focused node prints; sandbox refs are examples, not universal targets.
+1. Determine the target MPS project dynamically.
+2. Resolve the shipped module/model by the explicit reference above. If name-based discovery omits globally visible modules, call `mps_mcp_get_project_structure` with `includeStubModules=true`.
+3. Print only the root or subtree needed for the current shape.
+4. Replace every domain/mapping/member reference with a reference resolved in the actual target model.
+5. Validate the changed target root; do not edit these examples as part of an application task.

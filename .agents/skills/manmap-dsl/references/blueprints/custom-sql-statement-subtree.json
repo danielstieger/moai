@@ -1,0 +1,68 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.C2SqlBlock",
+  "properties": [
+    { "name": "sqlType", "value": "STATEMENT" },
+    { "name": "debugMe", "value": "false" }
+  ],
+  "children": [
+    {
+      "role": "statements",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.StatementList",
+          "children": [
+            {
+              "role": "statement",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.manmap.structure.C2SqlText",
+                  "children": [
+                    {
+                      "role": "lines",
+                      "nodes": [
+                        {
+                          "concept": "jetbrains.mps.lang.text.structure.Line",
+                          "children": [
+                            {
+                              "role": "elements",
+                              "nodes": [
+                                {
+                                  "concept": "jetbrains.mps.lang.text.structure.Word",
+                                  "properties": [
+                                    { "name": "value", "value": "UPDATE" }
+                                  ]
+                                },
+                                {
+                                  "concept": "jetbrains.mps.lang.text.structure.Word",
+                                  "properties": [
+                                    { "name": "value", "value": "$TARGET_TABLE$" }
+                                  ]
+                                },
+                                {
+                                  "concept": "jetbrains.mps.lang.text.structure.Word",
+                                  "properties": [
+                                    { "name": "value", "value": "SET" }
+                                  ]
+                                },
+                                {
+                                  "concept": "jetbrains.mps.lang.text.structure.Word",
+                                  "properties": [
+                                    { "name": "value", "value": "$TARGET_ASSIGNMENT$" }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

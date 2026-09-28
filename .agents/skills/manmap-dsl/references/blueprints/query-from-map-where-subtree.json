@@ -1,0 +1,33 @@
+{
+  "concept": "org.modellwerkstatt.manmap.structure.QueryFromMap",
+  "properties": [
+    { "name": "readOnly", "value": "true" },
+    { "name": "debugMe", "value": "false" }
+  ],
+  "references": [
+    { "role": "entityMapping", "target": "$TARGET_ENTITY_MAPPING$" }
+  ],
+  "children": [
+    {
+      "role": "queryOperation",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.manmap.structure.WhereQuery",
+          "children": [
+            {
+              "role": "filter",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.BooleanConstant",
+                  "properties": [
+                    { "name": "value", "value": "true" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

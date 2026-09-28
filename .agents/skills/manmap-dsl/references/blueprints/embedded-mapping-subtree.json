@@ -1,20 +1,26 @@
 {
   "concept": "org.modellwerkstatt.manmap.structure.EmbeddedMapping",
-  "references": [{ "role": "property", "target": "<value-object-property-node-ref>" }],
+  "references": [
+    { "role": "property", "target": "$TARGET_VALUE_OBJECT_PROPERTY$" }
+  ],
   "children": [
     {
       "role": "atomMpig",
       "nodes": [
         {
           "concept": "org.modellwerkstatt.manmap.structure.FieldMapping",
-          "references": [{ "role": "property", "target": "<embedded-property-node-ref>" }],
+          "references": [
+            { "role": "property", "target": "$TARGET_EMBEDDED_PROPERTY$" }
+          ],
           "children": [
             {
               "role": "fieldName",
               "nodes": [
                 {
                   "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
-                  "properties": [{ "name": "value", "value": "<column-name>" }]
+                  "properties": [
+                    { "name": "value", "value": "$TARGET_COLUMN$" }
+                  ]
                 }
               ]
             }

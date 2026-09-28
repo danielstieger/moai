@@ -1,8 +1,0 @@
-{
-  "concept": "org.modellwerkstatt.manmap.structure.C2SqlWordVarReference",
-  "properties": [],
-  "references": [
-    { "role": "varDecl", "target": "<variable-declaration-node-ref>" }
-  ],
-  "children": []
-}

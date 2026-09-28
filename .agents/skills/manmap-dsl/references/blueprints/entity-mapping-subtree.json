@@ -1,10 +1,10 @@
 {
   "concept": "org.modellwerkstatt.manmap.structure.EntityMapping",
   "properties": [
-    { "name": "name", "value": "<mapping-name>" }
+    { "name": "name", "value": "$TARGET_MAPPING_NAME$" }
   ],
   "references": [
-    { "role": "classConcept", "target": "<class-concept-node-ref>" }
+    { "role": "classConcept", "target": "$TARGET_ENTITY$" }
   ],
   "children": [
     {
@@ -13,38 +13,15 @@
         {
           "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
           "properties": [
-            { "name": "value", "value": "<table-name>" }
-          ],
-          "references": [],
-          "children": []
+            { "name": "value", "value": "$TARGET_TABLE$" }
+          ]
         }
       ]
     },
     {
-      "role": "atomMpig",
+      "role": "tableOption",
       "nodes": [
-        {
-          "concept": "org.modellwerkstatt.manmap.structure.FieldMapping",
-          "properties": [],
-          "references": [
-            { "role": "property", "target": "<property-node-ref>" }
-          ],
-          "children": [
-            {
-              "role": "fieldName",
-              "nodes": [
-                {
-                  "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
-                  "properties": [
-                    { "name": "value", "value": "<column-name>" }
-                  ],
-                  "references": [],
-                  "children": []
-                }
-              ]
-            }
-          ]
-        }
+        { "concept": "org.modellwerkstatt.manmap.structure.OptimisticOption" }
       ]
     }
   ]

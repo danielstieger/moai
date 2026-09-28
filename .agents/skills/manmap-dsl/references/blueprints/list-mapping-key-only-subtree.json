@@ -1,6 +1,8 @@
 {
   "concept": "org.modellwerkstatt.manmap.structure.ListMapping",
-  "references": [{ "role": "property", "target": "<list-property-node-ref>" }],
+  "references": [
+    { "role": "property", "target": "$TARGET_LIST_PROPERTY$" }
+  ],
   "children": [
     {
       "role": "mappedfieldRef",
@@ -8,8 +10,8 @@
         {
           "concept": "org.modellwerkstatt.manmap.structure.KeyOnlyReferenceMapping",
           "references": [
-            { "role": "entityMapping", "target": "<list-element-entity-mapping-node-ref>" },
-            { "role": "keyOnlyRef", "target": "<key-field-mapping-node-ref>" }
+            { "role": "entityMapping", "target": "$TARGET_ELEMENT_MAPPING$" },
+            { "role": "keyOnlyRef", "target": "$TARGET_PARENT_KEY_MAPPING$" }
           ]
         }
       ]
