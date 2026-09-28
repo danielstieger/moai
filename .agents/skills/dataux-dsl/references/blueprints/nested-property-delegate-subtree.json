@@ -1,0 +1,37 @@
+{
+  "concept": "org.modellwerkstatt.dataux.structure.StringDelegate",
+  "children": [
+    {
+      "role": "boundTo",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.PathDot",
+          "children": [
+            {
+              "role": "operand",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.dataux.structure.LocalPropertyReference",
+                  "references": [
+                    { "role": "property", "target": "TARGET_MODEL.nestedObject" }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "operation",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.dataux.structure.OperationPropertyReference",
+                  "references": [
+                    { "role": "property", "target": "TARGET_MODEL.nestedText" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

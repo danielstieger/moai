@@ -1,11 +1,39 @@
-  Verwende den Skill `mps-dsl-memory` für org.modellwerkstatt.objectflow
+
+
+
+
+
+# TODO
+
+- Skill für baselang collection
+
+- Plugin erzeugen
+  - .agents/skills nach skills?  !! PFADE STIMMEN JA GARNICHT !! Codex verschieben lassen + Referenzen (z.B. auf docu anpassen, Report "Summary angepasste Referenzen")
+  - AGENT.md mit neuem namespace, welche skills gibt es, welchen skill für was verwenden? Was ist im docu ordner 
+  - json plugin manifest
+  - ? 
+
+- Readme anpassen
+- Erster Testlauf für PetClinic. Was ist in der Doku zu Verbessern, was in den beteiligten dsl skills. Welche Verbesserungen hätten positive Konsquenzen? Was bietet sich an? Lass uns das erst diskutieren.    
+
+
+
+
+
+
+
+
+--- 
+
+
+  Verwende den Skill `mps-dsl-memory` für org.modellwerkstatt.dataux
   
 
   Nutze dabei folgende Quellen:
 
   1. Die aktuell über MPS MCP erreichbare Sprache
-     - `org.modellwerkstatt.objectflow` als technische Quelle der Wahrheit für:
-     - Die global geladene Solution `org.modellwerkstatt.dataux.tests` (wird immer mit ausgeliefert! darf zitiert werden!)
+     - `org.modellwerkstatt.dataux` als technische Quelle der Wahrheit für:
+     - Die global geladene Solution `org.modellwerkstatt.dataux.tests ` (wird immer mit ausgeliefert, primär aber kein dataux content! darf zitiert werden!)
      - Das offene Beispielprojekt (wird nicht ausgeliefert, steht später nicht zu Verfügung und darf nicht zitiert werden.)
      - English als Sprache verwenden. Nur die Doku in /docu bleibt deutsch. 
 
@@ -14,6 +42,8 @@
      - Die Doku steht immer zur Verfügung, darf Referenziert und Verlinkt werden.
      - Wichtiges und Zentrales für das mps-dsl-memory dieser DSL kann auch direkt übernommen werden. Der Skill soll die Dokumentation aber nicht generell duplizieren, sondern für Agenten operationalisieren: Navigation, kritische Regeln, Workflows, Gotchas, überprüfte Beispielreferenzen und portable JSON-Blueprints.
      - Die Dokumentation darf nicht verändert werden. 
+    
+  3. NEU ist, dass der erzeugte Skill sowohl für Codex als auxh für Claude optimal sein soll. 
 
 
   ## Portabilitätsanforderungen

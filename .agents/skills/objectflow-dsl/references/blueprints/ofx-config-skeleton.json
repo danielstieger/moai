@@ -1,0 +1,6 @@
+{
+  "concept": "org.modellwerkstatt.objectflow.structure.OFXConfig",
+  "properties": [
+    { "name": "name", "value": "SampleConfig" }
+  ]
+}

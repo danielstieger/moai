@@ -1,0 +1,28 @@
+{
+  "concept": "jetbrains.mps.baseLanguage.collections.structure.MapElement",
+  "children": [
+    {
+      "role": "map",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.VariableReference",
+          "references": [
+            { "role": "variableDeclaration", "target": "$TARGET_MAP_VARIABLE$" }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "key",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+          "properties": [
+            { "name": "value", "value": "key" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

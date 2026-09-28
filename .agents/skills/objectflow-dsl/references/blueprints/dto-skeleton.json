@@ -1,0 +1,17 @@
+{
+  "concept": "org.modellwerkstatt.objectflow.structure.DTO",
+  "properties": [
+    { "name": "isStatic", "value": "true" },
+    { "name": "nestedName", "value": "SampleDTO" },
+    { "name": "name", "value": "SampleDTO" },
+    { "name": "resolveInfo", "value": "SampleDTO" }
+  ],
+  "children": [
+    {
+      "role": "visibility",
+      "nodes": [
+        { "concept": "jetbrains.mps.baseLanguage.structure.PublicVisibility" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "concept": "jetbrains.mps.baseLanguage.collections.structure.ForEachStatement",
+  "children": [
+    {
+      "role": "variable",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.collections.structure.ForEachVariable",
+          "properties": [
+            { "name": "name", "value": "item" },
+            { "name": "resolveInfo", "value": "item" }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "inputSequence",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.VariableReference",
+          "references": [
+            { "role": "variableDeclaration", "target": "$TARGET_SEQUENCE_VARIABLE$" }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "body",
+      "nodes": [
+        { "concept": "jetbrains.mps.baseLanguage.structure.StatementList" }
+      ]
+    }
+  ]
+}
+

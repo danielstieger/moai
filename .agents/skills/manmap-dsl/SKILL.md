@@ -55,6 +55,4 @@ ManMap references ObjectFlow entities, value objects, DTOs, and properties; repo
 - [Shipped examples and verified anchors](references/sandbox.md)
 - [Creation and editing workflows](references/workflows.md)
 - [Runtime and modeling gotchas](references/gotchas.md)
-- [Documentation source coverage](references/source-coverage.md)
 - [Blueprint index and placeholder contract](references/blueprints.md)
-- [Generation problem log](references/problems.md)

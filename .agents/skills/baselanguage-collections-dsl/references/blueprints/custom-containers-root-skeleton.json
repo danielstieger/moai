@@ -1,0 +1,6 @@
+{
+  "concept": "jetbrains.mps.baseLanguage.collections.structure.CustomContainers",
+  "properties": [
+    { "name": "name", "value": "SampleCustomContainers" }
+  ]
+}

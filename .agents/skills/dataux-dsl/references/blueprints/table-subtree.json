@@ -1,0 +1,47 @@
+{
+  "concept": "org.modellwerkstatt.dataux.structure.Table",
+  "references": [
+    { "role": "boundClassifier", "target": "TARGET_MODEL.TableOwnerClassifier" },
+    { "role": "boundProperty", "target": "TARGET_MODEL.items" }
+  ],
+  "children": [
+    {
+      "role": "options",
+      "nodes": [
+        { "concept": "org.modellwerkstatt.dataux.structure.SelectFirstFOption" }
+      ]
+    },
+    {
+      "role": "delegates",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.StringDelegate",
+          "children": [
+            {
+              "role": "boundTo",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.dataux.structure.LocalPropertyReference",
+                  "references": [
+                    { "role": "property", "target": "TARGET_MODEL.rowText" }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "option",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.dataux.structure.WidthDOption",
+                  "properties": [
+                    { "name": "percent", "value": "40" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "concept": "jetbrains.mps.baseLanguage.collections.structure.ListElementAccessExpression",
+  "children": [
+    {
+      "role": "list",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.VariableReference",
+          "references": [
+            { "role": "variableDeclaration", "target": "$TARGET_LIST_VARIABLE$" }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "index",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.IntegerConstant",
+          "properties": [
+            { "name": "value", "value": "0" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

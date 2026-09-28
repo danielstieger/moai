@@ -1,0 +1,9 @@
+{
+  "concept": "org.modellwerkstatt.objectflow.structure.OFXTestSuit",
+  "properties": [
+    { "name": "name", "value": "Sample test suite" }
+  ],
+  "references": [
+    { "role": "configuration", "target": "TARGET_OFX_CONFIG" }
+  ]
+}

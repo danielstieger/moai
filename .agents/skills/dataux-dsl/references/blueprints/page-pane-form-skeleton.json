@@ -1,0 +1,52 @@
+{
+  "concept": "org.modellwerkstatt.dataux.structure.PagePane",
+  "properties": [
+    { "name": "isNamed", "value": "true" },
+    { "name": "name", "value": "ExampleFormPage" }
+  ],
+  "references": [
+    { "role": "boundClassifier", "target": "TARGET_MODEL.RootClassifier" }
+  ],
+  "children": [
+    {
+      "role": "uxChild",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.DelegateForm",
+          "references": [
+            { "role": "boundClassifier", "target": "TARGET_MODEL.RootClassifier" }
+          ],
+          "children": [
+            {
+              "role": "colWeights",
+              "nodes": [
+                { "concept": "org.modellwerkstatt.dataux.structure.OneWeight" }
+              ]
+            },
+            {
+              "role": "delegates",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.dataux.structure.StringDelegate",
+                  "children": [
+                    {
+                      "role": "boundTo",
+                      "nodes": [
+                        {
+                          "concept": "org.modellwerkstatt.dataux.structure.LocalPropertyReference",
+                          "references": [
+                            { "role": "property", "target": "TARGET_MODEL.textProperty" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

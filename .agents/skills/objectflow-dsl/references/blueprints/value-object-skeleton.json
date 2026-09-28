@@ -1,0 +1,17 @@
+{
+  "concept": "org.modellwerkstatt.objectflow.structure.ValueObject",
+  "properties": [
+    { "name": "isStatic", "value": "true" },
+    { "name": "nestedName", "value": "SampleValue" },
+    { "name": "name", "value": "SampleValue" },
+    { "name": "resolveInfo", "value": "SampleValue" }
+  ],
+  "children": [
+    {
+      "role": "visibility",
+      "nodes": [
+        { "concept": "jetbrains.mps.baseLanguage.structure.PublicVisibility" }
+      ]
+    }
+  ]
+}

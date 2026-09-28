@@ -1,0 +1,97 @@
+{
+  "concept": "org.modellwerkstatt.dataux.structure.GridLayout",
+  "references": [
+    { "role": "boundClassifier", "target": "TARGET_MODEL.TableOwnerClassifier" }
+  ],
+  "children": [
+    {
+      "role": "rowWeights",
+      "nodes": [
+        { "concept": "org.modellwerkstatt.dataux.structure.OneWeight" }
+      ]
+    },
+    {
+      "role": "colWeights",
+      "nodes": [
+        { "concept": "org.modellwerkstatt.dataux.structure.OneWeight" },
+        { "concept": "org.modellwerkstatt.dataux.structure.TwoWeight" }
+      ]
+    },
+    {
+      "role": "uxChild",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.Table",
+          "references": [
+            { "role": "boundClassifier", "target": "TARGET_MODEL.TableOwnerClassifier" },
+            { "role": "boundProperty", "target": "TARGET_MODEL.items" }
+          ],
+          "children": [
+            {
+              "role": "options",
+              "nodes": [
+                { "concept": "org.modellwerkstatt.dataux.structure.SelectFirstFOption" }
+              ]
+            },
+            {
+              "role": "delegates",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.dataux.structure.StringDelegate",
+                  "children": [
+                    {
+                      "role": "boundTo",
+                      "nodes": [
+                        {
+                          "concept": "org.modellwerkstatt.dataux.structure.LocalPropertyReference",
+                          "references": [
+                            { "role": "property", "target": "TARGET_MODEL.rowText" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.DelegateForm",
+          "references": [
+            { "role": "boundClassifier", "target": "TARGET_MODEL.RowClassifier" }
+          ],
+          "children": [
+            {
+              "role": "colWeights",
+              "nodes": [
+                { "concept": "org.modellwerkstatt.dataux.structure.OneWeight" }
+              ]
+            },
+            {
+              "role": "delegates",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.dataux.structure.StringDelegate",
+                  "children": [
+                    {
+                      "role": "boundTo",
+                      "nodes": [
+                        {
+                          "concept": "org.modellwerkstatt.dataux.structure.LocalPropertyReference",
+                          "references": [
+                            { "role": "property", "target": "TARGET_MODEL.detail" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

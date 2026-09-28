@@ -1,0 +1,17 @@
+{
+  "concept": "org.modellwerkstatt.objectflow.structure.Service",
+  "properties": [
+    { "name": "isStatic", "value": "true" },
+    { "name": "nestedName", "value": "SampleService" },
+    { "name": "name", "value": "SampleService" },
+    { "name": "resolveInfo", "value": "SampleService" }
+  ],
+  "children": [
+    {
+      "role": "visibility",
+      "nodes": [
+        { "concept": "jetbrains.mps.baseLanguage.structure.PublicVisibility" }
+      ]
+    }
+  ]
+}

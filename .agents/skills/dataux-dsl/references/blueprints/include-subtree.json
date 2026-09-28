@@ -1,0 +1,6 @@
+{
+  "concept": "org.modellwerkstatt.dataux.structure.Include",
+  "references": [
+    { "role": "uxElement", "target": "TARGET_MODEL.ReusableUiRoot" }
+  ]
+}

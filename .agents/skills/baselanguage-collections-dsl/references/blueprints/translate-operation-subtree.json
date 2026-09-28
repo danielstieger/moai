@@ -1,0 +1,88 @@
+{
+  "concept": "jetbrains.mps.baseLanguage.structure.DotExpression",
+  "children": [
+    {
+      "role": "operand",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.VariableReference",
+          "references": [
+            { "role": "variableDeclaration", "target": "$TARGET_SEQUENCE_VARIABLE$" }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "operation",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.collections.structure.TranslateOperation",
+          "children": [
+            {
+              "role": "closure",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.closures.structure.ClosureLiteral",
+                  "children": [
+                    {
+                      "role": "parameter",
+                      "nodes": [
+                        {
+                          "concept": "jetbrains.mps.baseLanguage.closures.structure.InferredClosureParameterDeclaration",
+                          "properties": [
+                            { "name": "name", "value": "it" },
+                            { "name": "resolveInfo", "value": "it" }
+                          ],
+                          "children": [
+                            {
+                              "role": "type",
+                              "nodes": [
+                                { "concept": "jetbrains.mps.baseLanguage.structure.UndefinedType" }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "body",
+                      "nodes": [
+                        {
+                          "concept": "jetbrains.mps.baseLanguage.structure.StatementList",
+                          "children": [
+                            {
+                              "role": "statement",
+                              "nodes": [
+                                {
+                                  "concept": "jetbrains.mps.baseLanguage.closures.structure.YieldStatement",
+                                  "children": [
+                                    {
+                                      "role": "expression",
+                                      "nodes": [
+                                        {
+                                          "concept": "jetbrains.mps.baseLanguage.structure.VariableReference",
+                                          "references": [
+                                            { "role": "variableDeclaration", "target": "it" }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

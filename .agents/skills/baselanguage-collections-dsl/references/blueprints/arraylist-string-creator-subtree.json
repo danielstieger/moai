@@ -1,0 +1,22 @@
+{
+  "concept": "jetbrains.mps.baseLanguage.structure.GenericNewExpression",
+  "children": [
+    {
+      "role": "creator",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.collections.structure.ListCreatorWithInit",
+          "children": [
+            {
+              "role": "elementType",
+              "nodes": [
+                { "concept": "jetbrains.mps.baseLanguage.structure.StringType" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

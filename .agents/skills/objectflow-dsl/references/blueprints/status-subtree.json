@@ -1,0 +1,81 @@
+{
+  "concept": "org.modellwerkstatt.objectflow.structure.StatusDeclaration",
+  "properties": [
+    { "name": "name", "value": "SampleStatus" }
+  ],
+  "children": [
+    {
+      "role": "element",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.objectflow.structure.StatusElement",
+          "properties": [
+            { "name": "value", "value": "N" },
+            { "name": "name", "value": "NEW" }
+          ],
+          "children": [
+            {
+              "role": "options",
+              "nodes": [
+                { "concept": "org.modellwerkstatt.objectflow.structure.OnCreationStatusElemOption" }
+              ]
+            },
+            {
+              "role": "shortDescNew",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+                  "properties": [
+                    { "name": "value", "value": "New" }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "longDescNew",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+                  "properties": [
+                    { "name": "value", "value": "New" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "concept": "org.modellwerkstatt.objectflow.structure.StatusElement",
+          "properties": [
+            { "name": "value", "value": "D" },
+            { "name": "name", "value": "DONE" }
+          ],
+          "children": [
+            {
+              "role": "shortDescNew",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+                  "properties": [
+                    { "name": "value", "value": "Done" }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "longDescNew",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+                  "properties": [
+                    { "name": "value", "value": "Done" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

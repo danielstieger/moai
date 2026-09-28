@@ -1,0 +1,12 @@
+{
+  "concept": "jetbrains.mps.baseLanguage.collections.structure.ListType",
+  "children": [
+    {
+      "role": "elementType",
+      "nodes": [
+        { "concept": "jetbrains.mps.baseLanguage.structure.StringType" }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,28 @@
+{
+  "concept": "jetbrains.mps.baseLanguage.structure.GenericNewExpression",
+  "children": [
+    {
+      "role": "creator",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.collections.structure.HashMapCreator",
+          "children": [
+            {
+              "role": "keyType",
+              "nodes": [
+                { "concept": "jetbrains.mps.baseLanguage.structure.StringType" }
+              ]
+            },
+            {
+              "role": "valueType",
+              "nodes": [
+                { "concept": "jetbrains.mps.baseLanguage.structure.StringType" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

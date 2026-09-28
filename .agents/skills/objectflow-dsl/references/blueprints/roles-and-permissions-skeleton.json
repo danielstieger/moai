@@ -1,0 +1,6 @@
+{
+  "concept": "org.modellwerkstatt.objectflow.structure.RolesAndPermissions",
+  "properties": [
+    { "name": "name", "value": "SampleRolesAndPermissions" }
+  ]
+}
