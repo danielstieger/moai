@@ -1,0 +1,6 @@
+interface:
+  display_name: "MPS DSL Memory Maintainer"
+  short_description: "Maintain bundled MPS DSL skills explicitly"
+  default_prompt: "Use $mps-dsl-memory to perform the explicitly requested package-maintenance update."
+policy:
+  allow_implicit_invocation: false

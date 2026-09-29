@@ -1,18 +1,91 @@
-# MoAI – Dokumentation der modellwerkstatt MoWare-Werkbank
+# MoAI – Agent Plugin für modellwerkstatt MoWare
 
-Dieses Repository bündelt die Dokumentation der **modellwerkstatt MoWare-Werkbank** und ihrer drei eng verzahnten domänenspezifischen Sprachen. Die auf JetBrains MPS basierende Werkbank unterstützt die Entwicklung von Geschäftsanwendungen vom fachlichen Modell über Persistenz und Anwendungsabläufe bis zur Benutzeroberfläche und zum ausführbaren Modul.
+MoAI bündelt Agent-Skills und Dokumentation für die drei MoWare-Sprachen
+ObjectFlow, ManMap und DataUX sowie wiederverwendbare Arbeitsabläufe für
+JetBrains MPS. Das Paket ist dafür vorgesehen, als versioniertes Git-Submodule
+in einem MoWare-Anwendungsprojekt zu liegen und zugleich als Agent-Plugin
+installiert zu werden.
 
-Die Architektur orientiert sich an ausgewählten Prinzipien des Domain-Driven Design: ObjectFlow beschreibt fachliche Daten, Regeln und Anwendungsfälle, ManMap verbindet diese Modelle mit relationalen Datenbanken, und DataUX macht sie in Oberflächen, Anwendungen und Batchjobs nutzbar. Generatoren und Laufzeitkomponenten übernehmen wiederkehrende technische Aufgaben, damit Fachbegriffe und Geschäftslogik im Modell sichtbar bleiben.
+## Inhalt
 
-| Bereich | Verantwortung | Zentrale Konzepte | Dokumentation |
-| --- | --- | --- | --- |
-| **MoWare-Werkbank** | Architektur, Zusammenspiel der DSLs, Laufzeiten und Entwicklungsablauf | Fachmodell, Persistenz, UI, Generatoren | [Überblick](moware-werkbank.md) |
-| **ObjectFlow**<br>`org.modellwerkstatt.objectflow` | Fachliche Datenstrukturen, Geschäftslogik, Commands und Querschnittsthemen | `Entity`, `ValueObject`, `DTO`, `Service`, `Command`, `OFXConfig`, `OFXTestSuit` | [Sprachreferenz](objectflow.md) |
-| **ManMap**<br>`org.modellwerkstatt.manmap` | Relationale Persistenz, Repositories, explizites Laden und SQL-basierte Lesemodelle | `PersistenceDescription`, `EntityMapping`, `Repository`, `QueryFromMap`, `C2SqlBlock` | [Sprachreferenz](manmap.md) |
-| **DataUX**<br>`org.modellwerkstatt.dataux` | Benutzeroberflächen sowie ausführbare Anwendungen und Batchjobs | `PagePane`, `DelegateForm`, `Table`, `AppUiModule`, `BatchJobModule` | [Sprachreferenz](dataux.md) |
+```text
+moai/
+├── .codex-plugin/plugin.json   Codex-Kompatibilitätsmanifest
+├── skills/                     MoWare- und MPS-Skills
+├── docu/                       Architektur- und Sprachdokumentation
+├── MPS_AGENT_GUIDE.md          Allgemeine MPS-Arbeitsregeln
+└── PROJECT_AGENTS.md           Vorlage für das Anwendungsprojekt
+```
 
-Im Zusammenspiel definiert ObjectFlow den fachlichen Kern und koordiniert einen Anwendungsfall als Command. ManMap lädt die dafür benötigten Objektgraphen oder Lesemodelle und registriert Speicheroperationen in der ObjectFlow-Session. DataUX bindet die bereitgestellten Daten an Page Panes, Formulare und Tabellen; ein `AppUiModule` oder `BatchJobModule` bildet schließlich den ausführbaren Rahmen. Die Zuständigkeiten bleiben bewusst getrennt: Datenzugriff gehört in Repositories, wiederverwendbare Fachlogik in Datenstrukturen oder Services und Darstellung in DataUX.
+Die MoWare-Skills sind:
 
-Aus den MPS-Modellen wird Java-Code für unterschiedliche Einsatzgebiete generiert. UI-Anwendungen können als JavaFX-Desktop-Anwendung, Vaadin-Webanwendung oder schlanke HTML5-Anwendung für mobile Geräte betrieben werden; Batchjobs unterstützen automatisierte und interaktive Ausführung. Fachliche Tests lassen sich mit ObjectFlow-Testsuiten modellieren und über die MPS-Konsole ausführen.
+- `objectflow-dsl` für Fachmodell, Services, Commands, Tests und Konfiguration;
+- `manmap-dsl` für Persistenzabbildungen, Repositories, Queries und SQL;
+- `dataux-dsl` für Oberflächen, Anwendungen und Batchjobs.
 
-Die Dokumentation richtet sich an Anwendungsentwickler und KI-Agenten. Der Überblick erklärt Architektur und Modellierungsentscheidungen, während die drei Sprachreferenzen Konzepte, Regeln, typische Abläufe, Fehlerbilder und technische Konzeptnamen vertiefen. Maßgebliche technische Quelle bleiben die geladenen MPS-Sprachdefinitionen und ihre Prüfregeln; die Dokumente dienen als verständliche und navigierbare Arbeitsgrundlage.
+Zusätzliche MPS-Skills unterstützen Node Editing, BaseLanguage,
+Modellmanipulation, Sprachuntersuchung, MPS Console und Run-Konfigurationen.
+`mps-mcp-workflow` ist der Einstiegspunkt für MPS-Arbeiten.
+
+`mps-dsl-memory` ist ein explizit aufzurufender Maintainer-Skill. Er ist nicht
+für die automatische Aktualisierung durch Paketnutzer oder Projekt-Agenten
+bestimmt.
+
+## Dokumentation
+
+- [MoWare-Werkbank](docu/moware-werkbank.md) – Architektur und Zusammenspiel;
+- [ObjectFlow](docu/objectflow.md) – Fachmodell und Geschäftslogik;
+- [ManMap](docu/manmap.md) – relationale Persistenz und Repositories;
+- [DataUX](docu/dataux.md) – Benutzeroberflächen, Anwendungen und Batchjobs.
+
+Die Dokumentation beschreibt die beabsichtigte fachliche Semantik. Für die
+technische AST-Struktur, Roles, Kardinalitäten, Referenzen und Prüfregeln sind
+die geladenen MPS-Sprachmodelle maßgeblich.
+
+## Einbindung als Git-Submodule
+
+Im Root des Anwendungsprojekts:
+
+```bash
+git submodule add https://github.com/danielstieger/moai.git moai
+git submodule update --init --recursive
+```
+
+Anschließend `moai/PROJECT_AGENTS.md` als `AGENTS.md` in das Projekt-Root
+kopieren oder mit einer vorhandenen `AGENTS.md` zusammenführen. Die Vorlage
+kennzeichnet `moai/` als paketierte Abhängigkeit und verweist Agenten auf die
+installierten MoAI-Skills und die Dokumentation.
+
+## Codex-Plugin
+
+Das Manifest [.codex-plugin/plugin.json](.codex-plugin/plugin.json) registriert
+die Skills unter `skills/` für Codex. Für eine lokale oder projektbezogene
+Installation muss das Plugin zusätzlich über einen konfigurierten Plugin-
+Marketplace bereitgestellt und aktiviert werden. Das Manifest allein installiert
+das Plugin nicht.
+
+Codex unterstützt dafür persönliche Marketplaces und Repo-Marketplaces. Die
+aktuelle Installationsweise ist in der
+[offiziellen OpenAI-Dokumentation](https://developers.openai.com/plugins/build/plugins)
+beschrieben.
+
+## Aktualisierung
+
+Das Anwendungsprojekt bestimmt über seinen Submodule-Commit, welche MoAI-Version
+verwendet wird. Eine Aktualisierung wird im Anwendungsprojekt durchgeführt und
+anschließend als neuer Submodule-Stand versioniert:
+
+```bash
+git submodule update --remote --merge moai
+git add moai
+```
+
+Paketdateien unter `moai/` werden bei gewöhnlicher Anwendungsentwicklung nicht
+direkt verändert. Projektspezifische Anweisungen und Skills bleiben außerhalb
+des Submodules.
+
+## Voraussetzungen
+
+- JetBrains MPS mit geöffnetem Zielprojekt;
+- aktivierte MPS-MCP-Integration für modellbewusste Agent-Arbeit;
+- installiertes und aktiviertes MoAI-Plugin in der verwendeten Agent-Runtime.

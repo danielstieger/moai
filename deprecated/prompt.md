@@ -8,17 +8,27 @@
 - Skill für baselang collection
 
 - Plugin erzeugen
-  - .agents/skills nach skills?  !! PFADE STIMMEN JA GARNICHT !! Codex verschieben lassen + Referenzen (z.B. auf docu anpassen, Report "Summary angepasste Referenzen")
+  - .agents/skills nach skills?  !! PFADE STIMMEN JA GARNICHT !! Codex verschieben lassen + Referenzen (z.B. auf docu anpassen, Report "Summary angepasste Referenzen") -> Okay, habe alles soweit fertig. Lass uns .agents/skills nach skills verschieben. Aber vorsicht! In den Unterverzeichnissen/Skills wird referenziert (z.B.
+  auf /docu - das müsst du alles anpassen. Bitte am Ende eine Zusammenfassung, was alles angepasst wurde.
+
   - AGENT.md mit neuem namespace, welche skills gibt es, welchen skill für was verwenden? Was ist im docu ordner 
   - json plugin manifest
   - ? 
+  - Da steht im MPS " load `mps-dsl-memory` to create or refresh the relevant generated DSL skill" -> RAUS 
+
 
 - Readme anpassen.. 
 - Erster Testlauf für PetClinic. Was ist in der Doku zu Verbessern, was in den beteiligten dsl skills. Welche Verbesserungen hätten positive Konsquenzen? Was bietet sich an? Lass uns das erst diskutieren.    
 
 
 
-
+# Plugin Erzeugung
+- Okay, habe alles soweit fertig. Lass uns .agents/skills nach skills verschieben. Aber vorsicht! In den Unterverzeichnissen/Skills wird referenziert (z.B.
+  auf /docu - das müsst du alles anpassen. Bitte am Ende eine Zusammenfassung, was alles angepasst wurde.
+- Wo steht überall, dass mps-dsl-memory für updates (automatische) der sprachen verwendet werden soll?
+-  Das in den Agents.md weg. Bei fehlenden oder veralteten DSL-Skills und nach neuen Erkentnissen - ich bin dafür zuständig, nicht ein Agent oder Anwender des paketes. Also raus - im mps-mcp-workflow stehen nicht existierend skill - raus, auch mps-dsl-memeory nicht erwähnen (aber nicht aus skills/ löschen!) dafür die moware skills rein! analysis-tools.md habe ich noch geändert. Gibt es sonst noch Probleme? Diese nicht automatisch ändern, lass uns in dialog gehen.
+- Plugin-Manifest erzeugen
+- PROJECT_AGENTS.md (nur Verweise auf docu und auf moai/AGENTS.md) und AGENTS.md getrennt 
 
 
 
