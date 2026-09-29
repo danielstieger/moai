@@ -56,19 +56,6 @@ kopieren oder mit einer vorhandenen `AGENTS.md` zusammenführen. Die Vorlage
 kennzeichnet `moai/` als paketierte Abhängigkeit und verweist Agenten auf die
 installierten MoAI-Skills und die Dokumentation.
 
-## Codex-Plugin
-
-Das Manifest [.codex-plugin/plugin.json](.codex-plugin/plugin.json) registriert
-die Skills unter `skills/` für Codex. Für eine lokale oder projektbezogene
-Installation muss das Plugin zusätzlich über einen konfigurierten Plugin-
-Marketplace bereitgestellt und aktiviert werden. Das Manifest allein installiert
-das Plugin nicht.
-
-Codex unterstützt dafür persönliche Marketplaces und Repo-Marketplaces. Die
-aktuelle Installationsweise ist in der
-[offiziellen OpenAI-Dokumentation](https://developers.openai.com/plugins/build/plugins)
-beschrieben.
-
 ## Aktualisierung
 
 Das Anwendungsprojekt bestimmt über seinen Submodule-Commit, welche MoAI-Version
