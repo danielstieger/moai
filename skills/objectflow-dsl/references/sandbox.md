@@ -29,7 +29,7 @@ Model: `r:40578ea0-bba5-4ae6-abfa-3691d42660ff(org.modellwerkstatt.objectflow.te
 - Test suite `RunCmdTests`: `r:40578ea0-bba5-4ae6-abfa-3691d42660ff(org.modellwerkstatt.objectflow.tests.OrderDocumentRunCmd)/5353263021888352480`
 - Graph-owner command `GO`: `r:40578ea0-bba5-4ae6-abfa-3691d42660ff(org.modellwerkstatt.objectflow.tests.OrderDocumentRunCmd)/5353263021888364202`
 - Graph-edit command `GE`: `r:40578ea0-bba5-4ae6-abfa-3691d42660ff(org.modellwerkstatt.objectflow.tests.OrderDocumentRunCmd)/5353263021888364229`
-- Search command `SEARCH`: `r:40578ea0-bba5-4ae6-abfa-3691d42660ff(org.modellwerkstatt.objectflow.tests.OrderDocumentRunCmd)/7464717488285058627`
+- Search command `SEARCH_CMD`: `r:40578ea0-bba5-4ae6-abfa-3691d42660ff(org.modellwerkstatt.objectflow.tests.OrderDocumentRunCmd)/7464717488285058627`
 
 Use these to compare command ownership and `run command` structures. Do not copy domain-specific references into portable blueprints; replace them with `TARGET_*` placeholders. [Command lifecycle](../../../docu/objectflow.md#grundablauf-eines-commands) and [headless command tests](../../../docu/objectflow.md#commands-ohne-ui-ausführen)
 

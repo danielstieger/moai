@@ -97,7 +97,7 @@ Ein `Feld-Mapping` (`FieldMapping`) referenziert die fachliche Property und enth
 | Bereich | Name (Konzeptname) | Bedeutung |
 | --- | --- | --- |
 | Schlüssel | `key` (`KeyOption`) | Markiert die für Persistenzoperationen verwendete Schlüssel-Property, falls sie nicht bereits an der ObjectFlow-Property markiert ist. |
-| Automatische ID | `autoid` (`AutoidOption`) | Bezieht vor einem Insert eine ID aus einer Datenbank-Sequence und setzt sie an der Entity; benötigt einen Sequenznamen. |
+| Automatische ID | `autoid` (`AutoidOption`) | Vergibt die ID automatisch; benötigt immer einen Sequenznamen. |
 | Schemahinweise | `index` (`IndexOption`), `notnull` (`NotnullOption`), `size` (`SizeOption`), `unique` (`UniqueOption`) | Beschreiben Anforderungen an Spalten. ManMap führt daraus keine allgemeinen Schema-Migrationen aus. |
 | Audit | `created at` (`CreatedAtFieldOption`), `created by` (`CreatedByFieldOption`), `modified at` (`ModifiedAtFieldOption`), `modified by` (`ModifiedByFieldOption`) | Ordnen Audit-Informationen den entsprechenden Feldern zu. |
 | Konkurrenzschutz | `optimistic` (`OptimisticOption`) | Aktiviert optimistische Sperrprüfung für ein schreibbares Entity-Mapping und ist für neue Entity-Mappings empfohlen. |
@@ -107,7 +107,7 @@ An Properties von ObjectFlow-Entitäten und -Value-Objects können die ManMap-Fe
 
 ### Automatische IDs und Sequences
 
-`autoid` verbindet eine einzelne Schlüssel-Property mit einer Datenbank-Sequence. Bei einem Insert bezieht ManMap zuerst den nächsten Wert der angegebenen Sequence, setzt ihn an der Entity und verwendet ihn anschließend beim Einfügen der Tabellenzeile. Automatische IDs sind nur für einfache Schlüssel vorgesehen; zusammengesetzte Schlüssel sind ausgeschlossen. Die Entscheidung für ein Insert erfolgt anhand des noch nicht vergebenen Schlüssels, bevor die automatische ID bezogen wird.
+`autoid` vergibt den Schlüssel einer einzelnen Schlüssel-Property automatisch. Unter Oracle bezieht ManMap vor dem Insert den nächsten Wert der angegebenen Sequence, setzt ihn an der Entity und verwendet ihn beim Einfügen der Tabellenzeile. Unter MySQL wird die Sequence nicht verwendet: Die Schlüsselspalte ist dort `AUTO_INCREMENT`, und die von der Datenbank vergebene ID wird nach dem Insert an der Entity gesetzt. Der Sequenzname ist trotzdem immer anzugeben; so bleibt das Mapping auch unter Oracle lauffähig. Automatische IDs sind nur für einfache Schlüssel vorgesehen; zusammengesetzte Schlüssel sind ausgeschlossen. Die Entscheidung für ein Insert erfolgt anhand des noch nicht vergebenen Schlüssels, bevor die automatische ID bezogen wird.
 
 Wird ein Mapping über `Mapping einbinden` (`IncludeMapping`) wiederverwendet, kann `OVERWRITE_AUTOID` (`OverWriteAutoIdOption`) für ein ausgewähltes Auto-ID-Feld eine andere Oracle-Sequence angeben. Für dieses Mapping wird dann nicht die ursprünglich am `autoid` deklarierte Sequence verwendet.
 

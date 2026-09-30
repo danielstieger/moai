@@ -71,7 +71,7 @@ Delegate kind must match the ObjectFlow property type. Delegates control present
 
 ### Delegate options
 
-Common zero-child options are `DisabledDOption`, `PickerDOption`, `IssueUpdateDOption`, `ForceNumericEditor`, `AlternativeDOption`, `WideDOption`, `EditableDOption`, `ImportantDOption`, `StatusLongDescDOption`, `FoldDOption`, `RightAlignDOption`, `HintDOption`, and `TimeOnlyDOption`.
+Common zero-child options are `DisabledDOption`, `PickerDOption`, `IssueUpdateDOption`, `ForceNumericEditor`, `AlternativeDOption`, `WideDOption`, `EditableDOption`, `ImportantDOption`, `StatusLongDescDOption`, `FoldDOption`, `RightAlignDOption`, and `TimeOnlyDOption`.
 
 Options with additional structure:
 
@@ -81,7 +81,6 @@ Options with additional structure:
 - `OverwriteLabelDOption.expression: Expression [1]`
 - `OverwriteFormatDOption.expression: Expression [1]`
 - `DynColorDOption.func: DynColorConceptFunction [1]`
-- `DelegateHookDOption.elementHook -> ClassConcept [1]`
 
 Apply an option only where its delegate/property context permits it; several constraints are semantic rather than expressible by the raw role type. [Documented delegate options](../../../docu/dataux.md#delegate-optionen)
 

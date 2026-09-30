@@ -51,7 +51,7 @@ Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimm
 
 ### Kapitellandkarte: ManMap
 
-`org.modellwerkstatt.manmap` bildet die Persistenzschicht und verbindet fachliche Objekte mit der relationalen Datenbank (Oracle oder MySQL). Neben der Persistierung von Entitäten unterstützt die Sprache benutzerdefinierte SQL-Abfragen und das Überführen ihrer Ergebnismengen in Datencontainer.
+`org.modellwerkstatt.manmap` bildet die Persistenzschicht und verbindet fachliche Objekte mit der relationalen Datenbank (Oracle, MySQL oder MariaDB). Neben der Persistierung von Entitäten unterstützt die Sprache benutzerdefinierte SQL-Abfragen und das Überführen ihrer Ergebnismengen in Datencontainer.
 
 | Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
@@ -133,17 +133,19 @@ Fachliche Prüfungen und Berechnungen gehören in das fachliche Modell beziehung
 
 ## Laufzeitumgebungen
 
-Die Ausführung richtet sich nach dem modellierten Modultyp: Anwendungen mit Benutzeroberfläche unterstützen drei Laufzeitumgebungen, Batchjobs können automatisiert oder mit Benutzeroberfläche betrieben werden. Testsuiten werden in der MPS-Konsole ausgeführt.
+Die Ausführung richtet sich nach dem modellierten Modultyp: Anwendungen mit Benutzeroberfläche unterstützen drei Laufzeitumgebungen, Batchjobs können automatisiert oder mit Benutzeroberfläche betrieben werden. Testsuiten können in MPS über eine Run-Konfiguration oder standalone mit Java ausgeführt werden.
 
-| Modultyp         | Ausführungsart                                    | Technologie/Laufzeitumgebung                    | Primärer Einsatz                                                       |
-| ---------------- | ------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------- |
+| Modultyp         | Ausführungsart                                    | Technologie/Laufzeitumgebung                     | Primärer Einsatz                                                       |
+| ---------------- | ------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------- |
 | `AppUiModule`    | Desktop-Anwendung                                 | JavaFX / `org.modellwerkstatt.fx8forms`          | Desktop-PCs                                                            |
 | `AppUiModule`    | Webanwendung auf Tomcat                           | Vaadin / `org.modellwerkstatt.turkuforms`        | Desktop-PCs                                                            |
 | `AppUiModule`    | HTML5-Webanwendung auf Tomcat                     | Pebble Templates / `org.modellwerkstatt.h2forms` | MDE-Geräte, beispielsweise von Zebra oder Datalogic, sowie Smartphones |
 | `BatchJobModule` | Automatisierte Ausführung ohne Benutzeroberfläche | Servlet auf Tomcat                               | Hintergrundverarbeitung                                                |
 | `BatchJobModule` | Ausführung mit Desktop-Oberfläche                 | JavaFX / `org.modellwerkstatt.fx8forms`          | Interaktive Ausführung auf Desktop-PCs                                 |
 | `BatchJobModule` | Ausführung mit Weboberfläche                      | Vaadin / `org.modellwerkstatt.turkuforms`        | Interaktive Ausführung im Browser                                      |
-| `OFXTestSuit`    | Testausführung                                    | MPS-Konsole                                      | Ausführen und Prüfen modellierter Testabläufe                          |
+| `OFXTestSuit`    | Testausführung                                    | MPS (Run-Konfiguration) oder standalone mit Java | Ausführen und Prüfen modellierter Testabläufe                          |
+
+`org.modellwerkstatt.turkuforms` ist nicht Teil von MPS und wird erst im finalen Build-Prozess der Anwendung eingebunden; in MPS sind nur `org.modellwerkstatt.fx8forms` und `org.modellwerkstatt.h2forms` verfügbar.
 
 Anwendungsmodelle sind mit wenigen Ausnahmen zwischen `org.modellwerkstatt.fx8forms`, `org.modellwerkstatt.turkuforms` und `org.modellwerkstatt.h2forms` portabel. Bei der Oberflächengestaltung sind die unterschiedlichen Gerätezielgruppen und Bildschirmgrößen zu berücksichtigen: Eine technisch ausführbare Oberfläche ist nicht automatisch für jedes Gerät gleichermaßen geeignet.
 
@@ -186,14 +188,14 @@ Auch für die Summe aller Rechnungen werden keine vollständigen Rechnungsgraphe
 
 ### Anwendungsfälle mit der DSL `org.modellwerkstatt.objectflow`
 
-| Beispiel-Command                  | Command-Typ   | Aufgabe                                                                                                                      |
-| --------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `Rechnungen suchen`               | `SEARCH`      | Erfasst Suchkriterien und zeigt die als `RechnungInfo`-DTOs geladenen Treffer auf einer zweiten Seite an.                    |
-| `Rechnung bearbeiten`             | `GRAPH_OWNER` | Lädt eine Rechnung anhand ihrer ID zur Bearbeitung und registriert Repository-Methoden zum Speichern als Session-Operationen. |
-| `Rechnungsposition bearbeiten`    | `GRAPH_EDIT`  | Bearbeitet eine Position innerhalb der bestehenden Session des `GRAPH_OWNER`.                                                |
-| `Summe aller Rechnungen anzeigen` | `SEARCH`      | Ruft die SQL-Aggregation im Repository auf und zeigt das Ergebnis an.                                                        |
+| Beispiel-Command                  | Command-Typ       | Aufgabe                                                                                                                       |
+| --------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `Rechnungen suchen`               | `SEARCH_CMD`      | Erfasst Suchkriterien und zeigt die als `RechnungInfo`-DTOs geladenen Treffer auf einer zweiten Seite an.                     |
+| `Rechnung bearbeiten`             | `GRAPH_OWNER_CMD` | Lädt eine Rechnung anhand ihrer ID zur Bearbeitung und registriert Repository-Methoden zum Speichern als Session-Operationen. |
+| `Rechnungsposition bearbeiten`    | `GRAPH_EDIT_CMD`  | Bearbeitet eine Position innerhalb der bestehenden Session des `GRAPH_OWNER_CMD`.                                             |
+| `Summe aller Rechnungen anzeigen` | `SEARCH_CMD`      | Ruft die SQL-Aggregation im Repository auf und zeigt das Ergebnis an.                                                         |
 
-Der ebenfalls verfügbare Typ `MODAL_GRAPH_OWNER` wird in diesem Beispiel nicht benötigt.
+Der ebenfalls verfügbare Typ `GRAPH_OWNER_CMD(modal)` wird in diesem Beispiel nicht benötigt.
 
 #### Rechnungen suchen
 
@@ -202,23 +204,23 @@ Der Command `Rechnungen suchen` startet eine eigene Read-only-Session und besteh
 1. **Suchfilter eingeben:** Ein Formular ist an das DTO `RechnungFilter` gebunden. Der Benutzer legt die Suchkriterien fest.
 2. **Suchergebnisse anzeigen:** Mit den Kriterien aus dem DTO wird die Repository-Methode `sucheRechnungen(filter)` aufgerufen. Sie führt benutzerdefiniertes SQL aus und legt die über ein No-Key-Mapper erzeugten `RechnungInfo`-DTOs in der Property `results` des Filter-DTOs ab. Eine Tabelle auf der zweiten Page zeigt diese Liste an.
 
-Bei der Suche werden weder `Rechnung`-Entitäten noch deren Positionen geladen. Die Session des `SEARCH`-Commands kann nicht committed werden. Die Eingabe von Suchkriterien und das Befüllen von `results` im DTO sind davon unabhängig: Diese Daten dienen dem Suchablauf und werden nicht in die Datenbank geschrieben. Auch die `RechnungInfo`-Ergebnisse des No-Key-Mapper sind read-only und nicht Bestandteil der Session-Identity-Map.
+Bei der Suche werden weder `Rechnung`-Entitäten noch deren Positionen geladen. Die Session des `SEARCH_CMD` kann nicht committed werden. Die Eingabe von Suchkriterien und das Befüllen von `results` im DTO sind davon unabhängig: Diese Daten dienen dem Suchablauf und werden nicht in die Datenbank geschrieben. Auch die `RechnungInfo`-Ergebnisse des No-Key-Mapper sind read-only und nicht Bestandteil der Session-Identity-Map.
 
 Ein Doppelklick auf eine Tabellenzeile startet `Rechnung bearbeiten`. Als Parameter wird die Rechnungs-ID aus dem ausgewählten `RechnungInfo`-DTO übergeben.
 
 #### Rechnung und Positionen bearbeiten
 
-Der Command `Rechnung bearbeiten` hat den Typ `GRAPH_OWNER` und startet eine eigene Session. Er ist dafür verantwortlich, die Daten zur Bearbeitung zu laden (**Checkout**). Dazu ruft er `checkoutRechnung(id)` mit der übergebenen Rechnungs-ID auf. Die Repository-Methode lädt den Rechnungskopf und die zugehörigen Positionen.
+Der Command `Rechnung bearbeiten` hat den Typ `GRAPH_OWNER_CMD` und startet eine eigene Session. Er ist dafür verantwortlich, die Daten zur Bearbeitung zu laden (**Checkout**). Dazu ruft er `checkoutRechnung(id)` mit der übergebenen Rechnungs-ID auf. Die Repository-Methode lädt den Rechnungskopf und die zugehörigen Positionen.
 
-Der Benutzer kann den Rechnungskopf und die Positionen bearbeiten. Für die Bearbeitung einer einzelnen Position wird `Rechnungsposition bearbeiten` vom Typ `GRAPH_EDIT` verwendet. Dieser Command arbeitet innerhalb der bestehenden Session des `GRAPH_OWNER` und eröffnet keine eigene Session. Änderungen werden direkt an der Entität Rechnungsposition durchgeführt.
+Der Benutzer kann den Rechnungskopf und die Positionen bearbeiten. Für die Bearbeitung einer einzelnen Position wird `Rechnungsposition bearbeiten` vom Typ `GRAPH_EDIT_CMD` verwendet. Dieser Command arbeitet innerhalb der bestehenden Session des `GRAPH_OWNER_CMD` und eröffnet keine eigene Session. Änderungen werden direkt an der Entität Rechnungsposition durchgeführt.
 
-Der `RechnungsService` übernimmt fachliche Prüfungen und Berechnungen. Der `GRAPH_OWNER` registriert die zum Speichern benötigten Repository-Methoden (**Check-in**) als **Session-Operationen**. Im Beispiel dient dazu `checkinRechnung(rechnung)`.
+Der `RechnungsService` übernimmt fachliche Prüfungen und Berechnungen. Der `GRAPH_OWNER_CMD` registriert die zum Speichern benötigten Repository-Methoden (**Check-in**) als **Session-Operationen**. Im Beispiel dient dazu `checkinRechnung(rechnung)`.
 
-Beim vorgesehenen Abschluss des `GRAPH_OWNER` wird eine Datenbanktransaktion gestartet. Die registrierten Session-Operationen werden ausgeführt und die Transaktion wird committed. Die Session begleitet damit die Bearbeitung; die Transaktion zum Speichern wird erst beim Abschluss ausgeführt.
+Beim vorgesehenen Abschluss des `GRAPH_OWNER_CMD` wird eine Datenbanktransaktion gestartet. Die registrierten Session-Operationen werden ausgeführt und die Transaktion wird committed. Die Session begleitet damit die Bearbeitung; die Transaktion zum Speichern wird erst beim Abschluss ausgeführt.
 
 #### Summe aller Rechnungen anzeigen
 
-Der Command `Summe aller Rechnungen anzeigen` hat den Typ `SEARCH` und verwendet eine eigene Read-only-Session. Er ruft `ladeSummeAllerRechnungen()` im Repository auf.
+Der Command `Summe aller Rechnungen anzeigen` hat den Typ `SEARCH_CMD` und verwendet eine eigene Read-only-Session. Er ruft `ladeSummeAllerRechnungen()` im Repository auf.
 
 Die Repository-Methode führt eine aggregierende SQL-Abfrage direkt auf der Datenbank aus. Ein No-Key-Mapper überführt deren Ergebnis in das read-only DTO `RechnungsSummenErgebnis`, das nicht in die Session-Identity-Map integriert wird. Der Command stellt dieses DTO für die Anzeige bereit. Ein Laden und anschließendes Durchlaufen aller Rechnungsentitäten in der Anwendung ist dafür nicht erforderlich.
 
@@ -308,12 +310,6 @@ Die Detaildokumentationen beschreiben Konzepte, Möglichkeiten, Einschränkungen
 | `org.modellwerkstatt.manmap` | [manmap.md](manmap.md) | ausgearbeitet |
 | `org.modellwerkstatt.objectflow` | [objectflow.md](objectflow.md) | ausgearbeitet |
 | `org.modellwerkstatt.dataux` | [dataux.md](dataux.md) | ausgearbeitet |
-
-### Zusätzliche Informationen
-
-| Thema       | Dokumentation                     |
-| ----------- | --------------------------------- |
-| Konventionen bei der Modellierung | [konventionen.md](stuff/konventionen.md) |
 
 ## Stand der Dokumentation
 

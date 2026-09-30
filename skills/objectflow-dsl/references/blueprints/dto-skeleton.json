@@ -12,6 +12,24 @@
       "nodes": [
         { "concept": "jetbrains.mps.baseLanguage.structure.PublicVisibility" }
       ]
+    },
+    {
+      "role": "member",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.ConstructorDeclaration",
+          "properties": [
+            { "name": "nestedName", "value": "SampleDTO" },
+            { "name": "name", "value": "SampleDTO" },
+            { "name": "resolveInfo", "value": "SampleDTO" }
+          ],
+          "children": [
+            { "role": "returnType", "nodes": [{ "concept": "jetbrains.mps.baseLanguage.structure.VoidType" }] },
+            { "role": "body", "nodes": [{ "concept": "jetbrains.mps.baseLanguage.structure.StatementList" }] },
+            { "role": "visibility", "nodes": [{ "concept": "jetbrains.mps.baseLanguage.structure.PublicVisibility" }] }
+          ]
+        }
+      ]
     }
   ]
 }

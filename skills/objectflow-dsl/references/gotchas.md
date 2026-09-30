@@ -19,6 +19,7 @@
 - Without a `validation` block, the first failing Precondition stops evaluation. Validate completely before mutation. [Validation pattern](../../../docu/objectflow.md#preconditions-validation-guards-und-exceptions)
 - Wrong formatted-string placeholders fail at runtime; unexpected `null` is rendered visibly. [String formatting](../../../docu/objectflow.md#formatieren-von-zeichenketten)
 - Use server time and `BigDecimal` literals; avoid `double` and `float` for exact business values. [Literals](../../../docu/objectflow.md#literale-für-datum-zeitpunkt-und-dezimalzahl)
+- In ObjectFlow code, choose the comparison operator by type: `==` for `int`, `boolean`, `string`, `BigDecimal`, and Entities; `of` / `status switch` for Status; `:eq:` / `:ne:` for `LocalDate`, `DateTime`, Value Objects, and other objects. The "always `:eq:`" rule of `moai:mps-baselanguage` applies to MPS nodes in language code, not here. [Comparison rules](../../../docu/objectflow.md#null-werte-in-datenstrukturen)
 
 ## Commands and sessions
 
@@ -48,7 +49,7 @@
 - Always use FQ concept names in blueprints. Never use a `c:` concept reference as a node-reference target.
 - A dry-run warning about an unresolved `TARGET_*` means the production write would create a dynamic reference. Resolve the placeholder first unless a temporary dynamic reference is deliberate.
 - Inspect roots shallowly first; deep-print only the needed subtree.
-- Use `mps_mcp_check_root_node_problems` after every complex edit. Run `FIX_REFERENCES` before declaring an existing target unresolvable.
+- Use `mps_mcp_check_root_node_problems` on each changed root after every complex edit. Run `FIX_REFERENCES` before declaring an existing target unresolvable.
 - If a concept descriptor is `hollow`, do not trust empty features; rebuild the language module and query again.
 - Never copy persistent node references from an application project into this skill or into portable blueprints.
 

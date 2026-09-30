@@ -1,9 +1,8 @@
-# Agents Guide for This MPS Project
- 
+# Agents Guide for MPS Work in a MoWare Application
 
-This is a JetBrains MPS language project. All source of truth lives in MPS models, language definitions, and generators. Use this file as the entry point.
+This is a modellwerkstatt MoWare application built with JetBrains MPS. All source of truth lives in MPS models. The MoWare languages ObjectFlow, ManMap and DataUX are used, not changed: their language definitions and generators are not part of the application project. Use this file as the entry point for MPS work.
 
-For detailed MPS node, model, language, generator, validation, and MCP workflows, load the bundled `mps-mcp-workflow` skill. If the plugin skills are not available through the agent runtime, read `skills/mps-mcp-workflow/SKILL.md` before changing MPS artifacts.
+For detailed MPS node, model, validation, and MCP workflows, load the `moai:mps-mcp-workflow` skill. If the MoAI skills are not available through the agent runtime, report that the MoAI plugin is not installed or enabled.
 
 MCP integration with MPS is an experimental feature. Use it with caution, expect surprises as well as future changes, and report any issues to the JetBrains MPS team.
 
@@ -16,6 +15,15 @@ If MCP tool calls start failing session-wide with this error:
 - Check whether any open project — including phantom or harness-created ones — lives at a path containing a space.
 - Ask the user to move/rename the affected project to a space-free path and reopen it in the IDE.
 - Until then, fall back to manual source reading and ask the user to build/test via the IDE UI.
+
+## ⚠️ Known Limitation: Model-Level Problem Check Misses Root Problems
+
+`mps_mcp_check_root_node_problems` accepts a model reference, but then it does not check the roots the model contains: it returns `no problems found` even when roots have errors or warnings. Reported to JetBrains.
+
+To validate a model:
+- List its roots with `mps_mcp_get_project_structure` (`startingPoint` = the model, `includeRootNodes: true`).
+- Call `mps_mcp_check_root_node_problems` for each root node reference.
+- Never treat a model-level `no problems found` as a successful validation.
 
 ## ⚠️ WARNING: Never Read Raw MPS Model Files
 
@@ -30,7 +38,7 @@ MPS model files are binary-like serialized XML that cannot be safely understood 
 
 ## Project Nature
 
-This repository is primarily an MPS project. Generated Java, Kotlin, and XML artifacts are produced by MPS generators and must not be edited directly. By default, all meaningful source lives in MPS models, but some projects also include hand-authored JVM or build code (e.g. custom runtime libraries, Gradle build scripts, or test harnesses). If this project contains such code, the user should document it in the Project-Specific Notes section below and note which tools are appropriate for it.
+This repository is primarily an MPS project. Generated Java, Kotlin, and XML artifacts are produced by MPS generators and must not be edited directly. By default, all meaningful source lives in MPS models, but some projects also include hand-authored JVM or build code (e.g. custom runtime libraries, Gradle build scripts, or test harnesses). If this project contains such code, it is documented in the application project's `AGENTS.md`, together with the tools appropriate for it.
 
 Use MPS MCP tools as the primary toolset for all model-related work.
 
@@ -38,9 +46,10 @@ Use MPS MCP tools as the primary toolset for all model-related work.
 
 Use MPS MCP tools for everything model-related:
 - modules, models, and root nodes
-- language structure, editors, constraints, typesystem, behavior, and generator aspects
 - model navigation, node editing, and validation
 - generation and build
+
+Do not change the MoWare language definitions (structure, editor, constraints, typesystem, behavior, generator) from an application project.
 
 File-based tools (Read, Grep, Glob) are acceptable for:
 - inspecting generated output to understand runtime behavior or diagnose a problem
@@ -71,16 +80,18 @@ Inspection of generated code is allowed when:
 
 ## Rules for MPS Work
 
-- Load the `mps-mcp-workflow` skill at the start of an MPS session. If MPS MCP tools are unavailable, apply the fallback described in the Tool Selection section above.
+- Load the `moai:mps-mcp-workflow` skill at the start of an MPS session. If MPS MCP tools are unavailable, apply the fallback described in the Tool Selection section above.
 - Use MPS MCP tools whenever available; do not hand-edit `.mps` files as plain XML.
 - Resolve nodes, concepts, models, and modules precisely before editing.
-- Validate after structural changes using `mps_mcp_check_root_node_problems`.
+- Validate after structural changes using `mps_mcp_check_root_node_problems` on each changed root.
 - Rebuild or regenerate after significant changes to keep generated artifacts consistent.
 
-Use the `mps-mcp-workflow` skill for complete guidance on MPS workflows, skills, available tools, and best practices.
+Use the `moai:mps-mcp-workflow` skill for complete guidance on MPS workflows, skills, available tools, and best practices.
 
 ## Skills
 
-A skill is a set of bundled instructions stored in `skills/<skill-name>/SKILL.md`. Start with `mps-mcp-workflow` for the overview and a directory of every other skill.
+MoAI provides its skills through the `moai:` plugin namespace. Start with `moai:mps-mcp-workflow` for the overview and a directory of every other skill.
 
-These `mps-*` skills and this guide originated from the `mps_mcp_initialize_project_for_agents` MCP tool and are now maintained as this package's bundled catalog under `skills/`. The `mps_mcp_*` tools themselves act on whichever MPS project is open in MPS; if a tool reports "no project" or "multiple projects opened", call `mps_mcp_list_open_projects` and give the next tool the intended project's `mpsProjectBaseDirectory`, not this repository root. All `mps_mcp_*` tools are routed by the framework's `projectPath` selector, so pass the open project's base directory (never an ancestor) as `projectPath`. When several MPS projects are open and the target is not obvious from the request or current editor focus, ask the user which project to use rather than guessing.
+## Selecting the MPS Project
+
+The `mps_mcp_*` tools themselves act on whichever MPS project is open in MPS; if a tool reports "no project" or "multiple projects opened", call `mps_mcp_list_open_projects` and give the next tool the intended project's `mpsProjectBaseDirectory`, not this repository root. All `mps_mcp_*` tools are routed by the framework's `projectPath` selector, so pass the open project's base directory (never an ancestor) as `projectPath`. When several MPS projects are open and the target is not obvious from the request or current editor focus, ask the user which project to use rather than guessing.

@@ -24,7 +24,7 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 - Binding never loads data. Ensure the ObjectFlow command/repository has already supplied the full data needed by the UI. See [binding and selection](../../docu/dataux.md#datenbindung-und-selektion) and [explicit graph loading](../../docu/manmap.md#modellierungsumfang-und-ausdrucksmöglichkeiten).
 - A table over a list property binds `boundClassifier` to the property owner and `boundProperty` to that list property; its delegates address properties of the row type. Lists of Value Objects are not valid DataUX table models. See [table binding](../../docu/dataux.md#tabellenbindung-und-selektion).
 - Prefer a root skeleton followed by surgical `ADD CHILD` operations for large or uncertain roots. Preserve existing node IDs.
-- Dry-run JSON first and inspect warnings. After a real change, run `mps_mcp_check_root_node_problems`; generate or build when the task requires it.
+- Dry-run JSON first and inspect warnings. After a real change, run `mps_mcp_check_root_node_problems` on each changed root; generate or build when the task requires it.
 - Keep business rules out of UI expressions. DataUX should remain presentation-oriented “CheapCode”; see the [MoWare development principles](../../docu/moware-werkbank.md#grundprinzipien-für-die-anwendungsentwicklung).
 
 ## Quick start
@@ -36,7 +36,7 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 5. Start from [references/blueprints/](references/blueprints/). Replace every `TARGET_MODEL.*` value with a name or persistent node reference resolved in the destination model.
 6. Dry-run roots with `mps_mcp_insert_root_node_from_json`; dry-run subtrees with `mps_mcp_update_node` using `ADD CHILD`.
 7. Insert the skeleton, add non-trivial subtrees incrementally, and use surgical updates for later edits.
-8. Run `mps_mcp_check_root_node_problems`, repair resolvable references if needed, and perform the task-required make/generation checks.
+8. Run `mps_mcp_check_root_node_problems` on each changed root, repair resolvable references if needed, and perform the task-required make/generation checks.
 
 ## Stable package references
 

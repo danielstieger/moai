@@ -76,7 +76,7 @@ Prefer an overflow submenu. Reserve top-level actions for a small number of unus
 - Use a skeleton plus `mps_mcp_update_node ADD CHILD` for grids, tab sets, large delegate lists, or menus with expressions.
 - Use `SET CHILD`, property updates, or reference updates for existing roots; do not rewrite the entire root for one change.
 - Dry-run every non-trivial blueprint. A successful insert does not prove semantic validity.
-- After real changes, run `mps_mcp_check_root_node_problems`; then generate/build when runtime or generated-code behavior matters.
+- After real changes, run `mps_mcp_check_root_node_problems` on each changed root; then generate/build when runtime or generated-code behavior matters.
 
 ## Diagnose a UI that shows no or wrong data
 

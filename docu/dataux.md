@@ -101,40 +101,42 @@ Der Delegate-Typ folgt dem fachlichen Property-Typ. Ein Delegate ersetzt keine f
 | `DateTime (Date Only)` | `DateTimeDateOnlyDelegate` | `org.modellwerkstatt.dataux.structure.DateTimeDateOnlyDelegate` | Nur Datumskomponente eines DateTime-Werts |
 | `LocalDate` | `LocalDateDelegate` | `org.modellwerkstatt.dataux.structure.LocalDateDelegate` | Lokales Datum |
 | `Status` | `StatusDelegate` | `org.modellwerkstatt.dataux.structure.StatusDelegate` | ObjectFlow-Statuswert |
-| `Reference` | `ReferenceDelegate` | `org.modellwerkstatt.dataux.structure.ReferenceDelegate` | Referenz auf ein fachliches Objekt; die mit `scopeText` festgelegte Kurzbeschreibung bestimmt den im Dropdown angezeigten Text |
+| `Reference` | `ReferenceDelegate` | `org.modellwerkstatt.dataux.structure.ReferenceDelegate` | Referenz auf ein fachliches Objekt; die mit `scopeText` festgelegte Kurzbeschreibung bestimmt den im Dropdown angezeigten Text; nur im Formular |
 | `Image` | `ImageDelegate` | `org.modellwerkstatt.dataux.structure.ImageDelegate` | Bilddarstellung, nur im Formular |
 | `Upload` | `UploadDelegate` | `org.modellwerkstatt.dataux.structure.UploadDelegate` | Datei-Upload, nur im Formular |
 | `Dummy` | `DummyDelegate` | `org.modellwerkstatt.dataux.structure.DummyDelegate` | Platzhalter zur Anordnung von Formularfeldern |
 
 #### Delegate-Optionen
 
-| Name | Konzeptname | FQ-Name | Element | Wirkung |
-| --- | --- | --- | --- | --- |
-| `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` | Formular | Delegate ist nicht editierbar |
-| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Formular | Wert darf fehlen beziehungsweise `null` sein |
-| `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` | Formular | Verwendet nach Möglichkeit eine Auswahlkomponente |
-| `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` | Formular | Löst eine verfügbare Update-Conclusion aus |
-| `HOOK` | `DelegateHookDOption` | `org.modellwerkstatt.dataux.structure.DelegateHookDOption` | Formular | Bindet projektspezifische Delegate-Logik ein |
-| `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` | Formular | Verwendet für einen `StringDelegate` einen numerischen Editor |
-| `ALTER` | `AlternativeDOption` | `org.modellwerkstatt.dataux.structure.AlternativeDOption` | Formular | Verwendet für einen `ReferenceDelegate` oder `StatusDelegate` einen alternativen Editor, sofern die Laufzeitumgebung diesen unterstützt |
-| `WIDE` | `WideDOption` | `org.modellwerkstatt.dataux.structure.WideDOption` | Formular | Blendet nach Möglichkeit das Label links vom Editor aus und gibt dem Editor die gesamte Breite |
-| `OVERWRITE LABEL` | `OverwriteLabelDOption` | `org.modellwerkstatt.dataux.structure.OverwriteLabelDOption` | Formular und Tabelle | Überschreibt die von der Datenstruktur vorgegebene Beschriftung |
-| `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `org.modellwerkstatt.dataux.structure.OverwriteFormatDOption` | Formular und Tabelle | Überschreibt das von der Datenstruktur vorgegebene Format |
-| `WIDTH` | `WidthDOption` | `org.modellwerkstatt.dataux.structure.WidthDOption` | Tabelle | Legt die Breite der Spalte fest |
-| `EDITABLE` | `EditableDOption` | `org.modellwerkstatt.dataux.structure.EditableDOption` | Tabelle | Property wird editierbar dargestellt |
-| `IMPORTANT` | `ImportantDOption` | `org.modellwerkstatt.dataux.structure.ImportantDOption` | Tabelle | Hebt ein wichtiges Tabellenfeld hervor |
-| `COLOR` | `DynColorDOption` | `org.modellwerkstatt.dataux.structure.DynColorDOption` | Tabelle | Berechnet die Farbe dynamisch aus dem Wert |
-| `LONG DESC` | `StatusLongDescDOption` | `org.modellwerkstatt.dataux.structure.StatusLongDescDOption` | Tabelle | Verwendet die Langbeschreibung eines Status |
-| `FOLD` | `FoldDOption` | `org.modellwerkstatt.dataux.structure.FoldDOption` | Tabelle | Blendet die Spalte zunächst aus; der Benutzer kann sie per Doppelklick auf den Spaltenkopf einblenden |
+| Name | Konzeptname | FQ-Name | Kontext | Delegate-Typen | Wirkung |
+| --- | --- | --- | --- | --- | --- |
+| `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` | Formular | alle | Delegate ist nicht editierbar |
+| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Formular | alle | Wert darf fehlen beziehungsweise `null` sein |
+| `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` | Formular | `LocalDate`, `DateTime (Date Only)`, `DateTime` | Verwendet nach Möglichkeit eine Datumsauswahl; bei `DateTime` nicht zusammen mit `OVERWRITE FORMAT` |
+| `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` | Formular | alle | Löst eine verfügbare Update-Conclusion aus |
+| `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` | Formular | `String` | Verwendet für einen `StringDelegate` einen numerischen Editor |
+| `ALTER` | `AlternativeDOption` | `org.modellwerkstatt.dataux.structure.AlternativeDOption` | Formular und Tabelle | `Reference`, `Status` | Verwendet einen alternativen Editor, sofern die Laufzeitumgebung diesen unterstützt |
+| `WIDE` | `WideDOption` | `org.modellwerkstatt.dataux.structure.WideDOption` | Formular | alle | Blendet nach Möglichkeit das Label links vom Editor aus und gibt dem Editor die gesamte Breite |
+| `NUM OF LINES` | `NumOfLinesDOption` | `org.modellwerkstatt.dataux.structure.NumOfLinesDOption` | Formular | `String` | Stellt den Text mehrzeilig mit der angegebenen Zeilenzahl dar |
+| `TIME PICKER ONLY` | `TimeOnlyDOption` | `org.modellwerkstatt.dataux.structure.TimeOnlyDOption` | Formular | `DateTime` | Erfasst nur die Uhrzeit; als Datum wird immer das aktuelle verwendet |
+| `OVERWRITE LABEL` | `OverwriteLabelDOption` | `org.modellwerkstatt.dataux.structure.OverwriteLabelDOption` | Formular und Tabelle | alle | Überschreibt die von der Datenstruktur vorgegebene Beschriftung |
+| `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `org.modellwerkstatt.dataux.structure.OverwriteFormatDOption` | Formular, Tabelle und Custom Element | `String`, `Integer`, `BigDecimal`, `DateTime`, `DateTime (Date Only)`, `LocalDate`, `Image` | Überschreibt das von der Datenstruktur vorgegebene Format |
+| `WIDTH` | `WidthDOption` | `org.modellwerkstatt.dataux.structure.WidthDOption` | Tabelle | alle | Legt die Breite der Spalte in Prozent fest; Pflicht für jede Spalte, die Summe darf 100 % nicht überschreiten |
+| `EDITABLE` | `EditableDOption` | `org.modellwerkstatt.dataux.structure.EditableDOption` | Tabelle | `Status`, `BigDecimal` | Property wird editierbar dargestellt; höchstens eine Spalte pro Tabelle, nicht zusammen mit `FOLD` |
+| `IMPORTANT` | `ImportantDOption` | `org.modellwerkstatt.dataux.structure.ImportantDOption` | Tabelle | alle | Hebt ein wichtiges Tabellenfeld hervor; höchstens einmal pro Tabelle |
+| `COLOR` | `DynColorDOption` | `org.modellwerkstatt.dataux.structure.DynColorDOption` | Tabelle | `BigDecimal` | Berechnet die Farbe dynamisch aus dem Wert |
+| `LONG DESC` | `StatusLongDescDOption` | `org.modellwerkstatt.dataux.structure.StatusLongDescDOption` | Tabelle | `Status` | Verwendet die Langbeschreibung eines Status |
+| `RIGHT ALIGN` | `RightAlignDOption` | `org.modellwerkstatt.dataux.structure.RightAlignDOption` | Tabelle | `String` | Richtet den Zelleninhalt rechtsbündig aus |
+| `FOLD` | `FoldDOption` | `org.modellwerkstatt.dataux.structure.FoldDOption` | Formular und Tabelle | alle | Tabelle: Blendet die Spalte zunächst aus; der Benutzer kann sie per Doppelklick auf den Spaltenkopf einblenden (in h2forms ohne Wirkung). Formular unter h2forms: Das Feld wird nicht angezeigt, bleibt aber als verstecktes Feld erhalten und kann etwa mit `ISSUE UPDATE/SCANABLE` per Scan befüllt werden |
 
-Weitere Delegate-Optionen steuern unter anderem Ausrichtung, mehrzeilige Darstellung, Fokus und dynamische Scopes. Vor dem Einsatz muss geprüft werden, ob die Option für den konkreten Delegate- und Property-Typ zulässig ist.
+Jede Option darf pro Delegate höchstens einmal verwendet werden. `Reference`-Delegates sind in Tabellen nicht zulässig.
 
-#### Optionen für Formulare und Tabellen
+#### Optionen für Elemente Formulare und Tabellen
 
 | Name | Konzeptname | FQ-Name | Element | Wirkung |
 | --- | --- | --- | --- | --- |
 | `DISABLED` | `DisabledFOption` | `org.modellwerkstatt.dataux.structure.DisabledFOption` | Formular | Formular ist nicht editierbar |
-| `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` | Formular und Tabelle | Setzt die Beschriftung des Elements |
+| `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` | Formular und Tabelle | Setzt die Beschriftung des Elements. Nicht zulässig am obersten Element einer Page Pane; dort kommt die Beschriftung aus dem Seitentitel |
 | `SELECT FIRST` | `SelectFirstFOption` | `org.modellwerkstatt.dataux.structure.SelectFirstFOption` | Tabelle | Selektiert das erste Tabellenelement bei der Initialisierung |
 | `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.SelectionSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung für ausgewählte Tabellenobjekte |
 | `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.TableSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung über alle Tabellenobjekte |
@@ -195,9 +197,9 @@ Vor dem Modellieren einer Aktion ist deshalb zu klären:
 - Welche Command-Parameter müssen befüllt werden?
 - Soll die Aktion global, in einem Submenü oder nur an der fokussierten Komponente angeboten werden?
 
-Eine `Compound Action` (`MenuCompoundAction`) verbindet einen `GRAPH_OWNER` optional mit einem anschließenden `GRAPH_EDIT`. Wird für den `GRAPH_OWNER` unmittelbar eine Page-Conclusion angegeben, kann er ohne sichtbare UI bis zu diesem Abschluss ausgeführt werden. Zusätzlich kann die Compound Action in derselben Session und mit den vom Owner bereitgestellten Daten direkt einen `GRAPH_EDIT` starten. Sowohl für den `GRAPH_OWNER` als auch für den `GRAPH_EDIT` lässt sich optional eine automatische Conclusion angeben.
+Eine `Compound Action` (`MenuCompoundAction`) verbindet einen `GRAPH_OWNER_CMD` optional mit einem anschließenden `GRAPH_EDIT_CMD`. Wird für den `GRAPH_OWNER_CMD` unmittelbar eine Page-Conclusion angegeben, kann er ohne sichtbare UI bis zu diesem Abschluss ausgeführt werden. Zusätzlich kann die Compound Action in derselben Session und mit den vom Owner bereitgestellten Daten direkt einen `GRAPH_EDIT_CMD` starten. Sowohl für den `GRAPH_OWNER_CMD` als auch für den `GRAPH_EDIT_CMD` lässt sich optional eine automatische Conclusion angeben.
 
-Damit kann beispielsweise aus einem Suchergebnis heraus eine Aktion auf einem vollständigen Aggregat ausgeführt werden: Der `GRAPH_OWNER` öffnet das ausgewählte Objekt, lädt den Aggregatgraphen vollständig und stellt die Session bereit. Anschließend führt der `GRAPH_EDIT` die fachliche Änderung aus. Dessen Conclusion bestätigt die Änderung; die Conclusion des Owners speichert und schließt den Aggregatgraphen. Ohne nachgelagerten `GRAPH_EDIT` eignet sich dasselbe Muster auch dazu, einen `GRAPH_OWNER` vollständig ohne UI auszuführen.
+Damit kann beispielsweise aus einem Suchergebnis heraus eine Aktion auf einem vollständigen Aggregat ausgeführt werden: Der `GRAPH_OWNER_CMD` öffnet das ausgewählte Objekt, lädt den Aggregatgraphen vollständig und stellt die Session bereit. Anschließend führt der `GRAPH_EDIT_CMD` die fachliche Änderung aus. Dessen Conclusion bestätigt die Änderung; die Conclusion des Owners speichert und schließt den Aggregatgraphen. Ohne nachgelagerten `GRAPH_EDIT_CMD` eignet sich dasselbe Muster auch dazu, einen `GRAPH_OWNER_CMD` vollständig ohne UI auszuführen.
 
 `PageConclusionReference` verweist dabei auf eine Abschlussart, d. h., das `Command` muss diese Conclusion deklarieren. `USER_CANCEL` (`PageConclusionOptionUserCancel`) modelliert einen Abbruch des Commands mit `cancel`, analog zu einem Benutzerabbruch.
 
@@ -286,7 +288,7 @@ Ein `BatchJob Module` beschreibt eine ausführbare Hintergrundverarbeitung. Sein
 Jedes Pair folgt einer Inbox-Denkweise:
 
 1. Der Producer sucht oder berechnet Arbeitseinheiten und legt deren Entities beziehungsweise Schlüssel in eine typisierte Inbox.
-2. Die konfigurierte Anzahl von Consumern entnimmt jeweils ein Inbox-Element und verarbeitet es, häufig über einen oder mehrere `GRAPH_OWNER`-Commands.
+2. Die konfigurierte Anzahl von Consumern entnimmt jeweils ein Inbox-Element und verarbeitet es, häufig über einen oder mehrere `GRAPH_OWNER_CMD`-Commands.
 3. Eine Vorbedingung sollte erneut prüfen, ob die Arbeitseinheit noch verarbeitet werden muss. Das schützt unter anderem vor zwischenzeitlichen UI-Änderungen und macht Wiederholungen robuster.
 4. Nach erfolgreicher Verarbeitung wird die Arbeitseinheit abgeschlossen; fachliche Abbrüche und technische Fehlschläge werden getrennt behandelt.
 
@@ -476,11 +478,13 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konz
 | Delegate-Option | `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` |
 | Delegate-Option | `OVERWRITE LABEL` | `OverwriteLabelDOption` | `org.modellwerkstatt.dataux.structure.OverwriteLabelDOption` |
 | Delegate-Option | `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `org.modellwerkstatt.dataux.structure.OverwriteFormatDOption` |
-| Delegate-Option | `HOOK` | `DelegateHookDOption` | `org.modellwerkstatt.dataux.structure.DelegateHookDOption` |
 | Delegate-Option | `FOLD` | `FoldDOption` | `org.modellwerkstatt.dataux.structure.FoldDOption` |
 | Delegate-Option | `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` |
 | Delegate-Option | `ALTER` | `AlternativeDOption` | `org.modellwerkstatt.dataux.structure.AlternativeDOption` |
 | Delegate-Option | `WIDE` | `WideDOption` | `org.modellwerkstatt.dataux.structure.WideDOption` |
+| Delegate-Option | `NUM OF LINES` | `NumOfLinesDOption` | `org.modellwerkstatt.dataux.structure.NumOfLinesDOption` |
+| Delegate-Option | `TIME PICKER ONLY` | `TimeOnlyDOption` | `org.modellwerkstatt.dataux.structure.TimeOnlyDOption` |
+| Delegate-Option | `RIGHT ALIGN` | `RightAlignDOption` | `org.modellwerkstatt.dataux.structure.RightAlignDOption` |
 | Formular-/Tabellenoption | `DISABLED` | `DisabledFOption` | `org.modellwerkstatt.dataux.structure.DisabledFOption` |
 | Formular-/Tabellenoption | `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` |
 | Formular-/Tabellenoption | `SELECT FIRST` | `SelectFirstFOption` | `org.modellwerkstatt.dataux.structure.SelectFirstFOption` |

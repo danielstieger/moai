@@ -13,13 +13,13 @@ JetBrains MPS workflow.
 
 Use the skills supplied by the installed MoAI plugin:
 
-- `objectflow-dsl` for domain structures, services, commands, tests,
+- `moai:objectflow-dsl` for domain structures, services, commands, tests,
   configuration, permissions, and resources;
-- `manmap-dsl` for persistence descriptions, repositories, queries, save/delete,
+- `moai:manmap-dsl` for persistence descriptions, repositories, queries, save/delete,
   and direct SQL;
-- `dataux-dsl` for pages, forms, tables, layouts, bindings, includes, menus,
+- `moai:dataux-dsl` for pages, forms, tables, layouts, bindings, includes, menus,
   applications, and batch jobs;
-- `mps-mcp-workflow` as the entry point for MPS tooling and workflow;
+- `moai:mps-mcp-workflow` as the entry point for MPS tooling and workflow;
 - the matching MPS support skill for node editing, BaseLanguage, console work,
   model manipulation, language analysis, or run configurations.
 
@@ -34,6 +34,11 @@ Use these package documents for the intended MoWare semantics:
 - `moai/docu/objectflow.md` — ObjectFlow language documentation;
 - `moai/docu/manmap.md` — ManMap language documentation;
 - `moai/docu/dataux.md` — DataUX language documentation.
+
+## Conventions
+
+Before modeling, read all files in `./moai/conventions/`. They define binding
+modeling conventions (e.g. naming) for this application project.
 
 ## MPS Workflow
 

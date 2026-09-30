@@ -22,6 +22,8 @@ Format je Eintrag:
 - **Erwartung:** Das Dokument ist mitgeliefert, oder der Verweis wird entfernt.
 - **Workaround:** Stattdessen die Abschnitte „Schreibkonventionen“ in den einzelnen DSL-Dokus verwenden.
 - **Schwere:** hinderlich (Namens- und Modellierungskonventionen bleiben unklar)
+- **Stand:** erledigt (Datei nach `conventions/moware-werkbank-konventionen_v1.md`
+  verschoben, im TEMPLATE referenziert, Link in `moware-werkbank.md` entfernt)
 
 ## P-002 Uneinheitliche Namen der Command-Typen
 
@@ -32,6 +34,10 @@ Format je Eintrag:
 - **Erwartung:** Überall dieselben Bezeichner wie in der Sprachdefinition.
 - **Workaround:** Die Sprachdefinition in MPS ist maßgeblich.
 - **Schwere:** kosmetisch
+- **Stand:** erledigt (überall `SEARCH_CMD`, `GRAPH_OWNER_CMD`, `GRAPH_EDIT_CMD`,
+  `GRAPH_OWNER_CMD_MODAL` laut Enum `O2CommandType`. Doku nach Schreibkonvention mit der
+  Projektion `GRAPH_OWNER_CMD(modal)`, Enum-Wert einmal in Klammern in der Typentabelle von
+  `objectflow.md`; Skills behalten den Enum-Wert für JSON)
 
 ## P-003 Unterstützte Datenbanken: MariaDB nicht erwähnt
 
@@ -42,6 +48,8 @@ Format je Eintrag:
 - **Erwartung:** Eine explizite Aussage zu MariaDB, insbesondere zu Sequences.
 - **Workaround:** offen (vorläufig wird MariaDB als MySQL behandelt)
 - **Schwere:** hinderlich
+- **Stand:** erledigt (MariaDB in `moware-werkbank.md` bei den unterstützten Datenbanken genannt;
+  AUTOID-Verhalten siehe P-016)
 
 ## P-004 Widersprüchliche Angaben zur Testausführung
 
@@ -52,6 +60,9 @@ Format je Eintrag:
 - **Erwartung:** Klare Aussage, welcher Weg empfohlen bzw. unterstützt wird.
 - **Workaround:** offen
 - **Schwere:** kosmetisch
+- **Stand:** erledigt (`moware-werkbank.md` „Laufzeitumgebungen“: Testsuiten laufen in MPS über eine
+  Run-Konfiguration oder standalone mit Java; `OFXTestSuit` implementiert `IMainClass`. Die
+  irreführende Angabe „MPS-Konsole“ ist entfernt)
 
 ## P-005 MPS_AGENT_GUIDE ist auf Sprachprojekte zugeschnitten
 
@@ -61,6 +72,10 @@ Format je Eintrag:
   denn es handelt sich um ein Anwendungsprojekt und der Pfad wäre `moai/skills/...`.
 - **Erwartung:** Formulierung für Konsumentenprojekte bzw. paketrelative Pfade.
 - **Schwere:** kosmetisch
+- **Stand:** erledigt (Einleitung für MoWare-Anwendungen umgeschrieben; Skills als `moai:…`
+  statt über Dateipfade referenziert; Sprachaspekte als nicht zu ändern markiert; Verweis auf
+  den fehlenden Abschnitt „Project-Specific Notes“ durch `AGENTS.md` ersetzt;
+  Entstehungsgeschichte entfernt, `projectPath`-Hinweis als eigener Abschnitt)
 
 ## P-006 Laufzeit turkuforms nicht verfügbar
 
@@ -71,6 +86,8 @@ Format je Eintrag:
 - **Erwartung:** Die Doku gibt an, welche Laufzeiten in einer Standardinstallation vorhanden sind.
 - **Workaround:** Nur fx8forms bzw. h2forms verwenden.
 - **Schwere:** kosmetisch (für v1 ist keine Laufzeit vorgegeben)
+- **Stand:** erledigt (`moware-werkbank.md`, Abschnitt „Laufzeitumgebungen“: turkuforms ist
+  nicht Teil von MPS und wird erst im finalen Build-Prozess eingebunden)
 
 ## P-007 Beispiel-Solution nicht als `startingPoint` auflösbar
 
@@ -136,6 +153,9 @@ Format je Eintrag:
   Konstruktor aus.
 - **Workaround:** Leeren `ConstructorDeclaration` in jede Entity und jedes DTO eingefügt.
 - **Schwere:** blockierend (Build schlägt fehl, Ursache aus der Meldung schwer ersichtlich)
+- **Stand:** erledigt (Checking Rules `check_BusinessObject`, `check_ViewObject`, `check_ValueObject`
+  verlangen den Default-Konstruktor bereits; verdeckt durch P-027. Blueprints `entity-`, `dto-` und
+  `value-object-skeleton.json` enthalten jetzt den leeren Default-Konstruktor)
 
 ## P-012 Per JSON angelegte Knoten erhalten nicht die Konzept-Initialwerte
 
@@ -180,6 +200,9 @@ Format je Eintrag:
 - **Workaround:** Beim Graph Owner („Owner öffnen“) kein Revert; die Session wird beim
   Abbruch ohnehin verworfen. Die Graph-Edits reverten den Parameter `owner`.
 - **Schwere:** hinderlich
+- **Stand:** erledigt (`objectflow.md` „Revert beim Abbruch“: nur Command-Parameter; lokale
+  Variablen sind nicht revertierbar, weil sie nur im Command-Kontext gelten; Revert ist vor allem
+  für `GRAPH_EDIT_CMD` gedacht)
 
 ## P-015 AppUI-Modul ohne `configuration` lässt den Generator mit NPE abstürzen
 
@@ -207,6 +230,9 @@ Format je Eintrag:
 - **Workaround:** Das PetClinic-Schema braucht `AUTO_INCREMENT`-IDs. Die Sequence-Namen
   bleiben laut Spezifikation im Modell, wirken aber nicht.
 - **Schwere:** hinderlich (Schema-Anforderung aus der Spezifikation nicht umsetzbar)
+- **Stand:** erledigt (`manmap.md` „Automatische IDs und Sequences“: Oracle nutzt die Sequence,
+  MySQL `AUTO_INCREMENT`; Sequenzname immer anzugeben. Tabellenzeilen in `manmap.md` und
+  `objectflow.md` neutral formuliert)
 
 ## P-017 Keine Page-Conclusion für einen Benutzerabbruch
 
@@ -218,6 +244,10 @@ Format je Eintrag:
 - **Erwartung:** Ein Konzept für eine Cancel-Conclusion oder ein Hinweis in der Doku.
 - **Workaround:** Abbrechen per ESC; kein eigener Button.
 - **Schwere:** kosmetisch
+- **Stand:** erledigt (`objectflow.md`: Abbrechen-Button kommt immer von der UI-Laufzeit, keine
+  Abbrechen-Conclusion modellieren; `NO_ESC` schaltet den Benutzerabbruch ab; `FINAL_CANCEL` durch
+  Guard, Exception und in Jobs durch Preconditions; neuer Abschnitt zu `listOfProblems`.
+  `VslCancelExParam`/`VslCancelMsgParam` sind deprecated und werden aus der Sprache entfernt)
 
 ## P-018 Kein Beispiel und keine Doku für `ReferenceDelegate.scopeText`
 
@@ -269,6 +299,9 @@ Format je Eintrag:
 - **Erwartung:** Pflichtfeld oder Default im Generator; Doku zur Bedeutung.
 - **Workaround:** Beschreibenden String übergeben (z. B. `"OwnerRepository.saveOwner"`).
 - **Schwere:** hinderlich
+- **Stand:** erledigt (`check_SessionOperation` meldet ein fehlendes `ex` bereits; übersehen wegen P-027.
+  Kardinalität von `ex` wird in der Sprache auf 1 gesetzt. `objectflow.md`: kein zusätzliches
+  `session operation add` bei automatisch registrierten Aufrufen)
 
 ## P-022 Test-Infrastruktur (Testdaten committen, Session-Operationen prüfen) nicht dokumentiert
 
@@ -285,6 +318,11 @@ Format je Eintrag:
 - **Workaround:** Service `PetClinicTestData` mit `newSession()`/`commit()`; Aufrufe per
   `#+ with sess`; Prüfung über `session.getOperations().get(i).getInformation()`.
 - **Schwere:** hinderlich
+- **Stand:** erledigt (neue Konvention `conventions/moware-werkbank-tests_v1.md` mit Services `CS`
+  (`CREATE()`/`COMMIT()`) und `TestDaten`, Aufruf `#+ with #CS.CREATE() …`, plausible Testdaten,
+  Zurücklesen in frischer Custom Session. `objectflow.md`: nur die Session des `Simple Test`
+  committet nicht; `run command` eines `GRAPH_OWNER_CMD` committet; Prüfung durch Zurücklesen und
+  weitergereichte Objekte. `session.getOperations()` ist kein vorgesehener Prüfweg)
 
 ## P-023 `==` zwischen `LocalDate`-Werten wird als Java-Referenzvergleich generiert, entgegen der Doku
 
@@ -310,6 +348,9 @@ Format je Eintrag:
   `Objects.equals(…)`. Die Skill-Regel „`:eq:` für Knotengleichheit“ (mps-baselanguage) gilt also
   sinngemäß auch für Objektwerte in ObjectFlow-Code.
 - **Schwere:** kritisch (stiller fachlicher Fehler)
+- **Stand:** erledigt (Ursache: Reduktionsregel `BinaryOperation` in `gen.javaext@generator` ersetzt
+  `==`/`!=` nur bei `string` und `BigDecimal`. `objectflow.md` „Null-Werte in Datenstrukturen“:
+  Vergleichsregel je Typ als Tabelle; Skill objectflow-dsl mit Verweis darauf)
 
 ## P-024 `run command`: Benutzerabbruch laut Doku möglich, bei Nicht-Such-Commands aber vom Checker blockiert und zur Laufzeit defekt
 
@@ -336,6 +377,10 @@ Format je Eintrag:
   `try … catch (OFXJobWorkCanceledException)` fassen und danach Revert bzw. DB-Zustand
   prüfen. Die Revert-Liste gilt laut Doku für FINAL_CANCEL und FINAL_USER_CANCEL gleichermaßen.
 - **Schwere:** hinderlich
+- **Stand:** erledigt (`objectflow.md` „Commands ohne UI ausführen“: `<user_cancel>` nur bei
+  `SEARCH_CMD`; Abbrüche anderer Commands über eine scheiternde Precondition → `FINAL_CANCEL`,
+  erwartet mit `FAIL IN`. Der Laufzeitfehler beim Child-`GRAPH_EDIT_CMD` ist durch den Checker
+  blockiert und wird nicht behoben)
 
 ## P-025 `assert a :eq: b` in Tests generiert keine Prüfung
 
@@ -350,6 +395,7 @@ Format je Eintrag:
   Das generiert `if (!(operand.isEqual(param0))) throw …`. Die Joda-Stub-Referenz liegt in
   `org.joda.time.base`, nicht in `org.joda.time`.
 - **Schwere:** kritisch (stiller Testausfall)
+- **Stand:** wird im Generator korrigiert (Entwickler); keine Änderung in moai
 
 ## P-026 `GRAPH_EDIT_CMD` lässt sich im Test nicht auf oberster Ebene ausführen; nicht dokumentiert
 
@@ -362,6 +408,8 @@ Format je Eintrag:
 - **Workaround:** Den Graph-Edit in einer Page von „Owner öffnen“ ausführen; dort
   `session.getOperations().size() == 0` prüfen (`session` ist die Session des Owners).
 - **Schwere:** hinderlich
+- **Stand:** erledigt (`objectflow.md` „Commands ohne UI ausführen“: `GRAPH_EDIT_CMD` nur als
+  Child in einer Page des Owner-`run command`)
 
 ## P-027 `check_root_node_problems` mit Modellreferenz meldet „no problems found“, obwohl Roots Fehler haben
 
@@ -378,6 +426,9 @@ Format je Eintrag:
 - **Workaround:** Jeden Root einzeln prüfen: Roots per `query_nodes FIND_INSTANCES`
   (`INamedConcept`, `isRoot`) ermitteln, dann `check_root_node_problems` pro Root aufrufen.
 - **Schwere:** kritisch (falsche Sicherheit)
+- **Stand:** erledigt (am 2026-09-30 nachgestellt: Modellreferenz → „no problems found“, pro Root
+  15 Warnungen; an JetBrains gemeldet. `MPS_AGENT_GUIDE.md`: neuer Abschnitt „Known Limitation“ mit
+  Umweg; Skills und Guide prüfen „on each changed root“)
 
 ## P-028 DataUX: `LABEL` am Top-Level-Formular einer Page Pane unzulässig, Doku sagt „Formular und Tabelle“
 
@@ -390,6 +441,8 @@ Format je Eintrag:
 - **Workaround:** `LABEL` am Top-Level-Element weglassen; die Beschriftung kommt aus dem
   Seitentitel.
 - **Schwere:** lästig
+- **Stand:** erledigt (`dataux.md`, Tabelle „Optionen für Formulare und Tabellen“, Zeile `LABEL`:
+  Einschränkung für das oberste Element einer Page Pane ergänzt)
 
 ## P-029 DataUX: `PICKER` an `ReferenceDelegate` unzulässig, Doku legt ihn nahe
 
@@ -403,6 +456,10 @@ Format je Eintrag:
 - **Erwartung:** Tabelle „Option × Delegate-Typ“ in Doku bzw. Skill.
 - **Workaround:** Option entfernen; der `ReferenceDelegate` bringt ohnehin eine Auswahl mit.
 - **Schwere:** lästig
+- **Stand:** erledigt (`dataux.md`, Tabelle „Delegate-Optionen“ aus den Constraints und Checking
+  Rules der Sprache neu aufgebaut: Spalten „Kontext“ und „Delegate-Typen“, Mengenregeln, fehlende
+  Optionen `NUM OF LINES`, `TIME PICKER ONLY`, `RIGHT ALIGN` ergänzt, `FOLD` im Formular unter
+  h2forms beschrieben, `HOOK` entfernt. `PICKER` ist die Datumsauswahl für Datums-Delegates)
 
 ## P-030 DataUX: Scope von `boundClassifier` weicht von der Doku zum Selektionskontext ab
 
@@ -603,3 +660,28 @@ Format je Eintrag:
   - Pflicht- und Längenvalidierungen samt Regeltests entfernen;
   - `normalize()` ohne Null-Prüfung und `hasDuplicatePet` ohne erneutes `trim()`.
 - **Schwere:** hinderlich (doppelte Logik, überflüssige Tests)
+
+## P-034 Skill-Auswahl hängt allein an der `description`; sie nennt Paket- statt Nutzerbegriffe
+
+- **Bereich:** Skill (`skills/*-dsl/SKILL.md`, Frontmatter); Befund aus einem Review des
+  Pakets, nicht aus dem Lauf gemessen. Ergänzt P-031, das die Abgrenzung
+  objectflow-dsl/dataux-dsl behandelt.
+- **Beobachtung:**
+  - Ein Agent (hier Claude Code) sieht zu Beginn einer Sitzung von jedem Skill nur
+    `name` und `description` aus dem Frontmatter. Ob ein Skill geladen wird, entscheidet
+    allein, ob die Anfrage zu dieser Zeile passt. Der Inhalt der SKILL.md wirkt erst
+    nach dem Laden.
+  - Die Beschreibungen setzen beim Paketnamen an („org.modellwerkstatt.objectflow
+    models“) und nennen Modellbegriffe wie „domain structures“. Nutzer formulieren
+    fachlich: „leg eine Entity an“, „Value Object“, „Service für Haustiere“, „bau ein
+    Formular“, „Repository/Query“.
+- **Erwartung:**
+  - `description` je DSL-Skill um die Begriffe ergänzen, die Nutzer verwenden, z. B.
+    objectflow-dsl: Entity, Value Object, DTO, Enum, Service, Command, Test;
+    manmap-dsl: Persistenz, Tabelle, Repository, Query, SQL, speichern/löschen;
+    dataux-dsl: Page, Formular, Tabelle, Layout, Menü, Anwendung, Batch.
+  - Nach der Installation ein kurzer Rauchtest: einige typische Anfragen stellen und
+    prüfen, ob der passende Skill geladen wird.
+- **Workaround:** Den Skill im Prompt ausdrücklich nennen („lade objectflow-dsl“).
+- **Schwere:** hinderlich (wird der Skill nicht geladen, arbeitet der Agent ohne die
+  Fallen und Blueprints)

@@ -21,7 +21,7 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 - Query concepts with `mps_mcp_get_concept_details` and `l:ec097fca-5b84-41f2-847d-6a5690cae277:org.modellwerkstatt.objectflow`, not the module-style reference.
 - Use fully qualified concept names in JSON blueprints.
 - Prefer a root skeleton followed by surgical `ADD CHILD` operations for large or uncertain roots.
-- Dry-run JSON first and inspect warnings. After real changes, run `mps_mcp_check_root_node_problems`; build or generate when the task requires it.
+- Dry-run JSON first and inspect warnings. After real changes, run `mps_mcp_check_root_node_problems` on each changed root; build or generate when the task requires it.
 - Never infer that a successful insert is semantically valid.
 - Keep domain methods free of repository/service `OperationCall`s; load facts first and coordinate infrastructure in a service or command. See [Services and domain logic](../../docu/objectflow.md#service-komponenten).
 - Validate all expected business failures before mutating a graph. See [Preconditions, validation, guards, and exceptions](../../docu/objectflow.md#preconditions-validation-guards-und-exceptions).
@@ -37,7 +37,7 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 5. Start from [references/blueprints/](references/blueprints/). Replace names and every `TARGET_*` placeholder.
 6. Dry-run a root with `mps_mcp_insert_root_node_from_json`; dry-run a subtree with `mps_mcp_update_node` using `ADD CHILD`.
 7. Insert the skeleton, add large subtrees incrementally, and preserve existing node IDs with surgical updates.
-8. Run `mps_mcp_check_root_node_problems`, repair resolvable references if needed, and run the task-required make/generation checks.
+8. Run `mps_mcp_check_root_node_problems` on each changed root, repair resolvable references if needed, and run the task-required make/generation checks.
 
 ## Stable project references
 

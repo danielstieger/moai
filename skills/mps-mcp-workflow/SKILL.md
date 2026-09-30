@@ -26,7 +26,7 @@ Read this together with `AGENTS.md` whenever the task involves MPS artifacts or 
     *Failing to follow this ordering results in stale or hollow descriptors where dependent tools silently see empty properties, children, or references.*
     **Shortcut:** `mps_mcp_alter_structure CREATE_CONCEPTS` with `make: true` already does steps 2–3 — it clean-rebuilds, verifies every created descriptor against the runtime, and auto-recovers a never-deployed language (one module-scoped rebuild, `recoveryStage: "module-rebuild"`). Trust its `makeStatus`; run the manual chain only for structure edits made through tools that do not make (`UPDATE_*`/`RENAME_*` operations, `mps_mcp_update_node`).
 - **Surgical edits over full-root rewrites.** When a single child changes, prefer `mps_mcp_update_node` over re-running `mps_mcp_update_root_node_from_json` on the whole root.
-- **Validate frequently.** A successful insertion (`"ok": true`) does not mean the AST is semantically valid — always follow with `mps_mcp_check_root_node_problems`.
+- **Validate frequently.** A successful insertion (`"ok": true`) does not mean the AST is semantically valid — always follow with `mps_mcp_check_root_node_problems` on each changed root.
 
 > **Tool name note**: MPS MCP tools are named with a `mps_mcp_` prefix (e.g. `mps_mcp_query_nodes`, `mps_mcp_alter_nodes`, `mps_mcp_get_concept_details`). Your MCP client wraps these with a server-specific prefix (e.g. `mcp__mps-mcp-server__<env>___`), which varies by environment. Match tools by the stable `mps_mcp_*` suffix.
 
@@ -78,7 +78,7 @@ MPS is a projectional editor and a language workbench. Unlike text-based IDEs, M
 1. **Check the bundled skills** under `skills/` before starting unfamiliar work and load the relevant MoWare or MPS skill when it exists.
 2. **Anchor on the user's focus** — call `mps_mcp_get_current_editor_root_node` so you know which root the user is looking at.
 3. **Identify the task family**: editing user code → load `mps-node-editing` and often `mps-baselanguage`; investigating an unfamiliar language → load `mps-language-analysis`; working with a MoWare DSL → load its dedicated skill.
-4. **Validate frequently** with `mps_mcp_check_root_node_problems`. Rebuild/reload after compiled-aspect changes.
+4. **Validate frequently** with `mps_mcp_check_root_node_problems` on each changed root. Rebuild/reload after compiled-aspect changes.
 
 ## Essential Skills (Detail)
 

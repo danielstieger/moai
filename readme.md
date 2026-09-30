@@ -11,6 +11,7 @@ application project and to be installed as an agent plugin at the same time.
 moai/
 ├── skills/                     MoWare and MPS skills
 ├── docu/                       Architecture and language documentation
+├── conventions/                Binding modeling conventions (in German)
 ├── MPS_AGENT_GUIDE.md          General MPS working rules
 ├── INSTALL_INSTRUCTIONS.md     Installation instructions for agents
 └── TEMPLATE_PROJECT_AGENTS.md  Template for the application project

@@ -70,6 +70,7 @@ Important verified roles:
 
 - Prefer `OFXTestSuit` over JUnit whenever ObjectFlow, ManMap, session, component, or command semantics are under test. [OFX Test Suit](../../../docu/objectflow.md#ofx-test-suit)
 - `run command` can simulate pages, conclusions, child commands, and successors without DataUX. [Commands without UI](../../../docu/objectflow.md#commands-ohne-ui-ausführen)
+- A value passed forward from `FINAL_OK` is declared by `CommandCreationInfo` (projected as `user toast message`; `msg` [1], optional `keyReference`, name in `refName`). In the test, reference it with `OFXRunCmdCreateInfoRef` (reference role `reference` → that `CommandCreationInfo`), not with a `VariableReference`. [Commands without UI](../../../docu/objectflow.md#commands-ohne-ui-ausführen)
 - `OFXConfig` models component wiring, reusable sections, overrides, scanning, and primary implementations. [OFX Config](../../../docu/objectflow.md#konfiguration-mit-ofx-config)
 - `RolesAndPermissions` separates roles, object-returning scopes, and cached identities. Invalidate role caches deliberately when context changes. [Roles, scopes, and identities](../../../docu/objectflow.md#rollen-scopes-und-identities)
 - `StaticRessources` requires at least one platform and centralizes platform-specific labels/colors without duplicating commands. [Static resources](../../../docu/objectflow.md#statische-ressourcen)
