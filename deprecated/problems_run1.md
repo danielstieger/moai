@@ -120,7 +120,7 @@ Format je Eintrag:
   Solution mit `JDK`, Modelle mit DevKit `org.modellwerkstatt.MoWareWerkbank`, weitere
   Abhängigkeiten nur bei direkter Verwendung. Verweis im Quick start von objectflow-dsl. Aufbau der
   Anwendung mit Bounded Contexts, Aggregat- und Use-Case-Bereichen in
-  `conventions/moware-werkbank-konventionen_v1.md`)
+  `conventions/moware-werkbank-anwendung_v1.md`)
 
 ## P-009 `QueryFromMap.readOnly` ist beim Anlegen per JSON implizit `true`
 

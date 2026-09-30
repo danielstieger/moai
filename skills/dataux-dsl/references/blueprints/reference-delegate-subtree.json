@@ -1,0 +1,37 @@
+{
+  "concept": "org.modellwerkstatt.dataux.structure.ReferenceDelegate",
+  "children": [
+    {
+      "role": "boundTo",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.LocalPropertyReference",
+          "references": [
+            { "role": "property", "target": "TARGET_MODEL.referenceProperty" }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "scopeText",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.RefDelegateScopeProps",
+          "children": [
+            {
+              "role": "paths",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.dataux.structure.LocalPropertyReference",
+                  "references": [
+                    { "role": "property", "target": "TARGET_MODEL.targetTypeProperty" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
