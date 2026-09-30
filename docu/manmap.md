@@ -143,11 +143,11 @@ Beide Formen beschreiben nur die Beziehung. Sie laden die Liste nicht automatisc
 
 ## Gemappte Abfragen mit `get`/`where` auf einem Mapping
 
-`get` erwartet einen Schlüssel und liefert eine Instanz oder `null`. Erkennt ManMap einen Integer-, String- oder zusammengesetzten Schlüssel nach seiner typabhängigen Null-Key-Semantik als nicht vergeben, liefert `get` unmittelbar `null`; dieselbe Schlüsselprüfung entscheidet bei `save with` ohne erzwingende Option zwischen Insert und Update. Die konkreten Null-Key-Werte sind im Abschnitt „Insert oder Update“ aufgeführt.
+`get` erwartet einen Schlüssel und liefert eine Instanz oder `null`. Erkennt ManMap einen Integer-, String- oder zusammengesetzten Schlüssel nach seiner typabhängigen Null-Key-Semantik als nicht vergeben, liefert `get` unmittelbar `null`; dieselbe Schlüsselprüfung entscheidet bei `save with` ohne erzwingende Option zwischen Insert und Update. Die konkreten Null-Key-Werte sind im Abschnitt „Insert oder Update“ aufgeführt. `get` steht allein: Weitere Operationen und Join-Optionen sind nicht zulässig.
 
-`where` (`WhereQuery`) enthält im Child `filter` genau eine BaseLanguage-Expression und liefert eine Liste. Die geschweiften Klammern und die Parameterdarstellung im Editor sind eine Closure-ähnliche Projektion, aber keine BaseLanguage-Closure im AST. Weitere Operationen für `where` werden in der Reihenfolge der Projektion ergänzt, etwa `sortBy`, `limit` oder `size`.
+`where` (`WhereQuery`) enthält im Child `filter` genau eine BaseLanguage-Expression und liefert eine Liste. Die geschweiften Klammern und die Parameterdarstellung im Editor sind eine Closure-ähnliche Projektion, aber keine BaseLanguage-Closure im AST. Nach `where` sind beliebig viele `sortBy` zulässig, als letztes Element optional `limit` oder `size`; eine Abfrage mit `size` ist read-only. Join-Optionen (`refJoin`, `listJoin`) gibt es nur bei `where`.
 
-`reload` liest die gemappten Felder der übergebenen Entity erneut aus der Datenbank und aktualisiert diese Entity.
+`reload` liest die gemappten Felder der übergebenen Entity erneut aus der Datenbank und aktualisiert diese Entity. Wie `get` steht `reload` allein, ohne weitere Operationen und Join-Optionen.
 
 ### Kapitellandkarte: Gemappte Abfragen
 

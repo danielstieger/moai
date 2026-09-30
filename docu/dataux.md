@@ -208,6 +208,10 @@ Eine `Action` (`MenuAction`) referenziert einen ObjectFlow-`Command`. Die im Com
 - `getSelectedObjects()` (`org.modellwerkstatt.objectflow.structure.SelectedList`) für die ausgewählten Objekte einer Mehrfachselektion,
 - Konstanten für fest vorgegebene Aufrufvarianten.
 
+Beschriftung, Icon und Hotkey einer Action kommen aus dem Command. Mit einem eigenen Label aus den statischen Ressourcen (`customLabel`) überschreibt die Action diese Vorgaben für diesen Menüeintrag.
+
+Ein Doppelklick auf eine Tabellenzeile oder die Enter-Taste auf einer ausgewählten Zeile führt die erste Action im Menü der Tabelle aus, deren Hotkey `ENTER` ist; Actions in Submenüs zählen der Reihe nach mit. Die Hauptaktion einer Tabelle, etwa Öffnen oder Bearbeiten, erhält deshalb den Hotkey `ENTER`, als `defaultHotkey` am Command oder über das Label der Action.
+
 Menüaktionen arbeiten immer im aktuellen UI-Kontext. Bei Tabellenaktionen ist deshalb typischerweise die Selektion des Zeilentyps maßgeblich; bei Page-Pane-Aktionen steht meist das gebundene Wurzelobjekt oder der gesamte Seitenablauf im Vordergrund. Das schränkt den Zugriff aber nicht auf diese Typen ein: An jeder Aktionsstelle kann mit einem typisierten `getSelected(...)` die gemeinsame Selektion eines beliebigen im `Page Pane` verwendeten Typs abgefragt werden, beispielsweise `getSelected(RechnungsSubPosition)` direkt in einer Page-Pane-Aktion.
 
 Vor dem Modellieren einer Aktion ist deshalb zu klären:

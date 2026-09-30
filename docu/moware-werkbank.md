@@ -260,13 +260,15 @@ Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion m
 
 2. **Modellieren und versionieren:** Die Anwendung wird mit den DSLs in MPS modelliert und mit Git versioniert. MPS speichert die Modelle als XML-Dateien. Diese enthalten strukturierte Modelle mit Referenzen und Identitäten; ein rein textueller Merge kann deren Konsistenz verletzen. Für die Versionsverwaltung werden deshalb die Git-Unterstützung von MPS und der MPS-Merge-Driver verwendet. Modellkonflikte werden mit den modellbewussten Werkzeugen von MPS aufgelöst. Agenten bearbeiten Modelle über die MPS-Werkzeuge und führen keine manuellen Text-Merges der XML-Modelldateien durch.
 
-3. **Laufzeitkonfiguration auswählen:** In der `OFXConfig` wird über **AppFactories** festgelegt, welche Laufzeitumgebung tatsächlich verwendet wird. Ein Projekt enthält häufig mehrere Konfigurationen.
+3. **Datenbankschema erstellen:** Das Datenbankschema erstellt der Entwickler in MPS aus den Entity-Mappings der Persistence Descriptions. Agenten erzeugen oder ändern keine Datenbankschemata.
 
-4. **Vollständig neu bauen:** Vor jedem Ant-Build wird die gesamte Anwendung in MPS (alle dem Projekt zugeordneten MPS-Solutions) vollständig neu gebaut (**Rebuild**). Ein inkrementeller Build reicht nicht aus. Dabei wird insbesondere der Java-Code aus den Modellen neu generiert. Erst nach einem erfolgreichen Rebuild wird mit dem nächsten Schritt fortgefahren.
+4. **Laufzeitkonfiguration auswählen:** In der `OFXConfig` wird über **AppFactories** festgelegt, welche Laufzeitumgebung tatsächlich verwendet wird. Ein Projekt enthält häufig mehrere Konfigurationen.
 
-5. **Mit Ant bauen und bereitstellen:** Anschließend wird Ant auf der Konsole ausgeführt. Die projektspezifische Builddatei und die gewählten Targets bestimmen den Build und die Bereitstellung. Sie müssen zur ausgewählten Laufzeitkonfiguration passen.
+5. **Vollständig neu bauen:** Vor jedem Ant-Build wird die gesamte Anwendung in MPS (alle dem Projekt zugeordneten MPS-Solutions) vollständig neu gebaut (**Rebuild**). Ein inkrementeller Build reicht nicht aus. Dabei wird insbesondere der Java-Code aus den Modellen neu generiert. Erst nach einem erfolgreichen Rebuild wird mit dem nächsten Schritt fortgefahren.
 
-6. **Ausführen und prüfen:** Die Anwendung wird in der durch die `OFXConfig` festgelegten Laufzeitumgebung gestartet und ihre Funktionsfähigkeit geprüft.
+6. **Mit Ant bauen und bereitstellen:** Anschließend wird Ant auf der Konsole ausgeführt. Die projektspezifische Builddatei und die gewählten Targets bestimmen den Build und die Bereitstellung. Sie müssen zur ausgewählten Laufzeitkonfiguration passen.
+
+7. **Ausführen und prüfen:** Die Anwendung wird in der durch die `OFXConfig` festgelegten Laufzeitumgebung gestartet und ihre Funktionsfähigkeit geprüft.
 
 ## Grundprinzipien für die Anwendungsentwicklung
 

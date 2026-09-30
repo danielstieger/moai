@@ -507,7 +507,7 @@ Ein Command kann folgende Bestandteile enthalten:
 | Permissions | `CAN_OPEN_RO`- oder `CAN_OPEN_RW`-Eintrag mit Rolle; fehlt beides, dann uneingeschränkter Zugriff | Lesenden beziehungsweise ändernden Zugriff erlauben | Beobachterrolle für Anzeige, Sachbearbeiterrolle für Änderung |
 | Preconditions | Liste von `Precondition`-Knoten | Verständliche Voraussetzungen vor dem Start prüfen | Vollständige Parameter, fachlich erlaubter Ausgangszustand |
 | Lokale Variablen | Typisierte Variablendeklaration | Zustand einer Command-Instanz halten | Geladener Graph, Filter-DTO, Ergebnisliste, Ablaufkennzeichen |
-| Command Settings | Deklarative Einstellungen und Ausdrücke | Darstellung und Laufzeitverhalten konfigurieren | Label, Icon, Hotkey, Farbe, Revert-Objekte, Locks, Optionen |
+| Command Settings | Deklarative Einstellungen und Ausdrücke | Darstellung und Laufzeitverhalten konfigurieren | Label, Icon, Hotkey, Farbe, Revert-Objekte, [Locks](#pessimistische-sperren-mit-locks), Optionen |
 | `command init` | Funktion ohne Rückgabewert | Ablauf vorbereiten und erste Kontrollentscheidung treffen | Checkout oder Suche, DTO-Aufbau, Precondition, `page …` oder `done` |
 | Pages | `PageCrtl`-Knoten | Interaktionsschritte definieren | Page Init mit Rückgabewert, Bindung, Titel, Scopes, UI-Auswahl und Conclusions |
 | `FINAL OK_CONCLUSION` | Funktion ohne Rückgabewert plus Successors und Selektionen | Erfolgreichen Abschluss vorbereiten | Check-in-Operationen registrieren, Ergebnisobjekte pushen |
@@ -772,6 +772,14 @@ Der Session-Schalter ist von der Read-only-Eigenschaft einzelner Entities zu unt
 `session.isDirty()` beantwortet, ob die Session ungespeicherte Änderungen enthält. Die Prüfung berücksichtigt zunächst einen ausdrücklich gesetzten Session-Dirty-Zustand und durchläuft andernfalls die Key Stores aller in die Session integrierten Entity-Typen. Eine neu integrierte Entity ohne Schlüssel gilt als dirty; bei vorhandenen Entities wird deren Dirty-Zustand abgefragt. Diese Entity-Prüfung bezieht auch nachträgliche Änderungen an Listen ein. Der Aufruf betrachtet damit die gesamte Session und nicht nur das aktuell auf einer Page gebundene Objekt.
 
 `session.isDirty()` wird von der Laufzeit für die automatische Abbruchrückfrage bei `GRAPH_OWNER_CMD`- und `GRAPH_OWNER_CMD(modal)`-Commands verwendet.
+
+### Pessimistische Sperren mit `locks`
+
+Gleichzeitige Änderungen werden standardmäßig optimistisch über die TCN erkannt (siehe [Optimistic Locking und Audit](manmap.md#optimistic-locking-und-audit)). Ein `GRAPH_OWNER_CMD` oder `GRAPH_OWNER_CMD(modal)` kann zusätzlich unter `locks` pessimistische Sperren anfordern. Pessimistische Sperren werden nur eingesetzt, wenn optimistisches Sperren nicht ausreicht, weil Konflikte in der Praxis häufig auftreten würden, etwa bei viel bearbeiteten Stammdaten.
+
+Jede Sperre ist ein String, der das gesperrte Objekt fachlich bezeichnet; ein Command kann mehrere Sperren anfordern. Die Ausdrücke werden vor `command init` ausgewertet und können deshalb nur Command-Parameter verwenden, etwa `"RECHNUNG_" + rechnung.id` für einen Parameter `rechnung`.
+
+Ist eine der Sperren bereits von einem anderen Benutzer belegt, läuft der Command mit einer Read-only-Session (siehe [Session-weites Read-only und Dirty](#session-weites-read-only-und-dirty)): Alle Page-Conclusions sind deaktiviert, der Benutzer kann die Daten nur ansehen, und die Oberfläche zeigt an, welcher Benutzer die Sperre hält. Die Sperren werden mit jedem Abschluss des Commands wieder freigegeben.
 
 ### Entities in der Session prüfen
 
