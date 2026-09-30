@@ -73,8 +73,9 @@
 
 - Reload the runtime or plugins if required for the changes to take effect,
   or state the required command or restart.
-- Confirm that the MoAI skills (`objectflow-dsl`, `manmap-dsl`, `dataux-dsl`,
-  `mps-mcp-workflow` and the MPS support skills) are visible in your runtime.
+- Confirm that the MoAI skills (`moai:objectflow-dsl`, `moai:manmap-dsl`,
+  `moai:dataux-dsl`, `moai:mps-mcp-workflow`) are
+  visible in your runtime.
 
 ## Final Report
 
