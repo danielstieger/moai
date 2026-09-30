@@ -1,6 +1,6 @@
 ---
 name: objectflow-dsl
-description: Use when creating, editing, validating, or inspecting org.modellwerkstatt.objectflow models, including domain structures, services, commands, tests, configuration, permissions, and resources.
+description: "Use when creating, editing, validating, or inspecting MoWare ObjectFlow models (org.modellwerkstatt.objectflow): domain model with entities, value objects, DTOs, status and business properties; services, business rules, validations and preconditions; commands (search, create, edit), pages, page conclusions and use-case flow; tests with test suites and run command; OFX configuration, roles and permissions."
 ---
 
 # ObjectFlow DSL
@@ -26,11 +26,12 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 - Keep domain methods free of repository/service `OperationCall`s; load facts first and coordinate infrastructure in a service or command. See [Services and domain logic](../../docu/objectflow.md#service-komponenten).
 - Validate all expected business failures before mutating a graph. See [Preconditions, validation, guards, and exceptions](../../docu/objectflow.md#preconditions-validation-guards-und-exceptions).
 - Treat Value Objects immutably and use their selected equality properties deliberately. See [Entity, Value Object, and DTO](../../docu/objectflow.md#entity-value-object-und-dto) and [Value Object equality](../../docu/objectflow.md#value-object-gleichheit).
+- Choose the comparison operator by type: `==` for `int`, `boolean`, `string`, `BigDecimal`, and Entities; `of` / `status switch` for Status; `:eq:` / `:ne:` for `LocalDate`, `DateTime`, Value Objects, and other objects. `==` on those compiles to an identity check. The "always `:eq:`" rule of `moai:mps-baselanguage` applies only to MPS nodes. See [comparison rules](../../docu/objectflow.md#null-werte-in-datenstrukturen).
 - Do not assume lazy loading or cascading persistence. See [explicit graph loading](../../docu/moware-werkbank.md#grundprinzipien-für-die-anwendungsentwicklung) and the [ManMap relationship rules](../../docu/manmap.md#referenzen-eingebettete-werte-und-listen).
 
 ## Quick start
 
-1. Call `mps_mcp_list_open_projects` and select the intended MPS project dynamically.
+1. Call `mps_mcp_list_open_projects` and select the intended MPS project dynamically. For a new application module, follow [From modeling to execution](../../docu/moware-werkbank.md#von-der-modellierung-zur-ausführung) and wire it with `mps_mcp_module_dependency` and `mps_mcp_model_used_language`.
 2. Inspect the destination model's dependencies and used languages with `mps_mcp_get_project_structure`.
 3. Load [references/concepts.md](references/concepts.md) and the task-specific recipe in [references/workflows.md](references/workflows.md).
 4. Inspect a packaged reference root from [references/sandbox.md](references/sandbox.md) when a concrete shape is needed.

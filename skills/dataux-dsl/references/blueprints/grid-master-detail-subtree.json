@@ -1,5 +1,9 @@
 {
   "concept": "org.modellwerkstatt.dataux.structure.GridLayout",
+  "properties": [
+    { "name": "isNamed", "value": "false" },
+    { "name": "name", "value": "#" }
+  ],
   "references": [
     { "role": "boundClassifier", "target": "TARGET_MODEL.TableOwnerClassifier" }
   ],
@@ -54,6 +58,10 @@
                 }
               ]
             }
+          ],
+          "properties": [
+            { "name": "isNamed", "value": "false" },
+            { "name": "name", "value": "#" }
           ]
         },
         {
@@ -89,6 +97,10 @@
                 }
               ]
             }
+          ],
+          "properties": [
+            { "name": "isNamed", "value": "false" },
+            { "name": "name", "value": "#" }
           ]
         }
       ]

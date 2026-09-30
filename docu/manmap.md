@@ -207,9 +207,8 @@ Eine deklarierte Beziehung ist noch keine geladene Beziehung:
 
 - Eine nicht geladene Referenz wirft beim Zugriff `org.modellwerkstatt.objectflow.runtime.OFXNotInitializedException`.
 - Eine nicht geladene Liste ist leer (`size == 0`) und wirft diese Ausnahme nicht.
-- `refJoin` lädt eine Referenz über das zugehörige `Referenz-Mapping` und das Ziel-`Entity-Mapping`.
-- `listJoin` lädt eine Liste als Teil der Abfrage.
-- Alternativ kann eine separate `where`-Abfrage geladen und der Listen-Property explizit zugewiesen werden.
+- Referenzen und Listen werden mit separaten Abfragen geladen, deren Ergebnis der Property explizit zugewiesen wird.
+- `refJoin` und `listJoin` laden die verbundene Referenz beziehungsweise Liste ebenfalls mit und integrieren sie in die Session. Sie werden aber nur verwendet, wenn die Abfrage auf Felder der verbundenen Mappings filtert oder sortiert; nur dann erweitern sie den Scope von `mappingSource`.
 
 Eine leere Liste beweist daher nicht, dass in der Datenbank keine Kindzeilen vorhanden sind. Vor einer solchen Schlussfolgerung ist die Ladestrategie der Repository-Methode zu prüfen.
 
@@ -379,7 +378,7 @@ Schemaoptionen wie `notnull`, `size`, `index` und `unique` beschreiben Anforderu
 ### Domänenmodell laden, bearbeiten und speichern
 
 1. Eine `CHECKOUT`-Repository-Methode lädt die Root-Entity mit `get`/`where` auf einem Mapping im Modus Checkout.
-2. Benötigte Referenzen und Listen werden per Join oder separater Abfrage explizit geladen.
+2. Benötigte Referenzen und Listen werden mit separaten Abfragen explizit geladen.
 3. Der Command beziehungsweise Service verändert die in der Session integrierten Objekte.
 4. Eine oder mehrere `CHECKIN`-Methoden werden als Session-Operationen registriert.
 5. Beim erfolgreichen Abschluss führt die Session die Operationen innerhalb der Transaktion aus.

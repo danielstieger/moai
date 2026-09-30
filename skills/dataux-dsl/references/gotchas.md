@@ -70,6 +70,10 @@ A wide desktop grid may be unsuitable for mobile or MDE devices. Model alternati
 - Expect dry-run warnings for unresolved names; do not treat them as harmless without a resolution plan.
 - Validate the finished root even when insertion returned `ok: true`.
 
+## Inner UI elements must stay unnamed
+
+`DelegateForm`, `Table`, `GridLayout`, `TabLayout`, and `CustomElement` inside a PagePane must have `isNamed = false` and `name = "#"`. JSON insertion leaves `isNamed = true` even though the concept constructor sets `false`, so always set both explicitly; the blueprints do. The checker error "optionally named component is not used anywhere … remove name" means: set `isNamed = false`. Do not clear the name; an empty name crashes the generator. Name an element only when it is reused with `Include`. [Include](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung)
+
 ## Partially documented concepts
 
 Some live UI concepts/options are absent from the documentation's detailed tables or have no complete runtime contract there. Do not infer behavior from their names; verify them against a focused package example before use.

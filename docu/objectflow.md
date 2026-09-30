@@ -69,7 +69,7 @@ Die Child-Rolle `propertyOption` einer Business Property akzeptiert konkrete Unt
 | `DEPRECATED` | `DeprecatedOption` | `org.modellwerkstatt.objectflow.structure.DeprecatedOption` | Kennzeichnet die Property als veraltet. |
 | `RANGE` für `int` | `IRangeOption` | `org.modellwerkstatt.objectflow.structure.IRangeOption` | Beschreibt den zulässigen ganzzahligen Bereich von `start` bis `stop`. |
 | `RANGE` für `BigDecimal` | `RangeOption` | `org.modellwerkstatt.objectflow.structure.RangeOption` | Beschreibt Bereich und Skalierung eines Dezimalwerts. |
-| `LENGTH` | `LengthOption` | `org.modellwerkstatt.objectflow.structure.LengthOption` | Beschreibt minimale und maximale Länge eines Strings. |
+| `LENGTH` | `LengthOption` | `org.modellwerkstatt.objectflow.structure.LengthOption` | Beschreibt minimale und maximale Länge eines Strings; die Oberfläche setzt damit auch Pflichteingabe und Maximallänge durch, siehe [Pflichtwerte, leere Eingaben und `null`](dataux.md#pflichtwerte-leere-eingaben-und-null). |
 | `KEY` | `KeyOption` | `org.modellwerkstatt.manmap.structure.KeyOption` | Markiert die Property als Persistenzschlüssel. |
 | `AUTOID` | `AutoidOption` | `org.modellwerkstatt.manmap.structure.AutoidOption` | Vergibt einen einfachen Schlüssel automatisch; siehe [Automatische IDs und Sequences](manmap.md#automatische-ids-und-sequences). |
 | `CREATEDAT` | `CreatedAtFieldOption` | `org.modellwerkstatt.manmap.structure.CreatedAtFieldOption` | Verwendet die Property als Erstellungszeitpunkt des Audit-Trails. |
@@ -115,9 +115,20 @@ Ein `Value Object` kann über `equal properties` (`EqualPropertyReference`) fest
 
 ### Null-Werte in Datenstrukturen
 
-Anders als bei standard Java-Klassen werden die Properties von Datenstrukturen initialisiert. `string` beginnt als leere Zeichenkette, `int` als `0`, `BigDecimal` als `0.0`, ein Status mit seinem Default- beziehungsweise `ON_CREATION`-Element und eine Liste als leere Liste. Anwendungscode soll diese Werte deshalb nicht vorsorglich durch `null` ersetzen; insbesondere Listen werden als leere Listen verwendet.
+Anders als bei standard Java-Klassen werden die Properties von Datenstrukturen initialisiert, allerdings nicht alle. Das gilt für Entities und DTOs gleichermaßen:
 
-Das bedeutet nicht, dass jeder enthaltene Referenzwert immer gesetzt ist. Datum/Zeit sowie Beziehungen zu Entities, Value Objects und DTOs können fachlich fehlen; auch die Laufzeit-Setter der Referenztypen unterstützen optionale Werte. `null` soll dann ausdrücklich „kein Wert vorhanden“ bedeuten und nicht als Ersatz für einen regulären Zustand dienen. `int` kann als primitiver Typ nicht `null` sein. In DataUX kennzeichnet die Delegate-Option `OPTIONAL`, dass ein Eingabewert fehlen darf; ohne diese Option setzt die Oberfläche einen erforderlichen Wert durch.
+| Property-Typ | Startwert |
+| --- | --- |
+| `string` | `""` |
+| `int` | `0` |
+| `BigDecimal` | `0.0` |
+| Status | Default- beziehungsweise `ON_CREATION`-Element |
+| Liste | leere Liste |
+| `LocalDate`, `DateTime` | `null` |
+| Value Object | `null` |
+| Referenz auf Entity oder DTO | `null`; bei geladenen Objekten, deren Referenz nicht mitgeladen wurde, siehe [Explizites Laden](manmap.md#explizites-laden) |
+
+`null` soll ausdrücklich „kein Wert vorhanden“ bedeuten und nicht als Ersatz für einen regulären Zustand dienen; initialisierte Werte werden nicht vorsorglich durch `null` ersetzt. Value Objects, Datum/Zeit und Referenzen müssen vor der Verwendung explizit gesetzt oder auf `null` geprüft werden. Wie die Oberfläche leere Eingaben behandelt, beschreibt DataUX unter [Pflichtwerte, leere Eingaben und `null`](dataux.md#pflichtwerte-leere-eingaben-und-null).
 
 `==` und `!=` werden je nach Typ unterschiedlich übersetzt. Null-sicher heißt dabei: Zwei `null`-Werte gelten als gleich, genau ein `null`-Wert als ungleich. Maßgeblich ist folgende Regel:
 

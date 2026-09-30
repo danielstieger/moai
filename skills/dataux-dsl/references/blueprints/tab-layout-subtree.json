@@ -1,5 +1,9 @@
 {
   "concept": "org.modellwerkstatt.dataux.structure.TabLayout",
+  "properties": [
+    { "name": "isNamed", "value": "false" },
+    { "name": "name", "value": "#" }
+  ],
   "children": [
     {
       "role": "tabs",
@@ -60,6 +64,10 @@
                         { "concept": "org.modellwerkstatt.dataux.structure.OneWeight" }
                       ]
                     }
+                  ],
+                  "properties": [
+                    { "name": "isNamed", "value": "false" },
+                    { "name": "name", "value": "#" }
                   ]
                 }
               ]

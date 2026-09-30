@@ -256,15 +256,17 @@ Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion m
 
 ## Von der Modellierung zur Ausführung
 
-1. **Modellieren und versionieren:** Die Anwendung wird mit den DSLs in MPS modelliert und mit Git versioniert. MPS speichert die Modelle als XML-Dateien. Diese enthalten strukturierte Modelle mit Referenzen und Identitäten; ein rein textueller Merge kann deren Konsistenz verletzen. Für die Versionsverwaltung werden deshalb die Git-Unterstützung von MPS und der MPS-Merge-Driver verwendet. Modellkonflikte werden mit den modellbewussten Werkzeugen von MPS aufgelöst. Agenten bearbeiten Modelle über die MPS-Werkzeuge und führen keine manuellen Text-Merges der XML-Modelldateien durch.
+1. **Solutions anlegen:** Eine Anwendung besteht aus mehreren MPS-Solutions, je einer pro Bounded Context sowie Solutions für Basis und Anwendung. Jede Solution hat eine Modulabhängigkeit auf `JDK`; ihre Modelle verwenden das DevKit `org.modellwerkstatt.MoWareWerkbank`. Weitere Abhängigkeiten, etwa auf Laufzeitmodule wie `org.modellwerkstatt.objectflow.runtime` oder auf Java-Bibliotheken wie einen JDBC-Treiber, werden nur ergänzt, wenn Inhalte daraus direkt verwendet werden.
 
-2. **Laufzeitkonfiguration auswählen:** In der `OFXConfig` wird über **AppFactories** festgelegt, welche Laufzeitumgebung tatsächlich verwendet wird. Ein Projekt enthält häufig mehrere Konfigurationen.
+2. **Modellieren und versionieren:** Die Anwendung wird mit den DSLs in MPS modelliert und mit Git versioniert. MPS speichert die Modelle als XML-Dateien. Diese enthalten strukturierte Modelle mit Referenzen und Identitäten; ein rein textueller Merge kann deren Konsistenz verletzen. Für die Versionsverwaltung werden deshalb die Git-Unterstützung von MPS und der MPS-Merge-Driver verwendet. Modellkonflikte werden mit den modellbewussten Werkzeugen von MPS aufgelöst. Agenten bearbeiten Modelle über die MPS-Werkzeuge und führen keine manuellen Text-Merges der XML-Modelldateien durch.
 
-3. **Vollständig neu bauen:** Vor jedem Ant-Build wird die gesamte Anwendung in MPS (alle dem Projekt zugeordneten MPS-Solutions) vollständig neu gebaut (**Rebuild**). Ein inkrementeller Build reicht nicht aus. Dabei wird insbesondere der Java-Code aus den Modellen neu generiert. Erst nach einem erfolgreichen Rebuild wird mit dem nächsten Schritt fortgefahren.
+3. **Laufzeitkonfiguration auswählen:** In der `OFXConfig` wird über **AppFactories** festgelegt, welche Laufzeitumgebung tatsächlich verwendet wird. Ein Projekt enthält häufig mehrere Konfigurationen.
 
-4. **Mit Ant bauen und bereitstellen:** Anschließend wird Ant auf der Konsole ausgeführt. Die projektspezifische Builddatei und die gewählten Targets bestimmen den Build und die Bereitstellung. Sie müssen zur ausgewählten Laufzeitkonfiguration passen.
+4. **Vollständig neu bauen:** Vor jedem Ant-Build wird die gesamte Anwendung in MPS (alle dem Projekt zugeordneten MPS-Solutions) vollständig neu gebaut (**Rebuild**). Ein inkrementeller Build reicht nicht aus. Dabei wird insbesondere der Java-Code aus den Modellen neu generiert. Erst nach einem erfolgreichen Rebuild wird mit dem nächsten Schritt fortgefahren.
 
-5. **Ausführen und prüfen:** Die Anwendung wird in der durch die `OFXConfig` festgelegten Laufzeitumgebung gestartet und ihre Funktionsfähigkeit geprüft.
+5. **Mit Ant bauen und bereitstellen:** Anschließend wird Ant auf der Konsole ausgeführt. Die projektspezifische Builddatei und die gewählten Targets bestimmen den Build und die Bereitstellung. Sie müssen zur ausgewählten Laufzeitkonfiguration passen.
+
+6. **Ausführen und prüfen:** Die Anwendung wird in der durch die `OFXConfig` festgelegten Laufzeitumgebung gestartet und ihre Funktionsfähigkeit geprüft.
 
 ## Grundprinzipien für die Anwendungsentwicklung
 

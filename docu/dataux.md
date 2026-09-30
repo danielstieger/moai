@@ -48,6 +48,8 @@ DataUX bindet UI-Komponenten an fachliche Typen und deren Properties. Ein bindba
 
 Jedes `Page Pane` besitzt einen gemeinsamen **Selektionskontext**. Für jeden darin verwendeten Entity- oder DTO-Typ kann eine aktuell selektierte Instanz existieren. Diese Selektion gehört nicht einer einzelnen Tabelle oder einem einzelnen Formular, sondern steht allen Komponenten des `Page Pane`s zur Verfügung.
 
+Im Modell kann ein Element als `boundClassifier` jedoch nur Typen wählen, die vor ihm in der UI-Hierarchie bereitgestellt werden: die Inhaltstypen vorheriger Geschwister einschließlich ihrer Kindelemente sowie die Inhaltstypen umgebender Layouts, Formulare und Tabellen und deren vorheriger Geschwister. Nachfolgende Elemente zählen nicht. Ein einzelner Tab begrenzt diese Suche: Ein Element in einem Tab sieht nur, was im selben Tab vor ihm steht oder dem `Tab Layout` vorausgeht, nicht aber Elemente anderer Tabs. Soll ein Detail in einem Tab die Selektion eines Masters verwenden, steht der Master deshalb vor dem `Tab Layout` oder im selben Tab vor dem Detail.
+
 ##### Typbindung
 
 Eine Bindung nur an einen Entity- oder DTO-Typ verwendet grundsätzlich die aktuelle Selektion dieses Typs. Ein an `Rechnung` gebundenes `Delegate Form` zeigt beispielsweise die aktuell selektierte `Rechnung`.
@@ -101,17 +103,19 @@ Der Delegate-Typ folgt dem fachlichen Property-Typ. Ein Delegate ersetzt keine f
 | `DateTime (Date Only)` | `DateTimeDateOnlyDelegate` | `org.modellwerkstatt.dataux.structure.DateTimeDateOnlyDelegate` | Nur Datumskomponente eines DateTime-Werts |
 | `LocalDate` | `LocalDateDelegate` | `org.modellwerkstatt.dataux.structure.LocalDateDelegate` | Lokales Datum |
 | `Status` | `StatusDelegate` | `org.modellwerkstatt.dataux.structure.StatusDelegate` | ObjectFlow-Statuswert |
-| `Reference` | `ReferenceDelegate` | `org.modellwerkstatt.dataux.structure.ReferenceDelegate` | Referenz auf ein fachliches Objekt; die mit `scopeText` festgelegte Kurzbeschreibung bestimmt den im Dropdown angezeigten Text; nur im Formular |
+| `Reference` | `ReferenceDelegate` | `org.modellwerkstatt.dataux.structure.ReferenceDelegate` | Referenz auf ein fachliches Objekt; nur im Formular |
 | `Image` | `ImageDelegate` | `org.modellwerkstatt.dataux.structure.ImageDelegate` | Bilddarstellung, nur im Formular |
 | `Upload` | `UploadDelegate` | `org.modellwerkstatt.dataux.structure.UploadDelegate` | Datei-Upload, nur im Formular |
 | `Dummy` | `DummyDelegate` | `org.modellwerkstatt.dataux.structure.DummyDelegate` | Platzhalter zur Anordnung von Formularfeldern |
+
+Ein `Reference`-Delegate bietet die zulässigen Objekte zur Auswahl an. `scopeText` (projiziert als `reference description`) legt mit einem oder mehreren Pfaden fest, welche Properties des referenzierten Typs den angezeigten Text bilden: Für einen an `Pet.type` gebundenen Delegate verweist `name` auf `PetType.name`. Die Auswahlmenge setzt die Scope-Funktion der Page mit `#Meta.setScope(…)`; siehe [ObjectFlow: Scopes](objectflow.md#scopes). Fehlt sie, führt eine Auswahl zu einer Exception. Ist der Delegate oder das Formular mit `DISABLED` gekennzeichnet, wird der Wert nur angezeigt und kein Scope benötigt.
 
 #### Delegate-Optionen
 
 | Name | Konzeptname | FQ-Name | Kontext | Delegate-Typen | Wirkung |
 | --- | --- | --- | --- | --- | --- |
 | `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` | Formular | alle | Delegate ist nicht editierbar |
-| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Formular | alle | Wert darf fehlen beziehungsweise `null` sein |
+| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Formular | alle | Der Benutzer muss nichts eingeben; ein leeres Feld ergibt `null` (bei `Integer` `0`). Nicht an `String`-Delegates; siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
 | `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` | Formular | `LocalDate`, `DateTime (Date Only)`, `DateTime` | Verwendet nach Möglichkeit eine Datumsauswahl; bei `DateTime` nicht zusammen mit `OVERWRITE FORMAT` |
 | `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` | Formular | alle | Löst eine verfügbare Update-Conclusion aus |
 | `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` | Formular | `String` | Verwendet für einen `StringDelegate` einen numerischen Editor |
@@ -130,6 +134,21 @@ Der Delegate-Typ folgt dem fachlichen Property-Typ. Ein Delegate ersetzt keine f
 | `FOLD` | `FoldDOption` | `org.modellwerkstatt.dataux.structure.FoldDOption` | Formular und Tabelle | alle | Tabelle: Blendet die Spalte zunächst aus; der Benutzer kann sie per Doppelklick auf den Spaltenkopf einblenden (in h2forms ohne Wirkung). Formular unter h2forms: Das Feld wird nicht angezeigt, bleibt aber als verstecktes Feld erhalten und kann etwa mit `ISSUE UPDATE/SCANABLE` per Scan befüllt werden |
 
 Jede Option darf pro Delegate höchstens einmal verwendet werden. `Reference`-Delegates sind in Tabellen nicht zulässig.
+
+#### Pflichtwerte, leere Eingaben und `null`
+
+`OPTIONAL` bedeutet, dass der Benutzer nichts eingeben muss; lässt er das Feld leer, liefert der Delegate `null`, bei `Integer` `0`. Ohne `OPTIONAL` ist eine Eingabe erforderlich; bei Strings bestimmt stattdessen `LENGTH`, ob das Feld leer bleiben darf.
+
+| Delegate | Leere Eingabe ohne `OPTIONAL` | Leere Eingabe mit `OPTIONAL` | Grenzen aus der Property |
+| --- | --- | --- | --- |
+| `String` | Fehler bei `LENGTH` mit `min ≥ 1`, sonst `""` | `null` | `LENGTH`: minimale und maximale Länge |
+| `Integer` | Eingabefehler | `0` | `RANGE`: Bereich |
+| `BigDecimal` | Eingabefehler | `null` | `RANGE`: Bereich und Skala |
+| `Reference`, `Status`, Datums-Delegates | Eingabe erforderlich | `null` | – |
+
+An einem `String`-Delegate wird `OPTIONAL` nicht verwendet, weil der reguläre leere Zustand eines `string` `""` ist und nicht `null`. Ob ein String leer bleiben darf, steuert `LENGTH[min-max]` an der Business Property: `min ≥ 1` erzwingt eine Eingabe, `min = 0` erlaubt ein leeres Feld. Die Oberfläche trimmt Eingaben nicht, auch nicht für die Längenprüfung; ein fachlich gefordertes Trimmen gehört ins Modell.
+
+Die Grenzen aus `LENGTH` und `RANGE` werden nicht zusätzlich als `validation` modelliert, außer die Regel ist fachlich zwingend oder die Eingabe kommt ohne Oberfläche, etwa aus einem Batch oder über eine Schnittstelle.
 
 #### Optionen für Elemente Formulare und Tabellen
 
@@ -155,7 +174,7 @@ Für ein `Grid Layout` stehen insbesondere folgende Optionen zur Verfügung:
 
 Ein `Tab Layout` enthält mindestens einen `Tab` (`Tab`). Jeder Tab besitzt eine als Ausdruck modellierte Beschriftung und genau ein UI-Element.
 
-Mit `Include` (`Include`) wird ein bereits deklariertes bindbares UI-Element wiederverwendet. Die Einbindung muss zur Datenbindung des umgebenden Kontexts passen. Sie erzeugt weder zusätzliche Daten noch einen unabhängigen Selektionsraum. Eine explizite Bindung am Include oder am eingebundenen Element kann den geerbten Kontext gezielt anpassen.
+Mit `Include` (`Include`) wird ein bereits deklariertes bindbares UI-Element wiederverwendet. Die Einbindung muss zur Datenbindung des umgebenden Kontexts passen. Sie erzeugt weder zusätzliche Daten noch einen unabhängigen Selektionsraum. Eine explizite Bindung am Include oder am eingebundenen Element kann den geerbten Kontext gezielt anpassen. Ein UI-Element wird nur benannt, wenn es mit `Include` wiederverwendet wird; für benannte Elemente erzeugt der Generator eine eigene Klasse.
 
 Ein `Custom UI Element` (`CustomElement`) bindet eine projektspezifische UI-Implementierung ein. Es ist für Darstellungsfälle gedacht, die Form, Tabelle und Layouts nicht ausdrücken. Die fachliche Datenbindung, Delegates und Menüaktionen bleiben Teil des DataUX-Modells; nur die konkrete Darstellung wird projektspezifisch implementiert.
 
@@ -218,7 +237,7 @@ Damit kann beispielsweise aus einem Suchergebnis heraus eine Aktion auf einem vo
 
 `AppUI Module` (`AppUiModule`) und `BatchJob Module` (`BatchJobModule`) sind ausführbare Einstiegspunkte. Die fachlichen Anwendungsfälle verbleiben in Commands, Services und Repositories.
 
-Die Referenz `configuration` dient ausschließlich dem Start mit FX8, aus MPS oder im Standalone-Betrieb; im regulär bereitgestellten Laufzeitkontext ist sie nicht die Anwendungskonfiguration. Die in beiden Konzepten noch vorhandenen Bereiche `onStartup` und `onShutdown` sind nicht mehr zu verwenden (Deprecated).
+Die Referenz `configuration` ist immer anzugeben, wird aber nur beim Start mit FX8, aus MPS oder im Standalone-Betrieb verwendet; im regulär bereitgestellten Laufzeitkontext ist sie nicht die Anwendungskonfiguration. Die in beiden Konzepten noch vorhandenen Bereiche `onStartup` und `onShutdown` sind nicht mehr zu verwenden (Deprecated).
 
 ### Anwendung mit `AppUI Module`
 

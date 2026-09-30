@@ -1,6 +1,6 @@
 # Packaged example catalogue
 
-The stable examples below belong to the shipped solution `org.modellwerkstatt.dataux.tests` (`3c6ef8ca-6366-4c8b-8839-0277eaca1f7e(org.modellwerkstatt.dataux.tests)`). They may be cited and inspected. Do not replace them with persistent references from an application project.
+The stable examples below belong to the shipped solution `org.modellwerkstatt.dataux.tests` (`3c6ef8ca-6366-4c8b-8839-0277eaca1f7e(org.modellwerkstatt.dataux.tests)`). They may be cited and inspected. Do not replace them with persistent references from an application project. Query it with explicit module/model references (`scope: "modules"` or `"models"`); see *Packaged modules outside the project* in `moai:mps-mcp-workflow` (`references/finding-things.md`).
 
 ## Types and mutation
 

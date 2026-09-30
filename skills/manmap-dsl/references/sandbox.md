@@ -1,6 +1,6 @@
 # Shipped Examples and Verification Anchors
 
-Despite this file's conventional name, these are package-shipped test models, not assumptions about editor state or a target application. They belong to the guaranteed module `3c6ef8ca-6366-4c8b-8839-0277eaca1f7e(org.modellwerkstatt.dataux.tests)` and may be cited and inspected read-only.
+Despite this file's conventional name, these are package-shipped test models, not assumptions about editor state or a target application. They belong to the guaranteed module `3c6ef8ca-6366-4c8b-8839-0277eaca1f7e(org.modellwerkstatt.dataux.tests)` and may be cited and inspected read-only. Query it with explicit module/model references (`scope: "modules"` or `"models"`); see *Packaged modules outside the project* in `moai:mps-mcp-workflow` (`references/finding-things.md`).
 
 ## Clean Root Anchors
 

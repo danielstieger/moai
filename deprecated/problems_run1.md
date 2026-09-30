@@ -102,6 +102,9 @@ Format je Eintrag:
 - **Workaround:** Vollständiger Dump plus Filterung per Skript; `print_node` und
   `query_nodes` mit expliziten Referenzen funktionieren.
 - **Schwere:** hinderlich
+- **Stand:** erledigt (zusammen mit P-019: `mps-mcp-workflow/references/finding-things.md` neuer
+  Abschnitt „Packaged modules outside the project“; `startingPoint` funktioniert mit
+  `includeStubModules: true`. Verweis darauf in den `sandbox.md` der DSL-Skills)
 
 ## P-008 Verdrahtung eines Anwendungsmoduls nicht dokumentiert
 
@@ -113,6 +116,11 @@ Format je Eintrag:
 - **Erwartung:** Ein Abschnitt oder Skill-Rezept „Neues MoWare-Anwendungsmodul anlegen“.
 - **Workaround:** Setup von `org.modellwerkstatt.dataux.tests` kopiert.
 - **Schwere:** hinderlich
+- **Stand:** erledigt (`moware-werkbank.md` „Von der Modellierung zur Ausführung“, neuer Schritt 1:
+  Solution mit `JDK`, Modelle mit DevKit `org.modellwerkstatt.MoWareWerkbank`, weitere
+  Abhängigkeiten nur bei direkter Verwendung. Verweis im Quick start von objectflow-dsl. Aufbau der
+  Anwendung mit Bounded Contexts, Aggregat- und Use-Case-Bereichen in
+  `conventions/moware-werkbank-konventionen_v1.md`)
 
 ## P-009 `QueryFromMap.readOnly` ist beim Anlegen per JSON implizit `true`
 
@@ -125,6 +133,9 @@ Format je Eintrag:
   und/oder die Sprache prüft `CHECKOUT`-Methoden ohne Checkout-Query.
 - **Workaround:** `readOnly` immer explizit setzen.
 - **Schwere:** hinderlich (fachlich gefährlich, fällt erst zur Laufzeit auf)
+- **Stand:** erledigt (`readOnly = true` ist der Konstruktor-Default von `QueryFromMap`, auch im
+  Editor; Skill manmap-dsl verlangt bereits die bewusste Wahl `true`/`false`. Sprache: Checking Rule
+  für `CHECKOUT`-Methoden ohne auscheckende Query wird ergänzt, Entwickler)
 
 ## P-010 `MappingReference.mappingSource` verweist auf die umgebende Query
 
@@ -139,6 +150,10 @@ Format je Eintrag:
   Tool blueprint-lokale IDs unterstützen.
 - **Workaround:** Platzhalter-StringLiterals einfügen, danach automatisiert ersetzen.
 - **Schwere:** hinderlich
+- **Stand:** erledigt (am 2026-09-30 getestet: Mit dem Namen des `EntityMapping` als einfachem Namen
+  in `mappingSource` löst sich der Verweis auch dann auf die umgebende Query auf, wenn sie im selben
+  Blueprint eingefügt wird; kein Zwei-Schritt-Ablauf nötig. Skill manmap-dsl: `workflows.md`
+  Schritt 5 und Blueprint `query-from-map-where-subtree.json` mit echtem Filter. Joins ungetestet)
 
 ## P-011 Entity-/DTO-Blueprints ohne Konstruktor erzeugen nicht kompilierbaren Code
 
@@ -177,6 +192,11 @@ Format je Eintrag:
   DataUX-Blueprints.
 - **Workaround:** Die Properties explizit setzen.
 - **Schwere:** blockierend (Build-Fehler bzw. stilles Fehlverhalten)
+- **Stand:** erledigt (am 2026-09-30 nachgestellt: Per JSON eingefügte `IOptionallyNamed`-Elemente
+  erhalten `name = "#"`, aber `isNamed = true`; der Checker meldet das. An JetBrains gemeldet.
+  `newWindowTitleType`: nicht nachstellbar, auch im Editor ungesetzt, Default `ADDON`.
+  `QueryFromMap.readOnly = true` ist der gewollte Konstruktor-Default. Skill dataux-dsl: Blueprints
+  setzen `isNamed = false`/`name = "#"` an inneren Elementen, Gotcha zur irreführenden Meldung)
 
 ## P-013 `print_node` zeigt `#` als Namen und verleitet zum Kopieren
 
@@ -188,6 +208,8 @@ Format je Eintrag:
 - **Erwartung:** Skill und Doku erklären `IOptionallyNamed` (`isNamed`, `name="#"`,
   generierte Named-UX-Klassen).
 - **Schwere:** hinderlich
+- **Stand:** erledigt (`dataux.md` „Layouts, Tabs und Wiederverwendung“: nur mit `Include`
+  wiederverwendete Elemente werden benannt, eigene generierte Klasse. Rest siehe P-012)
 
 ## P-014 `revert` akzeptiert nur Command-Parameter, nicht Variablen
 
@@ -215,6 +237,9 @@ Format je Eintrag:
 - **Erwartung:** Eine Checking Rule, die Pflichtfelder meldet, oder ein robuster Generator.
 - **Workaround:** `PetClinic Config` angelegt und referenziert.
 - **Schwere:** blockierend (Ursache nicht aus der Meldung ersichtlich)
+- **Stand:** erledigt (`check_AppUiModule` meldet fehlende `configuration` und `VERSION` bereits;
+  verdeckt durch P-027. `dataux.md`: `configuration` ist immer anzugeben. Kardinalität wird in der
+  Sprache angepasst)
 
 ## P-016 ManMap mit MySQL/MariaDB ignoriert AUTOID-Sequences
 
@@ -260,6 +285,9 @@ Format je Eintrag:
 - **Workaround:** Pfade relativ zum Zieltyp angenommen (`PetType.name`, `Vet.lastName`,
   `Vet.firstName`); prüft fehlerfrei, zur Laufzeit ungetestet.
 - **Schwere:** hinderlich
+- **Stand:** erledigt (`dataux.md`: Absatz zum `Reference`-Delegate: Pfade relativ zum referenzierten
+  Typ, Auswahlmenge über `#Meta.setScope`, ohne Scope Exception bei Auswahl, bei `DISABLED` kein Scope
+  nötig. Skill dataux-dsl: Blueprint `reference-delegate-subtree.json`, per Dry-Run geprüft)
 
 ## P-019 `FIND_INSTANCES` mit `scope: all` findet die Beispiel-Solution nicht
 
@@ -270,6 +298,7 @@ Format je Eintrag:
   nicht ersichtlich.
 - **Erwartung:** Klare Beschreibung des Scopes oder ein Scope für alle sichtbaren Module.
 - **Schwere:** kosmetisch
+- **Stand:** erledigt (siehe P-007; `all` ist laut Tool-Beschreibung die sichtbare Abhängigkeitshülle)
 
 ## P-020 MCP-Tools rufen NodeFactories mit `enclosingNode = null` auf, `OFXRunCmdPage` ist nicht anlegbar
 
@@ -287,6 +316,10 @@ Format je Eintrag:
   Danach per `update_node` Name, Page, Conclusion und `beforeConclude` setzen.
   Verschachtelte `run command`s brauchen dafür eine zweite Runde.
 - **Schwere:** blockierend (ohne Konsolen-Umweg keine Command-Tests)
+- **Stand:** in Arbeit (am 2026-09-30 nachgestellt; an JetBrains gemeldet. Entwickler passt die
+  NodeFactory `OFXRunCmdNodeFactory` an, sodass sie bei `enclosingNode = null` nichts vorbelegt.
+  Danach im Skill objectflow-dsl: Hinweis + Blueprint, `name`/`page`/`conclusion`/`boundObjectType`
+  explizit setzen)
 
 ## P-021 `SessionOperationAdd.ex` ist optional, wird aber vom Generator verlangt; Semantik undokumentiert
 
@@ -477,6 +510,8 @@ Format je Eintrag:
   Inhaltstyp platzieren. Hier ersetzt eine Pet-Tabelle (gemeinsame Selektion) das
   Pet-Formular im Tab „Visits“.
 - **Schwere:** hinderlich
+- **Stand:** erledigt (`dataux.md` „Datenbindung und Selektion“: Scope-Regel für `boundClassifier`
+  ergänzt. Korrektur: Grid und Tab Layout sind bindbar; die Grenze ist der einzelne `Tab`)
 
 ## P-031 Skill-Nutzung: DataUX wurde nicht überproportional genutzt, aber Fallen fehlen in Skills und Trigger
 
@@ -588,6 +623,10 @@ Format je Eintrag:
 - **Workaround:** Vor dem Modellieren `references/gotchas.md` und `problems.md` lesen;
   nach jeder Änderung jeden Root einzeln prüfen.
 - **Schwere:** hinderlich
+- **Stand:** erledigt (Critical rules der DSL-Skills enthalten jetzt die stillen, nicht vom Checker
+  erkannten Fallen, jeweils mit Link; die entsprechenden Einträge in `gotchas.md` entfallen. Die meisten
+  hier genannten Fallen sind inzwischen durch Doku, Blueprints oder die Prüfung pro Root (P-027)
+  abgedeckt. Trigger geschärft: Commands/Pages/Conclusions bei objectflow-dsl, UI bei dataux-dsl)
 
 ## P-032 DataUX: `OPTIONAL` am `StringDelegate` liefert `null`, widerspricht der `""`-Initialisierung; nicht dokumentiert
 
@@ -618,6 +657,10 @@ Format je Eintrag:
 - **Workaround:** `OPTIONAL` an `StringDelegate` weglassen; Pflicht oder Nicht-Pflicht
   über `LENGTH` steuern (siehe P-033).
 - **Schwere:** hinderlich (still falsche Werte)
+- **Stand:** erledigt (zusammen mit P-033: `dataux.md` neuer Unterabschnitt „Pflichtwerte, leere
+  Eingaben und `null`“ mit Tabelle je Delegate aus der Laufzeit `dataux.runtime.delegates`;
+  Verweise aus `OPTIONAL`, `LENGTH` und `objectflow.md` „Null-Werte“; Skill dataux-dsl Gotcha.
+  Korrektur: Die Oberfläche trimmt nicht, auch nicht für die Leer-Prüfung)
 
 ## P-033 `LENGTH` steuert die Pflichteingabe in der Oberfläche; Rolle undokumentiert, Validierungen doppelt modelliert
 
@@ -660,6 +703,7 @@ Format je Eintrag:
   - Pflicht- und Längenvalidierungen samt Regeltests entfernen;
   - `normalize()` ohne Null-Prüfung und `hasDuplicatePet` ohne erneutes `trim()`.
 - **Schwere:** hinderlich (doppelte Logik, überflüssige Tests)
+- **Stand:** erledigt (siehe P-032)
 
 ## P-034 Skill-Auswahl hängt allein an der `description`; sie nennt Paket- statt Nutzerbegriffe
 
@@ -685,3 +729,5 @@ Format je Eintrag:
 - **Workaround:** Den Skill im Prompt ausdrücklich nennen („lade objectflow-dsl“).
 - **Schwere:** hinderlich (wird der Skill nicht geladen, arbeitet der Agent ohne die
   Fallen und Blueprints)
+- **Stand:** erledigt (neue englische `description` für objectflow-dsl, manmap-dsl und dataux-dsl mit
+  den Begriffen, die Nutzer verwenden)

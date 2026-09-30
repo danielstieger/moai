@@ -26,3 +26,14 @@
 - `mps_mcp_get_project_structure(startingPoint=<module>)` returns `facets` (e.g. `["java","tests"]`) and `loadExtensions` for each module — use these to check whether a solution is a test container (`"tests"` in `facets`) or whether a module loads plugin extensions.
 - When not explicitly pointing to a node, assume the user is referring to the root node currently open in the editor and possibly also a selected node within that root node. Use `mps_mcp_get_current_editor_root_node`.
 - WHEN asked for the 'current model' or 'current module/solution/language/generator', it is the model/module of the root node currently open in the editor — use `mps_mcp_get_current_editor_root_node`.
+
+## Packaged modules outside the project
+
+Packaged solutions and language modules that are not part of the open project (for example the shipped example solution `org.modellwerkstatt.dataux.tests`, or generator models of a packaged language) need explicit references:
+
+| Tool | Behavior for packaged modules | What works |
+| --- | --- | --- |
+| `mps_mcp_get_project_structure` with `startingPoint` | `NOT_FOUND` | Add `includeStubModules: true` |
+| `mps_mcp_search_root_node_by_name`, `mps_mcp_query_nodes` `FIND_INSTANCES` with `scope: "all"` | Does not include them; `all` means the project's visible dependency closure | `scope: "modules"` or `"models"` with explicit references |
+| `mps_mcp_query_nodes` `FIND_USAGES` | Finds nothing inside packaged language modules | `FIND_INSTANCES` of the referencing concept in explicit models, then filter |
+| `mps_mcp_print_node` | Works with explicit node references | – |

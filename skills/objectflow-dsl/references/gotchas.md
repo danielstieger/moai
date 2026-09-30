@@ -19,7 +19,6 @@
 - Without a `validation` block, the first failing Precondition stops evaluation. Validate completely before mutation. [Validation pattern](../../../docu/objectflow.md#preconditions-validation-guards-und-exceptions)
 - Wrong formatted-string placeholders fail at runtime; unexpected `null` is rendered visibly. [String formatting](../../../docu/objectflow.md#formatieren-von-zeichenketten)
 - Use server time and `BigDecimal` literals; avoid `double` and `float` for exact business values. [Literals](../../../docu/objectflow.md#literale-für-datum-zeitpunkt-und-dezimalzahl)
-- In ObjectFlow code, choose the comparison operator by type: `==` for `int`, `boolean`, `string`, `BigDecimal`, and Entities; `of` / `status switch` for Status; `:eq:` / `:ne:` for `LocalDate`, `DateTime`, Value Objects, and other objects. The "always `:eq:`" rule of `moai:mps-baselanguage` applies to MPS nodes in language code, not here. [Comparison rules](../../../docu/objectflow.md#null-werte-in-datenstrukturen)
 
 ## Commands and sessions
 

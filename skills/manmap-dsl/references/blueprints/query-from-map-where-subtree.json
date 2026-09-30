@@ -18,9 +18,31 @@
               "role": "filter",
               "nodes": [
                 {
-                  "concept": "jetbrains.mps.baseLanguage.structure.BooleanConstant",
-                  "properties": [
-                    { "name": "value", "value": "true" }
+                  "concept": "jetbrains.mps.baseLanguage.structure.EqualsExpression",
+                  "children": [
+                    {
+                      "role": "leftExpression",
+                      "nodes": [
+                        {
+                          "concept": "org.modellwerkstatt.manmap.structure.MappingReference",
+                          "references": [
+                            { "role": "mappingSource", "target": "$TARGET_ENTITY_MAPPING$" },
+                            { "role": "fieldMapping", "target": "$TARGET_FIELD_MAPPING$" }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "rightExpression",
+                      "nodes": [
+                        {
+                          "concept": "jetbrains.mps.baseLanguage.structure.VariableReference",
+                          "references": [
+                            { "role": "variableDeclaration", "target": "$TARGET_PARAMETER$" }
+                          ]
+                        }
+                      ]
+                    }
                   ]
                 }
               ]

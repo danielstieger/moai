@@ -1,6 +1,6 @@
 ---
 name: dataux-dsl
-description: "Use when creating, editing, validating, or inspecting the UI part of org.modellwerkstatt.dataux models: PagePane, forms, tables, layouts, binding, delegates, includes, and menus."
+description: "Use when creating, editing, validating, or inspecting MoWare DataUX user interfaces (org.modellwerkstatt.dataux): page panes, forms and input fields (delegates), tables and columns, layouts and tabs, master-detail, binding and selection, menus and actions, application modules (AppUI) and batch jobs."
 ---
 
 # DataUX UI DSL
@@ -25,6 +25,8 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 - A table over a list property binds `boundClassifier` to the property owner and `boundProperty` to that list property; its delegates address properties of the row type. Lists of Value Objects are not valid DataUX table models. See [table binding](../../docu/dataux.md#tabellenbindung-und-selektion).
 - Prefer a root skeleton followed by surgical `ADD CHILD` operations for large or uncertain roots. Preserve existing node IDs.
 - Dry-run JSON first and inspect warnings. After a real change, run `mps_mcp_check_root_node_problems` on each changed root; generate or build when the task requires it.
+- Inner forms, tables, and layouts need `isNamed = false` and `name = "#"`; JSON insertion sets `isNamed = true`. Name an element only when it is reused with `Include`. See [inner UI elements](references/gotchas.md#inner-ui-elements-must-stay-unnamed).
+- Do not put `OPTIONAL` on a `StringDelegate` (it yields `null` instead of `""`); control required strings with `LENGTH` and do not repeat `LENGTH`/`RANGE` limits as `validation`. See [required values](../../docu/dataux.md#pflichtwerte-leere-eingaben-und-null).
 - Keep business rules out of UI expressions. DataUX should remain presentation-oriented “CheapCode”; see the [MoWare development principles](../../docu/moware-werkbank.md#grundprinzipien-für-die-anwendungsentwicklung).
 
 ## Quick start

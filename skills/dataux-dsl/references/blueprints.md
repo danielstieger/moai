@@ -17,6 +17,8 @@ Every JSON string beginning with `TARGET_MODEL.` is intentionally unresolved and
 | `TARGET_MODEL.detail` | Property displayed in the detail form |
 | `TARGET_MODEL.nestedObject` | Direct property used as the left side of a nested path |
 | `TARGET_MODEL.nestedText` | Property reached after the path dot |
+| `TARGET_MODEL.referenceProperty` | Entity-typed property selected by a reference delegate |
+| `TARGET_MODEL.targetTypeProperty` | Property of the referenced type shown as the choice text |
 | `TARGET_MODEL.ReusableUiRoot` | Bindable DataUX root referenced by Include |
 | `TARGET_MODEL.Command` | ObjectFlow Command referenced by a menu action |
 
@@ -32,5 +34,6 @@ Prefer persistent `r:` references when the destination target has been resolved 
 - [menu-submenu-subtree.json](blueprints/menu-submenu-subtree.json): overflow submenu with one command using its ObjectFlow defaults.
 - [direct-property-delegate-subtree.json](blueprints/direct-property-delegate-subtree.json): direct property binding path.
 - [nested-property-delegate-subtree.json](blueprints/nested-property-delegate-subtree.json): `PathDot` binding path.
+- [reference-delegate-subtree.json](blueprints/reference-delegate-subtree.json): reference selection; `scopeText` paths are properties of the referenced type, the choices come from `#Meta.setScope` in the page scope function.
 
 For roots and subtrees above roughly 4 KB, pass the file path to the MPS tool or construct incrementally. Do not paste an oversized JSON string into a tool call.

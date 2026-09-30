@@ -2,7 +2,7 @@
 
 ## Stable packaged source
 
-The following examples are part of the shipped solution `org.modellwerkstatt.dataux.tests` (`3c6ef8ca-6366-4c8b-8839-0277eaca1f7e(org.modellwerkstatt.dataux.tests)`) and may be cited and inspected.
+The following examples are part of the shipped solution `org.modellwerkstatt.dataux.tests` (`3c6ef8ca-6366-4c8b-8839-0277eaca1f7e(org.modellwerkstatt.dataux.tests)`) and may be cited and inspected. Query it with explicit module/model references (`scope: "modules"` or `"models"`); see *Packaged modules outside the project* in `moai:mps-mcp-workflow` (`references/finding-things.md`).
 
 Model: `r:04e6a6ad-5d6d-449f-aceb-0afb0d6dad9e(org.modellwerkstatt.objectflow.tests.OrderDocumentUi)`
 
