@@ -10,7 +10,7 @@ Normative technische Quellen: objectflow.md, manmap.md, dataux.md und moware-wer
 | Produktname | PetClinic |
 | Basis-Namensraum | org.modellwerkstatt.petclinic |
 | Zielplattform | MoWare / JetBrains MPS 2026.1 |
-| Datenbank | Oracle |
+| Datenbank | mariadb |
 | UI | DataUX AppUI |
 | Löschfunktionen | Nicht Bestandteil von v1 |
 | Rollen/Berechtigungen | Keine fachlichen Rollen in v1; Commands ohne Permissions |
@@ -164,67 +164,7 @@ OwnerSearchResult ist ausschließlich Lesemodell und wird niemals gespeichert.
 
 # 4. Relationales Datenmodell
 
-Die Datenbankstruktur ist verbindlich. ManMap-Schemahinweise ersetzen kein DDL.
-
-```text
-CREATE SEQUENCE PC_OWNER_SEQ START WITH 1 INCREMENT BY 1 NOCACHE;
-CREATE SEQUENCE PC_PET_TYPE_SEQ START WITH 1 INCREMENT BY 1 NOCACHE;
-CREATE SEQUENCE PC_PET_SEQ START WITH 1 INCREMENT BY 1 NOCACHE;
-CREATE SEQUENCE PC_VET_SEQ START WITH 1 INCREMENT BY 1 NOCACHE;
-CREATE SEQUENCE PC_VISIT_SEQ START WITH 1 INCREMENT BY 1 NOCACHE;
-
-CREATE TABLE PC_OWNER (
-    OWNER_ID    NUMBER(10)      NOT NULL,
-    FIRST_NAME  VARCHAR2(30)    NOT NULL,
-    LAST_NAME   VARCHAR2(30)    NOT NULL,
-    ADDRESS     VARCHAR2(255)   NOT NULL,
-    CITY        VARCHAR2(80)    NOT NULL,
-    TELEPHONE   VARCHAR2(20)    NOT NULL,
-    CONSTRAINT PK_PC_OWNER PRIMARY KEY (OWNER_ID)
-);
-CREATE INDEX IX_PC_OWNER_LAST_NAME ON PC_OWNER (LAST_NAME);
-CREATE INDEX IX_PC_OWNER_TELEPHONE ON PC_OWNER (TELEPHONE);
-
-CREATE TABLE PC_PET_TYPE (
-    PET_TYPE_ID NUMBER(10)      NOT NULL,
-    NAME        VARCHAR2(40)    NOT NULL,
-    CONSTRAINT PK_PC_PET_TYPE PRIMARY KEY (PET_TYPE_ID),
-    CONSTRAINT UQ_PC_PET_TYPE_NAME UNIQUE (NAME)
-);
-
-CREATE TABLE PC_VET (
-    VET_ID      NUMBER(10)      NOT NULL,
-    FIRST_NAME  VARCHAR2(30)    NOT NULL,
-    LAST_NAME   VARCHAR2(30)    NOT NULL,
-    CONSTRAINT PK_PC_VET PRIMARY KEY (VET_ID)
-);
-CREATE INDEX IX_PC_VET_LAST_NAME ON PC_VET (LAST_NAME);
-
-CREATE TABLE PC_PET (
-    PET_ID      NUMBER(10)      NOT NULL,
-    OWNER_ID    NUMBER(10)      NOT NULL,
-    NAME        VARCHAR2(30)    NOT NULL,
-    BIRTH_DATE  DATE            NOT NULL,
-    PET_TYPE_ID NUMBER(10)      NOT NULL,
-    CONSTRAINT PK_PC_PET PRIMARY KEY (PET_ID),
-    CONSTRAINT FK_PC_PET_OWNER FOREIGN KEY (OWNER_ID) REFERENCES PC_OWNER (OWNER_ID),
-    CONSTRAINT FK_PC_PET_TYPE FOREIGN KEY (PET_TYPE_ID) REFERENCES PC_PET_TYPE (PET_TYPE_ID)
-);
-CREATE INDEX IX_PC_PET_OWNER ON PC_PET (OWNER_ID);
-CREATE INDEX IX_PC_PET_NAME ON PC_PET (NAME);
-
-CREATE TABLE PC_VISIT (
-    VISIT_ID     NUMBER(10)     NOT NULL,
-    PET_ID       NUMBER(10)     NOT NULL,
-    VET_ID       NUMBER(10)     NOT NULL,
-    VISIT_DATE   DATE           NOT NULL,
-    DESCRIPTION  VARCHAR2(1000) NOT NULL,
-    CONSTRAINT PK_PC_VISIT PRIMARY KEY (VISIT_ID),
-    CONSTRAINT FK_PC_VISIT_PET FOREIGN KEY (PET_ID) REFERENCES PC_PET (PET_ID),
-    CONSTRAINT FK_PC_VISIT_VET FOREIGN KEY (VET_ID) REFERENCES PC_VET (VET_ID)
-);
-CREATE INDEX IX_PC_VISIT_PET_DATE ON PC_VISIT (PET_ID, VISIT_DATE);
-```
+Wird vom Entwickler automatisch aus MPS generiert! Wichtig ist, dass die Entity-Mappings dazu korrekt ausgeführt worden sind. 
 
 # 5. ManMap-Persistenz
 
@@ -249,32 +189,6 @@ Alle schreibbaren Entity-Mappings erhalten optimistic, sofern die geladene Sprac
 | saveOwner(owner) | CHECKIN | speichert ausschließlich PC_OWNER |
 | savePet(pet) | CHECKIN | speichert ausschließlich PC_PET |
 | saveVisit(visit) | CHECKIN | speichert ausschließlich PC_VISIT |
-
-```text
-SELECT
-    o.OWNER_ID,
-    o.FIRST_NAME,
-    o.LAST_NAME,
-    o.CITY,
-    o.TELEPHONE,
-    COUNT(p.PET_ID) AS PET_COUNT
-FROM PC_OWNER o
-LEFT JOIN PC_PET p ON p.OWNER_ID = o.OWNER_ID
-WHERE
-    (:lastName = '' OR UPPER(o.LAST_NAME) LIKE '%' || UPPER(:lastName) || '%')
-AND (:telephone = '' OR o.TELEPHONE LIKE '%' || :telephone || '%')
-AND (
-    :petName = ''
-    OR EXISTS (
-        SELECT 1
-        FROM PC_PET px
-        WHERE px.OWNER_ID = o.OWNER_ID
-          AND UPPER(px.NAME) LIKE '%' || UPPER(:petName) || '%'
-    )
-)
-GROUP BY o.OWNER_ID, o.FIRST_NAME, o.LAST_NAME, o.CITY, o.TELEPHONE
-ORDER BY o.LAST_NAME, o.FIRST_NAME, o.OWNER_ID
-```
 
 checkoutOwner darf kein Lazy Loading voraussetzen. Alle für die Owner-Übersicht benötigten Referenzen und Listen müssen innerhalb der Query-/Join-Struktur explizit geladen werden.
 

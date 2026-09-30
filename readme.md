@@ -1,78 +1,83 @@
-# MoAI – Agent Plugin für modellwerkstatt MoWare
+# MoAI – Agent Plugin for modellwerkstatt MoWare
 
-MoAI bündelt Agent-Skills und Dokumentation für die drei MoWare-Sprachen
-ObjectFlow, ManMap und DataUX sowie wiederverwendbare Arbeitsabläufe für
-JetBrains MPS. Das Paket ist dafür vorgesehen, als versioniertes Git-Submodule
-in einem MoWare-Anwendungsprojekt zu liegen und zugleich als Agent-Plugin
-installiert zu werden.
+MoAI bundles agent skills and documentation for the three MoWare languages
+ObjectFlow, ManMap and DataUX, as well as reusable workflows for JetBrains MPS.
+The package is intended to live as a versioned Git submodule in a MoWare
+application project and to be installed as an agent plugin at the same time.
 
-## Inhalt
+## Contents
 
 ```text
 moai/
-├── .codex-plugin/plugin.json   Codex-Kompatibilitätsmanifest
-├── skills/                     MoWare- und MPS-Skills
-├── docu/                       Architektur- und Sprachdokumentation
-├── MPS_AGENT_GUIDE.md          Allgemeine MPS-Arbeitsregeln
-└── PROJECT_AGENTS.md           Vorlage für das Anwendungsprojekt
+├── skills/                     MoWare and MPS skills
+├── docu/                       Architecture and language documentation
+├── MPS_AGENT_GUIDE.md          General MPS working rules
+├── INSTALL_INSTRUCTIONS.md     Installation instructions for agents
+└── TEMPLATE_PROJECT_AGENTS.md  Template for the application project
 ```
 
-Die MoWare-Skills sind:
+The MoWare skills are:
 
-- `objectflow-dsl` für Fachmodell, Services, Commands, Tests und Konfiguration;
-- `manmap-dsl` für Persistenzabbildungen, Repositories, Queries und SQL;
-- `dataux-dsl` für Oberflächen, Anwendungen und Batchjobs.
+- `objectflow-dsl` for the domain model, services, commands, tests and
+  configuration;
+- `manmap-dsl` for persistence mappings, repositories, queries and SQL;
+- `dataux-dsl` for user interfaces, applications and batch jobs.
 
-Zusätzliche MPS-Skills unterstützen Node Editing, BaseLanguage,
-Modellmanipulation, Sprachuntersuchung, MPS Console und Run-Konfigurationen.
-`mps-mcp-workflow` ist der Einstiegspunkt für MPS-Arbeiten.
+Additional MPS skills support node editing, BaseLanguage, model manipulation,
+language analysis, the MPS console and run configurations. `mps-mcp-workflow`
+is the entry point for MPS work.
 
-`mps-dsl-memory` ist ein explizit aufzurufender Maintainer-Skill. Er ist nicht
-für die automatische Aktualisierung durch Paketnutzer oder Projekt-Agenten
-bestimmt.
+## Documentation (in German)
 
-## Dokumentation
+- [MoWare Werkbank](docu/moware-werkbank.md) – architecture and interaction;
+- [ObjectFlow](docu/objectflow.md) – domain model and business logic;
+- [ManMap](docu/manmap.md) – relational persistence and repositories;
+- [DataUX](docu/dataux.md) – user interfaces, applications and batch jobs.
 
-- [MoWare-Werkbank](docu/moware-werkbank.md) – Architektur und Zusammenspiel;
-- [ObjectFlow](docu/objectflow.md) – Fachmodell und Geschäftslogik;
-- [ManMap](docu/manmap.md) – relationale Persistenz und Repositories;
-- [DataUX](docu/dataux.md) – Benutzeroberflächen, Anwendungen und Batchjobs.
+The documentation describes the intended domain semantics. The loaded MPS
+language models are authoritative for the technical AST structure, roles,
+cardinalities, references and validation rules.
 
-Die Dokumentation beschreibt die beabsichtigte fachliche Semantik. Für die
-technische AST-Struktur, Roles, Kardinalitäten, Referenzen und Prüfregeln sind
-die geladenen MPS-Sprachmodelle maßgeblich.
+## Installation as a Git Submodule
 
-## Einbindung als Git-Submodule
+MoAI is not listed in any plugin marketplace and is included locally in the
+project.
 
-Im Root des Anwendungsprojekts:
+1. Add the submodule manually in the root of the application project:
 
-```bash
-git submodule add https://github.com/danielstieger/moai.git moai
-git submodule update --init --recursive
-```
+   ```bash
+   git submodule add https://github.com/danielstieger/moai.git moai
+   git submodule update --init --recursive
+   ```
 
-Anschließend `moai/PROJECT_AGENTS.md` als `AGENTS.md` in das Projekt-Root
-kopieren oder mit einer vorhandenen `AGENTS.md` zusammenführen. Die Vorlage
-kennzeichnet `moai/` als paketierte Abhängigkeit und verweist Agenten auf die
-installierten MoAI-Skills und die Dokumentation.
+2. Hand the rest of the installation to a coding agent [INSTALL_INSTRUCTIONS.md](INSTALL_INSTRUCTIONS.md) is written as a
+   prompt for this. In the root of the application project, this is enough:
 
-## Aktualisierung
+   > Read `INSTALL_INSTRUCTIONS.md` from ./moai and perform the installation
+   > for this project.
 
-Das Anwendungsprojekt bestimmt über seinen Submodule-Commit, welche MoAI-Version
-verwendet wird. Eine Aktualisierung wird im Anwendungsprojekt durchgeführt und
-anschließend als neuer Submodule-Stand versioniert:
+   The agent registers the plugin in its runtime, sets up `AGENTS.md` from
+   `moai/TEMPLATE_PROJECT_AGENTS.md` and checks the prerequisites. The template
+   marks `moai/` as a packaged dependency and points agents to the installed
+   MoAI skills and the documentation.
+
+## Updating
+
+The application project determines which MoAI version is used through its
+submodule commit. An update is performed in the application project and then
+versioned as a new submodule state:
 
 ```bash
 git submodule update --remote --merge moai
 git add moai
 ```
 
-Paketdateien unter `moai/` werden bei gewöhnlicher Anwendungsentwicklung nicht
-direkt verändert. Projektspezifische Anweisungen und Skills bleiben außerhalb
-des Submodules.
+Package files under `moai/` are not modified directly during regular
+application development. Project-specific instructions and skills stay outside
+the submodule.
 
-## Voraussetzungen
+## Prerequisites
 
-- JetBrains MPS mit geöffnetem Zielprojekt;
-- aktivierte MPS-MCP-Integration für modellbewusste Agent-Arbeit;
-- installiertes und aktiviertes MoAI-Plugin in der verwendeten Agent-Runtime.
+- JetBrains MPS with the target project open;
+- enabled MPS MCP integration for model-aware agent work;
+- the MoAI plugin installed and enabled in the agent runtime in use.
