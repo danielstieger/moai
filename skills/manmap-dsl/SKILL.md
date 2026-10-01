@@ -16,7 +16,7 @@ ManMap models relational persistence and read models for MoWare applications. `P
 - Treat every `$TARGET_*` value in a blueprint as a required target-model placeholder. Resolve it by scope or replace it with a persistent `r:` node reference from the target model immediately before insertion.
 - Never copy persistent references from an application example into another model. The stable references in [sandbox.md](references/sandbox.md) are read-only navigation and verification anchors, not insertion values.
 - Prefer skeleton-plus-subtree construction for persistence descriptions and repositories. Preserve existing node IDs with surgical updates.
-- A mapping never implies lazy loading, cascading save, or cascading delete. Load references and lists with separate queries; use `refJoin`/`listJoin` only when the query filters or sorts on the joined mapping. [Explicit loading](../../docu/manmap.md#explizites-laden)
+- A mapping never implies lazy loading, cascading save, or cascading delete. Load references and lists explicitly: usually with separate queries, or with `refJoin`/`listJoin`, which is recommended mainly when the query filters or sorts on the joined mapping. [Explicit loading](../../docu/manmap.md#explizites-laden)
 - In a blueprint, set `MappingReference.mappingSource` to the name of the query's `EntityMapping`; it resolves to the enclosing query even within the same blueprint. See [mapped query workflow](references/workflows.md#build-a-mapped-query).
 - New `QueryFromMap` nodes default to `readOnly = true`. Set `readOnly = false` deliberately for queries that check out data for editing.
 - Validate changed roots with `mps_mcp_check_root_node_problems`; then run task-required generation or build checks.

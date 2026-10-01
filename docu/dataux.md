@@ -7,9 +7,9 @@
 DataUX verbindet zwei Aufgabenbereiche:
 
 1. **UI-Modellierung:** Eine Oberfläche wird aus einem fachlich gebundenen `Page Pane` (`PagePane`) sowie Formularen, Tabellen, Layouts und Aktionen aufgebaut.
-2. **Anwendung und Batchjob:** Ausführbare Module konfigurieren den Start und das Ende einer Anwendung, Authentifizierung, Navigation beziehungsweise Batch-Verarbeitung und die zugehörige Laufzeitkonfiguration.
+2. **Anwendung und Batchjob:** Ausführbare Module konfigurieren Authentifizierung, Navigation beziehungsweise Batch-Verarbeitung und die zugehörige Laufzeitkonfiguration.
 
-Die Sprache beschreibt vor allem, **welche fachlichen Daten wie visualisiert werden**. Generator und Laufzeit übernehmen die technische Umsetzung. An dafür vorgesehenen Stellen können BaseLanguage-Ausdrücke eingebettet werden, etwa für Beschriftungen, Farben, Bedingungen, Command-Argumente oder Lebenszykluslogik.
+Die Sprache beschreibt vor allem, **welche fachlichen Daten wie visualisiert werden**. Generator und Laufzeit übernehmen die technische Umsetzung. An dafür vorgesehenen Stellen können BaseLanguage-Ausdrücke eingebettet werden, etwa für Beschriftungen, Farben, Bedingungen oder Command-Argumente.
 
 `org.modellwerkstatt.dataux.structure.ApiDescription` ist veraltet und nicht mehr zu verwenden.
 
@@ -115,7 +115,7 @@ Ein `Reference`-Delegate bietet die zulässigen Objekte zur Auswahl an. `scopeTe
 | Name | Konzeptname | FQ-Name | Kontext | Delegate-Typen | Wirkung |
 | --- | --- | --- | --- | --- | --- |
 | `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` | Formular | alle | Delegate ist nicht editierbar |
-| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Formular | alle außer `String` | Der Benutzer muss nichts eingeben; ein leeres Feld ergibt `null` (bei `Integer` `0`). Nicht an `String`-Delegates; siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
+| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Formular | alle | Der Benutzer muss nichts eingeben; ein leeres Feld ergibt `null` (bei `Integer` `0`); siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
 | `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` | Formular | `LocalDate`, `DateTime (Date Only)`, `DateTime` | Verwendet nach Möglichkeit eine Datumsauswahl; bei `DateTime` nicht zusammen mit `OVERWRITE FORMAT` |
 | `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` | Formular | alle | Löst eine verfügbare Update-Conclusion aus |
 | `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` | Formular | `String` | Verwendet für einen `StringDelegate` einen numerischen Editor |
@@ -137,7 +137,7 @@ Jede Option darf pro Delegate höchstens einmal verwendet werden. `Reference`-De
 
 #### Pflichtwerte, leere Eingaben und `null`
 
-`OPTIONAL` bedeutet, dass der Benutzer nichts eingeben muss; lässt er das Feld leer, liefert der Delegate `null`, bei `Integer` `0`. Ohne `OPTIONAL` ist eine Eingabe erforderlich; bei Strings bestimmt stattdessen `LENGTH`, ob das Feld leer bleiben darf.
+`OPTIONAL` bedeutet, dass der Benutzer nichts eingeben muss; lässt er das Feld leer, liefert der Delegate `null`, bei `Integer` `0`. Ein optionaler Text an `OPTIONAL` legt fest, wie der fehlende Wert dargestellt wird, etwa „weiß ich nicht“; ohne Angabe erscheint `--`. Ohne `OPTIONAL` ist eine Eingabe erforderlich; bei Strings bestimmt stattdessen `LENGTH`, ob das Feld leer bleiben darf.
 
 | Delegate | Leere Eingabe ohne `OPTIONAL` | Leere Eingabe mit `OPTIONAL` | Grenzen aus der Property |
 | --- | --- | --- | --- |
@@ -146,16 +146,16 @@ Jede Option darf pro Delegate höchstens einmal verwendet werden. `Reference`-De
 | `BigDecimal` | Eingabefehler | `null` | `RANGE`: Bereich und Skala |
 | `Reference`, `Status`, Datums-Delegates | Eingabe erforderlich | `null` | – |
 
-An einem `String`-Delegate wird `OPTIONAL` nicht verwendet, weil der reguläre leere Zustand eines `string` `""` ist und nicht `null`. Ob ein String leer bleiben darf, steuert `LENGTH[min-max]` an der Business Property: `min ≥ 1` erzwingt eine Eingabe, `min = 0` erlaubt ein leeres Feld. Die Oberfläche trimmt Eingaben nicht, auch nicht für die Längenprüfung; ein fachlich gefordertes Trimmen gehört ins Modell.
+Ob ein String leer bleiben darf, steuert `LENGTH[min-max]` an der Business Property: `min ≥ 1` erzwingt eine Eingabe, `min = 0` erlaubt ein leeres Feld, das dann `""` liefert. `OPTIONAL` ist an einem `String`-Delegate deshalb nicht nötig, aber möglich: Ein leeres Feld liefert dann `null` statt `""` und kann gegen `null` geprüft werden. Die Oberfläche trimmt Eingaben nicht, auch nicht für die Längenprüfung; ein fachlich gefordertes Trimmen gehört ins Modell.
 
 Die Grenzen aus `LENGTH` und `RANGE` werden nicht zusätzlich als `validation` modelliert, außer die Regel ist fachlich zwingend oder die Eingabe kommt ohne Oberfläche, etwa aus einem Batch oder über eine Schnittstelle.
 
-#### Optionen für Elemente Formulare und Tabellen
+#### Optionen für Formulare und Tabellen
 
 | Name | Konzeptname | FQ-Name | Element | Wirkung |
 | --- | --- | --- | --- | --- |
 | `DISABLED` | `DisabledFOption` | `org.modellwerkstatt.dataux.structure.DisabledFOption` | Formular | Formular ist nicht editierbar |
-| `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` | Formular und Tabelle | Setzt die Beschriftung des Elements. Nicht zulässig am obersten Element eines Page Pane; dort kommt die Beschriftung aus dem Seitentitel |
+| `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` | Formular und Tabelle | Setzt die Beschriftung des Elements. Nicht zulässig am obersten Element eines `Page Pane`s; dort kommt die Beschriftung aus dem Seitentitel |
 | `SELECT FIRST` | `SelectFirstFOption` | `org.modellwerkstatt.dataux.structure.SelectFirstFOption` | Tabelle | Selektiert das erste Tabellenelement bei der Initialisierung |
 | `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.SelectionSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung für ausgewählte Tabellenobjekte |
 | `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.TableSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung über alle Tabellenobjekte |
@@ -224,7 +224,7 @@ Eine `Compound Action` (`MenuCompoundAction`) verbindet einen `GRAPH_OWNER_CMD` 
 
 Damit kann beispielsweise aus einem Suchergebnis heraus eine Aktion auf einem vollständigen Aggregat ausgeführt werden: Der `GRAPH_OWNER_CMD` öffnet das ausgewählte Objekt, lädt den Aggregatgraphen vollständig und stellt die Session bereit. Anschließend führt der `GRAPH_EDIT_CMD` die fachliche Änderung aus. Dessen Conclusion bestätigt die Änderung; die Conclusion des Owners speichert und schließt den Aggregatgraphen. Ohne nachgelagerten `GRAPH_EDIT_CMD` eignet sich dasselbe Muster auch dazu, einen `GRAPH_OWNER_CMD` vollständig ohne UI auszuführen.
 
-`PageConclusionReference` verweist dabei auf eine Abschlussart, d. h., das `Command` muss diese Conclusion deklarieren. `USER_CANCEL` (`PageConclusionOptionUserCancel`) modelliert einen Abbruch des Commands mit `cancel`, analog zu einem Benutzerabbruch.
+`PageConclusionReference` verweist dabei auf eine Abschlussart, d. h., der `Command` muss diese Conclusion deklarieren. `USER_CANCEL` (`PageConclusionOptionUserCancel`) modelliert einen Abbruch des Commands mit `cancel`, analog zu einem Benutzerabbruch.
 
 ### Typischer UI-Modellierungsablauf
 
@@ -254,7 +254,7 @@ Ein `AppUI Module` beschreibt eine interaktive Anwendung. Neben Benutzerkontext 
 | `AppUI Module` | `AppUiModule` | `org.modellwerkstatt.dataux.structure.AppUiModule` | Anwendung mit Benutzerkontext, Navigation und Tiles |
 | `Tile` | `AppTile` | `org.modellwerkstatt.dataux.structure.AppTile` | Hervorgehobener Command-Einstieg mit optionalem Label- und Farbausdruck |
 | `tileInit` | `TileInitFunction` | `org.modellwerkstatt.dataux.structure.TileInitFunction` | Initialisiert den Tile-Zustand |
-| `StartupCommandCall` | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` | Bedingter Command-Aufruf beim Anwendungsstart |
+| `startup command to run` | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` | Command, der nach der Anmeldung gestartet wird |
 | `Action` | `MenuAction` | `org.modellwerkstatt.dataux.structure.MenuAction` | Verknüpft Menü oder Tile mit einem ObjectFlow-Command |
 
 - `mainMenu` bildet das fachliche Start- beziehungsweise Hauptmenü.
@@ -262,7 +262,7 @@ Ein `AppUI Module` beschreibt eine interaktive Anwendung. Neben Benutzerkontext 
 - `helpMenu` bündelt Hilfe- und Dokumentationsaktionen.
 - `Tile` (`AppTile`) sind die Kacheln/Schaltflächen auf der Startoberfläche mit einer `Action` sowie optional dynamischem Text und dynamischer Farbe.
 - `tileInit` (`TileInitFunction`) initialisiert Werte, die für Tiles benötigt werden.
-- Ein optionaler Start-Command (`StartupCommandCall`) kann beim Start aufgerufen und über einen Ausdruck aktiviert werden.
+- `startup command to run` (`StartupCommandCall`) startet nach der Anmeldung einen Command; eine optionale Bedingung legt fest, ob er ausgeführt wird. Ist er beendet, erscheinen die Tiles. Beim Einstieg über eine URL läuft zuerst der Start-Command und danach der über die URL angesprochene Command, siehe [Command-Optionen](objectflow.md#command-optionen).
 - `VERSION` (`OptVersion`) und `OFFICIAL NAME` (`OptOfficialAppName`) beschreiben Modulmetadaten.
 
 Die Funktion `isAuthenticated` (`AppAuthenticationFunction`) ist der vorgesehene Ort, um den Benutzerkontext des AppUI-Moduls zu initialisieren. Die Funktion erledigt das nicht automatisch: In ihrem Funktionskörper muss ausdrücklich modelliert werden, dass der von der Laufzeit gelieferte Benutzername in die `userEnvironment` übernommen und die zugehörige Benutzer-ID gesetzt wird. Diese ID wird üblicherweise über einen Service oder ein Repository zum Benutzernamen ermittelt und nicht als Konstante hinterlegt. Je nach Laufzeit stammt der Benutzername beispielsweise aus einer OAuth-Anmeldung oder aus einer Login-Maske. Authentifizierung und fachliche Berechtigungsprüfung bleiben trotzdem getrennte Aufgaben.
@@ -292,7 +292,7 @@ Ein `Tile` kann Beschriftung und Farbe über BaseLanguage-Ausdrücke dynamisch b
 - Argumente für Command-Aufrufe,
 - Darstellungsoptionen, die vom aktuellen Zustand abhängen.
 
-Welche Variablen sichtbar sind und welcher Ergebnistyp erwartet wird, hängt von der Einbettungsstelle ab. Ein Ausdruck in einer Tile-Funktion ist deshalb nicht automatisch im Modul-Lebenszyklus oder in einer anderen UI-Funktion gültig.
+Welche Variablen sichtbar sind und welcher Ergebnistyp erwartet wird, hängt von der Einbettungsstelle ab. Ein Ausdruck in einer Tile-Funktion ist deshalb nicht automatisch in einer anderen UI-Funktion gültig.
 
 Diese Ausdrücke sollen Darstellungs- und Interaktionslogik enthalten. Fachliche Berechnungen und Regeln bleiben in den zuständigen Entities, Value Objects, Services oder Commands und werden von dort aufgerufen. `tileInit` darf solche fachlichen Fähigkeiten aufrufen und ihre Ergebnisse für die Darstellung aufbereiten.
 
@@ -323,7 +323,7 @@ Der Producer läuft nur, wenn kein Consumer des Pairs mehr arbeitet. Dadurch ent
 
 Ein Pair darf auch nur aus einem Producer bestehen, wenn der gestartete Command die Arbeit vollständig erledigt und keine einzelnen Inbox-Elemente nachbearbeitet werden müssen. Ein solches Producer-only-Pair darf seine Inbox nicht füllen: Enthält sie Elemente, obwohl kein Consumer vorhanden ist, verwirft die Laufzeit sie wieder. `null`-Elemente aus einem Producer-Ergebnis werden ebenfalls nicht übernommen.
 
-Auch ein Batchjob benötigt einen konsistenten technischen Benutzerkontext. Die Funktion `isAuthenticated` ist auch am `BatchJob Module` verpflichtend zu modellieren, wird aber nur für eine gegebenenfalls gestartete UI ausgeführt. Im Betrieb ohne UI kommt der Benutzerkontext aus der `OFX Config`; siehe [User Environment und User Service](objectflow.md#user-environment-und-user-service). Der Benutzerkontext dient der Ausführung und Nachvollziehbarkeit, ist aber keine alleinige Sicherheitsgrenze.
+Auch ein Batchjob benötigt einen konsistenten technischen Benutzerkontext. Die Funktion `isAuthenticated` ist auch am `BatchJob Module` verpflichtend zu modellieren, wird aber nur für eine gegebenenfalls gestartete UI ausgeführt. Im Betrieb ohne UI kommt der Benutzerkontext aus der `OFXConfig`; siehe [User Environment und User Service](objectflow.md#user-environment-und-user-service). Der Benutzerkontext dient der Ausführung und Nachvollziehbarkeit, ist aber keine alleinige Sicherheitsgrenze.
 
 #### Exception-Strategien und Wiederanlauf
 
@@ -527,7 +527,7 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konz
 | Anwendung | `AppUI Module` | `AppUiModule` | `org.modellwerkstatt.dataux.structure.AppUiModule` |
 | Anwendung | `Tile` | `AppTile` | `org.modellwerkstatt.dataux.structure.AppTile` |
 | Anwendung | `tileInit` | `TileInitFunction` | `org.modellwerkstatt.dataux.structure.TileInitFunction` |
-| Anwendung | `StartupCommandCall` | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` |
+| Anwendung | `startup command to run` | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` |
 | Modul | `isAuthenticated` | `AppAuthenticationFunction` | `org.modellwerkstatt.dataux.structure.AppAuthenticationFunction` |
 | Moduloption | `VERSION` | `OptVersion` | `org.modellwerkstatt.dataux.structure.OptVersion` |
 | Moduloption | `OFFICIAL NAME` | `OptOfficialAppName` | `org.modellwerkstatt.dataux.structure.OptOfficialAppName` |
@@ -543,4 +543,4 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konz
 
 ## Dokumentstand
 
-Diese Dokumentation beschreibt DataUX, Stand September 2026, auf Basis von JetBrains MPS 2026.1.
+Diese Dokumentation beschreibt DataUX, Stand Oktober 2026, auf Basis von JetBrains MPS 2026.1.

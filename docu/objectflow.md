@@ -9,7 +9,7 @@ ObjectFlow verbindet fünf Aufgabenbereiche:
 1. **Datenmodellierung:** `Entity` (`Entity`), `Value Object` (`ValueObject`) und `DTO` (`DTO`) beschreiben fachliche Objekte, Werte und anwendungsbezogene Datencontainer.
 2. **Domänenlogik:** Zustandsübergänge, Berechnungen und fachliche Prüfungen liegen in den Datenstrukturen selbst oder häufig in einem zustandslosen `Service` (`Service`).
 3. **Anwendungsabläufe:** Ein `Command` (`Command`) modelliert die mögliche Interaktion mit dem Endanwender. Commands können mehrere Pages mit Conclusions beinhalten, verwalten die Session und koordinieren Services und Repositories.
-4. **Tests:** Eine `OFX Test Suit` (`OFXTestSuit`) führt fachliche Tests und vollständige Commands ohne Benutzeroberfläche aus.
+4. **Tests:** Eine `OFXTestSuit` führt fachliche Tests und vollständige Commands ohne Benutzeroberfläche aus.
 5. **Querschnitt:** Konfiguration, Rollen und Berechtigungen, statische Ressourcen, Logging und Serialisierung ergänzen die fachlichen Bausteine.
 
 ### Schreibkonventionen
@@ -240,7 +240,7 @@ Dieser Teil beschreibt zustandslose Service-Komponenten, Komponentenaufrufe, fac
 
 ### Service-Komponenten
 
-Ein `Service` ist eine von der Laufzeit verwaltete Komponente; im Editor beginnt er mit `component <Name>`. Services werden über die ObjectFlow-Konfiguration instanziiert und innerhalb einer Anwendung daher nur einmal erzeugt. Sie dürfen daher keinen veränderlichen Benutzer- oder Vorgangszustand halten. Aufrufübergreifender sowie benutzer- oder sessionbezogener Zustand darf nicht in Feldern eines Services gespeichert werden. Anwendungsweite technische Zustände wie Caches, Nachschlagetabellen oder technische Clients sind in Ausnahmefällen erlaubt.
+Ein `Service` ist eine von der Laufzeit verwaltete Komponente; im Editor beginnt er mit `component <Name>`. Services werden über die ObjectFlow-Konfiguration instanziiert und innerhalb einer Anwendung nur einmal erzeugt. Sie dürfen daher keinen veränderlichen Benutzer- oder Vorgangszustand halten. Aufrufübergreifender sowie benutzer- oder sessionbezogener Zustand darf nicht in Feldern eines Services gespeichert werden. Anwendungsweite technische Zustände wie Caches, Nachschlagetabellen oder technische Clients sind in Ausnahmefällen erlaubt.
 
 Services bündeln vor allem:
 
@@ -413,7 +413,7 @@ Der optionale Zweig `default: // and null` behandelt sowohl alle nicht ausdrück
 
 ### UI-Metadaten einer Property mit `#Meta` steuern
 
-Mit `#Meta` (`BPMetaReference`) greift ObjectFlow nicht auf den fachlichen Wert einer Business Property zu, sondern auf ihre veränderbaren Laufzeitmetadaten. Ein Command kann damit die an diese Property gebundene DataUX-Darstellung situationsabhängig steuern, ohne dem statischen Aufbau eines `Page Pane` zu widersprechen.
+Mit `#Meta` (`BPMetaReference`) greift ObjectFlow nicht auf den fachlichen Wert einer Business Property zu, sondern auf ihre veränderbaren Laufzeitmetadaten. Ein Command kann damit die an diese Property gebundene DataUX-Darstellung situationsabhängig steuern, ohne dem statischen Aufbau eines `Page Pane`s zu widersprechen.
 
 Beispielsweise kann ein Rechnungsablauf folgende Laufzeitmetadaten setzen:
 
@@ -674,7 +674,8 @@ Die DSL erlaubt `pushSelection` nur
 
 - in der Page-Initialisierung (`PageInitConceptFunc`),
 - in einer Page Conclusion (`PageConclusion`),
-- in der Funktion eines Command-Termination-Handlers (`PageCmdTermConceptFunction`) 
+- in der Funktion eines Command-Termination-Handlers (`PageCmdTermConceptFunction`),
+- im `before conclude`-Block eines `run command` im Test (`OFXRunCmdStatementList`).
 
 Damit ist `pushSelection` in einem Termination-Handler zwar sprachseitig zulässig, aber meist nicht erwünscht. Die bestehende Selektion soll meist beibehalten werden. 
 
@@ -729,7 +730,7 @@ Revert ist damit eine In-Memory-Rücknahme des bearbeiteten Objekt-Graphen und n
 
 `URL` gilt für Turku- und H2-Laufzeiten. Die Option deklariert einen Pfad und eine geordnete Liste von Command-Parametern (`CommandUrlParamOption`); nach dem ersten optionalen Parameter dürfen nur noch weitere optionale Parameter folgen. Bei einem direkten URL-Aufruf konvertiert die Laufzeit die Pfadsegmente und stellt sie vor `command init` als normale Command-Parameter bereit.
 
-Nach `command init` stellt die Laufzeit die Browser-URL anhand des Command-Bereichs `url param adjust` richtig. Das ist insbesondere nötig, wenn der Command nicht direkt über eine URL gestartet wurde, etwa aus einem Menü. Die Werte stehen dort als Ausdrücke und nicht als Zuweisungen im Funktionskörper von `command init`. Dessen Ausdrücke entsprechen positionsweise den in der `URL`-Option deklarierten Parametern und müssen zum jeweiligen Parametertyp passen. Für jeden nicht optionalen URL-Parameter ist ein Ausdruck erforderlich; nur optionale Parameter am Ende dürfen entfallen.
+Nach `command init` stellt die Laufzeit die Browser-URL anhand des Command-Bereichs `url param adjust` richtig. Das ist insbesondere nötig, wenn der Command nicht direkt über eine URL gestartet wurde, etwa aus einem Menü. Die Werte stehen dort als Ausdrücke und nicht als Zuweisungen im Funktionskörper von `command init`. Die Ausdrücke entsprechen positionsweise den in der `URL`-Option deklarierten Parametern und müssen zum jeweiligen Parametertyp passen. Für jeden nicht optionalen URL-Parameter ist ein Ausdruck erforderlich; nur optionale Parameter am Ende dürfen entfallen.
 
 ```objectflow
 command parameter and defaults:
@@ -762,7 +763,7 @@ Die ObjectFlow-Session begleitet den Command-Ablauf und hält die geladenen bezi
 
 Das Konzept `session` (`Session`) gibt bei Bedarf direkten Zugriff auf Interna der aktuellen Session. Es ist für Fälle gedacht, die durch die höherwertigen Sprachkonzepte nicht abgedeckt werden. Direkter Session-Zugriff erhöht die Kopplung an die Laufzeit und sollte deshalb gezielt bleiben.
 
-Entities, die nicht über `QueryFromMap` (`org.modellwerkstatt.manmap.structure.QueryFromMap`) in die Session gelangt sind, müssen Teil der Session werden, bevor Session- und UI-Mechanismen sie als bearbeiteten Graphen behandeln können. Das betrifft neu erzeugte Entities ebenso wie Entities aus einem Lesemodell, die etwa mit Custom SQL über ein `nokeystore/read-only map` geladen wurden. Dafür stellt die Session `session.ensureInSession(…)` für eine Entity oder eine Liste von Entities bereit. Eine Entity mit vergebenem Schlüssel wird unter diesem Schlüssel in die Identity Map aufgenommen, eine Entity ohne Schlüssel als neue Entity geführt. Enthält die Session zu dem Schlüssel bereits eine Entity, bleibt der Aufruf ohne Wirkung.
+Entities, die nicht über `QueryFromMap` (`org.modellwerkstatt.manmap.structure.QueryFromMap`) in die Session gelangt sind, müssen Teil der Session werden, bevor Session- und UI-Mechanismen sie als bearbeiteten Graphen behandeln können. Das betrifft neu erzeugte Entities ebenso wie Entities aus einem Lesemodell, die etwa mit Custom SQL über ein `nokeystore/read-only map` geladen wurden. Dafür stellt die Session `session.ensureInSession(…)` für eine Entity oder eine Liste von Entities bereit. Eine Entity mit vergebenem Schlüssel wird unter diesem Schlüssel in die Identity Map aufgenommen, eine Entity ohne Schlüssel als neue Entity geführt. Enthält die Session zu dem Schlüssel bereits eine Entity, bleibt der Aufruf ohne Wirkung. Der Read-only-Zustand der Entity bleibt dabei unverändert.
 
 #### Session-weites Read-only und Dirty
 
@@ -915,17 +916,17 @@ Dieser Teil beschreibt Integrationstests auf der Abstraktionsebene der ObjectFlo
 
 | Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
-| `OFX Test Suit` | `OFXTestSuit` | `org.modellwerkstatt.objectflow.structure.OFXTestSuit` | Definiert eine ausführbare Testsuite mit eigener Konfiguration. |
+| `OFXTestSuit` | `OFXTestSuit` | `org.modellwerkstatt.objectflow.structure.OFXTestSuit` | Definiert eine ausführbare Testsuite mit eigener Konfiguration. |
 | `Simple Test` | `OFXTestMethod` | `org.modellwerkstatt.objectflow.structure.OFXTestMethod` | Beschreibt einen Test mit eigener ObjectFlow-Session. |
 | `run command` | `OFXRunCmd` | `org.modellwerkstatt.objectflow.structure.OFXRunCmd` | Führt einen vollständigen Command ohne Benutzeroberfläche aus. |
 | Run-Command-Page | `OFXRunCmdPage` | `org.modellwerkstatt.objectflow.structure.OFXRunCmdPage` | Beschreibt eine erwartete Page und ihre erzwungene Conclusion. |
 | Successor-Handler | `OFXRunCmdSuccessorHandler` | `org.modellwerkstatt.objectflow.structure.OFXRunCmdSuccessorHandler` | Behandelt einen erwarteten Successor-Command im Test. |
 
-### `OFX Test Suit`
+### `OFXTestSuit`
 
-Eine `OFX Test Suit` ist eine eigenständig ausführbare Testsuite. Sie referenziert eine `OFX Config`, stellt konfigurierte Komponenten bereit und kann Start-/Ende-Logik sowie mehrere `Simple Test`s enthalten.
+Eine `OFXTestSuit` ist eine eigenständig ausführbare Testsuite. Sie referenziert eine `OFXConfig`, stellt konfigurierte Komponenten bereit und kann Start-/Ende-Logik sowie mehrere `Simple Test`s enthalten.
 
-Die eigene Test-DSL ist der Ersatz für JUnit. Sie ist für Integrationstests auf derselben Abstraktionsebene wie ObjectFlow gedacht: Komponenten werden über eine echte `OFX Config` aufgelöst, jeder Test erhält einen definierten Session- und Benutzerkontext, Repository- und Serviceaufrufe verwenden `OperationCall`, und Commands können mitsamt Pages, Conclusions, Successors und Problembehandlung ohne UI ausgeführt werden. `OFXTestSuit` ist immer vorzuziehen, da die Semantik der ObjectFlow-, ManMap- oder Command-Laufzeit so Teil der Tests ist.
+Die eigene Test-DSL ist der Ersatz für JUnit. Sie ist für Integrationstests auf derselben Abstraktionsebene wie ObjectFlow gedacht: Komponenten werden über eine echte `OFXConfig` aufgelöst, jeder Test erhält einen definierten Session- und Benutzerkontext, Repository- und Serviceaufrufe verwenden `OperationCall`, und Commands können mitsamt Pages, Conclusions, Successors und Problembehandlung ohne UI ausgeführt werden. `OFXTestSuit` ist immer vorzuziehen, da die Semantik der ObjectFlow-, ManMap- oder Command-Laufzeit so Teil der Tests ist.
 
 | Bestandteil | Aufgabe |
 | --- | --- |
@@ -968,7 +969,7 @@ Ein `run command` kann:
 - einen innerhalb der Page gestarteten Child-Command wiederum mit `run command` beantworten,
 - Successor-Commands über `when successor command ...` samt eigener Page-Abfolge behandeln.
 
-Ein `run command` arbeitet mit einer eigenen Session: Ein `GRAPH_OWNER_CMD` committet bei `FINAL OK_CONCLUSION` wie im Betrieb. Die in `FINAL OK_CONCLUSION` passed forward Werte des Commands (siehe [`user toast message`](#final-ok_conclusion-final-cancel_conclusion-und-final_user_cancel)) stehen dem Test danach unter ihrem Namen zur Verfügung (`OFXRunCmdCreateInfoRef` - nicht lokale variable), etwa die ID eines neu angelegten Objekts. Darüber liest der Test das Committete zurück und prüft so neben Seiteneffekten am Eingabeobjekt auch die expliziten Command-Ergebnisse. Ein fehlender erwarteter Page-Schritt, eine unerwartete nicht-optionale Page oder eine andere Conclusion macht den Test reproduzierbar fehlerhaft. Mit `FAIL IN` lässt sich zusätzlich festlegen, dass der gesamte simulierte Ablauf mit einer bestimmten Exception oder einem bestimmten Session-Problem enden muss.
+Ein `run command` arbeitet mit einer eigenen Session: Ein `GRAPH_OWNER_CMD` committet bei `FINAL OK_CONCLUSION` wie im Betrieb. Die in `FINAL OK_CONCLUSION` passed forward Werte des Commands (siehe [`user toast message`](#final-ok_conclusion-final-cancel_conclusion-und-final_user_cancel)) stehen dem Test danach unter ihrem Namen zur Verfügung (`OFXRunCmdCreateInfoRef`, keine lokale Variable), etwa die ID eines neu angelegten Objekts. Darüber liest der Test das Committete zurück und prüft so neben Seiteneffekten am Eingabeobjekt auch die expliziten Command-Ergebnisse. Ein fehlender erwarteter Page-Schritt, eine unerwartete nicht-optionale Page oder eine andere Conclusion macht den Test reproduzierbar fehlerhaft. Mit `FAIL IN` lässt sich zusätzlich festlegen, dass der gesamte simulierte Ablauf mit einer bestimmten Exception oder einem bestimmten Session-Problem enden muss.
 
 Das folgende Pseudocode-Beispiel simuliert einen Rechnungs-Command mit zwei aufeinanderfolgenden Pages. Der Test bearbeitet zuerst die Kopfdaten, erzwingt die Conclusion für den Page-Wechsel und bestätigt anschließend die Positionen:
 
@@ -1015,7 +1016,7 @@ Persistenzwirksame Erwartungen prüft der Test, indem er die Daten nach dem Comm
 
 Ein ManMap-`Repository` kann über seine `superclass`-Rolle ein anderes Repository erweitern. Damit lässt sich zu einem produktiven Repository eine Testimplementierung modellieren, die einzelne Methoden überschreibt und beispielsweise kontrollierte Fake-Daten liefert. Die Vererbung allein ersetzt die produktive Komponente jedoch nicht: Durch Komponenten-Scanning können produktives Repository und Test-Repository gleichzeitig als kompatible Beans vorhanden sein.
 
-Die von der Testsuite verwendete `OFX Config` kennzeichnet deshalb die vollständig qualifizierte Klasse des Test-Repositories mit `primary instance` (`OFXConfigPrimary`). Daraus wird eine primäre Spring-Bean. Wird anschließend der Basistyp des produktiven Repositories benötigt, wählt die Komponentenauflösung die primäre Testimplementierung; `OperationCall`s bleiben unverändert und erreichen deren überschriebene Methoden. `OFXConfigPrimary` gehört ausschließlich in die Testkonfiguration beziehungsweise eine nur dort eingebundene Config-Section. Pro benötigtem Komponententyp darf nicht mehr als ein passender primärer Kandidat entstehen.
+Die von der Testsuite verwendete `OFXConfig` kennzeichnet deshalb die vollständig qualifizierte Klasse des Test-Repositories mit `primary instance` (`OFXConfigPrimary`). Daraus wird eine primäre Spring-Bean. Wird anschließend der Basistyp des produktiven Repositories benötigt, wählt die Komponentenauflösung die primäre Testimplementierung; `OperationCall`s bleiben unverändert und erreichen deren überschriebene Methoden. `OFXConfigPrimary` gehört ausschließlich in die Testkonfiguration beziehungsweise eine nur dort eingebundene Config-Section. Pro benötigtem Komponententyp darf nicht mehr als ein passender primärer Kandidat entstehen.
 
 Für dasselbe Basis-Repository können mehrere Test-Repositories existieren, etwa für einen leeren Datenbestand, einen typischen Erfolgsfall oder einen simulierten Fehler. Die jeweilige Testkonfiguration wählt genau die benötigte Implementierung aus. Dadurch bleiben Service und Command unverändert und werden trotzdem mit einem gezielt kontrollierten Repository-Verhalten ausgeführt. Die Vererbung allein aktiviert das Test-Repository nicht; entscheidend ist seine Instanziierung und Auswahl in der tatsächlich von der Testsuite referenzierten Konfiguration.
 
@@ -1027,15 +1028,15 @@ Dieser Teil beschreibt Konfiguration, Benutzerkontext, Berechtigungen, gemeinsam
 
 | Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
-| `OFX Config` | `OFXConfig` | `org.modellwerkstatt.objectflow.structure.OFXConfig` | Konfiguriert Laufzeitkomponenten und ihre Abhängigkeiten. |
+| `OFXConfig` | `OFXConfig` | `org.modellwerkstatt.objectflow.structure.OFXConfig` | Konfiguriert Laufzeitkomponenten und ihre Abhängigkeiten. |
 | `isAuthenticated` | `AppAuthenticationFunction` | `org.modellwerkstatt.dataux.structure.AppAuthenticationFunction` | Initialisiert in einer interaktiven Anwendung den Benutzerkontext. |
 | Roles and Permissions | `RolesAndPermissions` | `org.modellwerkstatt.objectflow.structure.RolesAndPermissions` | Bündelt Rollen, Scopes und Identities. |
 | Static Ressources | `StaticRessources` | `org.modellwerkstatt.objectflow.structure.StaticRessources` | Bündelt wiederverwendbare Bezeichnungen und Farben. |
 | log | `LogStatement` | `org.modellwerkstatt.objectflow.structure.LogStatement` | Schreibt strukturierte technische und fachliche Diagnoseinformationen. |
 
-### Konfiguration mit `OFX Config`
+### Konfiguration mit `OFXConfig`
 
-Eine `OFX Config` (`OFXConfig`) beschreibt die Laufzeitkomponenten und deren Abhängigkeiten. Konzeptionell entspricht sie einer modellierten Spring-Framework IoC-Konfiguration: Komponenten werden bereitgestellt, Sections eingebunden und Properties überschrieben. Eine Dependency-Resolution-Strategie kann Komponenten anhand konfigurierter Packages finden.
+Eine `OFXConfig` beschreibt die Laufzeitkomponenten und deren Abhängigkeiten; im Editor beginnt sie mit `Configuration <Name>`. Konzeptionell entspricht sie einer modellierten Spring-Framework IoC-Konfiguration: Komponenten werden bereitgestellt, Sections eingebunden und Properties überschrieben. Eine Dependency-Resolution-Strategie kann Komponenten anhand konfigurierter Packages finden. Klassen und Namespaces werden in einer `OFXConfig` ausschließlich als Strings mit FQ-Namen angegeben; eine Modellabhängigkeit auf die verdrahteten Komponenten ist nicht nötig.
 
 Wichtige Konfigurationsknoten sind:
 
@@ -1049,8 +1050,8 @@ Wichtige Konfigurationsknoten sind:
 | Zusätzlicher Wert für Instanz | `OFXConfigInstanceValue` | Lifecycle-Konfiguration bzw. ein Lifecycle-Metadatum der Bean |
 | Property, Konstruktorargument oder Wert | `OFXConfigProperty`, `OFXConfigConstructorArg` | Versorgt eine Instanz mit benannten beziehungsweise typisierten Konfigurationswerten |
 | primäre Implementierung | `OFXConfigPrimary` | Bevorzugt eine Repository- oder Service-Implementierung, wenn mehrere kompatible Kandidaten vorhanden sind |
-| Laufzeit-Scanning | `ComponentsScanning` | Begrenzt die Spring-Framework Komponentensuche auf einen konfigurierten Package-Basisnamen |
-| Generierungszeit-Scanning | `GenTimeScanning` | Ermittelt Komponenten bereits bei der Generierung; importierte Modelle können ein- und Package-Bereiche ausgeschlossen werden, die Spring-Framework Komponentensuche wird nicht verwendet |
+| Laufzeit-Scanning | `ComponentsScanning` | Sucht Komponenten zur Laufzeit über die Spring-Framework-Komponentensuche; berücksichtigt wird nur, was unter dem angegebenen Package-Basisnamen liegt |
+| Generierungszeit-Scanning | `GenTimeScanning` | Ermittelt bei der Generierung alle Komponenten des MPS-Projekts; beliebig viele Namespaces können ausgeschlossen werden. Die Spring-Framework-Komponentensuche wird nicht verwendet |
 
 Damit lassen sich gemeinsame Sections einbinden, einzelne Werte pro Anwendung oder Test überschreiben und unterschiedliche Konfigurationen für Entwicklung, Test und Deployment bilden. 
 
@@ -1076,7 +1077,7 @@ Außerhalb der Authentifizierungsfunktion liefert der Ausdruck `session` (`Sessi
 
 Für Rollen, Scopes und Identities stehen eigene DSL-Ausdrücke zur Verfügung: `StaticRoleReference`, `ScopeReference` und `IdentityReference`. Sie kapseln die generierten Zugriffe und deren Cache-Semantik. Anwendungscode soll diese Konzepte verwenden und keine eigenen String-Schlüssel für `getValue(...)` oder `getIdentity(...)` erfinden.
 
-Bei einem headless Batchjob wird `isAuthenticated` nicht ausgeführt; beim `BatchJobModule` ist diese Funktion nur für eine gegebenenfalls gestartete UI relevant. Die verwendete `OFX Config` muss deshalb eine `OFXConfigInstance` für eine Implementierung von `IOFXUserEnvironment` bereitstellen, üblicherweise `org.modellwerkstatt.objectflow.runtime.UserEnvironmentInformation`. Technischer Benutzername und Benutzer-ID werden dort mit `OFXConfigProperty` vorkonfiguriert. Zusätzlich benötigt der Job eine `IOFXUserServices`-Implementierung, beispielsweise `OFXSimpleUserServices`. Die Job-Laufzeit übernimmt beide Komponenten in die Sessions der Producer- und Consumer-Abläufe.
+Bei einem headless Batchjob wird `isAuthenticated` nicht ausgeführt; beim `BatchJobModule` ist diese Funktion nur für eine gegebenenfalls gestartete UI relevant. Die verwendete `OFXConfig` muss deshalb eine `OFXConfigInstance` für eine Implementierung von `IOFXUserEnvironment` bereitstellen, üblicherweise `org.modellwerkstatt.objectflow.runtime.UserEnvironmentInformation`. Technischer Benutzername und Benutzer-ID werden dort mit `OFXConfigProperty` vorkonfiguriert. Zusätzlich benötigt der Job eine `IOFXUserServices`-Implementierung, beispielsweise `OFXSimpleUserServices`. Die Job-Laufzeit übernimmt beide Komponenten in die Sessions der Producer- und Consumer-Abläufe.
 
 | Konfigurationselement | Typische Job-Konfiguration |
 | --- | --- |
@@ -1148,8 +1149,7 @@ Die ergänzende ObjectFlow-Serdes-Runtime stellt über `CONV` (`org.modellwerkst
 
 Die Implementierungen introspektieren jeweils die generierten ObjectFlow-Datenstrukturen. Unterstützt werden `Integer`, `BigDecimal`, `String`, `LocalDate`, `DateTime` und Statuswerte sowie verschachtelte Value Objects, Key References und Listen. Damit lassen sich sowohl flache DTOs als auch mehrstufige Objektgraphen mit Unterobjekten und Positionen serialisieren und wieder aufbauen. Virtuelle Properties (`OFXVPBase`) werden derzeit ausdrücklich nicht unterstützt.
 
-
-Eine Zyklusbehandlung ist automatisch vorgesehen. Eine mit `OPPOSITE` markierte Key Reference wird nicht als weiteres Unterobjekt verfolgt, sondern nur über ihr Schlüsselfeld repräsentiert. Die eigentlichen JSON- und XML-Serializer führen dagegen keine Menge bereits besuchter Objektinstanzen und erzeugen keine Objekt-IDs oder Referenzmarker. Ein sonstiger Zyklus im konkreten Laufzeitgraphen wird daher nicht automatisch aufgelöst.
+Zyklen werden nur über `OPPOSITE` behandelt: Eine mit `OPPOSITE` markierte Key Reference wird nicht als weiteres Unterobjekt verfolgt, sondern nur über ihr Schlüsselfeld repräsentiert. Die JSON- und XML-Serializer führen keine Menge bereits besuchter Objektinstanzen und erzeugen keine Objekt-IDs oder Referenzmarker; ein sonstiger Zyklus im Laufzeitgraphen wird daher nicht aufgelöst.
 
 `IConvFormatOptions` steuert Datums-, Zeit- und Dezimalformate, Locale, die Abbildung zwischen Property- und externen Feldnamen sowie das Verhalten bei fehlenden oder leeren Werten. Wichtige Modi sind:
 
@@ -1270,12 +1270,12 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 | Session | session queue next command | `SessionQueueNextCommand` | `org.modellwerkstatt.objectflow.structure.SessionQueueNextCommand` |
 | Selektion | `getSelected()` | `SelectedObject` | `org.modellwerkstatt.objectflow.structure.SelectedObject` |
 | Selektion | `getSelectedObjects()` | `SelectedList` | `org.modellwerkstatt.objectflow.structure.SelectedList` |
-| Tests | `OFX Test Suit` | `OFXTestSuit` | `org.modellwerkstatt.objectflow.structure.OFXTestSuit` |
+| Tests | `OFXTestSuit` | `OFXTestSuit` | `org.modellwerkstatt.objectflow.structure.OFXTestSuit` |
 | Tests | `Simple Test` | `OFXTestMethod` | `org.modellwerkstatt.objectflow.structure.OFXTestMethod` |
 | Tests | `run command` | `OFXRunCmd` | `org.modellwerkstatt.objectflow.structure.OFXRunCmd` |
 | Tests | Run-Command-Page | `OFXRunCmdPage` | `org.modellwerkstatt.objectflow.structure.OFXRunCmdPage` |
 | Tests | Successor-Handler | `OFXRunCmdSuccessorHandler` | `org.modellwerkstatt.objectflow.structure.OFXRunCmdSuccessorHandler` |
-| Konfiguration | `OFX Config` | `OFXConfig` | `org.modellwerkstatt.objectflow.structure.OFXConfig` |
+| Konfiguration | `OFXConfig` | `OFXConfig` | `org.modellwerkstatt.objectflow.structure.OFXConfig` |
 | Konfiguration | Config-Section | `OFXConfigSection` | `org.modellwerkstatt.objectflow.structure.OFXConfigSection` |
 | Konfiguration | Section einbinden | `OFXConfigInclude` | `org.modellwerkstatt.objectflow.structure.OFXConfigInclude` |
 | Konfiguration | konkrete Instanz | `OFXConfigInstance` | `org.modellwerkstatt.objectflow.structure.OFXConfigInstance` |
@@ -1299,4 +1299,4 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen Konzepte, n
 
 ## Dokumentstand
 
-Diese Dokumentation beschreibt ObjectFlow, Stand September 2026, auf Basis von JetBrains MPS 2026.1.
+Diese Dokumentation beschreibt ObjectFlow, Stand Oktober 2026, auf Basis von JetBrains MPS 2026.1.

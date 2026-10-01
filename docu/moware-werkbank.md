@@ -47,7 +47,7 @@ Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimm
 | Persistenz                         | `Persistence Description`, `Repository`                                         | `org.modellwerkstatt.manmap`     |
 | Benutzeroberfläche                 | `Page Pane`, `Table`, `Delegate Form`, `Grid Layout`, `Tab Layout`, `Custom UI Element` | `org.modellwerkstatt.dataux` |
 | Ausführbare Module                 | `AppUI Module`, `BatchJob Module`                                               | `org.modellwerkstatt.dataux`     |
-| Querschnitt                        | `OFX Config`, `OFX Test Suit`, Roles and Permissions, Static Ressources         | `org.modellwerkstatt.objectflow` |
+| Querschnitt                        | `OFXConfig`, `OFXTestSuit`, Roles and Permissions, Static Ressources         | `org.modellwerkstatt.objectflow` |
 
 ### Kapitellandkarte: ManMap
 
@@ -69,8 +69,8 @@ Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimm
 | `DTO` | `DTO` | `org.modellwerkstatt.objectflow.structure.DTO` | Definiert einen Datencontainer für die Benutzeroberfläche oder die Ergebnisse von Datenbankabfragen. Kann durch Mapper aus Result-Sets befüllt werden, ohne selbst ein persistentes Domänenobjekt zu sein. |
 | `Service` | `Service` | `org.modellwerkstatt.objectflow.structure.Service` | Bündelt fachliche oder anwendungsbezogene Operationen, die nicht sinnvoll einer einzelnen Entity oder einem Value Object zugeordnet werden. Erlaubt Zugriff auf Repositories und andere Infrastrukturkomponenten. |
 | `Command` | `Command` | `org.modellwerkstatt.objectflow.structure.Command` | Modelliert einen Anwendungsfall beziehungsweise eine Benutzeraktion. Koordiniert Parameter, Zustandsvariablen, Seiten sowie Initialisierung und Abschluss bei Bestätigung oder Abbruch. Steuert Session-Logik. |
-| `OFX Config` | `OFXConfig` | `org.modellwerkstatt.objectflow.structure.OFXConfig` | Definiert die zentrale Konfiguration der Anwendungskomponenten und ihrer Abhängigkeiten. Ist konzeptionell mit einer XML-basierten Spring-Bean-Konfiguration vergleichbar: Komponenten werden konfiguriert und ihre Abhängigkeiten miteinander verdrahtet. |
-| `OFX Test Suit` | `OFXTestSuit` | `org.modellwerkstatt.objectflow.structure.OFXTestSuit` | Definiert eine eigenständig ausführbare Testsuite mit konfigurierten Komponenten, Start-/Ende-Logik und Testinhalten. |
+| `OFXConfig` | `OFXConfig` | `org.modellwerkstatt.objectflow.structure.OFXConfig` | Definiert die zentrale Konfiguration der Anwendungskomponenten und ihrer Abhängigkeiten. Ist konzeptionell mit einer XML-basierten Spring-Bean-Konfiguration vergleichbar: Komponenten werden konfiguriert und ihre Abhängigkeiten miteinander verdrahtet. |
+| `OFXTestSuit` | `OFXTestSuit` | `org.modellwerkstatt.objectflow.structure.OFXTestSuit` | Definiert eine eigenständig ausführbare Testsuite mit konfigurierten Komponenten, Start-/Ende-Logik und Testinhalten. |
 | Roles and Permissions | `RolesAndPermissions` | `org.modellwerkstatt.objectflow.structure.RolesAndPermissions` | Beschreibt das Berechtigungsmodell mit Rollen, Geltungsbereichen und Identitäten. Dient als zentrale Grundlage für Zugriffskontrollen. |
 | Static Ressources | `StaticRessources` | `org.modellwerkstatt.objectflow.structure.StaticRessources` | Bündelt wiederverwendbare, plattformbezogene Ressourcen wie Bezeichnungen und Farben. Ressourcensätze können aufeinander aufbauen. |
 
@@ -95,16 +95,16 @@ Eine typische Geschäftsanwendung verbindet die drei Sprachen entlang eines durc
 
 ```text
 ObjectFlow
-Entity / ValueObject / DTO / Service / Command
+Entity / Value Object / DTO / Service / Command
         │
         ├── ManMap
         │   Mapping / Repository / SQL / DTO-Mapping
         │
         └── DataUX
-            PagePane / Form / Table / Layout / Interaktion
+            Page Pane / Form / Table / Layout / Interaktion
                     │
                     ▼
-             AppUiModule / BatchJobModule
+             AppUI Module / BatchJob Module
                     │
                     ▼
                  OFXConfig
@@ -129,7 +129,7 @@ Entity / ValueObject / DTO / Service / Command
 | Neue Darstellung oder Bedienelemente                    | `org.modellwerkstatt.dataux`                                                    | `Page Pane` und darin eingebundene Formulare, Tabellen, Layouts oder andere UI-Komponenten        |
 | Neue Anwendung oder geändertes Hauptmenü                | `org.modellwerkstatt.dataux`                                                    | `AppUI Module`                                                                                   |
 
-Fachliche Prüfungen und Berechnungen gehören in das fachliche Modell beziehungsweise in Services. Datenbankabfragen und Speicheroperationen werden in Repositories implementiert. Commands koordinieren den Anwendungsfall, die Session und die zugehörigen Pages. Deren Darstellung wird durch `PagePane`s und die darin eingebundenen UI-Komponenten beschrieben. Eine Änderung kann daher mehrere Modellierungsorte und DSLs betreffen.
+Fachliche Prüfungen und Berechnungen gehören in das fachliche Modell beziehungsweise in Services. Datenbankabfragen und Speicheroperationen werden in Repositories implementiert. Commands koordinieren den Anwendungsfall, die Session und die zugehörigen Pages. Deren Darstellung wird durch `Page Pane`s und die darin eingebundenen UI-Komponenten beschrieben. Eine Änderung kann daher mehrere Modellierungsorte und DSLs betreffen.
 
 ## Laufzeitumgebungen
 
@@ -137,12 +137,12 @@ Die Ausführung richtet sich nach dem modellierten Modultyp: Anwendungen mit Ben
 
 | Modultyp         | Ausführungsart                                    | Technologie/Laufzeitumgebung                     | Primärer Einsatz                                                       |
 | ---------------- | ------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------- |
-| `AppUiModule`    | Desktop-Anwendung                                 | JavaFX / `org.modellwerkstatt.fx8forms`          | Desktop-PCs                                                            |
-| `AppUiModule`    | Webanwendung auf Tomcat                           | Vaadin / `org.modellwerkstatt.turkuforms`        | Desktop-PCs                                                            |
-| `AppUiModule`    | HTML5-Webanwendung auf Tomcat                     | Pebble Templates / `org.modellwerkstatt.h2forms` | MDE-Geräte, beispielsweise von Zebra oder Datalogic, sowie Smartphones |
-| `BatchJobModule` | Automatisierte Ausführung ohne Benutzeroberfläche | Servlet auf Tomcat                               | Hintergrundverarbeitung                                                |
-| `BatchJobModule` | Ausführung mit Desktop-Oberfläche                 | JavaFX / `org.modellwerkstatt.fx8forms`          | Interaktive Ausführung auf Desktop-PCs                                 |
-| `BatchJobModule` | Ausführung mit Weboberfläche                      | Vaadin / `org.modellwerkstatt.turkuforms`        | Interaktive Ausführung im Browser                                      |
+| `AppUI Module`    | Desktop-Anwendung                                 | JavaFX / `org.modellwerkstatt.fx8forms`          | Desktop-PCs                                                            |
+| `AppUI Module`    | Webanwendung auf Tomcat                           | Vaadin / `org.modellwerkstatt.turkuforms`        | Desktop-PCs                                                            |
+| `AppUI Module`    | HTML5-Webanwendung auf Tomcat                     | Pebble Templates / `org.modellwerkstatt.h2forms` | MDE-Geräte, beispielsweise von Zebra oder Datalogic, sowie Smartphones |
+| `BatchJob Module` | Automatisierte Ausführung ohne Benutzeroberfläche | Servlet auf Tomcat                               | Hintergrundverarbeitung                                                |
+| `BatchJob Module` | Ausführung mit Desktop-Oberfläche                 | JavaFX / `org.modellwerkstatt.fx8forms`          | Interaktive Ausführung auf Desktop-PCs                                 |
+| `BatchJob Module` | Ausführung mit Weboberfläche                      | Vaadin / `org.modellwerkstatt.turkuforms`        | Interaktive Ausführung im Browser                                      |
 | `OFXTestSuit`    | Testausführung                                    | MPS (Run-Konfiguration) oder standalone mit Java | Ausführen und Prüfen modellierter Testabläufe                          |
 
 `org.modellwerkstatt.turkuforms` ist nicht Teil von MPS und wird erst im finalen Build-Prozess der Anwendung eingebunden; in MPS sind nur `org.modellwerkstatt.fx8forms` und `org.modellwerkstatt.h2forms` verfügbar.
@@ -161,7 +161,7 @@ Das Beispiel umfasst die Suche nach Rechnungen, die Bearbeitung einer Rechnung m
 | ------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Entity`      | `Rechnung`                | Enthält Rechnungs-ID, Rechnungsnummer, Rechnungsdatum und eine Liste von Rechnungspositionen.                                                                 |
 | `Entity`      | `Rechnungsposition`       | Enthält Positionsnummer, Beschreibung, Menge und Einzelpreis.                                                                                                 |
-| `ValueObject` | `Geldbetrag`              | Fasst Betrag und Währung zusammen.                                                                                                                            |
+| `Value Object` | `Geldbetrag`              | Fasst Betrag und Währung zusammen.                                                                                                                            |
 | `DTO`         | `RechnungInfo`            | Read-only-Projektion für ein Suchergebnis. Enthält die Rechnungs-ID sowie die für die Ergebnisliste benötigten Rechnungsdaten.                                 |
 | `DTO`         | `RechnungFilter`          | Enthält Suchkriterien, beispielsweise Rechnungsnummer und Datumsbereich, sowie die Property `results` vom Typ `list<RechnungInfo>`.                           |
 | `DTO`         | `RechnungsSummenErgebnis` | Nimmt das Ergebnis der SQL-Aggregation zur Summe aller Rechnungen auf.                                                                                        |
@@ -171,7 +171,7 @@ Für das vereinfachte Beispiel müssen Mengen positiv und Einzelpreise nicht neg
 
 ### Persistenz mit der DSL `org.modellwerkstatt.manmap`
 
-Eine `PersistenceDescription` enthält die Mappings für `Rechnung` und `Rechnungsposition`. Die Positionstabelle besitzt eine Zuordnung zur jeweiligen Rechnung.
+Eine `Persistence Description` enthält die Mappings für `Rechnung` und `Rechnungsposition`. Die Positionstabelle besitzt eine Zuordnung zur jeweiligen Rechnung.
 
 Das `RechnungsRepo` kapselt die Datenbankzugriffe:
 
@@ -226,18 +226,18 @@ Die Repository-Methode führt eine aggregierende SQL-Abfrage direkt auf der Date
 
 ### Benutzeroberfläche mit der DSL `org.modellwerkstatt.dataux`
 
-Eine **Page** beschreibt eine Seite im Ablauf eines Commands. Die zugehörige **`PagePane`** bildet ihr Gegenstück in der Benutzeroberfläche und nimmt deren UI-Inhalte auf. Formulare, Tabellen, Layouts und andere UI-Komponenten müssen jeweils innerhalb einer `PagePane` eingebunden sein, gegebenenfalls über darin enthaltene Layouts. `PagePane`s können wiederverwendet werden.
+Eine **Page** beschreibt eine Seite im Ablauf eines Commands. Das zugehörige **`Page Pane`** bildet ihr Gegenstück in der Benutzeroberfläche und nimmt deren UI-Inhalte auf. Formulare, Tabellen, Layouts und andere UI-Komponenten müssen jeweils innerhalb eines `Page Pane`s eingebunden sein, gegebenenfalls über darin enthaltene Layouts. `Page Pane`s können wiederverwendet werden.
 
 | Element                                 | Inhalt                                                                                                                                                                     |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AppUiModule`                           | Einstieg in die Rechnungsverwaltung mit Menüeinträgen für `Rechnungen suchen` und `Summe aller Rechnungen anzeigen`.                                                       |
-| `PagePane` für die Suchfilter-Page      | Enthält ein `DelegateForm`, dessen Eingabefelder an die Suchkriterien des DTOs `RechnungFilter` gebunden sind.                                                             |
-| `PagePane` für die Suchergebnis-Page    | Enthält eine `Table`, die die `RechnungInfo`-DTOs aus `RechnungFilter.results` zeigt. Ein Doppelklick startet `Rechnung bearbeiten` mit der Rechnungs-ID aus dem DTO.    |
-| `PagePane` für die Rechnungsbearbeitung | Enthält ein `DelegateForm` für den Rechnungskopf und eine `Table` für die geladenen Rechnungspositionen. Ein `GridLayout` oder `TabLayout` strukturiert diese Komponenten. |
-| `PagePane` für die Positionsbearbeitung | Enthält ein `DelegateForm` zur Bearbeitung einer einzelnen Rechnungsposition im Command `Rechnungsposition bearbeiten`.                                                    |
-| `PagePane` für die Summenanzeige        | Enthält ein `DelegateForm` zur Anzeige des DTOs `RechnungsSummenErgebnis`.                                                                                                 |
+| `AppUI Module`                           | Einstieg in die Rechnungsverwaltung mit Menüeinträgen für `Rechnungen suchen` und `Summe aller Rechnungen anzeigen`.                                                       |
+| `Page Pane` für die Suchfilter-Page      | Enthält ein `Delegate Form`, dessen Eingabefelder an die Suchkriterien des DTOs `RechnungFilter` gebunden sind.                                                             |
+| `Page Pane` für die Suchergebnis-Page    | Enthält eine `Table`, die die `RechnungInfo`-DTOs aus `RechnungFilter.results` zeigt. Ein Doppelklick startet `Rechnung bearbeiten` mit der Rechnungs-ID aus dem DTO.    |
+| `Page Pane` für die Rechnungsbearbeitung | Enthält ein `Delegate Form` für den Rechnungskopf und eine `Table` für die geladenen Rechnungspositionen. Ein `Grid Layout` oder `Tab Layout` strukturiert diese Komponenten. |
+| `Page Pane` für die Positionsbearbeitung | Enthält ein `Delegate Form` zur Bearbeitung einer einzelnen Rechnungsposition im Command `Rechnungsposition bearbeiten`.                                                    |
+| `Page Pane` für die Summenanzeige        | Enthält ein `Delegate Form` zur Anzeige des DTOs `RechnungsSummenErgebnis`.                                                                                                 |
 
-Die Seitenfolge wird im jeweiligen Command beschrieben. Die zugeordneten `PagePane`s und ihre enthaltenen UI-Komponenten legen Darstellung, Datenbindungen und angebotene Interaktionen fest. Fachliche Prüfungen und Berechnungen bleiben in der Geschäftslogik; Datenbankabfragen und Speicheroperationen liegen im Repository.
+Die Seitenfolge wird im jeweiligen Command beschrieben. Die zugeordneten `Page Pane`s und ihre enthaltenen UI-Komponenten legen Darstellung, Datenbindungen und angebotene Interaktionen fest. Fachliche Prüfungen und Berechnungen bleiben in der Geschäftslogik; Datenbankabfragen und Speicheroperationen liegen im Repository.
 
 ### Fachliche Prüfung und Qualitätssicherung
 
@@ -316,4 +316,4 @@ Die Detaildokumentationen beschreiben Konzepte, Möglichkeiten, Einschränkungen
 
 ## Stand der Dokumentation
 
-Diese Dokumentation beschreibt die **modellwerkstatt MoWare-Werkbank, Stand September 2026**, auf Basis von **JetBrains MPS 2026.1**.
+Diese Dokumentation beschreibt die **modellwerkstatt MoWare-Werkbank, Stand Oktober 2026**, auf Basis von **JetBrains MPS 2026.1**.

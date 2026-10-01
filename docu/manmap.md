@@ -26,11 +26,11 @@ Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der 
 | Session-Verhalten | Ergebnisse von `QueryFromMap` werden in die ObjectFlow-Session integriert. | Ergebnisse von `nokeystore/read-only map` sind read-only und nicht in die Session-Identity-Map integriert. |
 | Lebensdauer | Begleitet einen fachlichen Bearbeitungs- und Speicherablauf | Wird für den Anwendungsfall geladen, verwendet und verworfen |
 
-> Ein Lesemodell kann auch mit Entities (und Value Objects) und `EntityMapping` sowie where realisiert werden, sofern der Funktionsumfang, die Ausdrucksstärke des where und die Möglichkeiten im Zusammenhang mit joins, für den Anwendungsfall ausreichend sind. Übersichtlichkeit, Wartung und Pflege sind dann mitunter besser gewährleistet, die Session-Integration muss allerdings berücksichtigt werden.
+> Ein Lesemodell kann auch mit Entities (und Value Objects) und `EntityMapping` sowie `where` realisiert werden, sofern der Funktionsumfang, die Ausdrucksstärke des `where` und die Möglichkeiten im Zusammenhang mit Joins für den Anwendungsfall ausreichend sind. Übersichtlichkeit, Wartung und Pflege sind dann mitunter besser gewährleistet, die Session-Integration muss allerdings berücksichtigt werden.
 
 ## Repositories und die vier Methodenarten
 
-Ein `Repository` (`Repository`) bündelt den Datenbankzugriff. Es kann Repository-Methoden, Row-Mapper, No-Key-Mapper und einen im ganzen Repository sichtbaren `sql string` (`SqlStringField`) enthalten. Wie bei einer BaseLanguage-Klasse kann ein `Repository` auch ein Field enthalten. Repositories sind jedoch grundsätzlich als zustandslos zu betrachten und werden pro Anwendung nur einmal instanziert.
+Ein `Repository` (`Repository`) bündelt den Datenbankzugriff. Es kann Repository-Methoden, Row-Mapper, No-Key-Mapper und einen im ganzen Repository sichtbaren `sql string` (`SqlStringField`) enthalten. Wie bei einer BaseLanguage-Klasse kann ein `Repository` auch ein Field enthalten. Repositories sind jedoch grundsätzlich als zustandslos zu betrachten und werden pro Anwendung nur einmal instanziiert.
 
 Die Repository-Methoden interagieren mit einer laufenden Session. Das Command-Konzept der `org.modellwerkstatt.objectflow`-DSL verantwortet den Lebenszyklus der Session und der Datenbanktransaktion. ManMap bestimmt, wie Abfrageergebnisse in diese Session integriert werden und ob sie read-only oder veränderbar sind. Eine Repository-Methode ist deshalb nicht automatisch eine eigene Transaktionsgrenze. Eine Session-Operation registriert einen später auszuführenden Repository-Aufruf, beispielsweise eine `CHECKIN`- oder `DELETE`-Methode. Im üblichen Command-Ablauf sammelt der Session Owner diese Operationen während der Bearbeitung. Erst beim vorgesehenen erfolgreichen Abschluss werden sie innerhalb der Datenbanktransaktion ausgeführt und anschließend committed. Bei Abbruch werden die vorgesehenen Speicheroperationen nicht ausgeführt. Das Registrieren einer Session-Operation ist daher von ihrem Ausführen zu unterscheiden. Ein Aufruf einer Repository-Methode im Modell eröffnet nicht automatisch eine eigene Transaktion.
 
@@ -59,7 +59,7 @@ Der Methodentyp beschreibt die Rolle der Methode im Lebenszyklus. Er ersetzt nic
 
 Ergebnisse von `QueryFromMap` werden in die Identity-Map der laufenden ObjectFlow-Session integriert. Wiederholte Read-only-Abfragen auf dieselbe Entity liefern innerhalb einer Session eine gecachte Entität; dabei wird dieselbe Objektinstanz verwendet. Wird allerdings versucht, eine bereits veränderbar geladene Entity erneut auszuchecken, wirft ManMap eine `IllegalStateException`; stattdessen ist die bereits in der Session vorhandene Instanz zu verwenden.
 
-Read-only schützt eine Entity nicht erst beim Speichern: Bereits eine Änderung oder das Löschen des Objekts ist unzulässig. Ein durch ein `nokeystore/read-only map` erzeugtes Ergebnis ist ebenfalls read-only, liegt selbst aber außerhalb der Session-Identity-Map; jede Abfrage liefert dafür neue Instanzen.
+Read-only schützt eine Entity nicht erst beim Speichern: Bereits eine Änderung oder das Löschen des Objekts ist unzulässig. Ein durch ein `nokeystore/read-only map` erzeugtes Ergebnis ist ebenfalls read-only, liegt selbst aber außerhalb der Session-Identity-Map; jede Abfrage liefert dafür neue Instanzen. Reguläre Entities, die ein `nokeystore/read-only map` über einen SQL-Join mitlädt, sind ebenfalls read-only, werden aber in die Session integriert: Eine dort schon vorhandene Instanz wird wiederverwendet; ist sie ausgecheckt, schlägt die Abfrage mit `IllegalStateException` fehl.
 
 ### Wiederverwendbarer SQL-Text
 
@@ -119,9 +119,10 @@ Beim Insert werden die mit `CREATEDAT`/`CREATEDBY` und `MODIFIEDAT`/`MODIFIEDBY`
 
 ### Alternative Tabellen
 
-Ein `EntityMapping` kann mit `ADDITIONAL_TABLE_NAME` alternative physische Tabellen für dasselbe Mapping deklarieren, beispielsweise eine Archiv-Tabelle. Mit `AdditionalTableReference` wird eine solche Tabelle gezielt für Abfragen sowie für `save with` und `delete with` ausgewählt. Bei einer Abfrage mit Joins muss gegebenenfalls auch für die beteiligten Mappings die jeweils passende alternative Tabelle ausgewählt werden.
+Ein `EntityMapping` kann mit `ADDITIONAL_TABLE_NAME` benannte alternative physische Tabellen für dasselbe Mapping deklarieren, beispielsweise eine Archiv-Tabelle. `WHEN <Bedingung> <Name>` (`AdditionalTableReference`) verwendet eine solche Tabelle für eine Abfrage, ein `save with` oder ein `delete with`, wenn die Bedingung zutrifft. Bei einer Abfrage mit Joins muss gegebenenfalls auch für die beteiligten Mappings die jeweils passende alternative Tabelle ausgewählt werden.
 
 Die alternative Tabelle ändert nur das physische Tabellenziel. Sie ist keine zusätzliche Mapping-Instanz und erweitert deshalb nicht den Scope der `MappingReference`s.
+
 ### Referenzen, eingebettete Werte und Listen
 
 `ReferenceMapping` wählt die Entity-Property, welche auf die Ziel-Entität verweist; deren deklarierter Typ bestimmt somit den Entitätstyp der Referenz. Das enthaltene Schlüsselmapping ordnet anschließend die Schlüssel-Property der Ziel-Entität der Fremdschlüsselspalte in der Tabelle der Quell-Entität zu. Bei einem zusammengesetzten Zielschlüssel kann dieses Schlüsselmapping entsprechend mehrere Teilmappings enthalten. Das Mapping speichert beziehungsweise liest nur den Fremdschlüssel und lädt das Zielobjekt nicht automatisch.
@@ -155,8 +156,8 @@ Beide Formen beschreiben nur die Beziehung. Sie laden die Liste nicht automatisc
 
 | Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
-| Mapping mit `get(...)` | `GetQuery` | `org.modellwerkstatt.manmap.structure.GetQuery` | Liefert eine Instanz anhand des Schlüssels oder `null`, wenn der Schlüssel nicht vergeben ist. |
-| Mapping mit `where(...)` | `WhereQuery` | `org.modellwerkstatt.manmap.structure.WhereQuery` | Liefert eine Liste anhand eines Filters. |
+| `get(...)` | `GetQuery` | `org.modellwerkstatt.manmap.structure.GetQuery` | Liefert eine Instanz anhand des Schlüssels oder `null`, wenn der Schlüssel nicht vergeben ist. |
+| `where(...)` | `WhereQuery` | `org.modellwerkstatt.manmap.structure.WhereQuery` | Liefert eine Liste anhand eines Filters. |
 | `sortBy(...)` | `SortByQuery` | `org.modellwerkstatt.manmap.structure.SortByQuery` | Sortiert auf- oder absteigend. |
 | `limit(...)` | `LimitQuery` | `org.modellwerkstatt.manmap.structure.LimitQuery` | Begrenzt die Anzahl der Ergebnisse. |
 | `size` | `SizeQuery` | `org.modellwerkstatt.manmap.structure.SizeQuery` | Liefert die Anzahl der Ergebnisse. |
@@ -262,7 +263,7 @@ Für einen Parent mit Kindern wird daher typischerweise zuerst der Parent gespei
 | `BATCH` (`BatchSaveOption`) | Viele Objekte effizient im JDBC-Batch speichern |
 | `FORCE AUDIT` | Auditbehandlung für diesen Speichervorgang erzwingen |
 | `SKIP AUDIT` | Auditbehandlung für diesen Speichervorgang überspringen |
-| `AdditionalTableReference` | Eine deklarierte alternative Tabelle für die Operation auswählen |
+| `WHEN` | Eine deklarierte alternative Tabelle verwenden, wenn die Bedingung zutrifft |
 
 `BATCH` ist für Mengenoperationen gedacht. Für das Speichern eines einzelnen Objekts sollte sie nicht nur deshalb verwendet werden, weil sie verfügbar ist. Bei größeren Mengen ist der Performance-Vorteil oft substanziell.
 
@@ -275,7 +276,7 @@ Für einen Parent mit Kindern wird daher typischerweise zuerst der Parent gespei
 | Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
 | `delete with` | `DeleteWithMap` | `org.modellwerkstatt.manmap.structure.DeleteWithMap` | Löscht eine geladene Entity anhand ihres Schlüssels. |
-| `AdditionalTableReference` | `AdditionalTableReference` | `org.modellwerkstatt.manmap.structure.AdditionalTableReference` | Wählt eine deklarierte alternative Tabelle als Ziel der Operation. |
+| `WHEN` | `AdditionalTableReference` | `org.modellwerkstatt.manmap.structure.AdditionalTableReference` | Verwendet eine deklarierte alternative Tabelle als Ziel der Operation, wenn die Bedingung zutrifft. |
 
 Auch beim Löschen gibt es keine automatische Kaskade. Soll ein Objektgraph entfernt werden, werden abhängige Kindobjekte in der fachlich und relational korrekten Reihenfolge explizit gelöscht, typischerweise vor dem Parent. Ein `ListMapping` allein erzeugt kein Kaskadenverhalten.
 
@@ -363,7 +364,7 @@ Für eine einmalige kleine skalare Abfrage kann dieselbe Logik als Inline-Closur
 
 `nokeystore/read-only map` referenziert über `classConcept` den Ergebnistyp und enthält seine Feldmappings in der Rolle `atomMpig`. Es kann alle Spalten selbst mappen oder über `IncludeMapping` ein geeignetes bestehendes Mapping wiederverwenden.
 
-Jedes von einem `nokeystore/read-only map` erzeugte Objekt ist read-only. Das gilt auch dann, wenn ein bestehendes `EntityMapping` über `IncludeMapping` wiederverwendet wird. Das No-Key-Ergebnis selbst wird nicht in die Session integriert, das heißt nicht in die Session-Identity-Map aufgenommen. Für transiente Such-, Tabellen- und Aggregationsergebnisse ist ein ObjectFlow-`DTO` die bevorzugte Standardwahl. Ein `nokeystore/read-only map` kann jedoch auch ein vorhandenes `EntityMapping` einbinden und dadurch Entity-förmige read-only Ergebnisse erzeugen. Solche Objekte bleiben Projektionen außerhalb der Session-Identity-Map und dürfen nicht wie regulär geladene oder ausgecheckte Entities behandelt werden. Bei Bedarf nimmt `session.ensureInSession(…)` sie in die Session auf, siehe [Session und Unit of Work](objectflow.md#session-und-unit-of-work). Diese Variante eignet sich insbesondere dann, wenn die Wiederverwendung der vorhandenen Feldabbildungen sinnvoll ist und die Verwendung strikt read-only bleibt. Soll ein solches Objekt geändert werden, ist die betreffende Entity zuvor regulär über ihr `EntityMapping` zu laden beziehungsweise auszuchecken. Für neue, stark auf einen Such-, Darstellungs- oder Auswertungsfall zugeschnittene Ergebnisse bleibt ein DTO die klarere Standardwahl.
+Jedes von einem `nokeystore/read-only map` erzeugte Objekt ist read-only. Das gilt auch dann, wenn ein bestehendes `EntityMapping` über `IncludeMapping` wiederverwendet wird. Das No-Key-Ergebnis selbst wird nicht in die Session integriert, das heißt nicht in die Session-Identity-Map aufgenommen. Für transiente Such-, Tabellen- und Aggregationsergebnisse ist ein ObjectFlow-`DTO` die bevorzugte Standardwahl. Ein `nokeystore/read-only map` kann jedoch auch ein vorhandenes `EntityMapping` einbinden und dadurch Entity-förmige read-only Ergebnisse erzeugen. Solche Objekte bleiben Projektionen außerhalb der Session-Identity-Map und dürfen nicht wie regulär geladene oder ausgecheckte Entities behandelt werden. Diese Variante eignet sich insbesondere dann, wenn die Wiederverwendung der vorhandenen Feldabbildungen sinnvoll ist und die Verwendung strikt read-only bleibt. Soll ein solches Objekt geändert werden, ist die betreffende Entity zuvor regulär über ihr `EntityMapping` zu laden beziehungsweise auszuchecken. Für neue, stark auf einen Such-, Darstellungs- oder Auswertungsfall zugeschnittene Ergebnisse bleibt ein DTO die klarere Standardwahl. Bei Bedarf nimmt `session.ensureInSession(…)` ein Entity-förmiges No-Key-Ergebnis in die Session auf, siehe [Session und Unit of Work](objectflow.md#session-und-unit-of-work).
 
 Im Ergebnis-Mapping von direktem SQL referenziert `MappingReference` ein einzelnes `FieldMapping`. In diesem Kontext kann sie nicht direkt ein `EntityMapping` als SQL-Row-Mapper verwenden. Soll ein vollständiges Mapping wiederverwendet werden, führt der Pfad über `nokeystore/read-only map` und dessen `IncludeMapping`.
 
@@ -402,7 +403,7 @@ Schemaoptionen wie `NOTNULL`, `SIZE`, `INDEX` und `UNIQUE` beschreiben Anforderu
 - **Automatisches Kaskadenlöschen erwarten:** Kinder müssen in geeigneter Reihenfolge explizit gelöscht werden.
 - **Read-only-Entity verändern:** Herkunft aus `QueryFromMap` mit `readOnly=true` oder aus einem No-Key-Mapping prüfen.
 - **Dieselbe Entität mehrfach auschecken:** Alle `get`- und `where`-Abfragen derselben Session prüfen und die bereits geladene Instanz verwenden.
-- **No-Key-Ergebnis für eine normale Entity halten:** No-Key-Ergebnisse bleiben read-only und liegen außerhalb der Session-Identity-Map. Sie weisen keinen fachlichen oder Surrogatschlüssel auf.
+- **No-Key-Ergebnis für eine normale Entity halten:** No-Key-Ergebnisse bleiben read-only und liegen außerhalb der Session-Identity-Map.
 - **`MappingReference` im SQL auf ein `EntityMapping` richten:** Für die Wiederverwendung eines `EntityMapping`s im Custom SQL ist `IncludeMapping` innerhalb eines `nokeystore/read-only map` zu verwenden.
 - **Batch für Einzelobjekte verwenden:** `BATCH` ist für größere Mengen gedacht.
 - **Repository-Methode als Transaktionsgrenze behandeln:** Den ObjectFlow-Session- und Command-Ablauf prüfen.
@@ -446,7 +447,7 @@ Der Index enthält die in dieser Dokumentation behandelten Konzepte, nicht alle 
 | Query | `reload` | `ReloadQuery` | `org.modellwerkstatt.manmap.structure.ReloadQuery` |
 | Query | `refJoin` | `RefJoinOption` | `org.modellwerkstatt.manmap.structure.RefJoinOption` |
 | Query | `listJoin` | `ListJoinOption` | `org.modellwerkstatt.manmap.structure.ListJoinOption` |
-| Query | `AdditionalTableReference` | `AdditionalTableReference` | `org.modellwerkstatt.manmap.structure.AdditionalTableReference` |
+| Query | `WHEN` | `AdditionalTableReference` | `org.modellwerkstatt.manmap.structure.AdditionalTableReference` |
 | Query / Row-Mapping | `MappingReference` | `MappingReference` | `org.modellwerkstatt.manmap.structure.MappingReference` |
 | Query-Operator | `in` | `InOperation` | `org.modellwerkstatt.manmap.structure.InOperation` |
 | Query-Operator | `like` | `LikeOperator` | `org.modellwerkstatt.manmap.structure.LikeOperator` |
@@ -472,4 +473,4 @@ Der Index enthält die in dieser Dokumentation behandelten Konzepte, nicht alle 
 
 ## Dokumentstand
 
-Diese Dokumentation beschreibt ManMap, Stand September 2026, auf Basis von JetBrains MPS 2026.1.
+Diese Dokumentation beschreibt ManMap, Stand Oktober 2026, auf Basis von JetBrains MPS 2026.1.

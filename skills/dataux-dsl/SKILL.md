@@ -26,7 +26,7 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 - Prefer a root skeleton followed by surgical `ADD CHILD` operations for large or uncertain roots. Preserve existing node IDs.
 - Dry-run JSON first and inspect warnings. After a real change, run `mps_mcp_check_root_node_problems` on each changed root; generate or build when the task requires it.
 - Inner forms, tables, and layouts need `isNamed = false` and `name = "#"`; JSON insertion sets `isNamed = true`. Name an element only when it is reused with `Include`. See [inner UI elements](references/gotchas.md#inner-ui-elements-must-stay-unnamed).
-- Do not put `OPTIONAL` on a `StringDelegate` (it yields `null` instead of `""`); control required strings with `LENGTH` and do not repeat `LENGTH`/`RANGE` limits as `validation`. See [required values](../../docu/dataux.md#pflichtwerte-leere-eingaben-und-null).
+- `OPTIONAL` on a `StringDelegate` is allowed but usually unnecessary (an empty field then yields `null` instead of `""`); control required strings with `LENGTH` and do not repeat `LENGTH`/`RANGE` limits as `validation`. See [required values](../../docu/dataux.md#pflichtwerte-leere-eingaben-und-null).
 - Give the main table action hotkey `ENTER` (command `defaultHotkey` or the action's label); double-click and Enter on a row run the first menu action with `ENTER`, submenus included. See [menus](../../docu/dataux.md#menüs-und-command-aktionen).
 - Keep business rules out of UI expressions. DataUX should remain presentation-oriented “CheapCode”; see the [MoWare development principles](../../docu/moware-werkbank.md#grundprinzipien-für-die-anwendungsentwicklung).
 

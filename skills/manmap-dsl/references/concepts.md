@@ -37,7 +37,7 @@ Use the documentation for the runtime meaning of [fields, keys, and options](../
 - Key and ID: `KeyOption`, `AutoidOption`, `OverWriteAutoIdOption`.
 - Concurrency and audit: `OptimisticOption`, `CreatedAtFieldOption`, `CreatedByFieldOption`, `ModifiedAtFieldOption`, `ModifiedByFieldOption`.
 - Schema metadata: `IndexOption`, `NotnullOption`, `SizeOption`, `UniqueOption`.
-- Alternate storage: `AdditionalTableName` declares a table; `AdditionalTableReference` selects it for an operation.
+- Alternate storage: `AdditionalTableName` declares a table; `AdditionalTableReference` (projected as `WHEN <condition> <name>`; child `condition` [1], reference `alternativeAccess`) uses it for an operation when the condition holds.
 
 `AutoidOption.sequenceName` and `AdditionalTableName.tablename` each require a `StringLiteral`. `OverWriteAutoIdOption` references the affected `FieldMapping` and supplies another sequence-name literal.
 

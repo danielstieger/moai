@@ -49,7 +49,7 @@ Model: `r:9a581386-85ce-41a3-b17b-b79192665eb8(org.modellwerkstatt.objectflow.te
 - Configuration `Defaults`: `r:9a581386-85ce-41a3-b17b-b79192665eb8(org.modellwerkstatt.objectflow.tests.config)/5505654805890699853`
 - Static resources `RessourcesForTests`: `r:9a581386-85ce-41a3-b17b-b79192665eb8(org.modellwerkstatt.objectflow.tests.config)/8255348026212344894`
 
-Inspect these instead of inventing component-wiring or platform-resource child shapes. [Configuration](../../../docu/objectflow.md#konfiguration-mit-ofx-config) and [static resources](../../../docu/objectflow.md#statische-ressourcen)
+Inspect these instead of inventing component-wiring or platform-resource child shapes. [Configuration](../../../docu/objectflow.md#konfiguration-mit-ofxconfig) and [static resources](../../../docu/objectflow.md#statische-ressourcen)
 
 ## Verification protocol
 

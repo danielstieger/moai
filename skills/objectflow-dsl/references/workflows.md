@@ -10,7 +10,7 @@
 6. Add status declarations under the structure's `status` role, not as roots. Ensure every element has technical value plus short/long descriptions. [Status](../../../docu/objectflow.md#status)
 7. Validate the root and generate/build if the target project workflow requires it.
 
-For Entity references, distinguish the key from the loaded object. `#Key` does not load; direct property access requires the reference join to have loaded the target. [Relationships and object graphs](../../../docu/objectflow.md#beziehungen-und-objektgraphen)
+For Entity references, distinguish the key from the loaded object. `#Key` does not load; direct property access requires the repository method to have loaded the reference. [Relationships and object graphs](../../../docu/objectflow.md#beziehungen-und-objektgraphen)
 
 ## Add or change domain logic
 
@@ -45,10 +45,10 @@ Use Successors for one atomic Unit of Work; use `session queue next command` for
 1. Insert [test-suite-skeleton.json](blueprints/test-suite-skeleton.json).
 2. Replace `TARGET_OFX_CONFIG` with a resolvable configuration in the destination model.
 3. Add configured components and test content incrementally.
-4. Use `Simple Test` for session-aware domain/service/repository tests. [OFX Test Suit](../../../docu/objectflow.md#ofx-test-suit)
-5. Use `run command` to model expected Pages, forced Conclusions, child Commands, Successors, cancellation, and pushed results. [Commands without UI](../../../docu/objectflow.md#commands-ohne-ui-ausführen)
+4. Use `Simple Test` for session-aware domain/service/repository tests. [OFXTestSuit](../../../docu/objectflow.md#ofxtestsuit)
+5. Use `run command` to model expected Pages, forced Conclusions, child Commands, Successors, cancellation, and passed-forward values. [Commands without UI](../../../docu/objectflow.md#commands-ohne-ui-ausführen)
 6. Use `FAIL IN` for expected failures and `DEFAULT_DATETIME` for deterministic business time. [Test options](../../../docu/objectflow.md#testoptionen)
-7. Remember that tests do not commit; assert through prepared/read state and observed operations. [Typical test levels](../../../docu/objectflow.md#typische-testebenen)
+7. Only the `Simple Test` session is not committed; a `run command` on a Graph Owner commits as in production. Verify persisted effects by reading them back, in a fresh Custom Session where needed. [Typical test levels](../../../docu/objectflow.md#typische-testebenen)
 
 ## Integrate persistence with ManMap
 

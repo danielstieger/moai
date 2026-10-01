@@ -8,7 +8,7 @@ Sources: [ManMap explicit loading](../../../docu/manmap.md#explizites-laden), [r
 - Accessing an unloaded reference throws `org.modellwerkstatt.objectflow.runtime.OFXNotInitializedException`.
 - An unloaded list appears empty, so `size == 0` does not prove the database has no children.
 - `QueryFromMap` results participate in the ObjectFlow session identity map. Repeated read-only loads reuse the same instance; checking out an already mutable instance again can throw `IllegalStateException`.
-- `NoKeyMapperField` results are always read-only and remain outside the session identity map, even if `IncludeMapping` reuses entity field mappings.
+- `NoKeyMapperField` results are always read-only and remain outside the session identity map, even if `IncludeMapping` reuses entity field mappings. Regular Entities that a no-key mapping loads through an SQL join are read-only too, but are integrated into the session; a join onto an already checked-out instance throws `IllegalStateException`.
 
 ## Save, Delete, and Transactions
 
@@ -43,7 +43,7 @@ Sources: [automatic IDs and sequences](../../../docu/manmap.md#automatische-ids-
 
 Sources: [Custom SQL](../../../docu/manmap.md#custom-sql-mit-sql), [SQL parameter binding](../../../docu/manmap.md#parameter-in-sql-text), [row/no-key mappers](../../../docu/manmap.md#row-mapper-und-no-key-mapper), and [database portability](../../../docu/manmap.md#datenbankportabilität-und-schema).
 
-- ManMap supports Oracle and MySQL, but custom SQL remains dialect-specific.
+- ManMap supports Oracle, MySQL, and MariaDB, but custom SQL remains dialect-specific.
 - SQL row access by index follows JDBC and starts at `1`.
 - Prefer specific C2 variable/property/status nodes and named parameters. Use free SQL integration only for legacy or strongly dynamic fragments.
 - Check generated SQL/parameters with `debugMe` only as a diagnostic aid, not as a normal runtime setting.
