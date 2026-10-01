@@ -21,7 +21,7 @@ Sources: [saving object graphs](../../../docu/manmap.md#speichern-von-objektgrap
 
 ## Queries and References
 
-Sources: [mapped query semantics](../../../docu/manmap.md#gemappte-abfragen-mit-getwhere-auf-einem-mapping), [references, embedded values, and lists](../../../docu/manmap.md#referenzen-eingebettete-werte-und-listen), and [limits of included mappings](../../../docu/manmap.md#grenzen-von-mapping-einbinden).
+Sources: [mapped query semantics](../../../docu/manmap.md#gemappte-abfragen-mit-queryfrommap), [references, embedded values, and lists](../../../docu/manmap.md#referenzen-eingebettete-werte-und-listen), and [limits of included mappings](../../../docu/manmap.md#grenzen-von-includemapping).
 
 - `MappingReference` requires both `mappingSource` and `fieldMapping`. It cannot point directly to an `EntityMapping` as a custom-SQL row mapper.
 - Only declared joins add mapping instances to query scope.

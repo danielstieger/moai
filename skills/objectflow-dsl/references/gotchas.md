@@ -22,7 +22,7 @@
 
 ## Commands and sessions
 
-- `SEARCH_CMD` never commits, even after `FINAL_OK`. [Command types](../../../docu/objectflow.md#die-vier-command-typen)
+- `SEARCH_CMD` never commits, even after `FINAL OK_CONCLUSION`. [Command types](../../../docu/objectflow.md#die-vier-command-typen)
 - `GRAPH_OWNER_CMD_MODAL` owns its own session/commit; it is not a Graph Edit. [Command types](../../../docu/objectflow.md#die-vier-command-typen)
 - `IN_BACKGROUND` applies only to `command init`. [Command init](../../../docu/objectflow.md#command-init-und-hintergrundinitialisierung)
 - Do not throw an aborting Precondition from Page Init; use a warning there or move the check to Command Init/Conclusion. [Page Init](../../../docu/objectflow.md#page-init-und-datenbereitstellung)

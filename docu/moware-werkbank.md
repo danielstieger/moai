@@ -55,7 +55,7 @@ Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimm
 
 | Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
-| `Persistence Description` | `PersistenceDescription` | `org.modellwerkstatt.manmap.structure.PersistenceDescription` | Bündelt die Persistenzabbildungen eines Modells. Die enthaltenen Entity-Mappings ordnen fachliche Objekte und ihre Eigenschaften Tabellen, Spalten und Beziehungen zu. |
+| `Persistence Description` | `PersistenceDescription` | `org.modellwerkstatt.manmap.structure.PersistenceDescription` | Bündelt die Persistenzabbildungen eines Modells. Die enthaltenen `EntityMapping`s ordnen fachliche Objekte und ihre Eigenschaften Tabellen, Spalten und Beziehungen zu. |
 | `Repository` | `Repository` | `org.modellwerkstatt.manmap.structure.Repository` | Kapselt den Datenbankzugriff. Enthält Methoden zum Abfragen, Laden, Zusammensetzen, Speichern und Löschen fachlicher Objekte. Unterstützt außerdem benutzerdefinierte SQL-Abfragen und spezialisierte Mapper, die Ergebnismengen in Objekte, insbesondere DTOs, überführen. |
 
 ### Kapitellandkarte: ObjectFlow
@@ -123,7 +123,7 @@ Entity / ValueObject / DTO / Service / Command
 | ------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | Neue fachliche Eigenschaft                              | `org.modellwerkstatt.objectflow`                                                | `Entity`, `Value Object` oder `DTO`, abhängig von der Bedeutung der Daten                         |
 | Neue Geschäftsregel oder Berechnung                     | `org.modellwerkstatt.objectflow`                                                | Fachliches Verhalten in `Entity`, `Value Object` oder `Service`                                   |
-| Neues Persistenzmapping                                 | `org.modellwerkstatt.manmap`                                                    | Entity-Mapping innerhalb einer `Persistence Description`                                          |
+| Neues Persistenzmapping                                 | `org.modellwerkstatt.manmap`                                                    | `EntityMapping` innerhalb einer `Persistence Description`                                          |
 | Neue Datenbankabfrage oder Speicheroperation            | `org.modellwerkstatt.manmap`                                                    | Methode und gegebenenfalls Mapper innerhalb eines `Repository`                                    |
 | Neuer Anwendungsfall oder geänderter Interaktionsablauf | `org.modellwerkstatt.objectflow`                                                | `Command` und dessen Pages                                                                        |
 | Neue Darstellung oder Bedienelemente                    | `org.modellwerkstatt.dataux`                                                    | `Page Pane` und darin eingebundene Formulare, Tabellen, Layouts oder andere UI-Komponenten        |
@@ -173,13 +173,13 @@ Für das vereinfachte Beispiel müssen Mengen positiv und Einzelpreise nicht neg
 
 Eine `PersistenceDescription` enthält die Mappings für `Rechnung` und `Rechnungsposition`. Die Positionstabelle besitzt eine Zuordnung zur jeweiligen Rechnung.
 
-Das `RechnungsRepository` kapselt die Datenbankzugriffe:
+Das `RechnungsRepo` kapselt die Datenbankzugriffe:
 
 | Beispielhafte Repository-Methode | Aufgabe                                                                                                                                                                                         |
 | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `sucheRechnungen(filter)`        | Übersetzt die Suchkriterien aus `RechnungFilter` in eine benutzerdefinierte SQL-Abfrage. Ein No-Key-Mapper überführt jede Ergebniszeile in ein read-only `RechnungInfo`-DTO. |
-| `checkoutRechnung(id)`           | Lädt die Rechnung und explizit ihre Positionen zur Bearbeitung. Stellt den vollständigen Rechnungsgraphen zusammen.                                                                           |
-| `checkinRechnung(rechnung)`      | Speichert die bearbeitete Rechnung einschließlich der zugehörigen Änderungen an ihren Positionen.                                                                                               |
+| `checkout(id)`           | Lädt die Rechnung und explizit ihre Positionen zur Bearbeitung. Stellt den vollständigen Rechnungsgraphen zusammen.                                                                           |
+| `checkin(rechnung)`      | Speichert die bearbeitete Rechnung einschließlich der zugehörigen Änderungen an ihren Positionen.                                                                                               |
 | `ladeSummeAllerRechnungen()`     | Führt die Aggregation direkt per SQL in der Datenbank aus. Ein No-Key-Mapper überführt das Ergebnis in das read-only DTO `RechnungsSummenErgebnis`.                                         |
 
 Die Suche lädt keine `Rechnung`-Entitäten. Die benutzerdefinierte SQL-Abfrage liest nur die für die Ergebnisliste benötigten Daten und bildet jede Zeile auf ein `RechnungInfo`-DTO ab. Diese No-Key-Ergebnisse sind read-only und werden nicht in die Session-Identity-Map integriert. Erst beim Öffnen eines Suchergebnisses wird anhand seiner Rechnungs-ID die zugehörige `Rechnung` einschließlich ihrer Positionen zur Bearbeitung explizit geladen.
@@ -210,11 +210,11 @@ Ein Doppelklick auf eine Tabellenzeile startet `Rechnung bearbeiten`. Als Parame
 
 #### Rechnung und Positionen bearbeiten
 
-Der Command `Rechnung bearbeiten` hat den Typ `GRAPH_OWNER_CMD` und startet eine eigene Session. Er ist dafür verantwortlich, die Daten zur Bearbeitung zu laden (**Checkout**). Dazu ruft er `checkoutRechnung(id)` mit der übergebenen Rechnungs-ID auf. Die Repository-Methode lädt den Rechnungskopf und die zugehörigen Positionen.
+Der Command `Rechnung bearbeiten` hat den Typ `GRAPH_OWNER_CMD` und startet eine eigene Session. Er ist dafür verantwortlich, die Daten zur Bearbeitung zu laden (**Checkout**). Dazu ruft er `checkout(id)` mit der übergebenen Rechnungs-ID auf. Die Repository-Methode lädt den Rechnungskopf und die zugehörigen Positionen.
 
 Der Benutzer kann den Rechnungskopf und die Positionen bearbeiten. Für die Bearbeitung einer einzelnen Position wird `Rechnungsposition bearbeiten` vom Typ `GRAPH_EDIT_CMD` verwendet. Dieser Command arbeitet innerhalb der bestehenden Session des `GRAPH_OWNER_CMD` und eröffnet keine eigene Session. Änderungen werden direkt an der Entität Rechnungsposition durchgeführt.
 
-Der `RechnungsService` übernimmt fachliche Prüfungen und Berechnungen. Der `GRAPH_OWNER_CMD` registriert die zum Speichern benötigten Repository-Methoden (**Check-in**) als **Session-Operationen**. Im Beispiel dient dazu `checkinRechnung(rechnung)`.
+Der `RechnungsService` übernimmt fachliche Prüfungen und Berechnungen. Der `GRAPH_OWNER_CMD` registriert die zum Speichern benötigten Repository-Methoden (**Check-in**) als **Session-Operationen**. Im Beispiel dient dazu `checkin(rechnung)`.
 
 Beim vorgesehenen Abschluss des `GRAPH_OWNER_CMD` wird eine Datenbanktransaktion gestartet. Die registrierten Session-Operationen werden ausgeführt und die Transaktion wird committed. Die Session begleitet damit die Bearbeitung; die Transaktion zum Speichern wird erst beim Abschluss ausgeführt.
 
@@ -245,8 +245,7 @@ Eine `OFXTestSuit` kann beispielsweise folgende Fälle abdecken:
 
 - Zwei Positionen mit `2 × 50 EUR` und `1 × 30 EUR` ergeben eine Rechnungssumme von `130 EUR`.
 - Eine Position mit Menge `0` wird fachlich abgelehnt.
-- Die benutzerdefinierte Suchabfrage bildet einen bekannten Datenbestand korrekt auf `RechnungInfo`-DTOs ab und liefert keine `Rechnung`-Entitäten.
-- Die SQL-Aggregation liefert für einen bekannten Datenbestand die erwartete Summe aller Rechnungen, unabhängig vom aktuell verwendeten Suchfilter.
+- Die Suche nach einem Merkmal, das nur dieser Testlauf anlegt, liefert genau die dafür angelegten Rechnungen als `RechnungInfo`-DTOs.
 
 ### ExpensiveCode und CheapCode im Beispiel
 
@@ -260,7 +259,7 @@ Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion m
 
 2. **Modellieren und versionieren:** Die Anwendung wird mit den DSLs in MPS modelliert und mit Git versioniert. MPS speichert die Modelle als XML-Dateien. Diese enthalten strukturierte Modelle mit Referenzen und Identitäten; ein rein textueller Merge kann deren Konsistenz verletzen. Für die Versionsverwaltung werden deshalb die Git-Unterstützung von MPS und der MPS-Merge-Driver verwendet. Modellkonflikte werden mit den modellbewussten Werkzeugen von MPS aufgelöst. Agenten bearbeiten Modelle über die MPS-Werkzeuge und führen keine manuellen Text-Merges der XML-Modelldateien durch.
 
-3. **Datenbankschema erstellen:** Das Datenbankschema erstellt der Entwickler in MPS aus den Entity-Mappings der Persistence Descriptions. Agenten erzeugen oder ändern keine Datenbankschemata.
+3. **Datenbankschema erstellen:** Das Datenbankschema erstellt der Entwickler in MPS aus den `EntityMapping`s der Persistence Descriptions. Agenten erzeugen oder ändern keine Datenbankschemata.
 
 4. **Laufzeitkonfiguration auswählen:** In der `OFXConfig` wird über **AppFactories** festgelegt, welche Laufzeitumgebung tatsächlich verwendet wird. Ein Projekt enthält häufig mehrere Konfigurationen.
 

@@ -2,7 +2,7 @@
 
 ## Create a Persistence Description
 
-Source semantics: [Persistence Description and mapping capabilities](../../../docu/manmap.md#persistence-description-und-mapping-möglichkeiten), [entity-mapping structure](../../../docu/manmap.md#aufbau-eines-entity-mappings), and [fields, keys, and options](../../../docu/manmap.md#felder-schlüssel-und-optionen).
+Source semantics: [Persistence Description and mapping capabilities](../../../docu/manmap.md#persistence-description-und-mapping-möglichkeiten), [entity-mapping structure](../../../docu/manmap.md#aufbau-eines-entitymappings), and [fields, keys, and options](../../../docu/manmap.md#felder-schlüssel-und-optionen).
 
 1. Determine the target project dynamically and resolve the editable target model.
 2. Resolve ObjectFlow entity and property declaration nodes in that model.
@@ -30,7 +30,7 @@ Repository method type states intent but does not create a transaction boundary 
 
 ## Build a Mapped Query
 
-Source semantics: [mapped `get`/`where` queries](../../../docu/manmap.md#gemappte-abfragen-mit-getwhere-auf-einem-mapping), [explicit loading](../../../docu/manmap.md#explizites-laden), and [read-only, checkout, and session identity](../../../docu/manmap.md#read-only-checkout-und-session-identität).
+Source semantics: [mapped `get`/`where` queries](../../../docu/manmap.md#gemappte-abfragen-mit-queryfrommap), [explicit loading](../../../docu/manmap.md#explizites-laden), and [read-only, checkout, and session identity](../../../docu/manmap.md#read-only-checkout-und-session-identität).
 
 1. Choose the source `EntityMapping`.
 2. Choose `readOnly=true` for inspection/search or `false` for checkout/editing according to the enclosing repository method.

@@ -96,7 +96,7 @@ Apply an option only where its delegate/property context permits it; several con
 - `SkipFocusOption.element -> IUxElement [1]`: move initial focus forward to a later element.
 - `ColorPpOption.color: Expression [1]` and `StatusColorPpFOption.path: IPath [1]` are structurally available PagePane options; their complete runtime semantics are not documented, so verify them against a focused package example before use.
 
-See [form and table options](../../../docu/dataux.md#optionen-für-formulare-und-tabellen) and [layout options](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung).
+See [form and table options](../../../docu/dataux.md#optionen-für-elemente-formulare-und-tabellen) and [layout options](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung).
 
 ## Layout weights
 

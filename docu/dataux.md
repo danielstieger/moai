@@ -11,11 +11,11 @@ DataUX verbindet zwei Aufgabenbereiche:
 
 Die Sprache beschreibt vor allem, **welche fachlichen Daten wie visualisiert werden**. Generator und Laufzeit übernehmen die technische Umsetzung. An dafür vorgesehenen Stellen können BaseLanguage-Ausdrücke eingebettet werden, etwa für Beschriftungen, Farben, Bedingungen, Command-Argumente oder Lebenszykluslogik.
 
-§ können wir hier noch erwähnen, dass es eine ApiDescription gibt, die ist nicht mehr zu verwenden! Deprecaterd §
+`org.modellwerkstatt.dataux.structure.ApiDescription` ist veraltet und nicht mehr zu verwenden.
 
 ### Schreibkonventionen
 
-Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der **Konzeptname** bezeichnet das technische AST-Konzept; der **FQ-Name** ist dessen vollständig qualifizierter Name. Die Kapitellandkarten führen alle drei Bezeichnungen zusammen; bei dort fehlenden Konzepten ergänzt der Fließtext beim ersten Auftreten den Konzeptnamen beziehungsweise bei Konzepten aus anderen Sprachen den FQ-Namen in Klammern und verwendet danach nur noch den Namen.
+Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der **Konzeptname** bezeichnet das technische AST-Konzept; der **FQ-Name** ist dessen vollständig qualifizierter Name. Die Kapitellandkarten führen alle drei Bezeichnungen zusammen; bei dort fehlenden Konzepten ergänzt der Fließtext beim ersten Auftreten den Konzeptnamen beziehungsweise bei Konzepten aus anderen Sprachen den FQ-Namen in Klammern und verwendet danach nur noch den Namen. Hat ein Konzept keine als Wort benennbare Projektion, wird sein Konzeptname verwendet. Umschreibungen und Kurzformen treten nicht an die Stelle von Projektion oder Konzeptname.
 
 ## Teil I – UI-Modellierung
 
@@ -70,7 +70,7 @@ Ist der Zeilentyp mit dem Root-Typ des `Page Pane`s identisch, kann die Tabelle 
 
 Die Auswahl einer Tabellenzeile bestimmt die gemeinsame Selektion des Zeilentyps. Mit `SELECT FIRST` (`SelectFirstFOption`) kann eine Tabelle beim initialen Anzeigen das erste Element selektieren und so eine abhängige Detaildarstellung initialisieren.
 
-Mehrere Tabellen mit demselben Zeilentyp teilen dieselbe Selektion. Enthält eine andere Tabelle dieselbe Laufzeitinstanz, markiert sie diese ebenfalls. Enthält sie die Instanz nicht, zeigt sie keine ausgewählte Zeile; die gemeinsame Selektion bleibt erhalten. Maßgeblich ist dieselbe Laufzeitinstanz, nicht nur eine gleiche fachliche ID oder fachliche Gleichheit. Durch die Session-Integration von Entities und DTOs ist die Instanz innerhalb der Session eindeutig.
+Mehrere Tabellen mit demselben Zeilentyp teilen dieselbe Selektion. Enthält eine andere Tabelle dieselbe Laufzeitinstanz, markiert sie diese ebenfalls. Enthält sie die Instanz nicht, zeigt sie keine ausgewählte Zeile; die gemeinsame Selektion bleibt erhalten. Maßgeblich ist dieselbe Laufzeitinstanz, nicht nur eine gleiche fachliche ID oder fachliche Gleichheit. Für in die Session integrierte Entities ist diese Instanz je Identität eindeutig, für DTOs und andere No-Key-Ergebnisse nicht; siehe [Read-only, Checkout und Session-Identität](manmap.md#read-only-checkout-und-session-identität).
 
 ##### Leere Selektion
 
@@ -108,14 +108,14 @@ Der Delegate-Typ folgt dem fachlichen Property-Typ. Ein Delegate ersetzt keine f
 | `Upload` | `UploadDelegate` | `org.modellwerkstatt.dataux.structure.UploadDelegate` | Datei-Upload, nur im Formular |
 | `Dummy` | `DummyDelegate` | `org.modellwerkstatt.dataux.structure.DummyDelegate` | Platzhalter zur Anordnung von Formularfeldern |
 
-Ein `Reference`-Delegate bietet die zulässigen Objekte zur Auswahl an. `scopeText` (projiziert als `reference description`) legt mit einem oder mehreren Pfaden fest, welche Properties des referenzierten Typs den angezeigten Text bilden: Für einen an `Pet.type` gebundenen Delegate verweist `name` auf `PetType.name`. Die Auswahlmenge setzt die Scope-Funktion der Page mit `#Meta.setScope(…)`; siehe [ObjectFlow: Scopes](objectflow.md#scopes). Fehlt sie, führt eine Auswahl zu einer Exception. Ist der Delegate oder das Formular mit `DISABLED` gekennzeichnet, wird der Wert nur angezeigt und kein Scope benötigt.
+Ein `Reference`-Delegate bietet die zulässigen Objekte zur Auswahl an. `scopeText` (projiziert als `reference description`) legt mit einem oder mehreren Pfaden fest, welche Properties des referenzierten Typs den angezeigten Text bilden: Für einen an `Rechnung.kunde` gebundenen Delegate verweist `name` auf `Kunde.name`. Die Auswahlmenge setzt die Scope-Funktion der Page mit `#Meta.setScope(…)`; siehe [ObjectFlow: Scopes](objectflow.md#scopes). Fehlt sie, führt eine Auswahl zu einer Exception. Ist der Delegate oder das Formular mit `DISABLED` gekennzeichnet, wird der Wert nur angezeigt und kein Scope benötigt.
 
 #### Delegate-Optionen
 
 | Name | Konzeptname | FQ-Name | Kontext | Delegate-Typen | Wirkung |
 | --- | --- | --- | --- | --- | --- |
 | `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` | Formular | alle | Delegate ist nicht editierbar |
-| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Formular | alle | Der Benutzer muss nichts eingeben; ein leeres Feld ergibt `null` (bei `Integer` `0`). Nicht an `String`-Delegates; siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
+| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Formular | alle außer `String` | Der Benutzer muss nichts eingeben; ein leeres Feld ergibt `null` (bei `Integer` `0`). Nicht an `String`-Delegates; siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
 | `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` | Formular | `LocalDate`, `DateTime (Date Only)`, `DateTime` | Verwendet nach Möglichkeit eine Datumsauswahl; bei `DateTime` nicht zusammen mit `OVERWRITE FORMAT` |
 | `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` | Formular | alle | Löst eine verfügbare Update-Conclusion aus |
 | `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` | Formular | `String` | Verwendet für einen `StringDelegate` einen numerischen Editor |
@@ -155,7 +155,7 @@ Die Grenzen aus `LENGTH` und `RANGE` werden nicht zusätzlich als `validation` m
 | Name | Konzeptname | FQ-Name | Element | Wirkung |
 | --- | --- | --- | --- | --- |
 | `DISABLED` | `DisabledFOption` | `org.modellwerkstatt.dataux.structure.DisabledFOption` | Formular | Formular ist nicht editierbar |
-| `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` | Formular und Tabelle | Setzt die Beschriftung des Elements. Nicht zulässig am obersten Element einer Page Pane; dort kommt die Beschriftung aus dem Seitentitel |
+| `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` | Formular und Tabelle | Setzt die Beschriftung des Elements. Nicht zulässig am obersten Element eines Page Pane; dort kommt die Beschriftung aus dem Seitentitel |
 | `SELECT FIRST` | `SelectFirstFOption` | `org.modellwerkstatt.dataux.structure.SelectFirstFOption` | Tabelle | Selektiert das erste Tabellenelement bei der Initialisierung |
 | `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.SelectionSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung für ausgewählte Tabellenobjekte |
 | `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.TableSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung über alle Tabellenobjekte |
@@ -195,7 +195,7 @@ Auch für ein `Custom UI Element` kann ein Menü modelliert werden. Ob und wie e
 | --- | --- | --- | --- |
 | `Action` | `MenuAction` | `org.modellwerkstatt.dataux.structure.MenuAction` | Ruft einen ObjectFlow-Command mit optionalem Label und Argumenten auf |
 | `Compound Action` | `MenuCompoundAction` | `org.modellwerkstatt.dataux.structure.MenuCompoundAction` | Verkettet mehrere Command-Aufrufe anhand ihrer Page-Conclusions |
-| kein eigener Alias | `PageConclusionReference` | `org.modellwerkstatt.dataux.structure.PageConclusionReference` | Referenziert die Abschlussart, unter der die Aktionskette fortgesetzt wird |
+| `PageConclusionReference` | `PageConclusionReference` | `org.modellwerkstatt.dataux.structure.PageConclusionReference` | Referenziert die Abschlussart, unter der die Aktionskette fortgesetzt wird |
 | `USER_CANCEL` | `PageConclusionOptionUserCancel` | `org.modellwerkstatt.dataux.structure.PageConclusionOptionUserCancel` | Behandelt einen Benutzerabbruch als Fortsetzungsfall |
 | `Submenu` | `MenuSub` | `org.modellwerkstatt.dataux.structure.MenuSub` | Gruppiert weitere Menüeinträge |
 | `- - - -` | `MenuSeparator` | `org.modellwerkstatt.dataux.structure.MenuSeparator` | Trennt Menügruppen optisch |
@@ -254,7 +254,7 @@ Ein `AppUI Module` beschreibt eine interaktive Anwendung. Neben Benutzerkontext 
 | `AppUI Module` | `AppUiModule` | `org.modellwerkstatt.dataux.structure.AppUiModule` | Anwendung mit Benutzerkontext, Navigation und Tiles |
 | `Tile` | `AppTile` | `org.modellwerkstatt.dataux.structure.AppTile` | Hervorgehobener Command-Einstieg mit optionalem Label- und Farbausdruck |
 | `tileInit` | `TileInitFunction` | `org.modellwerkstatt.dataux.structure.TileInitFunction` | Initialisiert den Tile-Zustand |
-| kein eigener Alias | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` | Bedingter Command-Aufruf beim Anwendungsstart |
+| `StartupCommandCall` | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` | Bedingter Command-Aufruf beim Anwendungsstart |
 | `Action` | `MenuAction` | `org.modellwerkstatt.dataux.structure.MenuAction` | Verknüpft Menü oder Tile mit einem ObjectFlow-Command |
 
 - `mainMenu` bildet das fachliche Start- beziehungsweise Hauptmenü.
@@ -323,7 +323,7 @@ Der Producer läuft nur, wenn kein Consumer des Pairs mehr arbeitet. Dadurch ent
 
 Ein Pair darf auch nur aus einem Producer bestehen, wenn der gestartete Command die Arbeit vollständig erledigt und keine einzelnen Inbox-Elemente nachbearbeitet werden müssen. Ein solches Producer-only-Pair darf seine Inbox nicht füllen: Enthält sie Elemente, obwohl kein Consumer vorhanden ist, verwirft die Laufzeit sie wieder. `null`-Elemente aus einem Producer-Ergebnis werden ebenfalls nicht übernommen.
 
-Auch ein Batchjob benötigt einen konsistenten technischen Benutzerkontext. In seiner Authentifizierungsfunktion muss deshalb ausdrücklich modelliert werden, dass Benutzername und Benutzer-ID in der `userEnvironment` gesetzt werden; die Benutzer-ID wird wie bei einer App über einen Service oder ein Repository ermittelt. Der Benutzerkontext dient der Ausführung und Nachvollziehbarkeit, ist aber keine alleinige Sicherheitsgrenze.
+Auch ein Batchjob benötigt einen konsistenten technischen Benutzerkontext. Die Funktion `isAuthenticated` ist auch am `BatchJob Module` verpflichtend zu modellieren, wird aber nur für eine gegebenenfalls gestartete UI ausgeführt. Im Betrieb ohne UI kommt der Benutzerkontext aus der `OFX Config`; siehe [User Environment und User Service](objectflow.md#user-environment-und-user-service). Der Benutzerkontext dient der Ausführung und Nachvollziehbarkeit, ist aber keine alleinige Sicherheitsgrenze.
 
 #### Exception-Strategien und Wiederanlauf
 
@@ -352,7 +352,7 @@ Die Exception-Strategie ersetzt keine fachliche Problembehandlung innerhalb des 
 | `CONSUMERS` | `OptNumConsumersPair` | `org.modellwerkstatt.dataux.structure.OptNumConsumersPair` | Anzahl paralleler Consumer eines referenzierten Paars |
 | `DEPENDENT_CONSECUTIVE` | `OptBatchDependent` | `org.modellwerkstatt.dataux.structure.OptBatchDependent` | Paare werden abhängig und nacheinander behandelt |
 | `RUN_IN_CONSOLE` | `OptRunInConsole` | `org.modellwerkstatt.dataux.structure.OptRunInConsole` | Start ohne instanziierte UI |
-| kein eigener Alias | `OptIncludeBatchUi` | `org.modellwerkstatt.dataux.structure.OptIncludeBatchUi` | Bindet einen referenzierten Batchjob in einen UI-Modulkontext ein |
+| `OptIncludeBatchUi` | `OptIncludeBatchUi` | `org.modellwerkstatt.dataux.structure.OptIncludeBatchUi` | Bindet einen referenzierten Batchjob in einen UI-Modulkontext ein |
 | `VERSION` | `OptVersion` | `org.modellwerkstatt.dataux.structure.OptVersion` | Version des Moduls |
 | `OFFICIAL NAME` | `OptOfficialAppName` | `org.modellwerkstatt.dataux.structure.OptOfficialAppName` | Sichtbarer offizieller Modulname |
 
@@ -518,7 +518,7 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konz
 | Gridlayout-Option | `FOCUS FORWARD 2` | `SkipFocusOption` | `org.modellwerkstatt.dataux.structure.SkipFocusOption` |
 | Menü | `Action` | `MenuAction` | `org.modellwerkstatt.dataux.structure.MenuAction` |
 | Menü | `Compound Action` | `MenuCompoundAction` | `org.modellwerkstatt.dataux.structure.MenuCompoundAction` |
-| Menü | kein eigener Alias | `PageConclusionReference` | `org.modellwerkstatt.dataux.structure.PageConclusionReference` |
+| Menü | `PageConclusionReference` | `PageConclusionReference` | `org.modellwerkstatt.dataux.structure.PageConclusionReference` |
 | Menü | `USER_CANCEL` | `PageConclusionOptionUserCancel` | `org.modellwerkstatt.dataux.structure.PageConclusionOptionUserCancel` |
 | Menü | `Submenu` | `MenuSub` | `org.modellwerkstatt.dataux.structure.MenuSub` |
 | Menü | `- - - -` | `MenuSeparator` | `org.modellwerkstatt.dataux.structure.MenuSeparator` |
@@ -527,7 +527,7 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konz
 | Anwendung | `AppUI Module` | `AppUiModule` | `org.modellwerkstatt.dataux.structure.AppUiModule` |
 | Anwendung | `Tile` | `AppTile` | `org.modellwerkstatt.dataux.structure.AppTile` |
 | Anwendung | `tileInit` | `TileInitFunction` | `org.modellwerkstatt.dataux.structure.TileInitFunction` |
-| Anwendung | kein eigener Alias | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` |
+| Anwendung | `StartupCommandCall` | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` |
 | Modul | `isAuthenticated` | `AppAuthenticationFunction` | `org.modellwerkstatt.dataux.structure.AppAuthenticationFunction` |
 | Moduloption | `VERSION` | `OptVersion` | `org.modellwerkstatt.dataux.structure.OptVersion` |
 | Moduloption | `OFFICIAL NAME` | `OptOfficialAppName` | `org.modellwerkstatt.dataux.structure.OptOfficialAppName` |
@@ -539,7 +539,7 @@ Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konz
 | Batchoption | `CONSUMERS` | `OptNumConsumersPair` | `org.modellwerkstatt.dataux.structure.OptNumConsumersPair` |
 | Batchoption | `DEPENDENT_CONSECUTIVE` | `OptBatchDependent` | `org.modellwerkstatt.dataux.structure.OptBatchDependent` |
 | Batchoption | `RUN_IN_CONSOLE` | `OptRunInConsole` | `org.modellwerkstatt.dataux.structure.OptRunInConsole` |
-| Batchoption | kein eigener Alias | `OptIncludeBatchUi` | `org.modellwerkstatt.dataux.structure.OptIncludeBatchUi` |
+| Batchoption | `OptIncludeBatchUi` | `OptIncludeBatchUi` | `org.modellwerkstatt.dataux.structure.OptIncludeBatchUi` |
 
 ## Dokumentstand
 

@@ -56,7 +56,7 @@ Other reusable repository members include:
 
 ## Mapped Queries
 
-For operation ordering, filter semantics, joins, and loading behavior, see [mapped `get`/`where` queries](../../../docu/manmap.md#gemappte-abfragen-mit-getwhere-auf-einem-mapping) and [explicit loading](../../../docu/manmap.md#explizites-laden).
+For operation ordering, filter semantics, joins, and loading behavior, see [mapped `get`/`where` queries](../../../docu/manmap.md#gemappte-abfragen-mit-queryfrommap) and [explicit loading](../../../docu/manmap.md#explizites-laden).
 
 `QueryFromMap` is an expression with required reference `entityMapping`, properties `readOnly` and `debugMe`, children `joinOption: IQueryOption[0..n]`, and `queryOperation: IQueryOperation[0..n]`.
 
