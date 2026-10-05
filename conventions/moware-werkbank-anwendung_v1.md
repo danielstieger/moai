@@ -1,27 +1,28 @@
 ## Verbindliche Konventionen für den Aufbau einer Anwendung
 
-Eine Anwendung umfasst einen oder mehrere **Bounded Contexts**; jeder Bounded Context ist eine MPS-Solution. Ein Bounded Context gliedert sich in **Bereiche**. Ein Bereich ist ein fachlich abgeschlossener Teil eines Bounded Context (im Sinne von DDD ein Module) und tritt in zwei Arten auf:
+Eine Anwendung umfasst einen oder mehrere **Bounded Contexts**. Eine kleine Anwendung mit einem Bounded Context ist eine einzige MPS-Solution `<firma>.<app>`; bei mehreren Bounded Contexts ist jeder Bounded Context eine eigene Solution. Ein Bounded Context gliedert sich in **Bereiche**. Ein Bereich ist ein fachlich abgeschlossener Teil eines Bounded Context (im Sinne von DDD ein Module) und tritt in zwei Arten auf:
 
 | Art | DDD-Schicht | geschnitten nach | Benennung | Beispiel |
 | --- | --- | --- | --- | --- |
 | **Aggregat-Bereich** | Domain Layer | Fachobjekt | Substantiv | `rechnung`, `kunde` |
 | **Use-Case-Bereich** | Application Layer | fachlicher Ablauf | Tätigkeit | `rechnungsexport`, `mahnlauf` |
 
-| Ebene | Solution | Modell | Inhalt | hängt ab von |
-| --- | --- | --- | --- | --- |
-| Basis | `<firma>.<app>.base` | `<firma>.<app>.base` | Alle `OFXConfig`s einschließlich Test-Konfigurationen, Static Ressources | – |
-| | | `<firma>.<app>.testbase` | Service `CS` | `base` |
-| Bounded Context, Aggregat-Bereich | `<firma>.<app>.<boundedcontext>` | `…<boundedcontext>.<aggregat>.domain` | Entities, Value Objects, `EntityMapping`s, Repositories für Laden, Checkout und Speichern, allgemeine Domänenservices; im Bereich für Benutzer auch Roles and Permissions | `base`, andere Aggregat-`domain`s |
-| | | `…<boundedcontext>.<aggregat>.read` | Lesemodelle: DTOs einschließlich Such- und Filter-DTOs, Custom-SQL-Abfragen, Row Mapper und No-Key-Mapper, Repositories nur zum Lesen | `base`, eigenes `domain`, andere Aggregat-`domain`s |
-| | | `…<boundedcontext>.<aggregat>.unit` | Commands für Anlegen, Bearbeiten und Suchen des Aggregats (mit oder ohne Page) samt Pages, Page Panes und Menüs; die fachliche Logik liegt im `domain`-Modell | `base`, eigenes `domain` und `read`, andere Aggregat-`domain`s, -`read`s und -`unit`s |
-| | | `…<boundedcontext>.<aggregat>.tests` | Tests der fachlichen Regeln, der Persistenz und der Commands; Service `TestDaten` | `testbase`, eigenes `domain`, `read` und `unit`, andere Aggregat-`domain`s, -`read`s und -`tests` |
-| Bounded Context, Use-Case-Bereich | `<firma>.<app>.<boundedcontext>` | `…<boundedcontext>.<usecase>.domain` | Anwendungsfallservices sowie eigene Aggregate des Ablaufs mit Entities, Value Objects, Mappings und Repositories | `base`, `domain`s und `read`s anderer Bereiche |
-| | | `…<boundedcontext>.<usecase>.read` | Lesemodelle des Ablaufs: DTOs, Custom-SQL-Abfragen, Row Mapper und No-Key-Mapper, Repositories nur zum Lesen | `base`, eigenes `domain`, `domain`s und `read`s anderer Bereiche |
-| | | `…<boundedcontext>.<usecase>.unit` | Commands, Pages, Page Panes und Menüs des Ablaufs | `base`, eigenes `domain` und `read`, `domain`s, `read`s und `unit`s anderer Bereiche |
-| | | `…<boundedcontext>.<usecase>.tests` | Tests des Ablaufs, insbesondere mit `run command`; Service `TestDaten` | `testbase`, eigene Modelle, alle Modelle anderer Bereiche |
-| Anwendung | `<firma>.<app>.app` | `<firma>.<app>.app` | AppUI-Module, Batchjobs | alle |
+| Ebene | Modell | Inhalt | hängt ab von |
+| --- | --- | --- | --- |
+| Basis | `<firma>.<app>.base` | Alle `OFXConfig`s einschließlich Test-Konfigurationen, Static Ressources | – |
+| | `<firma>.<app>.testbase` | Service `CS` | `base` |
+| Bounded Context, Aggregat-Bereich | `…<boundedcontext>.<aggregat>.domain` | Entities, Value Objects, `EntityMapping`s, Repositories für Laden, Checkout und Speichern, allgemeine Domänenservices; Roles and Permissions liegen im Aggregat-Bereich `benutzer`, auch wenn er sonst nichts enthält | `base`, andere Aggregat-`domain`s |
+| | `…<boundedcontext>.<aggregat>.read` | Lesemodelle: DTOs einschließlich Such- und Filter-DTOs, Custom-SQL-Abfragen, Row Mapper und No-Key-Mapper, Repositories nur zum Lesen | `base`, eigenes `domain`, andere Aggregat-`domain`s |
+| | `…<boundedcontext>.<aggregat>.unit` | Commands für Anlegen, Bearbeiten und Suchen des Aggregats (mit oder ohne Page) samt Pages, Page Panes und Menüs; die fachliche Logik liegt im `domain`-Modell | `base`, eigenes `domain` und `read`, andere Aggregat-`domain`s, -`read`s und -`unit`s |
+| | `…<boundedcontext>.<aggregat>.tests` | Tests der fachlichen Regeln, der Persistenz und der Commands; Service `TestDaten` | `testbase`, eigenes `domain`, `read` und `unit`, andere Aggregat-`domain`s, -`read`s und -`tests` |
+| Bounded Context, Use-Case-Bereich | `…<boundedcontext>.<usecase>.domain` | Anwendungsfallservices sowie eigene Aggregate des Ablaufs mit Entities, Value Objects, Mappings und Repositories | `base`, `domain`s und `read`s anderer Bereiche |
+| | `…<boundedcontext>.<usecase>.read` | Lesemodelle des Ablaufs: DTOs, Custom-SQL-Abfragen, Row Mapper und No-Key-Mapper, Repositories nur zum Lesen | `base`, eigenes `domain`, `domain`s und `read`s anderer Bereiche |
+| | `…<boundedcontext>.<usecase>.unit` | Commands, Pages, Page Panes und Menüs des Ablaufs | `base`, eigenes `domain` und `read`, `domain`s, `read`s und `unit`s anderer Bereiche |
+| | `…<boundedcontext>.<usecase>.tests` | Tests des Ablaufs, insbesondere mit `run command`; Service `TestDaten` | `testbase`, eigene Modelle, alle Modelle anderer Bereiche |
+| Anwendung | `<firma>.<app>.app` | AppUI-Module, Batchjobs | alle |
 
-- **KONVENTION:** Eine Anwendung ist nach obiger Tabelle in Solutions und Modelle gegliedert. Namen von Bounded Contexts und Bereichen sind deutsche Fachbegriffe, Aggregat-Bereiche als Substantiv, Use-Case-Bereiche als Tätigkeit. Die Schichtnamen `base`, `testbase`, `domain`, `read`, `unit`, `tests` und `app` sind technische Namen.
+- **KONVENTION:** Eine Anwendung ist nach obiger Tabelle in Modelle gegliedert. Namen von Bounded Contexts und Bereichen sind deutsche Fachbegriffe, Aggregat-Bereiche als Substantiv, Use-Case-Bereiche als Tätigkeit. Die Schichtnamen `base`, `testbase`, `domain`, `read`, `unit`, `tests` und `app` sind technische Namen.
+- **KONVENTION:** Bei einer Anwendung mit nur einem Bounded Context entfällt das Segment `<boundedcontext>` im Modellnamen: `<firma>.<app>.<aggregat>.domain`. Bei mehreren Bounded Contexts heißt die Solution eines Bounded Context `<firma>.<app>.<boundedcontext>`; die Modelle `base`, `testbase` und `app` erhalten keine eigene Solution, sondern liegen standardmäßig in der zentralsten dieser Solutions.
 - **KONVENTION:** Abhängigkeiten verlaufen möglichst nur nach unten: `app` → `unit` → `read` → `domain` → `base`; `unit` darf auch direkt auf `domain` zugreifen; `tests` → `testbase`. Ein Use-Case-Bereich hat häufig ein eigenes `read`; dass sein `domain` darauf zugreift, ist möglich, aber selten. Verbindlich gilt: Use-Case-Bereiche dürfen auf Aggregat-Bereiche zugreifen, nie umgekehrt, und zwischen Modellen, Bereichen und Bounded Contexts gibt es keine Zyklen.
 - **KONVENTION:** Use-Case-Bereiche werden angelegt, wenn ein Ablauf mehrere Aggregate umfasst oder eigene DTOs, Lesemodelle, Services oder Commands benötigt, die nicht zum Aggregat selbst gehören.
 - **KONVENTION:** Modelle werden erst angelegt, wenn sie gebraucht werden. Ein Bereich muss nicht alle vier Modelle besitzen; eine kleine Anwendung kommt oft ganz ohne Use-Case-Bereiche aus.

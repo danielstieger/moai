@@ -98,6 +98,7 @@ Der Editor schränkt den Typ einer Business Property bewusst ein. Die folgende L
 | deklariertes DTO | `org.modellwerkstatt.objectflow.structure.DTO` | Referenziert einen sichtbaren anwendungsbezogenen Datencontainer. |
 | `list<T>` | `jetbrains.mps.baseLanguage.collections.structure.ListType` | Modelliert eine Liste. Der Elementtyp `T` kann wiederum eine Enität oder ein DTO sein. |
 | `byte[]` | `jetbrains.mps.baseLanguage.structure.ArrayType` mit `jetbrains.mps.baseLanguage.structure.ByteType` | Binärdaten, beispielsweise ein Dokument oder Bildinhalt. |
+| `boolean` | – | Nicht unterstützt. In Methoden und Ausdrücken ist `boolean` verwendbar, als Typ einer Business Property aber nicht: ManMap kann ihn nicht mappen und DataUX nicht darstellen. Ein fachliches Ja/Nein wird als Status modelliert. |
 
 ManMap-Persistenzoptionen an einer Business Property werden von ManMap ausgewertet. Ihre genaue Wirkung ist in [manmap.md](manmap.md) beschrieben.
 
@@ -122,7 +123,7 @@ Anders als bei standard Java-Klassen werden die Properties von Datenstrukturen i
 | `string` | `""` |
 | `int` | `0` |
 | `BigDecimal` | `0.0` |
-| Status | Default- beziehungsweise `ON_CREATION`-Element |
+| Status | `ON_CREATION`-Element |
 | Liste | leere Liste |
 | `LocalDate`, `DateTime` | `null` |
 | Value Object | `null` |
@@ -135,12 +136,14 @@ Anders als bei standard Java-Klassen werden die Properties von Datenstrukturen i
 | Werte | Vergleich | Übersetzung |
 | --- | --- | --- |
 | `int` | `==` / `!=` | Direkter Vergleich |
-| `string` | `==` / `!=` | Null-sicher über `equals` |
+| `string` | `:eq:` / `:ne:` | Null-sicher über `equals` (Der Generator übersetzt bei Strings `==` / `!=` ebenfalls in `equals` - nicht mehr verwenden). |
 | `BigDecimal` | `==` / `!=` | Null-sicher über `compareTo`, unabhängig von der Skala; `:eq:` würde über `equals` auch die Skala vergleichen |
 | Status | `of` beziehungsweise `status switch` | Siehe [Status](#status) und [Statuswerte mit `status switch` behandeln](#statuswerte-mit-status-switch-behandeln); `==` wäre korrekt, soll aber nicht verwendet werden |
 | Entity | `==` / `!=` | Identität der Instanz. Eindeutig je Identität sind nur in die Session integrierte Entities, siehe [Read-only, Checkout und Session-Identität](manmap.md#read-only-checkout-und-session-identität); andernfalls wird der Schlüssel verglichen. |
 | DTO | kein Objektvergleich | Ein DTO hat keine fachliche Identität und kein eigenes `equals`; `==` und `:eq:` vergleichen nur die Instanz. Verglichen werden einzelne Properties, etwa eine enthaltene ID. |
 | `LocalDate`, `DateTime`, Value Object und alle übrigen Objekte | `:eq:` / `:ne:` | Null-sicher über `equals`; `==` wäre hier ein Vergleich auf Identität |
+
+Für `where`-Filter in ManMap gelten eigene Regeln, siehe [Spezifikum - Filterausdrücke und gemappte Felder](manmap.md#spezifikum---filterausdrücke-und-gemappte-felder).
 
 Ein Vergleich mit dem Literal `null` bleibt in jedem Fall ein direkter Vergleich. Diese Regeln verhindern NullPointerExceptions und Identitätsvergleiche, ersetzen aber keine bewusste fachliche Entscheidung über optionale Werte.
 
@@ -185,7 +188,7 @@ Die Optionen liegen entweder an der Statusdeklaration oder an einem einzelnen St
 | --- | --- | --- | --- |
 | `ALLOW_NULL_PERSISTANCE` | `AllowNullStatusDeclOption` | Statusdeklaration | Erlaubt, für diesen Status einen fehlenden Wert zu persistieren. Die historische Schreibweise `PERSISTANCE` ist Teil der DSL. |
 | `OPTIONAL_AS` | `OptionalAsStatusDeclOption` | Statusdeklaration | Legt eine abweichende sichtbare Beschriftung für den optionalen, nicht gesetzten Status fest. |
-| `ON_CREATION` | `OnCreationStatusElemOption` | Statuselement | Verwendet dieses Element als Anfangszustand bei der Erzeugung eines Objekts. |
+| `ON_CREATION` | `OnCreationStatusElemOption` | Statuselement | Verwendet dieses Element als Anfangszustand bei der Erzeugung eines Objekts. Jede Statusdeklaration braucht genau ein Element mit dieser Option. |
 | `COLOR` | `ColorStatusElemOption` | Statuselement | Verknüpft das Element mit einer statischen ObjectFlow-Farbe für die Standarddarstellung. |
 | `WHEN_NULL_WL` | `WhenNullOnDbStatusElemOption` | Statuselement | Verwendet dieses Element beim Laden, wenn der Persistenzwert `null` oder leer ist. |
 | `WHEN_UNDEFINED_WL` | `WhenUndefinedStatusElemOption` | Statuselement | Verwendet dieses Element beim Laden, wenn der vorhandene Persistenzwert keinem deklarierten Element entspricht. |
@@ -380,15 +383,15 @@ Für die Standardkonvertierungen und `%bd` unterstützt die Laufzeit auch Format
 
 ObjectFlow ergänzt BaseLanguage um fachlich geeignete Literale. Sie vermeiden technische Konstruktoraufrufe und halten im Modell sichtbar, ob ein fester Wert oder die Serverzeit gemeint ist.
 
-| Projektion | Konzeptname | Typ und Semantik |
-| --- | --- | --- |
-| `31.12.2026` | `DateLiteral` | Erzeugt ein festes `org.joda.time.LocalDate` aus Tag, Monat und Jahr. |
-| `new_LocalDateFromServer()` | `DateLiteral` | Ermittelt das aktuelle Datum über den von der Laufzeit bereitgestellten Server-Zeitkontext. |
-| `31.12.2026 14:30:0` | `DateTimeLiteral` | Erzeugt einen festen `org.joda.time.DateTime` aus Datum, Stunde, Minute und Sekunde. |
-| `new_DateTimeFromServer()` | `DateTimeLiteral` | Ermittelt Datum und Uhrzeit über den Server-Zeitkontext. |
-| `13.44bd` | `DezimalLiteral` | Erzeugt ein `java.math.BigDecimal`; das Suffix `bd` verhindert die ungenaue Gleitkomma-Semantik von `double`. |
+| Projektion | Konzeptname | Konzept Property | Typ und Semantik |
+| --- | --- | --- | --- |
+| `31.12.2026` | `DateLiteral` | `fromServer=false` | Erzeugt ein festes `org.joda.time.LocalDate` aus Tag, Monat und Jahr. |
+| `new_LocalDateFromServer()` | `DateLiteral` | `fromServer=true` | Ermittelt das aktuelle Datum über den von der Laufzeit bereitgestellten Server-Zeitkontext; Tag, Monat und Jahr des Knotens bleiben ohne Wirkung. |
+| `31.12.2026 14:30:0` | `DateTimeLiteral` | `fromServer=false` | Erzeugt einen festen `org.joda.time.DateTime` aus Datum, Stunde, Minute und Sekunde. |
+| `new_DateTimeFromServer()` | `DateTimeLiteral` | `fromServer=true` | Ermittelt Datum und Uhrzeit über den Server-Zeitkontext; Datum und Uhrzeit des Knotens bleiben ohne Wirkung. |
+| `13.44bd` | `DezimalLiteral` | – | Erzeugt ein `java.math.BigDecimal`; das Suffix `bd` verhindert die ungenaue Gleitkomma-Semantik von `double`. |
 
-Serverdatum und Serverzeitpunkt sind für fachliche Regeln den lokalen Uhren eines Clients immer vorzuziehen. Sie werden erst zur Laufzeit ausgewertet und können dadurch in einer Testkonfiguration zentral kontrolliert werden. Feste Literale eignen sich für fachliche Konstanten und Testdaten. Für Geld und andere exakte Dezimalwerte ist das `bd`-Literal zu verwenden; eine vorausgehende Berechnung mit `double` wird durch eine spätere Umwandlung in `BigDecimal` nicht nachträglich exakt. Auf java Double und Float ist stets zu verzichten!
+Serverdatum und Serverzeitpunkt sind für fachliche Regeln den lokalen Uhren eines Clients immer vorzuziehen. Sie werden erst zur Laufzeit ausgewertet und können dadurch in einer Testkonfiguration zentral kontrolliert werden. Feste Literale eignen sich für fachliche Konstanten und Testdaten. Für Geld und andere exakte Dezimalwerte ist das `bd`-Literal zu verwenden; eine vorausgehende Berechnung mit `double` wird durch eine spätere Umwandlung in `BigDecimal` nicht nachträglich exakt. Die Java-Typen `double` und `float` werden nicht unterstützt; auf sie ist stets zu verzichten.
 
 ### Statuswerte mit `status switch` behandeln
 
@@ -458,7 +461,7 @@ Dieser Teil beschreibt ausführbare Anwendungsfälle, ihre Pages, Abschlüsse, S
 
 Ein `Command` modelliert einen ausführbaren Anwendungsfall oder einen abgegrenzten Teil einer Benutzerinteraktion. Er verbindet Eingaben, lokalen Ablaufzustand, fachliche Prüfungen, Pages und den erfolgreichen oder fehlerhaften Abschluss mit einer klaren Session-Grenze. Ein Command ist damit weder bloß eine UI-Aktion noch nur eine Methode: Er beschreibt den gesamten kontrollierten Ablauf zwischen Aufruf und Termination. Der Name von Commands wird nicht in CamelCase geschrieben, sondern soll Leerzeichen enthalten!
 
-Bevor eine Command-Aktion gestartet werden kann, müssen ihre Parameter beziehungsweise Default-Selektionen verfügbar sein, alle Ausdrücke unter `generally enabled` `true` liefern und eine passende Command-Berechtigung erfüllt sein. Die Berechtigungen heißen konkret `CAN_OPEN_RO` für lesenden und `CAN_OPEN_RW` für ändernden Zugriff und werden jeweils mit einer Rolle verbunden. Eine Rollenprüfung kann zusätzlich Teil von `generally enabled` sein, soll die deklarierte Command-Berechtigung aber nicht ersetzen.
+Bevor eine Command-Aktion gestartet werden kann, müssen ihre Parameter beziehungsweise Default-Selektionen verfügbar sein, alle Ausdrücke unter `generally enabled` `true` liefern und eine passende Command-Berechtigung erfüllt sein. Die Berechtigungen heißen konkret `CAN_OPEN_RO` für eine reine Ansicht und `CAN_OPEN_RW` für den bedienbaren Command (siehe [Rollen, Scopes und Identities](#rollen-scopes-und-identities)) und werden jeweils mit einer Rolle verbunden. Eine Rollenprüfung kann zusätzlich Teil von `generally enabled` sein, soll die deklarierte Command-Berechtigung aber nicht ersetzen.
 
 ### Grundablauf eines Commands
 
@@ -505,7 +508,7 @@ Ein Command kann folgende Bestandteile enthalten:
 | --- | --- | --- | --- |
 | Parameter und Defaults | Typisierte Parameterdeklaration mit optionalem Ausdruck | Eingaben des Aufrufs festlegen | Schlüssel, ausgewählte Entity oder DTO, Filterwert; Default über `getSelected()` oder Konstante |
 | `generally enabled` | Liste boolescher Ausdrücke, logisch UND-verknüpft | Sichtbare Command-Aktion fachlich aktivieren oder deaktivieren | Zulässiger Status, vorhandene Selektion, passende Betriebsart |
-| Permissions | `CAN_OPEN_RO`- oder `CAN_OPEN_RW`-Eintrag mit Rolle; fehlt beides, dann uneingeschränkter Zugriff | Lesenden beziehungsweise ändernden Zugriff erlauben | Beobachterrolle für Anzeige, Sachbearbeiterrolle für Änderung |
+| Permissions | `CAN_OPEN_RO`- oder `CAN_OPEN_RW`-Eintrag mit Rolle; fehlt beides, dann uneingeschränkter Zugriff | Command als reine Ansicht beziehungsweise bedienbar öffnen | Beobachterrolle für Anzeige, Sachbearbeiterrolle für Änderung |
 | Preconditions | Liste von `Precondition`-Knoten | Verständliche Voraussetzungen vor dem Start prüfen | Vollständige Parameter, fachlich erlaubter Ausgangszustand |
 | Lokale Variablen | Typisierte Variablendeklaration | Zustand einer Command-Instanz halten | Geladener Graph, Filter-DTO, Ergebnisliste, Ablaufkennzeichen |
 | Command Settings | Deklarative Einstellungen und Ausdrücke | Darstellung und Laufzeitverhalten konfigurieren | Label, Icon, Hotkey, Farbe, Revert-Objekte, [Locks](#pessimistische-sperren-mit-acquire-locks), Optionen |
@@ -767,7 +770,7 @@ Entities, die nicht über `QueryFromMap` (`org.modellwerkstatt.manmap.structure.
 
 #### Session-weites Read-only und Dirty
 
-Mit `session.setReadOnly()` kann ein Command seine aktuelle Session ausdrücklich in den Read-only-Modus versetzen. ObjectFlow setzt dann alle Page-Conclusions auf disabled. Escape steht dem Benutzer weiterhin zur Verfügung. Er kann auch Commands aus Menüs starten, sofern diese enabled sind. In diesem Modus darf die Laufzeit keine speichernde Transaktion starten.
+Mit `session.setReadOnly()` kann ein Command seine aktuelle Session ausdrücklich in den Read-only-Modus versetzen. ObjectFlow setzt dann alle Page-Conclusions auf disabled und sperrt alle `Delegate Form`s der Pages, als trügen sie die Option `DISABLED`. Escape steht dem Benutzer weiterhin zur Verfügung. Er kann auch Commands aus Menüs starten, sofern diese enabled sind. In diesem Modus darf die Laufzeit keine speichernde Transaktion starten.
 
 Der Session-Schalter ist von der Read-only-Eigenschaft einzelner Entities zu unterscheiden. `session.setReadOnly()` markiert die Session, setzt aber bereits integrierte Entity-Instanzen nicht nachträglich einzeln auf read-only. Ob deren Setter Änderungen zulassen, hängt weiterhin davon ab, ob sie read-only geladen oder ausgecheckt wurden.
 
@@ -971,6 +974,8 @@ Ein `run command` kann:
 
 Ein `run command` arbeitet mit einer eigenen Session: Ein `GRAPH_OWNER_CMD` committet bei `FINAL OK_CONCLUSION` wie im Betrieb. Die in `FINAL OK_CONCLUSION` passed forward Werte des Commands (siehe [`user toast message`](#final-ok_conclusion-final-cancel_conclusion-und-final_user_cancel)) stehen dem Test danach unter ihrem Namen zur Verfügung (`OFXRunCmdCreateInfoRef`, keine lokale Variable), etwa die ID eines neu angelegten Objekts. Darüber liest der Test das Committete zurück und prüft so neben Seiteneffekten am Eingabeobjekt auch die expliziten Command-Ergebnisse. Ein fehlender erwarteter Page-Schritt, eine unerwartete nicht-optionale Page oder eine andere Conclusion macht den Test reproduzierbar fehlerhaft. Mit `FAIL IN` lässt sich zusätzlich festlegen, dass der gesamte simulierte Ablauf mit einer bestimmten Exception oder einem bestimmten Session-Problem enden muss.
 
+`run command` bildet die Sperren durch `CAN_OPEN_RO` nicht nach: Der Test setzt Werte und erzwingt Conclusions auch dort, wo die Oberfläche sie sperrt.
+
 Das folgende Pseudocode-Beispiel simuliert einen Rechnungs-Command mit zwei aufeinanderfolgenden Pages. Der Test bearbeitet zuerst die Kopfdaten, erzwingt die Conclusion für den Page-Wechsel und bestätigt anschließend die Positionen:
 
 ```objectflow
@@ -1098,7 +1103,7 @@ Der User Service bündelt benutzer- beziehungsweise laufzeitabhängige Infrastru
 | Scope | `Scope` | Liefert die für einen Benutzer beziehungsweise Kontext zugänglichen Objekte eines Typs |
 | Identity | `Identity` | Hält ein einzelnes, für den Anwendungskontext zentrales Objekt beziehungsweise dessen Schlüssel |
 
-Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN_OPEN_RW role ...`. Damit wird nicht nur eine Rolle, sondern zugleich die erlaubte Zugriffsart des Commands festgelegt. Rollen sind hierarchisch modellierbar: Eine übergeordnete Rolle kann die Fähigkeiten einer weiteren Rolle einschließen.
+Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN_OPEN_RW role ...`. Die Art der Berechtigung beschreibt nicht den Datenzugriff, sondern die Bedienbarkeit des Commands: Öffnet ein Benutzer den Command über `CAN_OPEN_RO`, läuft dieser mit einer Read-only-Session (siehe [Session-weites Read-only und Dirty](#session-weites-read-only-und-dirty)) und ist damit eine reine Ansicht. Erfüllt ein Benutzer sowohl einen `CAN_OPEN_RO`- als auch einen `CAN_OPEN_RW`-Eintrag, gilt `CAN_OPEN_RW`. Ein `SEARCH_CMD` mit Filterformular braucht `CAN_OPEN_RW` oder gar keine Berechtigung; weil seine Session nie committet wird, ist damit kein Schreibrecht verbunden. Rollen sind hierarchisch modellierbar: Eine übergeordnete Rolle kann die Fähigkeiten einer weiteren Rolle einschließen.
 
 Scopes sind nicht nur Berechtigungsflags, sondern liefern eine eingeschränkte Objektmenge. Sie können Parameter und lokale Variablen besitzen und Services beziehungsweise Repositories über `OperationCall` verwenden.
 

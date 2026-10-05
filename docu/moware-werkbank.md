@@ -255,7 +255,7 @@ Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion m
 
 ## Von der Modellierung zur Ausführung
 
-1. **Solutions anlegen:** Eine Anwendung besteht aus mehreren MPS-Solutions, je einer pro Bounded Context sowie Solutions für Basis und Anwendung. Jede Solution hat eine Modulabhängigkeit auf `JDK`; ihre Modelle verwenden das DevKit `org.modellwerkstatt.MoWareWerkbank`. Weitere Abhängigkeiten, etwa auf Laufzeitmodule wie `org.modellwerkstatt.objectflow.runtime` oder auf Java-Bibliotheken wie einen JDBC-Treiber, werden nur ergänzt, wenn Inhalte daraus direkt verwendet werden.
+1. **Solutions anlegen:** Eine kleine Anwendung besteht aus einer MPS-Solution. Jede Solution hat eine Modulabhängigkeit auf `JDK`; ihre Modelle verwenden das DevKit `org.modellwerkstatt.MoWareWerkbank`. Weitere Abhängigkeiten, etwa auf Laufzeitmodule wie `org.modellwerkstatt.objectflow.runtime` oder auf Java-Bibliotheken wie einen JDBC-Treiber, werden nur ergänzt, wenn Inhalte daraus direkt verwendet werden.
 
 2. **Modellieren und versionieren:** Die Anwendung wird mit den DSLs in MPS modelliert und mit Git versioniert. MPS speichert die Modelle als XML-Dateien. Diese enthalten strukturierte Modelle mit Referenzen und Identitäten; ein rein textueller Merge kann deren Konsistenz verletzen. Für die Versionsverwaltung werden deshalb die Git-Unterstützung von MPS und der MPS-Merge-Driver verwendet. Modellkonflikte werden mit den modellbewussten Werkzeugen von MPS aufgelöst. Agenten bearbeiten Modelle über die MPS-Werkzeuge und führen keine manuellen Text-Merges der XML-Modelldateien durch.
 
