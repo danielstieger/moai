@@ -45,8 +45,18 @@ rarely needed.
 
 ## Conventions
 
-Before modeling, read all files in `./moai/conventions/`. They define binding
-modeling conventions (e.g. naming) for this application project.
+Before modeling, read all files in `./moai/conventions/`. They are the MoWare
+standard modeling conventions (e.g. structure, naming) and apply in full unless
+this project states otherwise in the section below.
+
+## Deviations from the MoWare Conventions
+
+None.
+
+A project may change individual conventions or replace them with its own. List
+here what deviates and what applies instead. Do not edit or delete files below
+`moai/` for this purpose. An agent never deviates on its own; a deviation is a
+project decision.
 
 ## MPS Workflow
 

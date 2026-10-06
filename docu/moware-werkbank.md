@@ -173,14 +173,14 @@ Für das vereinfachte Beispiel müssen Mengen positiv und Einzelpreise nicht neg
 
 Eine `Persistence Description` enthält die Mappings für `Rechnung` und `Rechnungsposition`. Die Positionstabelle besitzt eine Zuordnung zur jeweiligen Rechnung.
 
-Das `RechnungsRepo` kapselt die Datenbankzugriffe:
+Zwei Repositories kapseln die Datenbankzugriffe. Das `RechnungsRepo` lädt und speichert das Aggregat Rechnung; das `RechnungsLeseRepo` enthält die Abfragen, die nur lesen. Nach den Konventionen für den Aufbau einer Anwendung liegt das erste im `domain`-Modell des Bereichs `rechnung`, das zweite in dessen `read`-Modell.
 
-| Beispielhafte Repository-Methode | Aufgabe                                                                                                                                                                                         |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sucheRechnungen(filter)`        | Übersetzt die Suchkriterien aus `RechnungFilter` in eine benutzerdefinierte SQL-Abfrage. Ein No-Key-Mapper überführt jede Ergebniszeile in ein read-only `RechnungInfo`-DTO. |
-| `checkout(id)`           | Lädt die Rechnung und explizit ihre Positionen zur Bearbeitung. Stellt den vollständigen Rechnungsgraphen zusammen.                                                                           |
-| `checkin(rechnung)`      | Speichert die bearbeitete Rechnung einschließlich der zugehörigen Änderungen an ihren Positionen.                                                                                               |
-| `ladeSummeAllerRechnungen()`     | Führt die Aggregation direkt per SQL in der Datenbank aus. Ein No-Key-Mapper überführt das Ergebnis in das read-only DTO `RechnungsSummenErgebnis`.                                         |
+| Repository          | Beispielhafte Methode        | Aufgabe                                                                                                                                                                       |
+| ------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `RechnungsRepo`     | `checkout(id)`               | Lädt die Rechnung und explizit ihre Positionen zur Bearbeitung. Stellt den vollständigen Rechnungsgraphen zusammen.                                                           |
+| `RechnungsRepo`     | `checkin(rechnung)`          | Speichert die bearbeitete Rechnung einschließlich der zugehörigen Änderungen an ihren Positionen.                                                                             |
+| `RechnungsLeseRepo` | `sucheRechnungen(filter)`    | Übersetzt die Suchkriterien aus `RechnungFilter` in eine benutzerdefinierte SQL-Abfrage. Ein No-Key-Mapper überführt jede Ergebniszeile in ein read-only `RechnungInfo`-DTO. |
+| `RechnungsLeseRepo` | `ladeSummeAllerRechnungen()` | Führt die Aggregation direkt per SQL in der Datenbank aus. Ein No-Key-Mapper überführt das Ergebnis in das read-only DTO `RechnungsSummenErgebnis`.                           |
 
 Die Suche lädt keine `Rechnung`-Entitäten. Die benutzerdefinierte SQL-Abfrage liest nur die für die Ergebnisliste benötigten Daten und bildet jede Zeile auf ein `RechnungInfo`-DTO ab. Diese No-Key-Ergebnisse sind read-only und werden nicht in die Session-Identity-Map integriert. Erst beim Öffnen eines Suchergebnisses wird anhand seiner Rechnungs-ID die zugehörige `Rechnung` einschließlich ihrer Positionen zur Bearbeitung explizit geladen.
 
@@ -193,7 +193,7 @@ Auch für die Summe aller Rechnungen werden keine vollständigen Rechnungsgraphe
 | `Rechnungen suchen`               | `SEARCH_CMD`      | Erfasst Suchkriterien und zeigt die als `RechnungInfo`-DTOs geladenen Treffer auf einer zweiten Seite an.                     |
 | `Rechnung bearbeiten`             | `GRAPH_OWNER_CMD` | Lädt eine Rechnung anhand ihrer ID zur Bearbeitung und registriert Repository-Methoden zum Speichern als Session-Operationen. |
 | `Rechnungsposition bearbeiten`    | `GRAPH_EDIT_CMD`  | Bearbeitet eine Position innerhalb der bestehenden Session des `GRAPH_OWNER_CMD`.                                             |
-| `Summe aller Rechnungen anzeigen` | `SEARCH_CMD`      | Ruft die SQL-Aggregation im Repository auf und zeigt das Ergebnis an.                                                         |
+| `Summe aller Rechnungen anzeigen` | `SEARCH_CMD`      | Ruft die SQL-Aggregation im `RechnungsLeseRepo` auf und zeigt das Ergebnis an.                                                |
 
 Der ebenfalls verfügbare Typ `GRAPH_OWNER_CMD(modal)` wird in diesem Beispiel nicht benötigt.
 
@@ -202,7 +202,7 @@ Der ebenfalls verfügbare Typ `GRAPH_OWNER_CMD(modal)` wird in diesem Beispiel n
 Der Command `Rechnungen suchen` startet eine eigene Read-only-Session und besteht aus zwei Pages:
 
 1. **Suchfilter eingeben:** Ein Formular ist an das DTO `RechnungFilter` gebunden. Der Benutzer legt die Suchkriterien fest.
-2. **Suchergebnisse anzeigen:** Mit den Kriterien aus dem DTO wird die Repository-Methode `sucheRechnungen(filter)` aufgerufen. Sie führt benutzerdefiniertes SQL aus und legt die über ein No-Key-Mapper erzeugten `RechnungInfo`-DTOs in der Property `results` des Filter-DTOs ab. Eine Tabelle auf der zweiten Page zeigt diese Liste an.
+2. **Suchergebnisse anzeigen:** Mit den Kriterien aus dem DTO wird die Methode `sucheRechnungen(filter)` des `RechnungsLeseRepo` aufgerufen. Sie führt benutzerdefiniertes SQL aus und legt die über ein No-Key-Mapper erzeugten `RechnungInfo`-DTOs in der Property `results` des Filter-DTOs ab. Eine Tabelle auf der zweiten Page zeigt diese Liste an.
 
 Bei der Suche werden weder `Rechnung`-Entitäten noch deren Positionen geladen. Die Session des `SEARCH_CMD` kann nicht committed werden. Die Eingabe von Suchkriterien und das Befüllen von `results` im DTO sind davon unabhängig: Diese Daten dienen dem Suchablauf und werden nicht in die Datenbank geschrieben. Auch die `RechnungInfo`-Ergebnisse des No-Key-Mapper sind read-only und nicht Bestandteil der Session-Identity-Map.
 
@@ -210,7 +210,7 @@ Ein Doppelklick auf eine Tabellenzeile startet `Rechnung bearbeiten`. Als Parame
 
 #### Rechnung und Positionen bearbeiten
 
-Der Command `Rechnung bearbeiten` hat den Typ `GRAPH_OWNER_CMD` und startet eine eigene Session. Er ist dafür verantwortlich, die Daten zur Bearbeitung zu laden (**Checkout**). Dazu ruft er `checkout(id)` mit der übergebenen Rechnungs-ID auf. Die Repository-Methode lädt den Rechnungskopf und die zugehörigen Positionen.
+Der Command `Rechnung bearbeiten` hat den Typ `GRAPH_OWNER_CMD` und startet eine eigene Session. Er ist dafür verantwortlich, die Daten zur Bearbeitung zu laden (**Checkout**). Dazu ruft er `checkout(id)` des `RechnungsRepo` mit der übergebenen Rechnungs-ID auf. Die Repository-Methode lädt den Rechnungskopf und die zugehörigen Positionen.
 
 Der Benutzer kann den Rechnungskopf und die Positionen bearbeiten. Für die Bearbeitung einer einzelnen Position wird `Rechnungsposition bearbeiten` vom Typ `GRAPH_EDIT_CMD` verwendet. Dieser Command arbeitet innerhalb der bestehenden Session des `GRAPH_OWNER_CMD` und eröffnet keine eigene Session. Änderungen werden direkt an der Entität Rechnungsposition durchgeführt.
 
@@ -220,7 +220,7 @@ Beim vorgesehenen Abschluss des `GRAPH_OWNER_CMD` wird eine Datenbanktransaktion
 
 #### Summe aller Rechnungen anzeigen
 
-Der Command `Summe aller Rechnungen anzeigen` hat den Typ `SEARCH_CMD` und verwendet eine eigene Read-only-Session. Er ruft `ladeSummeAllerRechnungen()` im Repository auf.
+Der Command `Summe aller Rechnungen anzeigen` hat den Typ `SEARCH_CMD` und verwendet eine eigene Read-only-Session. Er ruft `ladeSummeAllerRechnungen()` im `RechnungsLeseRepo` auf.
 
 Die Repository-Methode führt eine aggregierende SQL-Abfrage direkt auf der Datenbank aus. Ein No-Key-Mapper überführt deren Ergebnis in das read-only DTO `RechnungsSummenErgebnis`, das nicht in die Session-Identity-Map integriert wird. Der Command stellt dieses DTO für die Anzeige bereit. Ein Laden und anschließendes Durchlaufen aller Rechnungsentitäten in der Anwendung ist dafür nicht erforderlich.
 
@@ -237,7 +237,7 @@ Eine **Page** beschreibt eine Seite im Ablauf eines Commands. Das zugehörige **
 | `Page Pane` für die Positionsbearbeitung | Enthält ein `Delegate Form` zur Bearbeitung einer einzelnen Rechnungsposition im Command `Rechnungsposition bearbeiten`.                                                    |
 | `Page Pane` für die Summenanzeige        | Enthält ein `Delegate Form` zur Anzeige des DTOs `RechnungsSummenErgebnis`.                                                                                                 |
 
-Die Seitenfolge wird im jeweiligen Command beschrieben. Die zugeordneten `Page Pane`s und ihre enthaltenen UI-Komponenten legen Darstellung, Datenbindungen und angebotene Interaktionen fest. Fachliche Prüfungen und Berechnungen bleiben in der Geschäftslogik; Datenbankabfragen und Speicheroperationen liegen im Repository.
+Die Seitenfolge wird im jeweiligen Command beschrieben. Die zugeordneten `Page Pane`s und ihre enthaltenen UI-Komponenten legen Darstellung, Datenbindungen und angebotene Interaktionen fest. Fachliche Prüfungen und Berechnungen bleiben in der Geschäftslogik; Datenbankabfragen und Speicheroperationen liegen in den Repositories.
 
 ### Fachliche Prüfung und Qualitätssicherung
 
