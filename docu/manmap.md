@@ -59,7 +59,7 @@ Der Methodentyp beschreibt die Rolle der Methode im Lebenszyklus. Er ersetzt nic
 
 Ergebnisse von `QueryFromMap` werden in die Identity-Map der laufenden ObjectFlow-Session integriert. Wiederholte Read-only-Abfragen auf dieselbe Entity liefern innerhalb einer Session eine gecachte Entität; dabei wird dieselbe Objektinstanz verwendet. Wird allerdings versucht, eine bereits veränderbar geladene Entity erneut auszuchecken, wirft ManMap eine `IllegalStateException`; stattdessen ist die bereits in der Session vorhandene Instanz zu verwenden.
 
-Read-only schützt eine Entity nicht erst beim Speichern: Bereits eine Änderung oder das Löschen des Objekts ist unzulässig. Ein durch ein `nokeystore/read-only map` erzeugtes Ergebnis ist ebenfalls read-only, liegt selbst aber außerhalb der Session-Identity-Map; jede Abfrage liefert dafür neue Instanzen. Reguläre Entities, die ein `nokeystore/read-only map` über einen SQL-Join mitlädt, sind ebenfalls read-only, werden aber in die Session integriert: Eine dort schon vorhandene Instanz wird wiederverwendet; ist sie ausgecheckt, schlägt die Abfrage mit `IllegalStateException` fehl.
+Read-only schützt eine Entity nicht erst beim Speichern: Bereits eine Änderung oder das Löschen des Objekts ist unzulässig. Das Nachladen von Referenzen und Listen durch eine Repository-Methode ist davon ausgenommen (siehe [Explizites Laden](#explizites-laden)). Ein durch ein `nokeystore/read-only map` erzeugtes Ergebnis ist ebenfalls read-only, liegt selbst aber außerhalb der Session-Identity-Map; jede Abfrage liefert dafür neue Instanzen. Reguläre Entities, die ein `nokeystore/read-only map` über einen SQL-Join mitlädt, sind ebenfalls read-only, werden aber in die Session integriert: Eine dort schon vorhandene Instanz wird wiederverwendet; ist sie ausgecheckt, schlägt die Abfrage mit `IllegalStateException` fehl.
 
 ### Wiederverwendbarer SQL-Text
 
@@ -113,7 +113,7 @@ Wird ein Mapping über `IncludeMapping` wiederverwendet, kann `OVERWRITE_AUTOID`
 
 ### Optimistic Locking und Audit
 
-`OPTIMISTIC_LOCK` verhindert, dass zwischenzeitliche Änderungen anderer Bearbeitungsvorgänge unbemerkt überschrieben werden. Hat sich der Datenbankstand seit dem Laden verändert, schlägt das Speichern mit einem Konflikt fehl.
+`OPTIMISTIC_LOCK` verhindert, dass zwischenzeitliche Änderungen anderer Bearbeitungsvorgänge unbemerkt überschrieben werden. Hat sich der Datenbankstand seit dem Laden verändert, schlägt das Speichern mit einem Konflikt fehl. Dafür ist keine Property im Modell nötig; die Tabelle braucht eine zusätzliche Spalte `TCN`.
 
 Beim Insert werden die mit `CREATEDAT`/`CREATEDBY` und `MODIFIEDAT`/`MODIFIEDBY` markierten Audit-Felder gesetzt; beim Update werden die mit `MODIFIEDAT`/`MODIFIEDBY` markierten Felder aktualisiert, wenn das Objekt geändert wurde. Die Zeitstempel stammen von der Datenbank. `FORCE AUDIT` (`ForceAuditSaveOption`) führt die Audit-Aktualisierung auch für ein nicht geändertes Objekt aus, während `SKIP AUDIT` (`SkipAuditSaveOption`) sie auch für ein geändertes Objekt unterdrückt.
 
@@ -136,7 +136,7 @@ Für Listen gibt es zwei wichtige Formen:
 | `ListMapping` mit Rückreferenz (`MappedFieldRef`) | Das Kindelement besitzt ein echtes `ReferenceMapping` zurück auf den Parent. |
 | `ListMapping` mit reiner Schlüsselreferenz (`KeyOnlyReferenceMapping`) | Die Kindtabelle trägt den Parent-Schlüssel, das Kindobjekt besitzt aber keine fachliche Rückreferenz. |
 
-Beide Formen beschreiben nur die Beziehung. Sie laden die Liste nicht automatisch und führen beim Speichern des Parents nicht zu einem automatischen Speichern der Listenelemente.
+Im Regelfall genügt die Schlüsselreferenz: Das Kind muss den Parent nicht kennen, und in einem Command liefert `getSelected()` den Parent ohnehin. Die Rückreferenz lohnt sich, wenn innerhalb des Aggregats vom Kind zum Parent navigiert werden muss. Beide Formen beschreiben nur die Beziehung. Sie laden die Liste nicht automatisch und führen beim Speichern des Parents nicht zu einem automatischen Speichern der Listenelemente.
 
 ### Grenzen von `IncludeMapping`
 
@@ -163,7 +163,7 @@ Beide Formen beschreiben nur die Beziehung. Sie laden die Liste nicht automatisc
 | `size` | `SizeQuery` | `org.modellwerkstatt.manmap.structure.SizeQuery` | Liefert die Anzahl der Ergebnisse. |
 | `reload(...)` | `ReloadQuery` | `org.modellwerkstatt.manmap.structure.ReloadQuery` | Lädt gemappte Daten für eine vorhandene Instanz erneut. |
 | `refJoin` | `RefJoinOption` | `org.modellwerkstatt.manmap.structure.RefJoinOption` | Lädt eine gemappte Referenz. |
-| `listJoin` | `ListJoinOption` | `org.modellwerkstatt.manmap.structure.ListJoinOption` | Lädt eine gemappte Liste. |
+| `listJoin` | `ListJoinOption` | `org.modellwerkstatt.manmap.structure.ListJoinOption` | Lädt eine gemappte Liste; ihre Reihenfolge kann bei Bedarf ein `sortBy` auf ein Feld des Kind-Mappings festlegen. |
 | `MappingReference` | `MappingReference` | `org.modellwerkstatt.manmap.structure.MappingReference` | Adressiert ein Feld einer in `where` oder `sortBy` verfügbaren Mapping-Instanz; im Editor steht dafür der kleingeschriebene Name des gemappten Entity-Typs. |
 
 ### Spezifikum - Filterausdrücke und gemappte Felder
@@ -210,7 +210,7 @@ Eine deklarierte Beziehung ist noch keine geladene Beziehung:
 
 - Eine nicht geladene Referenz wirft beim Zugriff `org.modellwerkstatt.objectflow.runtime.OFXNotInitializedException`.
 - Eine nicht geladene Liste ist leer (`size == 0`) und wirft diese Ausnahme nicht.
-- Referenzen und Listen werden entweder mit separaten Abfragen geladen, deren Ergebnis der Property explizit zugewiesen wird, oder mit `refJoin` beziehungsweise `listJoin` in derselben Abfrage mitgeladen und in die Session integriert.
+- Referenzen und Listen werden entweder mit separaten Abfragen geladen, deren Ergebnis der Property explizit zugewiesen wird, oder mit `refJoin` beziehungsweise `listJoin` in derselben Abfrage mitgeladen und in die Session integriert. Die Zuweisung ist auch bei einer read-only geladenen Entity zulässig: Das Laden von Referenzen und Listen durch eine Repository-Methode gilt nicht als Änderung.
 - Ein Join wird vor allem empfohlen, wenn die Abfrage auf Felder des verbundenen Mappings filtert oder sortiert; nur vorhandene Joins erweitern den Scope von `mappingSource`. Zum reinen Laden sind zwei separate Abfragen in der Praxis häufig und transparenter; sie sind auch nicht per se langsamer als ein Join.
 
 Eine leere Liste beweist daher nicht, dass in der Datenbank keine Kindzeilen vorhanden sind. Vor einer solchen Schlussfolgerung ist die Ladestrategie der Repository-Methode zu prüfen.
@@ -265,7 +265,7 @@ Für einen Parent mit Kindern wird daher typischerweise zuerst der Parent gespei
 | `SKIP AUDIT` | Auditbehandlung für diesen Speichervorgang überspringen |
 | `WHEN` | Eine deklarierte alternative Tabelle verwenden, wenn die Bedingung zutrifft |
 
-`BATCH` ist für Mengenoperationen gedacht. Für das Speichern eines einzelnen Objekts sollte sie nicht nur deshalb verwendet werden, weil sie verfügbar ist. Bei größeren Mengen ist der Performance-Vorteil oft substanziell.
+`BATCH` ist für Mengenoperationen gedacht. Für das Speichern eines einzelnen Objekts sollte sie nicht nur deshalb verwendet werden, weil sie verfügbar ist. Bei größeren Mengen ist der Performance-Vorteil oft substanziell. Auf MySQL und MariaDB ist `BATCH` nicht verfügbar; sie müssen also einzeln gespeichert werden.
 
 ## Löschen mit `delete with`
 
@@ -333,7 +333,7 @@ Neben einfachen Variablenreferenzen werden Zugriffe über den Dot-Operator (`.`)
 | `:rechnung_refLieferant_KEY` | Liest `KEY` über die Referenz `refLieferant` von `rechnung`.            | Property-Zugriff mit Variablenreferenz und Entity-Key-Property-Referenz (`C2EntityKeyPropReference`). |
 | `:rechnung_methode`          | Verwendet den Rückgabewert einer parameterlosen Methode von `rechnung`. | Methodenzugriff mit Variablenreferenz und Methodenreferenz (`C2MethodReference`).                     |
 
-Der aufgelöste Wert muss einen primitiven Typ besitzen. Bei einem Methodenzugriff muss die Methode parameterlos sein und einen primitiven Typ zurückgeben.
+Als benannter Parameter sind Werte vom Typ `int`, `string`, `BigDecimal`, `DateTime`, `LocalDate`, `byte[]` und Status zulässig; ein Status wird über seinen Persistenzwert gebunden. Bei einem Methodenzugriff muss die Methode parameterlos sein und einen dieser Typen liefern.
 
 ### Statuskonstanten in SQL-Text
 

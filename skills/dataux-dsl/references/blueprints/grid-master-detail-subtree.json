@@ -4,9 +4,6 @@
     { "name": "isNamed", "value": "false" },
     { "name": "name", "value": "#" }
   ],
-  "references": [
-    { "role": "boundClassifier", "target": "TARGET_MODEL.TableOwnerClassifier" }
-  ],
   "children": [
     {
       "role": "rowWeights",

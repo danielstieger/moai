@@ -26,6 +26,7 @@ Pick the right authoring tool before you start:
 - **`mps_mcp_parse_java_and_insert`** — use for plain Java skeletons or bodies (classes, methods, statements, expressions), including the current MPS Console input (`insert.mode: "console"` to replace the console command, or `mode: "child"/"replace"` with a `parentRef`/`targetRef` inside the current console command for nested edits). Fastest path when no BaseLanguage extension is required.
 - **JSON AST blueprints** — use when the parser is unavailable, when the code uses BaseLanguage extensions (smodel, closures, collections), or when stable persistent references to members are required for downstream consumers.
 - **Mixed** — use the parser for the skeleton with placeholders (e.g. `IntegerConstant`, `StringLiteral`, `IntegerType`, `StringType`), then JSON-edit the placeholders to swap in extension-specific subtrees.
+- **MoWare DSL roots** — the parser also fills method bodies inside ObjectFlow Entities, Value Objects, DTOs, and Services as long as the body is plain Java (string handling, regex checks, arithmetic). As soon as it needs the object's own Business Properties, a Status, or a `#` component call, author that method as a JSON blueprint instead.
 
 ## Common Workflow
 

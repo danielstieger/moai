@@ -35,6 +35,14 @@ Use these package documents for the intended MoWare semantics:
 - `moai/docu/manmap.md` — ManMap language documentation;
 - `moai/docu/dataux.md` — DataUX language documentation.
 
+Read them in stages. For research and planning, `moai/docu/moware-werkbank.md`
+together with the sections "Modellierungsumfang und Ausdrucksmöglichkeiten" and
+the chapter maps ("Kapitellandkarte") of the three DSL documents is sufficient;
+they name every concept with its projection and FQ name. Read the full part of a
+DSL document only when modeling that layer, following the section links in the
+skills. Reading all four documents up front costs about 140,000 tokens and is
+rarely needed.
+
 ## Conventions
 
 Before modeling, read all files in `./moai/conventions/`. They define binding

@@ -186,7 +186,7 @@ Die Optionen liegen entweder an der Statusdeklaration oder an einem einzelnen St
 
 | Name | Konzeptname | Ort | Wirkung |
 | --- | --- | --- | --- |
-| `ALLOW_NULL_PERSISTANCE` | `AllowNullStatusDeclOption` | Statusdeklaration | Erlaubt, für diesen Status einen fehlenden Wert zu persistieren. Die historische Schreibweise `PERSISTANCE` ist Teil der DSL. |
+| `ALLOW_NULL_PERSISTANCE` | `AllowNullStatusDeclOption` | Statusdeklaration | Eine Status-Property kann im Speicher immer `null` sein. Mit dieser Option wird `null` auch als `null` gespeichert und beim Laden als `null` geliefert; ohne sie bricht das Speichern eines `null`-Status mit einer Exception ab. Die historische Schreibweise `PERSISTANCE` ist Teil der DSL. |
 | `OPTIONAL_AS` | `OptionalAsStatusDeclOption` | Statusdeklaration | Legt eine abweichende sichtbare Beschriftung für den optionalen, nicht gesetzten Status fest. |
 | `ON_CREATION` | `OnCreationStatusElemOption` | Statuselement | Verwendet dieses Element als Anfangszustand bei der Erzeugung eines Objekts. Jede Statusdeklaration braucht genau ein Element mit dieser Option. |
 | `COLOR` | `ColorStatusElemOption` | Statuselement | Verknüpft das Element mit einer statischen ObjectFlow-Farbe für die Standarddarstellung. |
@@ -955,7 +955,7 @@ Jeder `Simple Test` (`OFXTestMethod`) erhält eine eigene Session. Diese Session
 
 Testsuites lassen sich hierarchisch zusammensetzen. `INCLUDE_SUIT` kann eine andere Suite einschließlich ihrer Start-/Ende-Logik einbinden und über `exec tests` festlegen, ob auch deren Tests laufen. Damit kann eine Suite beispielsweise nur den gemeinsamen Datenbankaufbau einer Basissuite verwenden oder mehrere fachliche Suites zu einem Gesamtlauf aggregieren. `DEPENDENT_TEST` markiert einen Test, der nicht alleinig als selbständiger Test ausgeführt werden kann. Er wird von einem anderen Test verwendet.  
 
-Mit `FAIL IN` (`OFXTestFailInAttribue`) beschreibt ein Test einen erwarteten Fehler an einer Anweisung: Die erwartete Exception-Klasse ist anzugeben, ein enthaltener Meldungstext optional. Tritt der Fehler wie erwartet auf, läuft der Test mit der nächsten Anweisung weiter; bleibt er aus, schlägt der Test fehl. Dadurch können neben erfolgreichen Lese-, Speicher- und Session-Abläufen auch Preconditions, Transaktionsabbrüche und technische Fehler explizit geprüft werden. 
+Mit `FAIL IN` (`OFXTestFailInAttribue`) beschreibt ein Test einen erwarteten Fehler an einer Anweisung: Die erwartete Exception-Klasse ist anzugeben, ein enthaltener Meldungstext optional. Tritt der Fehler wie erwartet auf, läuft der Test mit der nächsten Anweisung weiter; bleibt er aus, schlägt der Test fehl. Dadurch können neben erfolgreichen Lese-, Speicher- und Session-Abläufen auch Preconditions, Transaktionsabbrüche und technische Fehler explizit geprüft werden. Welche Exception zu erwarten ist, hängt vom Aufruf ab: Eine verletzte Precondition in einem direkt aufgerufenen Service oder Repository wirft `OFXAbortedException`; die Probleme bleiben an der Session hängen, ein weiterer Aufruf in derselben Session scheitert deshalb ebenfalls. Innerhalb eines `run command` wird daraus `OFXJobWorkCanceledException`. Ein Command, dessen `generally enabled` oder Berechtigung nicht erfüllt ist, lässt sich mit `run command` nicht starten und endet mit `RuntimeException`. 
 
 ### Commands ohne UI ausführen
 

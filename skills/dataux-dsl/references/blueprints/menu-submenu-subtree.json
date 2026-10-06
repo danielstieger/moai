@@ -2,17 +2,6 @@
   "concept": "org.modellwerkstatt.dataux.structure.MenuSub",
   "children": [
     {
-      "role": "label",
-      "nodes": [
-        {
-          "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
-          "properties": [
-            { "name": "value", "value": "Actions" }
-          ]
-        }
-      ]
-    },
-    {
       "role": "menuItems",
       "nodes": [
         {

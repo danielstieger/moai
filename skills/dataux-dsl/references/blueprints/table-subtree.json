@@ -25,7 +25,7 @@
               "role": "boundTo",
               "nodes": [
                 {
-                  "concept": "org.modellwerkstatt.dataux.structure.LocalPropertyReference",
+                  "concept": "org.modellwerkstatt.dataux.structure.DuxLocalPropertyReference",
                   "references": [
                     { "role": "property", "target": "TARGET_MODEL.rowText" }
                   ]

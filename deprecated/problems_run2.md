@@ -12,6 +12,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Beide Dateien sagen, die Schritte 5 bis 8 werden nicht gestartet und das Produkt wird nicht gebaut. Der Auftrag vom 2026-10-05 lautet, die Applikation zu bauen.
 - **Annahme:** Der Auftrag des Nutzers gilt, die beiden Stellen sind veraltet und werden angepasst, sobald der Nutzer das Vorgehen bestätigt.
 - **Ausgang:** Nutzer hat bestätigt, beide Stellen am 2026-10-05 auf den Umfang bis Schritt 8 umgestellt.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-002: Schreibweise „furhpark“ und „fuhrpark“ gemischt
 
@@ -19,6 +20,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Ich hatte aus dem Verzeichnisnamen geschlossen, die Solution heiße „mjfurhpark“. Die `.msd` und MPS nennen sie `org.modellwerkstatt.mjfuhrpark`; nur die beiden Verzeichnisse haben den Buchstabendreher.
 - **Annahme:** Modell- und Solution-Namen verwenden „mjfuhrpark“. Die Verzeichnisnamen bleiben, wie sie sind.
 - **Ausgang:** Meine erste Aussage an den Nutzer war falsch und ist hiermit berichtigt. Ob das Solution-Verzeichnis umbenannt wird, entscheidet der Nutzer (siehe P-004).
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-003: Solution ohne Modelle, nicht versioniert
 
@@ -26,6 +28,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Solution enthält nur die `.msd`, keine Modelle, keine Abhängigkeiten, kein DevKit. `solutions/` und `.mps/` sind nicht in Git.
 - **Annahme:** Modelle und Abhängigkeiten legt der Agent über die MPS-MCP-Werkzeuge an.
 - **Ausgang:** Am 2026-10-05 über MCP erledigt: Abhängigkeit auf `JDK`, Modelle `base`, `testbase`, `benutzer.domain`, `fahrzeug.domain` mit DevKit. Das Solution-Verzeichnis heißt inzwischen `solutions/org.modellwerkstatt.mjfuhrpark` (während der Sitzung vom Nutzer oder von MPS umbenannt), die Modelldateien sind in Git vorgemerkt.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-004: Vorhandene Solution passt nicht zur Konvention
 
@@ -49,6 +52,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Ohne Datenbank laufen keine Tests, ohne Laufzeit keine Anwendung. Auf der Maschine sind `mysql`/`mariadb` installiert, der Dienst läuft nicht. In MPS sind laut Doku nur `fx8forms` und `h2forms` verfügbar.
 - **Annahme:** MariaDB lokal, Laufzeit `fx8forms`. Dienst starten, Datenbank und Benutzer anlegen sind Schritte des Entwicklers.
 - **Ausgang:** Nutzer bestätigt am 2026-10-05: `fx8forms` und MariaDB. Als Verbindungsdaten hat der Nutzer einen Konfigurationsausschnitt ohne Begleittext geschickt (Datenbank `test` auf `localhost`, Benutzer `dan`). Ich habe das als „diese Werte verwenden“ gedeutet und `url`, `username` und `password` in `FuhrparkTestKonfiguration` entsprechend gesetzt.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-007: `mps_mcp_list_open_projects` scheitert ohne `projectPath`
 
@@ -56,6 +60,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Der Aufruf ohne Argument endet mit „Unable to determine the target project“, obwohl genau ein Projekt offen ist. Das Werkzeug, das das Projekt ermitteln soll, braucht selbst schon den Projektpfad. Die offenen Projekte stehen nur in der Fehlermeldung.
 - **Annahme:** Projektpfad ist das Arbeitsverzeichnis; ich gebe `projectPath` bei jedem Aufruf mit.
 - **Ausgang:** Mit `projectPath` funktionieren die Aufrufe. Der Hinweis fehlt in Guide und Skills.
+- **Stand:** keine Änderung (Nutzer, 2026-10-06)
 
 ## P-008: Constitution ist nur ein Entwurf
 
@@ -63,6 +68,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Pläne und Tasks werden gegen die Constitution geprüft, sie selbst ist nicht freigegeben. Ihr Abschnitt „Offen“ verweist auf Q10 bis Q12, Q12 ist inzwischen beantwortet.
 - **Annahme:** Die Constitution gilt in der vorliegenden Fassung.
 - **Ausgang:** Weiter offen am Ende des Laufs: Die Constitution steht auf „Entwurf“. Beide Pläne wurden gegen die vorliegende Fassung geprüft; die Freigabe liegt beim Nutzer.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-009: `tech-stack.md` beschreibt einen veralteten Stand der Umgebung
 
@@ -70,6 +76,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Dort steht, der MCP-Server `mps-mcp` sei nicht erreichbar, und die drei DSL-Dokus und Skills seien noch nicht gelesen.
 - **Annahme:** keine nötig
 - **Ausgang:** Am 2026-10-05 ist `mps-mcp` erreichbar, das Projekt offen, das DevKit `org.modellwerkstatt.MoWareWerkbank` sichtbar. Die Dokus sind gelesen. Der Abschnitt wird mit Plan 001 nachgezogen.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-010: Mindestinhalt einer lauffähigen `OFXConfig` ist nicht dokumentiert
 
@@ -77,6 +84,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Doku erklärt die Konfigurationsknoten, aber nicht, welche Instanzen eine Anwendung oder Testsuite mindestens braucht (DataSource, Transaktionsmanager, `databaseDesc`, Type Handler, String-Formatter, User Environment, AppFactory je Laufzeit). Das Beispiel `Defaults` zeigt sie, ist aber auf Oracle und eine fremde Umgebung zugeschnitten (fremde Hostnamen, Benutzer und Passwörter im Klartext). Die Klasse der Datenbankbeschreibung für MySQL/MariaDB und die AppFactory für `fx8forms` nennt die Doku nicht.
 - **Annahme:** Die Konfiguration wird aus `Defaults` und der im Beispielmodul referenzierten `LocalMySqlCONFIG` abgeleitet.
 - **Ausgang:** Am 2026-10-05 bestätigt: Mit der aus den Beispielen abgeleiteten Liste (P-018) läuft die Testsuite gegen MariaDB. Die Liste gehört in die Doku.
+- **Stand:** zurückgestellt (Nutzer, 2026-10-06: Die Beispielkonfigurationen in `org.modellwerkstatt.dataux.tests` werden später aufgeräumt; danach übernimmt der Agent Konfigurationen von dort. Bis dahin keine Doku-Änderung)
 
 ## P-011: Pflicht-Status ohne Vorbelegung
 
@@ -84,7 +92,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Eine Status-Property startet mit dem Default- beziehungsweise `ON_CREATION`-Element. AC-1.4 verlangt, dass eine leer gelassene Fahrzeugklasse abgelehnt wird. Die Doku sagt nicht, welches Element ohne `ON_CREATION` der Default ist und ob eine Status-Property ohne `ALLOW_NULL_PERSISTANCE` im Speicher `null` sein darf.
 - **Annahme:** Der Command setzt Fahrzeugklasse, Nutzungsart und Antriebsart beim Anlegen auf `null`; der Service prüft auf `null`; persistiert wird nie `null`.
 - **Ausgang:** Teilweise geklärt am 2026-10-05: MPS meldet „You have to specify exactly one status element with 'on creation'“. Jede Statusdeklaration braucht also zwingend genau ein `ON_CREATION`-Element; die Doku stellt die Option als optional dar, und der Blueprint `status-subtree.json` zeigt sie ohne Hinweis auf die Pflicht. Ich habe `Pkw`, `FestZugeordnet` und `Benzin` als Startwerte gesetzt. Ob der Command sie zum Anlegen auf `null` setzen kann, ist weiter offen (AC-1.4). Nachtrag: Ein Status lässt sich im Speicher gegen `null` prüfen (`fahrzeug.fahrzeugklasse != null` wird ohne Fehler akzeptiert). Ob die Oberfläche einen leeren Status liefern kann, zeigt sich erst mit dem Command.
-- **Stand:** teilweise erledigt (`objectflow.md` „Status“: `ON_CREATION` ist Pflicht, genau ein Element je Statusdeklaration; Startwert-Tabelle nennt nur noch das `ON_CREATION`-Element. Offen: ob und wo eine Status-Property im Speicher `null` sein soll, siehe P-034)
+- **Stand:** erledigt (`objectflow.md` „Status“: `ON_CREATION` ist Pflicht, genau ein Element je Statusdeklaration; Startwert-Tabelle nennt nur noch das `ON_CREATION`-Element; Zeile `ALLOW_NULL_PERSISTANCE`: Status-Property kann im Speicher immer `null` sein, gespeichert und geladen wird `null` nur mit der Option, sonst Exception beim Speichern. Belegt am generierten Code der ManMap-Testsuite)
 
 ## P-012: Anlegen als modaler Owner oder als Owner mit Edit-Command
 
@@ -92,6 +100,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Laut Doku hält ein `GRAPH_OWNER_CMD` meist nur Session und Navigation, die editierbare Maske öffnet ein `GRAPH_EDIT_CMD`; ein `GRAPH_OWNER_CMD(modal)` „kann selbst editierbare Delegates enthalten“. Für einen einfachen Anlegen-Dialog bleibt offen, welches Muster gemeint ist und ob ein normaler Owner editierbare Formulare haben darf.
 - **Annahme:** „Fahrzeug anlegen“ ist ein `GRAPH_OWNER_CMD(modal)` mit eigenem Formular. Das Bearbeiten läuft über einen Owner mit `GRAPH_EDIT_CMD`s.
 - **Ausgang:** Am 2026-10-05 bestätigt: `Fahrzeug anlegen` als `GRAPH_OWNER_CMD(modal)` mit eigenem Formular wird von der Prüfung akzeptiert und läuft im Test über `run command` (Anlegen, Ablehnung bei fehlender Marke, sofort aktiv). In der Oberfläche ist es noch nicht ausprobiert.
+- **Stand:** erledigt (`conventions/moware-werkbank-konventionen_v1.md`: `GRAPH_OWNER_CMD` darf die editierbare Maske selbst halten, etwa beim Anlegen; bei geladenem Aggregat nur Session und Navigation, Masken über `GRAPH_EDIT_CMD`. Dabei `moware-werkbank-anwendung_v1.md` in `moware-werkbank-modularisierung_v1.md` umbenannt)
 
 ## P-013: `OPTIMISTIC_LOCK` empfohlen, Voraussetzungen nicht beschrieben
 
@@ -99,6 +108,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Option ist für neue Mappings empfohlen. Nicht beschrieben ist, ob sie eine eigene Property oder Spalte braucht und wie diese heißt.
 - **Annahme:** Beide Mappings erhalten `OPTIMISTIC_LOCK`; was dafür nötig ist, kläre ich an der Sprachdefinition.
 - **Ausgang:** Geklärt am 2026-10-05 über die generierte Schemabeschreibung: `OPTIMISTIC_LOCK` braucht keine Property im Modell, erzeugt aber eine zusätzliche Spalte `TCN NUMBER (9) NOT NULL` je Tabelle. Das steht nicht in der ManMap-Doku.
+- **Stand:** erledigt (`manmap.md` „Optimistic Locking und Audit“: keine Property nötig, zusätzliche Spalte `TCN`; Typ und Schemabeschreibung bewusst nicht genannt)
 
 ## P-014: Doku-Dateien überschreiten die Lesegrenze des Agenten
 
@@ -106,6 +116,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Eine Datei lässt sich nicht in einem Zug lesen (Grenze 25.000 Tokens je Lesevorgang). `objectflow.md` brauchte drei Lesevorgänge, alle drei DSL-Dokus zusammen rund 150.000 Tokens Kontext, bevor die erste Zeile Plan entsteht. Die Skills verweisen auf Abschnitte, für einen Plan über alle Schichten braucht man aber fast alles.
 - **Annahme:** keine
 - **Ausgang:** Gelesen sind `moware-werkbank.md`, `objectflow.md`, `manmap.md` vollständig und `dataux.md` bis Zeile 403 (Rest: Monitoring, Diagnose, Konzeptindex; wird vor der DataUX-Umsetzung nachgeholt).
+- **Stand:** erledigt (`TEMPLATE_PROJECT_AGENTS.md`, Abschnitt „Documentation“: Lesen nach Phase; für Research und Plan genügen `moware-werkbank.md`, „Modellierungsumfang“ und die Kapitellandkarten, die vollen Teile erst beim Modellieren der Schicht. Keine Aufteilung der Dateien, keine Kürzung. Die `AGENTS.md` des Fuhrpark-Projekts zieht der Nutzer nach)
 
 ## P-015: Glossar und Spec weichen bei Begriffen ab
 
@@ -113,6 +124,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Das Glossar definiert Kilometerstand als „Stand mit Datum und Quelle“, die Spec kennt keine Quelle. „Antriebsart“ und „Standort“ stehen in der Spec, aber nicht im Glossar; die Constitution verlangt, dass ein neuer Begriff zuerst ins Glossar kommt.
 - **Annahme:** Die freigegebene Spec gilt: Kilometerstand ohne Quelle. Antriebsart und Standort werden im Glossar ergänzt (Task T001).
 - **Ausgang:** Erledigt am 2026-10-05: Glossar um Antriebsart, Standort und Personalnummer ergänzt, Kilometerstand ohne Quelle.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-016: Beispielkonfigurationen im MoWare-Testmodul enthalten Zugangsdaten
 
@@ -120,6 +132,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Skills verweisen auf dieses Modell als Vorlage für Konfigurationen. `MySQLOFXLdapConfig` enthält ein LDAP-Bind-Passwort im Klartext, das echt aussieht; die anderen enthalten Hostnamen, Benutzer und Passwörter einer fremden Umgebung. Ein Agent liest das beim Nachschlagen zwangsläufig mit.
 - **Annahme:** Ich übernehme keine dieser Werte, nur die Struktur der Instanzen.
 - **Ausgang:** Hinweis an den Nutzer: Passwort prüfen und gegebenenfalls ändern, Beispiele bereinigen.
+- **Stand:** keine Änderung in moai (Nutzer, 2026-10-06; gehört zur späteren Bereinigung der Beispielkonfigurationen, siehe P-010)
 
 ## P-017: JDBC-Treiber für MySQL/MariaDB ist in keinem MoWare-Modul eingebunden
 
@@ -127,6 +140,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** `LocalMySqlCONFIG` nennt `com.mysql.cj.jdbc.Driver`. Der Treiber liegt als Jar unter `objectflow/solutions/sandbox/jars/addons/`, wird aber von keiner `.msd` referenziert. Wie eine Anwendungs-Solution den Treiber auf den Klassenpfad bekommt (Java-Library an der Solution, eigene Stub-Solution, Ort der Jar-Datei), sagt die Doku nicht. Die Konfiguration nennt die Klasse nur als String, also ist es nach dem Wortlaut der Doku gar keine „direkte Verwendung“.
 - **Annahme:** Jar nach `lib/` im Projekt kopieren und als Java-Library an der Solution eintragen, sobald der erste Testlauf ansteht.
 - **Ausgang:** Der Nutzer hat den Treiber am 2026-10-05 selbst der Solution hinzugefügt; damit lief der erste Test. Der Weg ist weiter nicht dokumentiert.
+- **Stand:** zurückgestellt (siehe P-010; Nutzer, 2026-10-06: Die Beispielkonfigurationen in `org.modellwerkstatt.dataux.tests` werden später aufgeräumt; danach übernimmt der Agent Konfigurationen von dort. Bis dahin keine Doku-Änderung)
 
 ## P-018: Minimalkonfiguration aus dem Beispiel abgeleitet
 
@@ -134,6 +148,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Aus den Beispielen ergibt sich diese Liste von Instanzen: Locale, `transactionDefinition`, `transactionManager`, `jdbcTemplate`, `dataSource`, `databaseDescription` (`MMMySqlDescription`), User Environment und User Services, `eventBus`, `printFactory`, `consoleAppFactory`, sieben Type Handler, `deprecatedServerDateProvider`, `simplePrinterServices`, `stringFormatter`, `currentPlatform` (generierte Klasse `<StaticRessources>_<Plattform>`). Welche davon Pflicht sind und welche nur Altlast (Name `deprecatedServerDateProvider`), ist nicht erkennbar. Eine eigene Beschreibung für MariaDB gibt es nicht.
 - **Annahme:** Alle übernehmen, MariaDB läuft über `MMMySqlDescription` und den MySQL-Treiber.
 - **Ausgang:** Am 2026-10-05 bestätigt: Der Test `speichernUndZuruecklesen` läuft mit dieser Konfiguration durch. Ob einzelne Instanzen entbehrlich sind, habe ich nicht geprüft.
+- **Stand:** zurückgestellt (siehe P-010; Nutzer, 2026-10-06: Die Beispielkonfigurationen in `org.modellwerkstatt.dataux.tests` werden später aufgeräumt; danach übernimmt der Agent Konfigurationen von dort. Bis dahin keine Doku-Änderung)
 
 ## P-019: Liste der Kilometerstände mit Schlüsselreferenz statt Rückreferenz
 
@@ -141,6 +156,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Doku nennt zwei Formen des `ListMapping` (Rückreferenz mit `OPPOSITE`, reine Schlüsselreferenz), sagt aber nicht, wann welche vorzuziehen ist. Das einzige kompakte Beispiel im Testmodul (`NewInvoice`/`NewInvoicePos`) verwendet die Schlüsselreferenz.
 - **Annahme:** `Kilometerstand` trägt `fahrzeugId` (int) statt einer Rückreferenz `fahrzeug`; das weicht vom Plan ab (dort `fahrzeug` mit `OPPOSITE`). Der Plan wird nachgezogen.
 - **Ausgang:** Am 2026-10-05 bestätigt: Speichern und Zurücklesen des Fahrzeugs funktioniert; die Liste mit Kilometerständen wird mit US-5 getestet.
+- **Stand:** erledigt (`manmap.md` „Referenzen, eingebettete Werte und Listen“: Schlüsselreferenz als Regelfall, Rückreferenz bei Navigation vom Kind zum Parent innerhalb des Aggregats)
 
 ## P-020: Abfragen im Beispielmodul sind sehr teuer
 
@@ -155,6 +171,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Für `OFXConfig`, `RolesAndPermissions`, `Service` und `OFXTestSuit` enthalten die Blueprints nur den leeren Root. Die eigentliche Arbeit (Instanzen, Sections, Rollenfunktion, Service-Methode, Autowired-Feld, `session`) musste ich aus dem Beispielmodul ableiten. `TryUniversalStatement` verlangt `MultipleCatchClause`; die Testkonvention zeigt `try/catch` nur als Text.
 - **Annahme:** `TryCatchStatement` mit `CatchClause` für `CS.COMMIT()`.
 - **Ausgang:** `CS`, `FuhrparkRollen`, `FuhrparkTestKonfiguration` und `FuhrparkRessourcen` sind angelegt und ohne Fehler geprüft (bei `CS` nur die Warnung „Field appFactory is never assigned“, die bei `@Autowired` zu erwarten ist).
+- **Stand:** keine Änderung (Nutzer, 2026-10-06; siehe auch P-035)
 
 ## P-022: Option `INDEX` erzeugt einen eindeutigen Index
 
@@ -162,6 +179,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Für `INDEX` an `Kilometerstand.fahrzeugId` und `Fahrzeug.kennzeichenNormiert` erzeugt der Generator `CREATE UNIQUE INDEX`. Damit könnte ein Fahrzeug nur einen einzigen Kilometerstand haben, und zwei bestellte Fahrzeuge ohne Kennzeichen wären ebenso unmöglich wie die Wiederverwendung eines Kennzeichens. Umgekehrt erzeugt `UNIQUE` an `fahrgestellnummer` nichts Sichtbares, und `KEY` keinen Primärschlüssel.
 - **Annahme:** `INDEX` ist für nicht eindeutige Spalten nicht verwendbar.
 - **Ausgang:** Beide `INDEX`-Optionen entfernt; der Plan (Abschnitt 5) wird nachgezogen. Die Eindeutigkeit der Fahrgestellnummer sichert der Service, nicht das Schema. Bitte prüfen, ob das Verhalten des Generators gewollt ist.
+- **Stand:** keine Änderung an der Doku (Nutzer, 2026-10-06: Die Generierung der Schemabeschreibung `DbSchema_*.xml` ist veraltet und wird entfernt. Befund: `SqlOracleTableDescriptor.createTable` setzt `UNIQUE` vor `INDEX` für jedes Feld, das nicht Fremdschlüssel eines `ReferenceMapping` ist; `UNIQUE` und `KEY` werden dort nicht ausgewertet; der vollständigere `SqlTableDescriber` wird vom Generator nicht benutzt)
 
 ## P-023: Schemabeschreibung ist Oracle-Syntax
 
@@ -169,6 +187,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die generierte Beschreibung verwendet `NUMBER`, `VARCHAR2` und `CREATE SEQUENCE`, auch wenn die Konfiguration `MMMySqlDescription` nennt. Wie der Entwickler in MPS das Schema für MariaDB erzeugt, beschreibt die Doku nicht.
 - **Annahme:** Der Entwickler kennt den Weg; ich erzeuge kein Schema.
 - **Ausgang:** Der Nutzer hat das Schema am 2026-10-05 erstellt; die Tabellen passen zum Mapping (erster Test grün). Wie er von der Oracle-Beschreibung zu MariaDB kam, weiß ich nicht.
+- **Stand:** keine Änderung an der Doku (siehe P-022: Schemabeschreibung wird entfernt. Befund: Der Dialekt wurde über die Umgebungsvariable `WERKBANK_MYSQL` gewählt, `QueriesGenerated.propertyMacro_GetValue_9_1`)
 
 ## P-024: Kind löschen über `mps_mcp_update_node`
 
@@ -176,6 +195,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** `operation: DELETE` wird abgelehnt („Valid operations: ADD, SET“). `childJson: "null"` wird ebenfalls abgelehnt. Es funktioniert nur `SET` × `CHILD` ganz ohne `childJson`.
 - **Annahme:** keine
 - **Ausgang:** Drei Versuche nötig; Skill und Werkzeug widersprechen sich.
+- **Stand:** keine Änderung (Nutzer, 2026-10-06)
 
 ## P-025: Make über MCP funktioniert
 
@@ -183,6 +203,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Offen war, ob der Agent selbst bauen kann.
 - **Annahme:** keine
 - **Ausgang:** `MAKE` auf der Solution läuft durch und erzeugt `source_gen` und `classes_gen`. Der Plan führt den Rebuild trotzdem als Schritt des Entwicklers vor dem Ant-Build.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-026: Kein Beispiel für `session operation add`
 
@@ -190,6 +211,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Testkonvention verlangt `session operation add`. Im Beispielmodul gibt es keine einzige Instanz von `SessionOperationAdd`. Der Kommentar im Konventionsbeispiel (`// "Testdaten Zahlungsart"`) ist in Wahrheit ein Pflichtfeld: Ohne Text meldet MPS „Description text should not be empty“.
 - **Annahme:** Aufbau nach Konzeptdefinition (`operationCall`, `ex`).
 - **Ausgang:** Funktioniert; der Beschreibungstext ist die Rolle `ex`.
+- **Stand:** keine Änderung (Nutzer, 2026-10-06: übergangen)
 
 ## P-027: Erster Test läuft durch, Testlauf über MCP möglich
 
@@ -197,6 +219,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Offen war, ob der Agent Testsuiten selbst starten kann.
 - **Annahme:** keine
 - **Ausgang:** `OFXTestSuit` ist als „Java Application“ startbar. `FahrzeugTests.speichernUndZuruecklesen` ist am 2026-10-05 grün: Fahrzeug über Custom Session angelegt und committet, ID vergeben, in frischer Session zurückgelesen. In der Textprojektion erscheint `#+ with # TestDaten…` ohne den Session-Ausdruck `#CS.CREATE()`; im Modell ist er vorhanden.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-028: Neues Datumsliteral steht auf „Serverdatum“
 
@@ -212,6 +235,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** `org.modellwerkstatt.dataux.structure.LocalPropertyReference` und `jetbrains.mps.baseLanguage.structure.LocalPropertyReference` tragen denselben Namen. In einer Entity-Methode ist das BaseLanguage-Konzept richtig; die Skills sagen dazu nichts, die Doku erwähnt den Zugriff auf eigene Properties in Methoden gar nicht.
 - **Annahme:** BaseLanguage-Konzept, wie im Beispiel `NewInvoice.complete`.
 - **Ausgang:** Funktioniert.
+- **Stand:** erledigt (Nutzer hat das DataUX-Konzept am 2026-10-06 in `DuxLocalPropertyReference` umbenannt; die neun Stellen im Skill `moai:dataux-dsl` (concepts.md, sieben Blueprints) sind nachgezogen. Doku und Konventionen nannten den Namen nicht)
 
 ## P-030: Verletzte Precondition im Test außerhalb eines Commands
 
@@ -219,6 +243,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Doku nennt für abgelehnte Fälle nur `FAIL IN OFXJobWorkCanceledException` an einem `run command`. Welche Ausnahme ein direkter Service-Aufruf im `Simple Test` wirft, steht nicht da. Laut generiertem Code ist es `OFXAbortedException`, und die Probleme bleiben an der Session hängen (`hasProblemsOtherThanWarnings`), sodass jede weitere Validation in derselben Session ebenfalls scheitern würde.
 - **Annahme:** Jeder Service-Aufruf im Test läuft mit `#+ with #CS.CREATE()` in einer frischen Session; erwartete Ablehnungen tragen `FAIL IN OFXAbortedException`. Das Testmodell braucht dafür einen Import auf `org.modellwerkstatt.objectflow.runtime`.
 - **Ausgang:** Funktioniert, 4 von 4 Tests grün. Ob der Meldungstext über `contains` prüfbar ist, habe ich noch nicht versucht.
+- **Stand:** erledigt (`objectflow.md` „Testoptionen“, Absatz zu `FAIL IN`: `OFXAbortedException` beim direkten Service-Aufruf, Probleme bleiben an der Session; `OFXJobWorkCanceledException` im `run command`; `RuntimeException` bei nicht startbarem Command. Belegt an `OFXSimpleManMapSession`, `CmdFlow` und `OFXCmdModule`)
 
 ## P-031: Stapelaufrufe liefern sehr große Antworten
 
@@ -226,6 +251,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Für elf Property-Änderungen kam je Zeile ein voller Knoten-Umschlag zurück, zusammen rund 5.000 Tokens ohne Informationswert.
 - **Annahme:** keine
 - **Ausgang:** Beobachtung für die MCP-Werkzeuge; eine knappe Erfolgsantwort würde reichen.
+- **Stand:** keine Änderung (Nutzer, 2026-10-06)
 
 ## P-032: Java-Parser spart viel Arbeit, aber nur für reines Java
 
@@ -233,6 +259,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Methoden ohne ObjectFlow-Konstrukte (Normierung, Regex-Prüfung) ließen sich als Java-Text in die Entity einfügen, ohne Fehler. Sobald eine Methode eigene Properties, Status oder `#`-Aufrufe braucht, bleibt nur der JSON-Blueprint; der `FahrzeugService` hatte als Blueprint 64 KB.
 - **Annahme:** keine
 - **Ausgang:** Beides funktioniert. Die DSL-Skills erwähnen den Parser nicht als Abkürzung.
+- **Stand:** erledigt (`moai:mps-baselanguage`, „Choose Your Path“: Parser auch für reine Java-Methodenrümpfe in ObjectFlow-Roots, JSON sobald Properties, Status oder `#`-Aufrufe nötig sind. Auf Wunsch des Nutzers nur dort, nicht in den DSL-Skills)
 
 ## P-033: Suche als gemappte Abfrage statt Custom SQL (Abweichung vom Plan)
 
@@ -240,6 +267,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Für die Suche brauche ich optionale Filter auf Status-Properties. Die Doku sagt, ein gebundener Wert müsse „einen primitiven Typ besitzen“, und nennt für Status nur Konstanten (`C2SqlStatusReference`). Wie man einen Status aus einer Variablen oder einem DTO bindet, steht nicht da; der Persistenzwert (`getDbValue()`) ist im Modell nicht erreichbar. Dazu kommt der Aufwand: SQL-Text ist im Modell Wort für Wort ein eigener Knoten.
 - **Annahme:** Die Doku erlaubt für Lesemodelle ausdrücklich auch `EntityMapping` mit `where`. Ich verwende `where` mit `optional`, `like`, `TO_LOWERCASE`, `in` und `listJoin`. Das Ergebnis sind read-only geladene `Fahrzeug`-Entities in `FahrzeugFilter.results`; das DTO `FahrzeugInfo` entfällt. Die Vorbereitung der Suchmuster liegt im Service `FahrzeugSuche` im `read`-Modell.
 - **Ausgang:** Test `suche` grün: Teilbegriff ohne Rücksicht auf Groß- und Kleinschreibung, Kennzeichen ohne Leerzeichen, Ausschluss ausgeschiedener Fahrzeuge ohne Statusfilter, Statusfilter, Filter nach Fahrzeugklasse. Offen: Die Konvention nennt für `read` keine Services; ob `FahrzeugSuche` dort richtig liegt, entscheidet der Nutzer. Sortierung fehlt noch.
+- **Stand:** erledigt (`manmap.md` „Parameter in SQL-Text“: zulässige Typen benannter Parameter einschließlich Status, gebunden über den Persistenzwert. Die Annahme des Agenten war falsch: `IAtomMapping.isPrimitiveType` lässt Status zu, `MMRepository.__paramSetter` bindet über `getDbValue()`. Die Konzepte `QueryFromSql`/`UpdateFormSql` sind laut Nutzer deprecated und kommen in Doku und Skills nicht vor)
 
 ## P-034: Status-Property in einem DTO startet nicht leer
 
@@ -247,7 +275,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Ein Filter-DTO braucht „kein Filter“ als Ausgangswert. Status-Properties starten aber mit dem `ON_CREATION`-Element, der Filter stünde also sofort auf PKW, „fest zugeordnet“ und „bestellt“.
 - **Annahme:** Der Konstruktor des DTOs setzt die drei Status-Properties auf `null`.
 - **Ausgang:** Funktioniert im Test; `optional` lässt die Bedingung bei `null` weg, wie dokumentiert.
-- **Stand:** offen (Entscheidung des Nutzers steht aus: Ist das Setzen auf `null` im Konstruktor der vorgesehene Weg für Filter-DTOs, und gilt es auch für Entities ohne `ALLOW_NULL_PERSISTANCE`?)
+- **Stand:** erledigt (siehe P-011: Status-Property kann im Speicher immer `null` sein; kein eigener Satz zu Filter-DTOs, weil `ON_CREATION` als Startwert dokumentiert ist)
 
 ## P-035: Command und `run command` ließen sich ohne Rückfrage bauen
 
@@ -255,6 +283,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Der Blueprint ist nur ein leerer Root. Rollen wie `okConclusionStatements`, `finalOkSelection`, `commandCreationInformation`, `permissionNew` mit `PermissionHasReference`, `OFXRunCmdPage.beforeConclude` und `OFXRunCmdVarRef` stehen in keiner Skill-Referenz, nur in der Konzeptdefinition und im Beispiel.
 - **Annahme:** Aufbau wie im Beispiel `GO`.
 - **Ausgang:** Erster Versuch fehlerfrei, Test `anlegenUeberCommand` grün. Die Textprojektion des fertigen Commands entsprach genau der Doku; das war die wirksamste Kontrolle. Eine Skill-Referenz mit einem vollständigen kleinen Command samt Test würde den Umweg über das Beispielmodul sparen.
+- **Stand:** keine Änderung (Nutzer, 2026-10-06)
 
 ## P-036: Statusauswahl beim Anlegen noch nicht eingeschränkt
 
@@ -262,6 +291,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Beim Anlegen sind nur „bestellt“ und „aktiv“ zulässig. Die Einschränkung der Auswahl über `#Meta.setElements` in der Scope-Funktion fehlt noch, und der Service lehnt „stillgelegt“ oder „ausgeschieden“ beim Anlegen bisher nicht ab.
 - **Annahme:** Wird mit den Scope-Funktionen der Edit-Commands nachgezogen, zusammen mit einer Prüfung im Service.
 - **Ausgang:** Erledigt am 2026-10-05: Die Scope-Funktion der Page begrenzt die Auswahl mit `fahrzeug.status#Meta.setElements(Bestellt, Aktiv)`, und `pruefeUndUebernehme` lehnt bei einem neuen Fahrzeug (ohne ID) jeden anderen Status ab. Die Scope-Funktion ließ sich nach dem Pseudocode der Doku bauen (`BPMetaReference` als Operation eines `DotExpression`).
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-037: `optional` wird im Oder zu `(1 != 1)`; eine Oder-Gruppe aus lauter entfallenden Prädikaten liefert keine Treffer
 
@@ -280,6 +310,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Der Blueprint gibt dem `GridLayout` ein `boundClassifier`. Innerhalb eines Page Pane meldet die Prüfung dafür „A layout in an ui hierarchy should not be bound to any object“.
 - **Annahme:** Bindung am Layout weglassen.
 - **Ausgang:** Ohne Bindung fehlerfrei. Der Blueprint führt in die Irre, wenn man ihn als Kind eines Page Pane verwendet.
+- **Stand:** erledigt (Blueprint `grid-master-detail-subtree.json` in `moai:dataux-dsl`: `boundClassifier` am äußeren `GridLayout` entfernt; Bindungen an Tabelle und Formular bleiben. Checking Rule `check_ILayout`)
 
 ## P-039: Aufgabe zu früh abgehakt
 
@@ -287,6 +318,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Ich hatte T035 abgehakt, obwohl nur `letzterKilometerstand` existierte und die virtuelle Property `aktuellerKilometerstand` fehlte. Aufgefallen ist es erst, als die Ergebnistabelle sie brauchte.
 - **Annahme:** keine
 - **Ausgang:** Property nachgezogen (`CustomPropertyImplementation` mit `PRESENTATION`), Vorlage war ein Beispiel im Testmodul.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-040: `save with … BATCH` mit Auto-ID ist für MySQL/MariaDB nicht implementiert
 
@@ -294,6 +326,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Ich hatte das Speichern der Kilometerstände wie im Beispiel als `save with MapKilometerstand, BATCH (liste)` modelliert. Beim ersten echten Insert eines Kilometerstands wirft die Laufzeit `RuntimeException: Not implemented yet.` aus `MMMySqlDescription.queryForListOfKey`. Die Doku nennt keine Einschränkung auf Oracle. Aufgefallen ist es erst im Test über die Commands, weil vorher kein Test Kilometerstände in die Datenbank schrieb.
 - **Annahme:** Kilometerstände einzeln in einer Schleife speichern.
 - **Ausgang:** Mit Einzelspeicherung läuft `aendernUeberCommands` durch. Die Doku sollte die Einschränkung nennen, oder die Laufzeit sollte es können.
+- **Stand:** erledigt (`manmap.md` „Save-Optionen“: `BATCH` auf MySQL/MariaDB nicht für neue Objekte mit automatischem Schlüssel; Laufzeit bleibt, Entscheidung des Nutzers vom 2026-10-06)
 
 ## P-041: Entfernte Kilometerstände über Vergleich im Owner gelöscht
 
@@ -301,6 +334,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Doku beschreibt nicht, wie ein Edit-Command ohne Page seinem Owner einen Wert übergibt, ohne den Weg über Push und Termination Handler.
 - **Annahme:** Die im Plan genannte Ausweichlösung: `Fahrzeug oeffnen` merkt sich beim Start die geladenen Kilometerstände und löscht in `FINAL OK_CONCLUSION` jene mit vergebener ID, die nicht mehr in der Liste stehen.
 - **Ausgang:** Test `aendernUeberCommands` grün: Stand erfassen, zweiten erfassen, letzten entfernen, jeweils aus der Datenbank zurückgelesen. Ein `DELETE`-Repository-Aufruf in einer Schleife innerhalb von `FINAL OK_CONCLUSION` wird wie erwartet als Session-Operation ausgeführt.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-042: Statuswechsel-Maske arbeitet auf der echten Property
 
@@ -308,6 +342,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Maske bindet direkt an `Fahrzeug.status`. Damit der Service den Übergang prüfen kann, merkt sich der Command den alten Status, setzt ihn vor der Prüfung zurück und übergibt den gewählten als Ziel. Lehnt der Service ab, zeigt die Maske weiter den gewählten Wert, das Objekt hat aber wieder den alten.
 - **Annahme:** Für die Demo vertretbar; sauberer wäre ein eigenes Eingabe-DTO wie beim Kilometerstand.
 - **Ausgang:** Im Test über `run command` funktioniert der Wechsel. Das Verhalten nach einer Ablehnung ist in der Oberfläche zu prüfen.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-043: Anwendungskonfiguration für `fx8forms` abgeleitet
 
@@ -315,6 +350,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Doku nennt keine Klasse einer AppFactory. Das Beispiel `OrderApp` im Testmodul verwendet `FakeUiFactory`. Die Klasse für JavaFX (`org.modellwerkstatt.fx8forms.windows.FX8UiFactory`) habe ich im generierten Code der MoWare-Bibliothek gesucht. Nachbarprojekte auf dieser Maschine (andere Anwendungen mit fertigen Konfigurationen) habe ich bewusst nicht als Vorlage gelesen, damit der Test der MoAI-Unterlagen nicht verfälscht wird.
 - **Annahme:** `FuhrparkAnwendung` bindet die drei Sections der Testkonfiguration ein und setzt `FX8UiFactory` als Instanz `consoleAppFactory`. `isAuthenticated` übernimmt den Benutzernamen und liefert `true`; eine Passwortprüfung gibt es in der Demo nicht.
 - **Ausgang:** Das AppUI-Modul `MjFuhrpark` ist fehlerfrei, die Run-Konfiguration `MjFuhrpark` startet einen JavaFX-Prozess ohne Fehlerausgabe. Ob Anmeldung, Menü und Masken funktionieren, kann ich nicht sehen; das prüft der Nutzer (T027, T042).
+- **Stand:** zurückgestellt (siehe P-010; Nutzer, 2026-10-06: Die Beispielkonfigurationen in `org.modellwerkstatt.dataux.tests` werden später aufgeräumt; danach übernimmt der Agent Konfigurationen von dort. Bis dahin keine Doku-Änderung)
 
 ## P-044: Suche aktualisiert sich nach dem Bearbeiten nicht von selbst
 
@@ -322,6 +358,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Nach `Fahrzeug oeffnen` oder `Fahrzeug anlegen` müsste die Trefferliste neu geladen werden. Dafür ist ein Termination Handler an der Page nötig; ob darin `page Suche` zulässig ist, sagt die Doku nicht.
 - **Annahme:** Vorerst lädt der Benutzer mit „Suchen“ neu.
 - **Ausgang:** Erledigt am 2026-10-05: Ein Termination Handler (`AnyCmdTerminated`) an der Page `Suche` ruft die Suche erneut auf; ein `page`-Statement war nicht nötig. Die Prüfung akzeptiert den Komponentenaufruf im Handler. Ob die Tabelle in der Oberfläche tatsächlich neu zeichnet, prüft der Nutzer.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-045: UI-Konventionen fehlten, zwei nachgetragen
 
@@ -329,7 +366,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Für Oberflächen gab es keine Konvention. Ich habe deshalb keine Page Titles gesetzt (optional im Konzept, die Prüfung meldet nichts, das Beispiel `GO` hat keine) und die Fahrzeugansicht links/rechts aufgeteilt. Die Suche habe ich mit einer statt zwei Pages gebaut, weil die Doku das Zwei-Page-Muster nur als Beispiel zeigt.
 - **Annahme:** keine
 - **Ausgang:** Der Nutzer hat am 2026-10-05 zwei Konventionen vorgegeben, ich habe sie auf seine Anweisung in `moai/` erfasst; das Submodul verwaltet er selbst. Angewendet am selben Tag: Alle sechs Pages haben einen Page Title (`dynamicPageTitle` als formatierter String, bei `Fahrzeug oeffnen` mit Marke und Modell). `FahrzeugAnsicht` stellt Formular und Kilometerstand-Tabelle untereinander. Die Formulare bleiben zwei- beziehungsweise dreispaltig; ob die Konvention auch das meint, ist offen. 11 von 11 Tests grün.
-
+- **Stand:** erledigt (bereits im Lauf als Konvention in `conventions/moware-werkbank-ui_v1.md` aufgenommen: Page Title und keine Links-rechts-Aufteilung; Commit „ui conventions 1“)
 
 ## P-046: Menüaktion nicht im Overflow-Menü
 
@@ -337,6 +374,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Doku sagt es, als Empfehlung („üblicherweise“). Ich habe es an zwei Stellen befolgt (Fahrzeugansicht, Menü der Suchseite) und `Fahrzeug oeffnen` in der Ergebnistabelle direkt auf die oberste Ebene gesetzt, ohne das abzuwägen. Im Hauptmenü des AppUI-Moduls stehen die Actions ebenfalls direkt, wie im Beispiel `OrderApp`.
 - **Annahme:** Die Hauptaktion der Tabelle gehört auch ins Submenü; Doppelklick und Enter finden sie dort laut Doku trotzdem.
 - **Ausgang:** `Fahrzeug oeffnen` steht jetzt im Submenü „Aktionen“ der Tabelle. Vorschlag: als Konvention aufnehmen, weil „üblicherweise“ einen Agenten nicht bindet, und dabei festlegen, ob das Hauptmenü der Anwendung ausgenommen ist.
+- **Stand:** erledigt (bereits im Lauf als Konvention in `conventions/moware-werkbank-ui_v1.md` aufgenommen: Overflow-Menü, Hauptaktion der Tabelle im Submenü; Commit „ui conventions 1“)
 
 ## P-047: Oberstes Submenü darf keinen Text haben
 
@@ -344,6 +382,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Ich hatte den drei obersten Submenüs den Text „Aktionen“ gegeben, wie es der Blueprint vormacht. Laut Nutzer darf das Submenü auf oberster Ebene (das Overflow-Menü) keinen Text tragen. Die Doku sagt dazu nichts; `label` ist im Konzept optional.
 - **Annahme:** keine
 - **Ausgang:** Am 2026-10-05 an allen drei Stellen entfernt (Fahrzeugansicht, Suchseite, Ergebnistabelle). Der Blueprint führt hier in die Irre; die Regel gehört in die UI-Konvention oder in die Doku. Am selben Tag als dritte Konvention in `moai/conventions/moware-werkbank-ui_v1.md` aufgenommen (Overflow-Menü, oberstes Submenü ohne Text); damit ist auch der Vorschlag aus P-046 umgesetzt.
+- **Stand:** erledigt (Blueprint `menu-submenu-subtree.json` in `moai:dataux-dsl`: Kind `label` entfernt)
 
 ## P-048: Gesperrter Command im Test wirft `RuntimeException`, und `FAIL IN` meldet es missverständlich
 
@@ -351,6 +390,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Doku sagt nicht, was `run command` tut, wenn `generally enabled` des Commands nicht erfüllt ist. Ich hatte `FAIL IN OFXJobWorkCanceledException` erwartet. Der Lauf meldete „Fail In Exception OFXJobWorkCanceledException was NOT catched!“, also dieselbe Meldung wie bei ausbleibender Ausnahme. Daraus und aus dem unveränderten Datensatz habe ich fälschlich geschlossen, der Command werde stillschweigend übersprungen, und das dem Nutzer auch so gemeldet. Erst ohne `FAIL IN` zeigte sich die wahre Ursache: `RuntimeException: Command … can not be started. Enabled condition of command not fulfilled.`
 - **Annahme:** `FAIL IN RuntimeException` für diesen Fall.
 - **Ausgang:** Test grün (12 von 12). AC-3.3 und AC-3.4 sind damit über die Commands geprüft: Ein Abbruch durch eine verletzte Precondition im Edit-Command speichert nichts, und bei einem ausgeschiedenen Fahrzeug lässt sich der Edit-Command nicht starten. Die Doku sollte das Verhalten nennen; die Meldung von `FAIL IN` sollte die tatsächlich geworfene Ausnahme zeigen.
+- **Stand:** in Arbeit (Generatorfehler, Nutzer fixt ihn am 2026-10-06: Template `reduce_FailInException` in `javaext@generator`, der `catch (Throwable t)`-Zweig setzt `__FailIn_origThrowable` nicht, deshalb greift im `finally` der Zweig „was NOT catched!“ statt „was not catched, instead …“. Keine Doku-Änderung)
 
 ## P-049: Sortierung der Trefferliste
 
@@ -358,6 +398,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** keine; `sortBy` ließ sich nach der Doku ergänzen.
 - **Annahme:** Sortiert wird nach normiertem Kennzeichen, dann Marke, dann Modell.
 - **Ausgang:** Fehlerfrei, Tests grün. Die Reihenfolge selbst prüft kein Test.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-050: Regel über zwei Aggregate ohne Use-Case-Bereich
 
@@ -381,6 +422,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Für `Zuordnung.lenker` brauchte ich `ReferenceMapping` und `refJoin`; die Blueprints des Skills zeigen `refJoin` nicht. Offen ist außerdem, ob eine Repository-Methode einer read-only geladenen Entity eine Liste zuweisen darf (`fahrzeug.zuordnungen = …` in `get`); die Doku nennt die Zuweisung als üblichen Weg, sagt aber auch, dass Setter einer read-only Entity eine Ausnahme werfen.
 - **Annahme:** `ReferenceMapping` mit `keyMapping` auf `Lenker.id`; Zuordnungen in einer zweiten Abfrage mit `refJoin` auf `MapLenker` laden und der Property zuweisen; kein `ListMapping` für die Zuordnungen, weil kein `listJoin` gebraucht wird.
 - **Ausgang:** Am 2026-10-05 bestätigt: Test `zuordnungSpeichernUndLaden` grün. `ReferenceMapping` speichert den Fremdschlüssel, die zweite Abfrage mit `refJoin` lädt Zuordnungen samt Lenker, und die Zuweisung an die read-only geladene Entity funktioniert.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-053: Doku-Lücke: Repository-Methode darf einer read-only Entity eine Liste zuweisen
 
@@ -388,6 +430,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Doku sagt einerseits, Listen würden „mit separaten Abfragen geladen, deren Ergebnis der Property explizit zugewiesen wird“, andererseits, dass der Setter einer read-only geladenen Entity `OFXIllegalAccessException` wirft. Ob die Zuweisung in einer `READONLY`-Repository-Methode erlaubt ist, steht nirgends (siehe P-052).
 - **Annahme:** erlaubt
 - **Ausgang:** Vom Nutzer am 2026-10-05 bestätigt: Eine Repository-Methode darf einer read-only geladenen Entity eine Liste zuweisen. **Das ist in die Doku aufzunehmen** (ManMap, „Explizites Laden“, mit Verweis aus dem Read-only-Abschnitt). Im Testlauf bestätigt: `FahrzeugRepo.get` weist `zuordnungen` zu, alle Tests grün.
+- **Stand:** erledigt (`manmap.md` „Explizites Laden“: Zuweisung auch bei read-only geladener Entity zulässig, Laden durch eine Repository-Methode gilt nicht als Änderung; Verweis darauf aus „Read-only, Checkout und Session-Identität“)
 
 ## P-054: Tabelle `ZUORDNUNG` fehlt, Run-Konfigurationen waren verschwunden
 
@@ -395,6 +438,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Nach der Meldung „Schema erstellt“ gibt es `LENKER`, aber keine Tabelle `ZUORDNUNG`. Außerdem war die Run-Konfiguration `FahrzeugTests` nicht mehr vorhanden (vermutlich nach einem Neustart von MPS; über MCP angelegte Konfigurationen sind offenbar nicht dauerhaft).
 - **Annahme:** Die Run-Konfigurationen lege ich bei Bedarf neu an. Das Schema erzeuge ich nicht selbst.
 - **Ausgang:** Der Nutzer hat `ZUORDNUNG` am 2026-10-05 angelegt (MariaDB: `ID` als `auto_increment`, Datumsspalten als `timestamp`). Danach `FahrzeugTests` 12 von 12 grün. Die Run-Konfigurationen lege ich nach einem Neustart von MPS neu an.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-055: Zwei Services `TestDaten` in verschiedenen Modellen
 
@@ -411,6 +455,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** keine neue Unklarheit; alle Bausteine (Methoden an Entities, `validation`, Status aus zwei Deklarationen, `refJoin`) waren aus 001 oder aus dem Testmodul bekannt.
 - **Annahme:** „Laufend“ heißt ohne Ende oder mit Ende nach dem heutigen Serverdatum (FR-008, FR-017).
 - **Ausgang:** `FahrzeugTests` 15 von 15, `LenkerTests` 3 von 3. Abgedeckt: AC-2.1 bis AC-2.6, AC-3.1 bis AC-3.4, AC-3.6, AC-4.1 bis AC-4.3, Zuordnung für einen Tag, Stilllegung mit Zuordnung, Entfernen. Noch ohne Test: die Sperre „Poolfahrzeug bei laufender Zuordnung“, AC-3.5 mit echten Zuordnungen, AC-4.4, sowie alles über Commands.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-057: Lenker- und Zuordnungs-Commands ohne Nacharbeit
 
@@ -418,6 +463,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Neu waren der `Reference`-Delegate mit `scopeText`, `#Meta.setScope` für die Lenker-Auswahl, eine Tabellenspalte über einen Pfad (`lenker.anzeigename` als `PathDot`), Edit-Commands mit zwei Selektionsparametern (`Fahrzeug`, `Zuordnung`) und ein `SEARCH_CMD` mit Parameter (Lenkerauskunft). Der Blueprint `reference-delegate-subtree.json` und das Beispiel-Page-Pane reichten als Vorlage.
 - **Annahme:** `Lenker ausscheiden` liest die Zuordnungen des Lenkers ohne `refJoin` und die Fahrzeugdaten über eine eigene Methode `getStammdaten`, damit der in derselben Session ausgecheckte Lenker nicht ein zweites Mal als read-only Referenz geladen wird (die Doku nennt für diesen Fall eine `IllegalStateException`).
 - **Ausgang:** Alle Roots beim ersten Versuch fehlerfrei; `LenkerTests` 4 von 4, `FahrzeugTests` 16 von 16 nach vollständigem Rebuild. Über Commands geprüft: Lenker anlegen, suchen, ändern, ausscheiden, reaktivieren; Zuordnung beenden, neu zuordnen, entfernen (mit Löschen in der Datenbank); Lenkerauskunft; Ablehnung von „Lenker ausscheiden“ bei laufender Zuordnung (AC-3.5). In der Oberfläche ungeprüft: Lenker-Auswahl, Verlaufstabelle, Menüs.
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-058: Was in 002 ohne Test bleibt
 
@@ -425,7 +471,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** keine
 - **Annahme:** keine
 - **Ausgang:** Am 2026-10-05 nachgezogen: Test `zuordnungSperrenUndEnddatum` deckt die Poolfahrzeug-Sperre, das Ändern eines gesetzten Enddatums und AC-4.4 ab (`FahrzeugTests` 17 von 17). Ohne automatischen Test bleibt FR-019 (Rollen), weil alle Tests als `leiter` laufen. Der Disponent kann Zuordnungen über `Fahrzeug oeffnen` ansehen, einen Lenker aber nur in der Trefferliste; Entscheidung des Nutzers offen.
-
+- **Stand:** kein moai-Thema (betrifft nur das Fuhrpark-Projekt beziehungsweise den Lauf selbst)
 
 ## P-059: Abgleich der Edge Cases gegen die Tests
 
@@ -435,6 +481,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Ausgang:** Alle 13 Edge Cases aus 001 und alle 10 aus 002 sind durch einen Test oder durch den Aufbau abgedeckt (kein `delete` für Fahrzeug und Lenker). Lücken, die bleiben:
   - 001 AC-1.4 (fehlende Fahrzeugklasse): nicht herstellbar, weil jede Statusdeklaration einen Startwert braucht (P-011). Spec oder Modell muss angepasst werden; Entscheidung des Nutzers.
   - 001 AC-5.5 (Verlauf nach Datum geordnet): Die Kilometerstände kommen über `listJoin` ohne Sortierung; in den Tests stimmt die Reihenfolge, garantiert ist sie nicht. Für `listJoin` nennt die Doku keine Sortierung der Kindliste.
+  - **Stand (P-059, Sortierung):** geklärt am 2026-10-06: `sortBy` auf ein Feld des `listJoin`-Kind-Mappings erzeugt `ORDER BY iKilometerstand_0.ID ASC` (vom Nutzer in `FahrzeugRepo.checkout` gezeigt); ebenso `sortBy` auf ein `refJoin`-Feld und auf das Wurzel-Mapping. Mein erster Versuch war falsch ausgewertet: Ich hatte die generierte Abfrage der Originalmethode `get` statt die der geklonten Methode gelesen. Die Kindliste ist also sortierbar. Erledigt: `manmap.md`, Zeile `listJoin` in der Tabelle der Query-Konzepte nennt das `sortBy` auf ein Feld des Kind-Mappings
   - 001 negativer Kilometerstand: Regel modelliert, nicht getestet.
   - 001 AC-2.6 und FR-014, 002 Auswahl und Verlauf: nur in der Oberfläche prüfbar.
   - 001 FR-024 und 002 FR-019 (Rollen): nur in der Oberfläche prüfbar.
@@ -478,6 +525,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Doku nennt das Gewicht `-1` (`MinWeight`) nur in der Aufzählung der Gewichte und als Möglichkeit („ein kompaktes Suchformular oberhalb einer flexiblen Ergebnistabelle“). Eine Regel, dass ein Formular im Grid die minimale Höhe bekommt, steht nicht da; der Blueprint verwendet `1*`. Ich hatte den Formularen `1*` beziehungsweise `2*` gegeben, sie nahmen also unnötig Höhe ein.
 - **Annahme:** keine
 - **Ausgang:** Vom Nutzer am 2026-10-05 als vierte UI-Konvention vorgegeben und in `moai/conventions/moware-werkbank-ui_v1.md` eingetragen: Ein `Delegate Form` im `Grid Layout` hat immer das Zeilengewicht `-1`. Angewendet auf `FahrzeugSuche`, `LenkerSuche` und `FahrzeugAnsicht`; andere Page Panes haben kein Grid. Wirkung nur in der Oberfläche prüfbar.
+- **Stand:** erledigt (bereits im Lauf als Konvention in `conventions/moware-werkbank-ui_v1.md` aufgenommen: Zeilengewicht `-1` für `Delegate Form` im `Grid Layout`; Commit „ui conventions 1“)
 
 ## P-062: Disponent sieht die Lenker-Einzelansicht über `CAN_OPEN_RO`
 
@@ -493,6 +541,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Die Doku führt `LABEL` als Option auf, sagt aber nicht, dass eine Tabelle eine Beschriftung haben soll; der Blueprint setzt keine. Ich hatte keiner der vier Tabellen ein Label gegeben. In der Fahrzeugansicht stehen zwei Tabellen untereinander, ohne dass erkennbar ist, welche die Kilometerstände und welche die Zuordnungen zeigt.
 - **Annahme:** Die Doku verbietet `LABEL` am obersten Element eines Page Pane (dort gilt der Page Title); diese Ausnahme habe ich in den Konventionstext übernommen.
 - **Ausgang:** Vom Nutzer am 2026-10-05 als fünfte UI-Konvention vorgegeben und in `moai/conventions/moware-werkbank-ui_v1.md` eingetragen. Angewendet: „Gefundene Fahrzeuge“, „Kilometerstände“, „Zuordnungen“, „Gefundene Lenker“. Prüfung und Make ohne Fehler; Wirkung nur in der Oberfläche prüfbar.
+- **Stand:** erledigt (bereits im Lauf als Konvention in `conventions/moware-werkbank-ui_v1.md` aufgenommen: `LABEL` an Tabellen; Commit „ui conventions 1“)
 
 ## P-064: Beschriftung und Hotkey der Conclusions nicht geregelt
 
@@ -500,6 +549,7 @@ Format je Eintrag: **Stelle** (Datei, Skill, Tool), **Unklar/Problem**, **Annahm
 - **Unklar/Problem:** Wie die Default-Conclusion je Command-Typ heißt und welchen Hotkey sie bekommt, stand nirgends. Ich hatte eigene Labels gewählt („Speichern“, „Suchen“, „Uebernehmen“ in `FuhrparkRessourcen`).
 - **Annahme:** keine; Vorgabe des Nutzers vom 2026-10-05.
 - **Ausgang:** Zwei Konventionen in `moai/conventions/moware-werkbank-ui_v1.md` ergänzt: Default-Conclusion mit `F12`, Beschriftung „OK“ (`GRAPH_EDIT_CMD`), „Aktualisieren“ (`SEARCH_CMD`), „Speichern & Schließen“ (`GRAPH_OWNER_CMD`); im Wizard „Zurück“ `F3` und „Weiter“ `F4` für den Page-Wechsel. Meine Auslegung: „Wizard“ = Command mit mehreren nacheinander durchlaufenen Pages; `GRAPH_OWNER_CMD(modal)` zählt wie `GRAPH_OWNER_CMD`. Angewendet über die drei Labels in `FuhrparkRessourcen`: `Speichern` → `SpeichernUndSchliessen` („Speichern & Schließen“), `Suchen` → `Aktualisieren`, `Uebernehmen` → `Ok` („OK“), alle mit Hotkey `F12` an der `LabelSpecification`. Jedes Label wurde schon vorher nur von einem Command-Typ verwendet, daher war keine Änderung an den Commands nötig. Einen Wizard gibt es in der Anwendung nicht. Make erfolgreich, `FahrzeugTests` 17/17 und `LenkerTests` 4/4 grün; in der Oberfläche nicht geprüft. Nachtrag (Nutzer, 2026-10-05): `Lenkerauskunft` ist eine Ausnahme, die Conclusion heißt dort „Suchen“ (neues Label `Suchen` mit `F12`). Die Ausnahme steht in der Konvention; ihre allgemeine Fassung („`SEARCH_CMD` ohne Trefferliste, der eine einzelne Auskunft liefert“) ist meine Formulierung.
+- **Stand:** erledigt (bereits im Lauf als Konvention in `conventions/moware-werkbank-ui_v1.md` aufgenommen: Default-Conclusion mit `F12`, Beschriftungen, Wizard `F3`/`F4`; Commit „ui conventions 1“)
 
 ---
 

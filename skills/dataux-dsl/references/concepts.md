@@ -41,7 +41,7 @@ See [binding and selection](../../../docu/dataux.md#datenbindung-und-selektion),
 
 | Concept | Shape | Use |
 | --- | --- | --- |
-| `LocalPropertyReference` | required `property` reference | Direct property in the current binding context |
+| `DuxLocalPropertyReference` | required `property` reference | Direct property in the current binding context |
 | `PathDot` | required `operand: IPath [1]`, `operation: IPathOperation [1]` | Nested property navigation |
 | `OperationPropertyReference` | required `property` reference | Ordinary property after a dot |
 | `LocalSpecialPropertyReference` | required `property` reference | Direct special/virtual property |
