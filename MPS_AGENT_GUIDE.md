@@ -84,6 +84,7 @@ Inspection of generated code is allowed when:
 - Use MPS MCP tools whenever available; do not hand-edit `.mps` files as plain XML.
 - Resolve nodes, concepts, models, and modules precisely before editing.
 - Validate after structural changes using `mps_mcp_check_root_node_problems` on each changed root.
+- Errors must be fixed. Warnings and infos can come from the MoWare Werkbank or BaseLanguage itself and are to be ignored; do not change a model to silence them.
 - Rebuild or regenerate after significant changes to keep generated artifacts consistent.
 
 Use the `moai:mps-mcp-workflow` skill for complete guidance on MPS workflows, skills, available tools, and best practices.

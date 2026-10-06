@@ -129,6 +129,8 @@ Anders als bei standard Java-Klassen werden die Properties von Datenstrukturen i
 | Value Object | `null` |
 | Referenz auf Entity oder DTO | `null`; bei geladenen Objekten, deren Referenz nicht mitgeladen wurde, siehe [Explizites Laden](manmap.md#explizites-laden) |
 
+Auch ein geladener `string` ist nie `null`: Für `NULL` in einer String-Spalte liefert ManMap den leeren String.
+
 `null` soll ausdrücklich „kein Wert vorhanden“ bedeuten und nicht als Ersatz für einen regulären Zustand dienen; initialisierte Werte werden nicht vorsorglich durch `null` ersetzt. Value Objects, Datum/Zeit und Referenzen müssen vor der Verwendung explizit gesetzt oder auf `null` geprüft werden. Wie die Oberfläche leere Eingaben behandelt, beschreibt DataUX unter [Pflichtwerte, leere Eingaben und `null`](dataux.md#pflichtwerte-leere-eingaben-und-null).
 
 `==` und `!=` werden je nach Typ unterschiedlich übersetzt. Null-sicher heißt dabei: Zwei `null`-Werte gelten als gleich, genau ein `null`-Wert als ungleich. Maßgeblich ist folgende Regel:
