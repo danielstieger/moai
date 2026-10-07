@@ -173,7 +173,7 @@ Für das vereinfachte Beispiel müssen Mengen positiv und Einzelpreise nicht neg
 
 Eine `Persistence Description` enthält die Mappings für `Rechnung` und `Rechnungsposition`. Die Positionstabelle besitzt eine Zuordnung zur jeweiligen Rechnung.
 
-Zwei Repositories kapseln die Datenbankzugriffe. Das `RechnungsRepo` lädt und speichert das Aggregat Rechnung; das `RechnungsLeseRepo` enthält die Abfragen, die nur lesen. Nach den Konventionen für den Aufbau einer Anwendung liegt das erste im `domain`-Modell des Bereichs `rechnung`, das zweite in dessen `read`-Modell.
+Zwei Repositories kapseln die Datenbankzugriffe. Das `RechnungsRepo` lädt und speichert das Aggregat Rechnung; das `RechnungsLeseRepo` enthält die Abfragen, die nur lesen. Nach den [Konventionen für den Aufbau einer Anwendung](../conventions/moware-werkbank-modularisierung_v1.md) liegt das erste im `domain`-Modell des Bereichs `rechnung`, das zweite in dessen `read`-Modell.
 
 | Repository          | Beispielhafte Methode        | Aufgabe                                                                                                                                                                       |
 | ------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -313,6 +313,10 @@ Die Detaildokumentationen beschreiben Konzepte, Möglichkeiten, Einschränkungen
 | `org.modellwerkstatt.manmap` | [manmap.md](manmap.md) | ausgearbeitet |
 | `org.modellwerkstatt.objectflow` | [objectflow.md](objectflow.md) | ausgearbeitet |
 | `org.modellwerkstatt.dataux` | [dataux.md](dataux.md) | ausgearbeitet |
+
+### Verbindliche Konventionen
+
+Die Dokumentation beschreibt, was die Sprachen können. Wie eine Anwendung das verwenden muss, legen die verbindlichen Konventionen unter `conventions/` fest: [Aufbau einer Anwendung](../conventions/moware-werkbank-modularisierung_v1.md), [Benutzeroberflächen](../conventions/moware-werkbank-ui_v1.md), [Tests](../conventions/moware-werkbank-tests_v1.md) und [allgemeine Konventionen](../conventions/moware-werkbank-konventionen_v1.md).
 
 ## Stand der Dokumentation
 
