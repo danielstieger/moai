@@ -4,29 +4,10 @@
 
 Die Session eines Tests wird am Testende nicht committet. Testdaten, die für einen Test in der Datenbank stehen müssen, werden deshalb über eine eigene Custom Session angelegt und dort committet.
 
-- **KONVENTION:** Das Modell `<firma>.<app>.testbase` enthält den Service `CS` mit den Methoden `CREATE()` und `COMMIT()`. `CREATE()` erzeugt eine neue Custom Session; `COMMIT()` startet mit `startTransactionAndFlush()` eine Transaktion auf der Session des aktuellen Kontexts, führt die registrierten Session-Operationen aus und committet.
+- **KONVENTION:** Der Service `CS` aus der Solution `org.modellwerkstatt.wbkit` hat die Methoden `CREATE()` und `COMMIT()`. `CREATE()` erzeugt eine neue Custom Session; `COMMIT()` startet mit `startTransactionAndFlush()` eine Transaktion auf der Session des aktuellen Kontexts, führt die registrierten Session-Operationen aus und committet. Die Anwendung legt `CS` nicht selbst an.
 - **KONVENTION:** Alle Methoden zum Anlegen von Testdaten liegen im Service `TestDaten` des jeweiligen `tests`-Modells. Eine solche Methode baut den Objektgraphen auf, registriert das Speichern mit `session operation add` und schließt mit `#CS.COMMIT()` ab.
 - **KONVENTION:** Der Test ruft Methoden zum Anlegen von Testdaten mit `#+ with #CS.CREATE()` auf. Innerhalb der Methode ist `session` damit die Custom Session; die Session des Tests bleibt unberührt.
 - **KONVENTION:** Persistierte Ergebnisse werden in einer frischen Custom Session zurückgelesen, etwa `#+ with #CS.CREATE() RechnungsRepo.get(id)`.
-
-```objectflow
-component CS
-
-  @Autowired()
-  private IOFXApplicationFactory appFactory;
-
-  public IOFXSession CREATE() {
-    return appFactory.createNewSession(session.getUserEnvironment(), session.getUserServices());
-  }
-
-  public void COMMIT() {
-    try {
-      session.startTransactionAndFlush();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-```
 
 ```objectflow
 component TestDaten
