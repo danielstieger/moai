@@ -1,6 +1,6 @@
 # Concept and Link ID Reference Tables
 
-Frequently needed `MetaAdapterFactory` hex IDs and persistent node refs. Use for `LINKS`/`CONCEPTS` constants, `replace_node_child` blueprints, and `SNodeType` / `RefConcept_Reference` targets.
+Frequently needed `MetaAdapterFactory` hex IDs and persistent node refs. Use for `LINKS`/`CONCEPTS` constants, `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`) blueprints, and `SNodeType` / `RefConcept_Reference` targets.
 
 ## BaseLanguage structure concepts and links (hex IDs)
 
@@ -33,10 +33,10 @@ Use as `target` in `SNodeType.concept`, `RefConcept_Reference.conceptDeclaration
 | `Type` (BaseLanguage) | `r:00000000-0000-4000-0000-011c895902ca(jetbrains.mps.baseLanguage.structure)/1068431790189` |
 | `Expression` (BaseLanguage) | `r:00000000-0000-4000-0000-011c895902ca(jetbrains.mps.baseLanguage.structure)/1068431790191` |
 | `Classifier` (BaseLanguage) | `r:00000000-0000-4000-0000-011c895902ca(jetbrains.mps.baseLanguage.structure)/1107461130800` |
-| `SequenceType` | `c:83888646-71ce-4f1c-9c53-c54016f6ad4f/1151689724996` |
-| `ListType` | `c:83888646-71ce-4f1c-9c53-c54016f6ad4f/1151688443754` |
-| `ListCreatorWithInit` | `c:83888646-71ce-4f1c-9c53-c54016f6ad4f/1160600644654` |
-| `SNodeType` | `c:7866978e-a0f0-4cc7-81bc-4d213d9375e1/1138055754698` |
+| `SequenceType` | `r:00000000-0000-4000-0000-011c8959032e(jetbrains.mps.baseLanguage.collections.structure)/1151689724996` |
+| `ListType` | `r:00000000-0000-4000-0000-011c8959032e(jetbrains.mps.baseLanguage.collections.structure)/1151688443754` |
+| `ListCreatorWithInit` | `r:00000000-0000-4000-0000-011c8959032e(jetbrains.mps.baseLanguage.collections.structure)/1160600644654` |
+| `SNodeType` | `r:00000000-0000-4000-0000-011c89590301(jetbrains.mps.lang.smodel.structure)/1138055754698` |
 | `AbstractCatchClause` | find via `mps_mcp_search_concepts "AbstractCatchClause"` |
 | `VariableReference` | find via `mps_mcp_search_concepts "VariableReference"` |
 | `BaseAssignmentExpression` | find via `mps_mcp_search_concepts "BaseAssignmentExpression"` |
@@ -44,5 +44,4 @@ Use as `target` in `SNodeType.concept`, `RefConcept_Reference.conceptDeclaration
 | `TryUniversalStatement` | find via `mps_mcp_search_concepts "TryUniversalStatement"` |
 | `StatementList` | find via `mps_mcp_search_concepts "StatementList"` |
 
-> For any concept not listed above: use `mps_mcp_search_concepts` to find its declaration,
-> then `mps_mcp_print_node` (shallow) on the result to get the persistent node ref.
+> For any concept not listed above: `mps_mcp_search_concepts` / `mps_mcp_get_concept_details` return the declaration's node ref in `sourceNode` — no `print_node` needed.

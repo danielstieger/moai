@@ -13,17 +13,17 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 - Use the packaged solution `org.modellwerkstatt.dataux.tests` for stable examples. Its verified model and node references are in [references/sandbox.md](references/sandbox.md).
 - Use the package documentation for semantics and runtime behavior; start with the [ObjectFlow scope](../../docu/objectflow.md#modellierungsumfang-und-ausdrucksmöglichkeiten) and the [MoWare responsibility map](../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin).
 - Determine the active MPS target dynamically with `mps_mcp_list_open_projects`. Never persist a project path, editor-session state, or references from an application project.
-- For targets outside the packaged solution, use explicit placeholders such as `TARGET_OFX_CONFIG`, then resolve them in the destination model before writing.
+- For targets outside the packaged solution, use explicit placeholders such as `TARGET_OFX_CONFIG`, then resolve them before writing. `OFXConfig`s live in `<firma>.<app>.base`; the destination model imports that model and references the config, it never holds its own copy. [Model layering](../../conventions/moware-werkbank-modularisierung_v1.md#solutions-und-modelle)
 
 ## Critical rules
 
-- Use MPS MCP tools; never hand-edit serialized `.mps` or `.mpl` XML.
+- Use MPS MCP tools; never read or edit raw `.mps` / `.mpl` XML (rule and fallback: [`MPS_AGENT_GUIDE.md`](../../MPS_AGENT_GUIDE.md#never-read-raw-mps-model-files)).
 - Query concepts with `mps_mcp_get_concept_details` and `l:ec097fca-5b84-41f2-847d-6a5690cae277:org.modellwerkstatt.objectflow`, not the module-style reference.
 - Use fully qualified concept names in JSON blueprints.
 - Prefer a root skeleton followed by surgical `ADD CHILD` operations for large or uncertain roots.
 - Dry-run JSON first and inspect warnings. After real changes, run `mps_mcp_check_root_node_problems` on each changed root; build or generate when the task requires it.
 - Never infer that a successful insert is semantically valid.
-- Keep domain methods free of repository/service `OperationCall`s; load facts first and coordinate infrastructure in a service or command. See [Services and domain logic](../../docu/objectflow.md#service-komponenten).
+- Keep domain methods free of repository/service `OperationCall`s; load facts first and coordinate infrastructure in a service or command. See [Methods on data structures](../../docu/objectflow.md#methoden-an-datenstrukturen).
 - Validate all expected business failures before mutating a graph. See [Preconditions, validation, guards, and exceptions](../../docu/objectflow.md#preconditions-validation-guards-und-exceptions).
 - Treat Value Objects immutably and use their selected equality properties deliberately. See [Entity, Value Object, and DTO](../../docu/objectflow.md#entity-value-object-und-dto) and [Value Object equality](../../docu/objectflow.md#value-object-gleichheit).
 - Choose the comparison operator by type: `==` for `int`, `boolean`, `BigDecimal`, and Entities; `of` / `status switch` for Status; `:eq:` / `:ne:` for `string`, `LocalDate`, `DateTime`, Value Objects, and other non-DTO objects. `==` on a `string` compiles to `equals` but is no longer to be used; on the other `:eq:` types it compiles to an identity check. ManMap `where` filters accept only `==` / `!=`, for every type; see [filter expressions](../../docu/manmap.md#spezifikum---filterausdrücke-und-gemappte-felder). `==` on Entities compares the instance, which is unique per identity only for session-integrated Entities; otherwise compare keys. DTOs have no meaningful object comparison; compare individual properties. The "always `:eq:`" rule of `moai:mps-baselanguage` applies only to MPS nodes. See [comparison rules](../../docu/objectflow.md#null-werte-in-datenstrukturen).
@@ -46,7 +46,7 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 - Concept-tools language ref: `l:ec097fca-5b84-41f2-847d-6a5690cae277:org.modellwerkstatt.objectflow`
 - Structure model: `r:5abca60f-e29b-478e-90f5-405db58d17d2(org.modellwerkstatt.objectflow.structure)`
 - Packaged example solution: `3c6ef8ca-6366-4c8b-8839-0277eaca1f7e(org.modellwerkstatt.dataux.tests)`
-- ObjectFlow extends ManMap, BaseLanguage, and `jetbrains.mps.execution.util`. Load the [ManMap DSL skill](../manmap-dsl/SKILL.md) when persistence mappings, repository operations, or SQL are involved.
+- ObjectFlow extends ManMap, BaseLanguage, and `jetbrains.mps.execution.util`. Load the `moai:manmap-dsl` skill when persistence mappings, repository operations, or SQL are involved.
 
 ## Documentation map
 

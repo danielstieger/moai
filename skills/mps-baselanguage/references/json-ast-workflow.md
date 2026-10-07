@@ -15,33 +15,32 @@ Use this workflow when authoring non-trivial BaseLanguage code via JSON blueprin
 
 ## Recommended Workflow
 
-1. **Context**: load `mps-node-editing` and the `mps-baselanguage` references on concept-mapping + critical-rules.
+1. **Context**: load `moai:mps-node-editing` and the `moai:mps-baselanguage` references on concept-mapping + critical-rules.
 2. **Setup**: resolve/create the target module/model and verify dependencies.
 3. **Skeleton**:
-    * Create placeholder roots via `mps_mcp_create_root_node`.
-    * Insert a skeleton (signatures, fields, empty bodies) using `mps_mcp_update_root_node_from_json`.
+    * Insert the root with signatures, fields and empty bodies (`mps_mcp_insert_root_node_from_json`, or `mps_mcp_create_root_node` + `mps_mcp_update_root_node_from_json` once).
 4. **Harvest References**:
     * **Own members**: use `mps_mcp_print_node` on the skeleton to get persistent refs for constructors and methods.
     * **External members**: derive refs from the class ref using URL-encoded signatures (`stub-references.md`).
     * **Inherited methods**: use the declaring class ref for `baseMethodDeclaration`.
     * **Ambiguity**: use `GET_ASSIGNABLE_REFERENCES` (mode: `completion`) for overloaded/inherited members if name auto-resolution fails.
 5. **Patch & Apply**:
-    * Replace placeholder targets in your JSON with the harvested/derived persistent refs (especially for `ClassCreator` and `InstanceMethodCallOperation`).
-    * Apply the full AST using `mps_mcp_update_root_node_from_json` or `mps_mcp_update_node`.
+    * Replace placeholder targets in your member blueprints with the harvested/derived persistent refs (especially for `ClassCreator` and `InstanceMethodCallOperation`).
+    * Apply member by member with `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`). Never re-run `mps_mcp_update_root_node_from_json` after harvesting — it re-creates all children and invalidates the harvested refs (`moai:mps-node-editing`, `references/staged-construction.md`).
 6. **Final Validation**: `dryRun` → `mps_mcp_check_root_node_problems` → `MAKE`.
 
 ## Reference Rules
 
 * `ClassCreator.baseMethodDeclaration`: points to a **constructor**, not the class.
 * `InstanceMethodCallOperation.baseMethodDeclaration`: points to the **method declaration**.
-* **Stale refs**: re-harvest refs after significant root rewrites as identities may change.
+* **Stale refs**: a full-root rewrite (`mps_mcp_update_root_node_from_json`) re-creates all children; re-harvest afterwards.
 
 ## Practical Authoring Tips
 
 * Use fully qualified concept names in JSON.
 * Keep helper JSON-generation scripts outside the model.
 * If only one subtree changes, prefer `mps_mcp_update_node` over a full root rewrite to reduce reference churn.
-* Harvest refs from live AST with `mps_mcp_print_node` for own-class members; do not assume constructor or method identities are stable across rewrites.
+* Harvest refs from live AST with `mps_mcp_print_node` for own-class members; member identities do not survive a full-root rewrite.
 * For library stubs, derive persistent refs from the class ref using the URL-encoded signature formula; do not print stubs to harvest refs that can be computed.
 
 ## Checklist

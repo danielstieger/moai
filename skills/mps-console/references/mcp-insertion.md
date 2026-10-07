@@ -2,7 +2,7 @@
 
 Use this when the user asks you to **put code into the MPS Console**. The tool builds a command from a JSON blueprint and drops it into the Console tool window's input editor **as an editable, unexecuted command** — the user reviews, edits, and runs it (Ctrl+Enter). After a successful insert the Console tool window is focused and the inserted node selected. Requires the MPS Console plugin to be enabled.
 
-The blueprint uses the **same node format** as `mps_mcp_insert_root_node_from_json` — see `mps-node-editing`. The command's languages and model imports are added to the console model automatically. Inline JSON up to 4 KB, or an absolute path to a file in the system temp directory.
+The blueprint uses the **same node format** as `mps_mcp_insert_root_node_from_json` — see `moai:mps-node-editing`. The command's languages and model imports are added to the console model automatically. Inline JSON up to 4 KB, or an absolute path to a file in the system temp directory.
 
 ## The two accepted shapes
 
@@ -84,8 +84,7 @@ All of the following pass `dryRun` and insert cleanly against a live MPS.
 | `#make` / `#clean` / `#removeGenSources` / `#show` | `…console.ideCommands.structure.Make` / `Clean` / `RemoveGenSources` / `ShowExpression` |
 | `#stat` / `#showGenPlan` / `#showBrokenRefs` | `…console.ideCommands.structure.StatCommand` / `ShowGenPlan` / `ShowBrokenReferences` |
 | `#reloadClasses` | `…console.internalCommands.structure.ReloadClassesCommand` |
-| `forEach` (apply closure to each node) | `jetbrains.mps.baseLanguage.collections.structure.VisitAllOperation` (child `closure: Expression`) — use this for headless mutation |
-| `refactor` | `…console.scripts.structure.RefactorOperation` (child `closure: Expression`) — ⚠️ pops a modal confirm dialog; stalls `mps_mcp_run_console_command`, see `console-languages.md`. Prefer `forEach` for unattended edits |
+| `forEach` / `refactor` | `jetbrains.mps.baseLanguage.collections.structure.VisitAllOperation` / `…console.scripts.structure.RefactorOperation` (child `closure: Expression`) — which one to use: `console-languages.md`, section Scripts |
 
 ## Workflow
 
@@ -94,4 +93,4 @@ All of the following pass `dryRun` and insert cleanly against a live MPS.
 3. **Tell the user it is not executed** — they run it with Ctrl+Enter. Offer to insert a different command if they want to iterate.
 4. **Pass `projectPath`** whenever you know it, to avoid ambiguous-project errors. If the console plugin is disabled, ask the user to enable it.
 
-Building the smodel/collections expressions that go *inside* these blueprints (e.g. the `.where(…).forEach(…)` / `.refactor(…)` chain, closure literals) is the job of `mps-model-manipulation` and `mps-node-editing`.
+Building the smodel/collections expressions that go *inside* these blueprints (e.g. the `.where(…).forEach(…)` / `.refactor(…)` chain, closure literals) is the job of `moai:mps-model-manipulation` and `moai:mps-node-editing`.

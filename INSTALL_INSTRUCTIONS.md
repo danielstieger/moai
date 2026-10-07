@@ -26,11 +26,9 @@
 
 ## Rules
 
-- Do not modify any files below `moai/`. Anything your runtime additionally
-  needs for registration belongs in the application project, outside the
-  submodule.
-- Do not copy the MoAI skills as project-local skills and do not recreate
-  them. They are provided exclusively through the plugin.
+- The package boundary rules in `moai/TEMPLATE_PROJECT_AGENTS.md` ("MoAI
+  Package Boundary", "Skills") apply during installation as well: nothing is
+  written below `moai/`, nothing is copied out of it.
 - Do not overwrite existing instruction files (`AGENTS.md`, `CLAUDE.md` or
   similar); merge the content instead.
 - If a step requires a decision that cannot be derived from these
@@ -73,9 +71,8 @@
 
 - Reload the runtime or plugins if required for the changes to take effect,
   or state the required command or restart.
-- Confirm that the MoAI skills (`moai:objectflow-dsl`, `moai:manmap-dsl`,
-  `moai:dataux-dsl`, `moai:mps-mcp-workflow`) are
-  visible in your runtime.
+- Confirm that `moai:mps-mcp-workflow` is visible in your runtime, then that
+  every skill named in its skill table is visible as well.
 
 ## Final Report
 

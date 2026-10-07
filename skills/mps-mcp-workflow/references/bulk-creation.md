@@ -3,10 +3,7 @@
 ## Bulk Insert (Top-Level Array)
 
 - To insert multiple root nodes in one call, pass a **top-level JSON array** to `mps_mcp_insert_root_node_from_json`. All nodes are inserted atomically — if any node fails, the entire batch is rolled back.
-- Identify the existing nodes that will be referred to by the nodes to be created.
-- Include the IDs of these nodes in the JSON blueprint wherever they fit the role of target nodes.
-- For nodes that are created as part of the same bulk operation, you can use their **name** as a placeholder in the `target` field. The tool will automatically resolve these "local" references once all nodes are created.
-- If automatic resolution is not possible or desired, leave the target references empty and set them later with `mps_mcp_update_node` (`SET`/`REFERENCE`) once you have discovered the IDs of the newly created nodes.
+- Use `r:` refs for existing targets; for targets created in the same batch or later, see the forward-reference strategy in `moai:mps-node-editing` (`references/staged-construction.md`).
 
 ## Print-Shallow-Then-Add-Children Workflow
 

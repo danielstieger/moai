@@ -24,7 +24,7 @@ Workflow for inspecting an MPS language from a name (e.g. `jetbrains.mps.lang.co
 4. **Drill Down**:
     * **Declaration**: use the `sourceNode` reference with `mps_mcp_open_node` to open the definition.
     * **Examples**: use `mps_mcp_query_nodes` with `FIND_INSTANCES` (`sampleOnly: true`) to get a sample node. Then use `mps_mcp_print_node` to see its canonical JSON structure for use as a template.
-    * **Inheritance**: load the `mps-language-inheritance` skill for deeper hierarchy analysis.
+    * **Inheritance**: use `mps_mcp_query_structure` (`GET_ALL_SUPERCONCEPTS`, `GET_SUB_CONCEPTS`, `IS_SUBCONCEPT_OF`) for hierarchy analysis.
 
 ## Inspecting Concept Aspects
 
@@ -39,9 +39,8 @@ Use `mps_mcp_query_structure` with `LIST_CONCEPT_ASPECTS` to find associated def
 
 ## Related Skills
 
-- **`mps-language-inheritance`** — load when you need extended-language / superconcept / subconcept analysis.
-- **`mps-aspect-structure-concepts`** — load when defining or modifying concepts (not just reading them).
-- **`mps-language-aspects-overview`** — overview of which aspects exist and what each owns.
+- **`moai:mps-mcp-workflow`** — `references/finding-things.md` for resolving model, module, and language names before analysis.
+- **`moai:mps-node-editing`** — creating or editing nodes once the concepts are understood.
 
 ## Reference Index
 

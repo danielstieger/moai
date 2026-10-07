@@ -10,9 +10,7 @@
 
 **Zusammenwirken beider Zugriffsarten.** Beide Zugriffsarten werden in Repositories gekapselt und können innerhalb einer Anwendung kombiniert werden. Das Domänenmodell trägt die fachlichen Daten und ihr Verhalten und bildet die Grundlage für Änderungen. Lesemodelle stellen bedarfsgerecht aufbereitete Informationen bereit. Über enthaltene Identifikatoren kann bei Bedarf vom Lesemodell zum gezielten Laden der zugehörigen fachlichen Objekte übergegangen werden.
 
-### Schreibkonventionen
-
-Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der **Konzeptname** bezeichnet das technische AST-Konzept; der **FQ-Name** ist dessen vollständig qualifizierter Name. Die Kapitellandkarten führen alle drei Bezeichnungen zusammen; bei dort fehlenden Konzepten ergänzt der Fließtext beim ersten Auftreten den Konzeptnamen beziehungsweise bei Konzepten aus anderen Sprachen den FQ-Namen in Klammern und verwendet danach nur noch den Namen. Hat ein Konzept keine als Wort benennbare Projektion, wird sein Konzeptname verwendet. Umschreibungen und Kurzformen treten nicht an die Stelle von Projektion oder Konzeptname.
+Name, Konzeptname und FQ-Name folgen der [Bezeichnung der Konzepte](moware-werkbank.md#bezeichnung-der-konzepte) in der Werkbank-Dokumentation.
 
 ## Die zwei Zugriffswege im Überblick
 
@@ -57,7 +55,7 @@ Der Methodentyp beschreibt die Rolle der Methode im Lebenszyklus. Er ersetzt nic
 
 ### Read-only, Checkout und Session-Identität
 
-Ergebnisse von `QueryFromMap` werden in die Identity-Map der laufenden ObjectFlow-Session integriert. Wiederholte Read-only-Abfragen auf dieselbe Entity liefern innerhalb einer Session eine gecachte Entität; dabei wird dieselbe Objektinstanz verwendet. Wird allerdings versucht, eine bereits veränderbar geladene Entity erneut auszuchecken, wirft ManMap eine `IllegalStateException`; stattdessen ist die bereits in der Session vorhandene Instanz zu verwenden.
+Ergebnisse von `QueryFromMap` werden in die Identity-Map der laufenden ObjectFlow-Session integriert. Wiederholte Read-only-Abfragen auf dieselbe Entity liefern innerhalb einer Session eine gecachte Entität; dabei wird dieselbe Objektinstanz verwendet. Ein Treffer in der Session wird nur zurückgegeben, wenn die Abfrage read-only ist und die vorhandene Instanz read-only geladen wurde. In allen anderen Fällen wirft ManMap eine `IllegalStateException`: beim erneuten Auschecken einer bereits ausgecheckten Entity, bei einem read-only `get` auf eine ausgecheckte Entity und beim Auschecken einer bereits read-only geladenen Entity. Stattdessen ist die bereits in der Session vorhandene Instanz zu verwenden.
 
 Read-only schützt eine Entity nicht erst beim Speichern: Bereits eine Änderung oder das Löschen des Objekts ist unzulässig. Das Nachladen von Referenzen und Listen durch eine Repository-Methode ist davon ausgenommen (siehe [Explizites Laden](#explizites-laden)). Ein durch ein `nokeystore/read-only map` erzeugtes Ergebnis ist ebenfalls read-only, liegt selbst aber außerhalb der Session-Identity-Map; jede Abfrage liefert dafür neue Instanzen. Reguläre Entities, die ein `nokeystore/read-only map` über einen SQL-Join mitlädt, sind ebenfalls read-only, werden aber in die Session integriert: Eine dort schon vorhandene Instanz wird wiederverwendet; ist sie ausgecheckt, schlägt die Abfrage mit `IllegalStateException` fehl.
 
@@ -80,28 +78,43 @@ Ein `sql string` benennt einen wiederverwendbaren SQL-Text, der im gesamten Repo
 | `EmbeddedMapping` | `EmbeddedMapping` | `org.modellwerkstatt.manmap.structure.EmbeddedMapping` | Mappt Properties eines eingebetteten Value Objects. |
 | `ListMapping` | `ListMapping` | `org.modellwerkstatt.manmap.structure.ListMapping` | Beschreibt eine Listenbeziehung über ein Rückreferenz- oder Schlüsselmapping. |
 | `IncludeMapping` | `IncludeMapping` | `org.modellwerkstatt.manmap.structure.IncludeMapping` | Verwendet ein geeignetes bestehendes Mapping erneut. |
+| `MappedFieldRef` | `MappedFieldRef` | `org.modellwerkstatt.manmap.structure.MappedFieldRef` | Rückreferenz-Form eines `ListMapping`s: verweist auf das `ReferenceMapping` des Kindelements zurück zum Parent. |
+| `KeyOnlyReferenceMapping` | `KeyOnlyReferenceMapping` | `org.modellwerkstatt.manmap.structure.KeyOnlyReferenceMapping` | Schlüsselreferenz-Form eines `ListMapping`s: Die Kindtabelle trägt den Parent-Schlüssel ohne fachliche Rückreferenz. |
+| `KEY` | `KeyOption` | `org.modellwerkstatt.manmap.structure.KeyOption` | Markiert die Schlüssel-Property für Persistenzoperationen, falls nicht bereits an der ObjectFlow-Property markiert. |
+| `AUTOID` | `AutoidOption` | `org.modellwerkstatt.manmap.structure.AutoidOption` | Vergibt einen einfachen Schlüssel automatisch; der Sequenzname ist immer anzugeben. |
+| `OVERWRITE_AUTOID` | `OverWriteAutoIdOption` | `org.modellwerkstatt.manmap.structure.OverWriteAutoIdOption` | Gibt in einem `IncludeMapping` für ein Auto-ID-Feld eine andere Oracle-Sequence an. |
+| `OPTIMISTIC_LOCK` | `OptimisticOption` | `org.modellwerkstatt.manmap.structure.OptimisticOption` | Aktiviert die optimistische Sperrprüfung über die Spalte `TCN`; für neue `EntityMapping`s empfohlen. |
+| `ADDITIONAL_TABLE_NAME` | `AdditionalTableName` | `org.modellwerkstatt.manmap.structure.AdditionalTableName` | Deklariert eine benannte alternative Tabelle, etwa eine Archiv-Tabelle, für dasselbe Mapping. |
+| `CREATEDAT` | `CreatedAtFieldOption` | `org.modellwerkstatt.manmap.structure.CreatedAtFieldOption` | Ordnet dem Feld den Erstellungszeitpunkt des Audit-Trails zu. |
+| `CREATEDBY` | `CreatedByFieldOption` | `org.modellwerkstatt.manmap.structure.CreatedByFieldOption` | Ordnet dem Feld den Ersteller des Audit-Trails zu. |
+| `MODIFIEDAT` | `ModifiedAtFieldOption` | `org.modellwerkstatt.manmap.structure.ModifiedAtFieldOption` | Ordnet dem Feld den Zeitpunkt der letzten Änderung zu. |
+| `MODIFIEDBY` | `ModifiedByFieldOption` | `org.modellwerkstatt.manmap.structure.ModifiedByFieldOption` | Ordnet dem Feld den Benutzer der letzten Änderung zu. |
+| `INDEX` | `IndexOption` | `org.modellwerkstatt.manmap.structure.IndexOption` | Schemahinweis: Index auf der Spalte; keine Schema-Migration. |
+| `NOTNULL` | `NotnullOption` | `org.modellwerkstatt.manmap.structure.NotnullOption` | Schemahinweis: Spalte darf keinen SQL-`NULL`-Wert enthalten; keine Schema-Migration. |
+| `SIZE` | `SizeOption` | `org.modellwerkstatt.manmap.structure.SizeOption` | Schemahinweis: Größe beziehungsweise Präzision und Nachkommastellen der Spalte; keine Schema-Migration. |
+| `UNIQUE` | `UniqueOption` | `org.modellwerkstatt.manmap.structure.UniqueOption` | Schemahinweis: Eindeutigkeitsanforderung an die Spalte; keine Schema-Migration. |
 
 ### Aufbau eines `EntityMapping`s
 
 Ein `EntityMapping` besitzt mindestens:
 
-- die Referenz `classConcept` auf eine gemappte ObjectFlow-Entity-Instanz,
+- die Referenz `classConcept` auf die gemappte ObjectFlow-Entity,
 - ein `tableName` als Stringliteral,
 - atomare Mappings im internen Child-Role `atomMpig`,
 - optional Tabellenoptionen in `tableOption`.
 
 ### Felder, Schlüssel und Optionen
 
-Ein `FieldMapping` referenziert die fachliche Property und enthält den Spaltennamen als Stringliteral. Wichtige Optionen sind:
+Ein `FieldMapping` referenziert die fachliche Property und enthält den Spaltennamen als Stringliteral. Optionen gelten entweder für ein einzelnes `FieldMapping` (Feldoption) oder für das ganze `EntityMapping` (Tabellenoption in `tableOption`). Wichtige Optionen sind:
 
-| Bereich | Name (Konzeptname) | Bedeutung |
-| --- | --- | --- |
-| Schlüssel | `KEY` (`KeyOption`) | Markiert die für Persistenzoperationen verwendete Schlüssel-Property, falls sie nicht bereits an der ObjectFlow-Property markiert ist. |
-| Automatische ID | `AUTOID` (`AutoidOption`) | Vergibt die ID automatisch; benötigt immer einen Sequenznamen. |
-| Schemahinweise | `INDEX` (`IndexOption`), `NOTNULL` (`NotnullOption`), `SIZE` (`SizeOption`), `UNIQUE` (`UniqueOption`) | Beschreiben Anforderungen an Spalten. ManMap führt daraus keine allgemeinen Schema-Migrationen aus. |
-| Audit | `CREATEDAT` (`CreatedAtFieldOption`), `CREATEDBY` (`CreatedByFieldOption`), `MODIFIEDAT` (`ModifiedAtFieldOption`), `MODIFIEDBY` (`ModifiedByFieldOption`) | Ordnen Audit-Informationen den entsprechenden Feldern zu. |
-| Konkurrenzschutz | `OPTIMISTIC_LOCK` (`OptimisticOption`) | Aktiviert optimistische Sperrprüfung für ein schreibbares `EntityMapping` und ist für neue `EntityMapping`s empfohlen. |
-| Weitere Tabelle | `ADDITIONAL_TABLE_NAME` (`AdditionalTableName`) | Deklariert beispielsweise eine Archiv-Tabelle für dasselbe Mapping. |
+| Bereich | Name (Konzeptname) | Ebene | Bedeutung |
+| --- | --- | --- | --- |
+| Schlüssel | `KEY` (`KeyOption`) | `FieldMapping` | Markiert die für Persistenzoperationen verwendete Schlüssel-Property, falls sie nicht bereits an der ObjectFlow-Property markiert ist. |
+| Automatische ID | `AUTOID` (`AutoidOption`) | `FieldMapping` | Vergibt die ID automatisch; benötigt immer einen Sequenznamen. |
+| Schemahinweise | `INDEX` (`IndexOption`), `NOTNULL` (`NotnullOption`), `SIZE` (`SizeOption`), `UNIQUE` (`UniqueOption`) | `FieldMapping` | Beschreiben Anforderungen an Spalten. ManMap führt daraus keine allgemeinen Schema-Migrationen aus. |
+| Audit | `CREATEDAT` (`CreatedAtFieldOption`), `CREATEDBY` (`CreatedByFieldOption`), `MODIFIEDAT` (`ModifiedAtFieldOption`), `MODIFIEDBY` (`ModifiedByFieldOption`) | `FieldMapping` | Ordnen Audit-Informationen den entsprechenden Feldern zu. |
+| Konkurrenzschutz | `OPTIMISTIC_LOCK` (`OptimisticOption`) | `EntityMapping` | Aktiviert optimistische Sperrprüfung für ein schreibbares `EntityMapping` und ist für neue `EntityMapping`s empfohlen. |
+| Weitere Tabelle | `ADDITIONAL_TABLE_NAME` (`AdditionalTableName`) | `EntityMapping` | Deklariert beispielsweise eine Archiv-Tabelle für dasselbe Mapping. |
 
 An Properties von ObjectFlow-Entitäten und -Value-Objects können die ManMap-Feldoptionen direkt angegeben werden: `KEY`, `AUTOID`, die vier Audit-Optionen sowie `INDEX`, `NOTNULL`, `SIZE` und `UNIQUE`. Sie gelten dann für die betreffende fachliche Property auch immer im Mapping.
 
@@ -156,15 +169,19 @@ Im Regelfall genügt die Schlüsselreferenz: Das Kind muss den Parent nicht kenn
 
 | Name | Konzeptname | FQ-Name | Aufgabe |
 | --- | --- | --- | --- |
-| `get(...)` | `GetQuery` | `org.modellwerkstatt.manmap.structure.GetQuery` | Liefert eine Instanz anhand des Schlüssels oder `null`, wenn der Schlüssel nicht vergeben ist. |
-| `where(...)` | `WhereQuery` | `org.modellwerkstatt.manmap.structure.WhereQuery` | Liefert eine Liste anhand eines Filters. |
-| `sortBy(...)` | `SortByQuery` | `org.modellwerkstatt.manmap.structure.SortByQuery` | Sortiert auf- oder absteigend. |
-| `limit(...)` | `LimitQuery` | `org.modellwerkstatt.manmap.structure.LimitQuery` | Begrenzt die Anzahl der Ergebnisse. |
+| `get` | `GetQuery` | `org.modellwerkstatt.manmap.structure.GetQuery` | Liefert eine Instanz anhand des Schlüssels oder `null`, wenn der Schlüssel nicht vergeben ist. |
+| `where` | `WhereQuery` | `org.modellwerkstatt.manmap.structure.WhereQuery` | Liefert eine Liste anhand eines Filters. |
+| `sortBy` | `SortByQuery` | `org.modellwerkstatt.manmap.structure.SortByQuery` | Sortiert auf- oder absteigend. |
+| `limit` | `LimitQuery` | `org.modellwerkstatt.manmap.structure.LimitQuery` | Begrenzt die Anzahl der Ergebnisse. |
 | `size` | `SizeQuery` | `org.modellwerkstatt.manmap.structure.SizeQuery` | Liefert die Anzahl der Ergebnisse. |
-| `reload(...)` | `ReloadQuery` | `org.modellwerkstatt.manmap.structure.ReloadQuery` | Lädt gemappte Daten für eine vorhandene Instanz erneut. |
+| `reload` | `ReloadQuery` | `org.modellwerkstatt.manmap.structure.ReloadQuery` | Lädt gemappte Daten für eine vorhandene Instanz erneut. |
 | `refJoin` | `RefJoinOption` | `org.modellwerkstatt.manmap.structure.RefJoinOption` | Lädt eine gemappte Referenz. |
 | `listJoin` | `ListJoinOption` | `org.modellwerkstatt.manmap.structure.ListJoinOption` | Lädt eine gemappte Liste; ihre Reihenfolge kann bei Bedarf ein `sortBy` auf ein Feld des Kind-Mappings festlegen. |
 | `MappingReference` | `MappingReference` | `org.modellwerkstatt.manmap.structure.MappingReference` | Adressiert ein Feld einer in `where` oder `sortBy` verfügbaren Mapping-Instanz; im Editor steht dafür der kleingeschriebene Name des gemappten Entity-Typs. |
+| `QueryFromMap` | `QueryFromMap` | `org.modellwerkstatt.manmap.structure.QueryFromMap` | Abfrage auf einem `EntityMapping` mit `get`, `where` oder `reload`; integriert Ergebnisse read-only (`ReadOnly`) oder ausgecheckt (`Checkout`) in die Session; `debugMe` protokolliert SQL und Parameter. |
+| `in` | `InOperation` | `org.modellwerkstatt.manmap.structure.InOperation` | Prüft eine `MappingReference` gegen eine Liste passenden Elementtyps. |
+| `like` | `LikeOperator` | `org.modellwerkstatt.manmap.structure.LikeOperator` | SQL-`LIKE`-Vergleich aus String-Ausdruck und Muster; Platzhalter gehören in den Musterwert. |
+| `optional` | `OptionalOperator` | `org.modellwerkstatt.manmap.structure.OptionalOperator` | Lässt ein Prädikat entfallen, wenn dessen Parameter nicht gesetzt ist (`0` bei `int`, sonst `null`). |
 
 ### Spezifikum - Filterausdrücke und gemappte Felder
 
@@ -301,6 +318,13 @@ Innerhalb des `SQL`-Blocks stehen alle Variablen zur Verfügung, die im umgebend
 | `+` | `C2SqlIntegration` | `org.modellwerkstatt.manmap.structure.C2SqlIntegration` | Integriert dynamischen SQL-Text mit gebundenen Argumenten. |
 | `row mapper` | `RowMapperField` | `org.modellwerkstatt.manmap.structure.RowMapperField` | Konvertiert eine Ergebniszeile mit einer wiederverwendbaren Closure. |
 | `nokeystore/read-only map` | `NoKeyMapperField` | `org.modellwerkstatt.manmap.structure.NoKeyMapperField` | Bildet Ergebnisse ohne verwendbaren Schlüssel auf read-only Objekte ab. |
+| `C2PropertyReference` | `C2PropertyReference` | `org.modellwerkstatt.manmap.structure.C2PropertyReference` | Property-Referenz in einem `C2Dot`-Zugriff (`:rechnung_id`). |
+| `C2SqlStatusReference` | `C2SqlStatusReference` | `org.modellwerkstatt.manmap.structure.C2SqlStatusReference` | Referenziert einen deklarierten ObjectFlow-Statuswert im SQL-Text, ohne dessen Persistenzwert einzutragen. |
+| `RowMapperFieldRef` | `RowMapperFieldRef` | `org.modellwerkstatt.manmap.structure.RowMapperFieldRef` | Referenziert im Ergebnis-Mapping eines `SQL` vom Typ `QUERY` einen `row mapper` des Repositorys. |
+| `NoKeyMapperFieldRef` | `NoKeyMapperFieldRef` | `org.modellwerkstatt.manmap.structure.NoKeyMapperFieldRef` | Referenziert im Ergebnis-Mapping eines `SQL` vom Typ `QUERY` ein `nokeystore/read-only map`. |
+| `C2EntityKeyPropReference` | `C2EntityKeyPropReference` | `org.modellwerkstatt.manmap.structure.C2EntityKeyPropReference` | Liest in einem `C2Dot`-Zugriff den `KEY` über eine Entity-Referenz (`:rechnung_refLieferant_KEY`). |
+| `C2MethodReference` | `C2MethodReference` | `org.modellwerkstatt.manmap.structure.C2MethodReference` | Verwendet in einem `C2Dot`-Zugriff den Rückgabewert einer parameterlosen Methode (`:rechnung_methode`). |
+| `SqlNamedParameter` | `SqlNamedParameter` | `org.modellwerkstatt.manmap.structure.SqlNamedParameter` | Benannter Parameter einer `+`-Integration als Alternative zu geordneten `arguments`. |
 
 ### SQL Query und SQL Statement
 
@@ -356,7 +380,7 @@ Innerhalb von `C2SqlIntegration` sind benannte Parameter für neue Verwendungen 
 
 #### `row mapper`
 
-`row mapper` enthält eine Closure, die eine Ergebniszeile in einen Wert überführt. Ihr Zeilenparameter hat den Laufzeittyp `org.modellwerkstatt.manmap.runtime.IM3QueryFromSqlRowRef`. Dieser stellt mit `getAsInteger`, `getAsString`, `getAsDecimal`, `getAsDateTime` und `getAsLocalDate` typisierte Zugriffe bereit, jeweils wahlweise über den Spaltennamen oder den Spaltenindex. Indizierte Zugriffe beginnen entsprechend JDBC bei `1`, nicht bei `0`.
+`row mapper` enthält eine Closure, die eine Ergebniszeile in einen Wert überführt. Ihr Zeilenparameter hat den Laufzeittyp `org.modellwerkstatt.manmap.runtime.IM3QueryFromSqlRowRef`. Dieser stellt mit `getAsInteger`, `getAsString`, `getAsDecimal`, `getAsDateTime` und `getAsLocalDate` typisierte Zugriffe bereit, jeweils wahlweise über den Spaltennamen oder den Spaltenindex. Indizierte Zugriffe beginnen bei `0`.
 
 Für eine einmalige kleine skalare Abfrage kann dieselbe Logik als Inline-Closure im Ergebnis-Mapping eines `SQL`-Blocks stehen; auch dort besitzt der Zeilenparameter denselben Typ und dieselben Zugriffsregeln. Der Repository-Member ist sinnvoll, wenn die Konvertierung wiederverwendet werden soll.
 
@@ -366,7 +390,7 @@ Für eine einmalige kleine skalare Abfrage kann dieselbe Logik als Inline-Closur
 
 Jedes von einem `nokeystore/read-only map` erzeugte Objekt ist read-only. Das gilt auch dann, wenn ein bestehendes `EntityMapping` über `IncludeMapping` wiederverwendet wird. Das No-Key-Ergebnis selbst wird nicht in die Session integriert, das heißt nicht in die Session-Identity-Map aufgenommen. Für transiente Such-, Tabellen- und Aggregationsergebnisse ist ein ObjectFlow-`DTO` die bevorzugte Standardwahl. Ein `nokeystore/read-only map` kann jedoch auch ein vorhandenes `EntityMapping` einbinden und dadurch Entity-förmige read-only Ergebnisse erzeugen. Solche Objekte bleiben Projektionen außerhalb der Session-Identity-Map und dürfen nicht wie regulär geladene oder ausgecheckte Entities behandelt werden. Diese Variante eignet sich insbesondere dann, wenn die Wiederverwendung der vorhandenen Feldabbildungen sinnvoll ist und die Verwendung strikt read-only bleibt. Soll ein solches Objekt geändert werden, ist die betreffende Entity zuvor regulär über ihr `EntityMapping` zu laden beziehungsweise auszuchecken. Für neue, stark auf einen Such-, Darstellungs- oder Auswertungsfall zugeschnittene Ergebnisse bleibt ein DTO die klarere Standardwahl. Bei Bedarf nimmt `session.ensureInSession(…)` ein Entity-förmiges No-Key-Ergebnis in die Session auf, siehe [Session und Unit of Work](objectflow.md#session-und-unit-of-work).
 
-Im Ergebnis-Mapping von direktem SQL referenziert `MappingReference` ein einzelnes `FieldMapping`. In diesem Kontext kann sie nicht direkt ein `EntityMapping` als SQL-Row-Mapper verwenden. Soll ein vollständiges Mapping wiederverwendet werden, führt der Pfad über `nokeystore/read-only map` und dessen `IncludeMapping`.
+Ein `EntityMapping` kann im Ergebnis-Mapping eines `SQL` nicht direkt als Row-Mapper angegeben werden. Soll ein vollständiges Mapping wiederverwendet werden, führt der Pfad über `nokeystore/read-only map` und dessen `IncludeMapping`.
 
 Bei Mappingfehlern sind zuerst SQL-Aliase und Ergebnisspalten mit den Namen der Mapper-Felder und den Properties der Zielklasse zu vergleichen. Danach ist zu prüfen, ob der `SQL` tatsächlich den beabsichtigten Mapper-Member referenziert.
 
@@ -395,81 +419,11 @@ Schemaoptionen wie `NOTNULL`, `SIZE`, `INDEX` und `UNIQUE` beschreiben Anforderu
 4. Eine enthaltene ID kann an einen späteren `CHECKOUT`-Ablauf übergeben werden.
 5. Die DTOs werden nicht zurückgespeichert und nach dem Anwendungsfall verworfen.
 
-## Häufige Fehler und Diagnose
-
-- **Mapping mit Lazy Loading verwechseln:** Ein `ReferenceMapping` oder `ListMapping` beschreibt eine Beziehung, lädt sie aber nicht.
-- **Leere Liste als leere Datenbankbeziehung interpretieren:** Eine nicht explizit geladene Liste ist ebenfalls leer.
-- **Automatisches Graph-Speichern erwarten:** Referenzziele und Listenelemente müssen mit eigenen Mappings explizit gespeichert werden.
-- **Automatisches Kaskadenlöschen erwarten:** Kinder müssen in geeigneter Reihenfolge explizit gelöscht werden.
-- **Read-only-Entity verändern:** Herkunft aus `QueryFromMap` mit `readOnly=true` oder aus einem No-Key-Mapping prüfen.
-- **Dieselbe Entität mehrfach auschecken:** Alle `get`- und `where`-Abfragen derselben Session prüfen und die bereits geladene Instanz verwenden.
-- **No-Key-Ergebnis für eine normale Entity halten:** No-Key-Ergebnisse bleiben read-only und liegen außerhalb der Session-Identity-Map.
-- **`MappingReference` im SQL auf ein `EntityMapping` richten:** Für die Wiederverwendung eines `EntityMapping`s im Custom SQL ist `IncludeMapping` innerhalb eines `nokeystore/read-only map` zu verwenden.
-- **Batch für Einzelobjekte verwenden:** `BATCH` ist für größere Mengen gedacht.
-- **Repository-Methode als Transaktionsgrenze behandeln:** Den ObjectFlow-Session- und Command-Ablauf prüfen.
-- **Name und Konzeptname verwechseln:** Name, Konzeptname und FQ-Name nach der eingangs festgelegten Schreibweise unterscheiden.
-
 ## Weiterführende Dokumentation
 
 - [MoWare-Werkbank im Überblick](moware-werkbank.md)
 - [ObjectFlow – Fachliches Modell, Services und Anwendungsabläufe](objectflow.md)
 - [DataUX – Benutzeroberflächen und ausführbare Module](dataux.md)
-
-## Konzeptindex für Agenten
-
-Der Index enthält die in dieser Dokumentation behandelten Konzepte, nicht alle Konzepte der Sprache. Für JSON-Blueprints sind die FQ-Namen zu verwenden. Vor einer Modelländerung müssen Referenzen, Child-Roles und Kardinalitäten über MPS MCP im aktuellen Projekt aufgelöst werden.
-
-| Themenbereich | Name | Konzeptname | FQ-Name |
-| --- | --- | --- | --- |
-| Root | `Persistence Description` | `PersistenceDescription` | `org.modellwerkstatt.manmap.structure.PersistenceDescription` |
-| Root | `Repository` | `Repository` | `org.modellwerkstatt.manmap.structure.Repository` |
-| Repository | `repo method` | `RepositoryInstanceMethodDeclaration` | `org.modellwerkstatt.manmap.structure.RepositoryInstanceMethodDeclaration` |
-| Repository | `sql string` | `SqlStringField` | `org.modellwerkstatt.manmap.structure.SqlStringField` |
-| Mapping | `EntityMapping` | `EntityMapping` | `org.modellwerkstatt.manmap.structure.EntityMapping` |
-| Mapping | `FieldMapping` | `FieldMapping` | `org.modellwerkstatt.manmap.structure.FieldMapping` |
-| Mapping | `ReferenceMapping` | `ReferenceMapping` | `org.modellwerkstatt.manmap.structure.ReferenceMapping` |
-| Mapping | `EmbeddedMapping` | `EmbeddedMapping` | `org.modellwerkstatt.manmap.structure.EmbeddedMapping` |
-| Mapping | `ListMapping` | `ListMapping` | `org.modellwerkstatt.manmap.structure.ListMapping` |
-| Mapping | `IncludeMapping` | `IncludeMapping` | `org.modellwerkstatt.manmap.structure.IncludeMapping` |
-| Mapping | `MappedFieldRef` | `MappedFieldRef` | `org.modellwerkstatt.manmap.structure.MappedFieldRef` |
-| Mapping | `KeyOnlyReferenceMapping` | `KeyOnlyReferenceMapping` | `org.modellwerkstatt.manmap.structure.KeyOnlyReferenceMapping` |
-| Mapping-Option | `KEY` | `KeyOption` | `org.modellwerkstatt.manmap.structure.KeyOption` |
-| Mapping-Option | `AUTOID` | `AutoidOption` | `org.modellwerkstatt.manmap.structure.AutoidOption` |
-| Mapping-Option | `OVERWRITE_AUTOID` | `OverWriteAutoIdOption` | `org.modellwerkstatt.manmap.structure.OverWriteAutoIdOption` |
-| Mapping-Option | `OPTIMISTIC_LOCK` | `OptimisticOption` | `org.modellwerkstatt.manmap.structure.OptimisticOption` |
-| Mapping-Option | `ADDITIONAL_TABLE_NAME` | `AdditionalTableName` | `org.modellwerkstatt.manmap.structure.AdditionalTableName` |
-| Query | `QueryFromMap` | `QueryFromMap` | `org.modellwerkstatt.manmap.structure.QueryFromMap` |
-| Query | `get` | `GetQuery` | `org.modellwerkstatt.manmap.structure.GetQuery` |
-| Query | `where` | `WhereQuery` | `org.modellwerkstatt.manmap.structure.WhereQuery` |
-| Query | `sortBy` | `SortByQuery` | `org.modellwerkstatt.manmap.structure.SortByQuery` |
-| Query | `limit` | `LimitQuery` | `org.modellwerkstatt.manmap.structure.LimitQuery` |
-| Query | `size` | `SizeQuery` | `org.modellwerkstatt.manmap.structure.SizeQuery` |
-| Query | `reload` | `ReloadQuery` | `org.modellwerkstatt.manmap.structure.ReloadQuery` |
-| Query | `refJoin` | `RefJoinOption` | `org.modellwerkstatt.manmap.structure.RefJoinOption` |
-| Query | `listJoin` | `ListJoinOption` | `org.modellwerkstatt.manmap.structure.ListJoinOption` |
-| Query | `WHEN` | `AdditionalTableReference` | `org.modellwerkstatt.manmap.structure.AdditionalTableReference` |
-| Query / Row-Mapping | `MappingReference` | `MappingReference` | `org.modellwerkstatt.manmap.structure.MappingReference` |
-| Query-Operator | `in` | `InOperation` | `org.modellwerkstatt.manmap.structure.InOperation` |
-| Query-Operator | `like` | `LikeOperator` | `org.modellwerkstatt.manmap.structure.LikeOperator` |
-| Query-Operator | `optional` | `OptionalOperator` | `org.modellwerkstatt.manmap.structure.OptionalOperator` |
-| Speichern | `save with` | `SaveWithMap` | `org.modellwerkstatt.manmap.structure.SaveWithMap` |
-| Speichern | `INSERT` | `InsertSaveOption` | `org.modellwerkstatt.manmap.structure.InsertSaveOption` |
-| Speichern | `UPDATE` | `UpdateSaveOption` | `org.modellwerkstatt.manmap.structure.UpdateSaveOption` |
-| Speichern | `BATCH` | `BatchSaveOption` | `org.modellwerkstatt.manmap.structure.BatchSaveOption` |
-| Speichern | `FORCE AUDIT` | `ForceAuditSaveOption` | `org.modellwerkstatt.manmap.structure.ForceAuditSaveOption` |
-| Speichern | `SKIP AUDIT` | `SkipAuditSaveOption` | `org.modellwerkstatt.manmap.structure.SkipAuditSaveOption` |
-| Löschen | `delete with` | `DeleteWithMap` | `org.modellwerkstatt.manmap.structure.DeleteWithMap` |
-| Custom SQL | `SQL` | `C2SqlBlock` | `org.modellwerkstatt.manmap.structure.C2SqlBlock` |
-| Custom SQL | `C2SqlText` | `C2SqlText` | `org.modellwerkstatt.manmap.structure.C2SqlText` |
-| Custom SQL | `:` | `C2SqlWordVarReference` | `org.modellwerkstatt.manmap.structure.C2SqlWordVarReference` |
-| Custom SQL | `C2Dot` | `C2Dot` | `org.modellwerkstatt.manmap.structure.C2Dot` |
-| Custom SQL | `C2PropertyReference` | `C2PropertyReference` | `org.modellwerkstatt.manmap.structure.C2PropertyReference` |
-| Custom SQL | `C2SqlStatusReference` | `C2SqlStatusReference` | `org.modellwerkstatt.manmap.structure.C2SqlStatusReference` |
-| Custom SQL | `+` | `C2SqlIntegration` | `org.modellwerkstatt.manmap.structure.C2SqlIntegration` |
-| Row-Mapping | `row mapper` | `RowMapperField` | `org.modellwerkstatt.manmap.structure.RowMapperField` |
-| Row-Mapping | `RowMapperFieldRef` | `RowMapperFieldRef` | `org.modellwerkstatt.manmap.structure.RowMapperFieldRef` |
-| Row-Mapping | `nokeystore/read-only map` | `NoKeyMapperField` | `org.modellwerkstatt.manmap.structure.NoKeyMapperField` |
-| Row-Mapping | `NoKeyMapperFieldRef` | `NoKeyMapperFieldRef` | `org.modellwerkstatt.manmap.structure.NoKeyMapperFieldRef` |
 
 ## Dokumentstand
 

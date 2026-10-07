@@ -18,7 +18,7 @@ Use [field-mapping-subtree.json](blueprints/field-mapping-subtree.json), [refere
 
 Source semantics: [repositories and the four method kinds](../../../docu/manmap.md#repositories-und-die-vier-methodenarten) and [ObjectFlow explicit session operations](../../../docu/objectflow.md#explizite-session-operationen).
 
-1. Load `mps-baselanguage` and `mps-node-editing`.
+1. Load `moai:mps-baselanguage` and `moai:mps-node-editing`.
 2. Insert [repository-skeleton.json](blueprints/repository-skeleton.json), or identify the existing root and preserve its ID.
 3. Add one `RepositoryInstanceMethodDeclaration` under inherited role `member`; [repository-method-skeleton.json](blueprints/repository-method-skeleton.json) is a minimal void-body starting point.
 4. Build the BaseLanguage return type, parameters, body, and visibility before adding ManMap operations.
@@ -36,7 +36,7 @@ Source semantics: [mapped `get`/`where` queries](../../../docu/manmap.md#gemappt
 2. Choose `readOnly=true` for inspection/search or `false` for checkout/editing according to the enclosing repository method.
 3. Add required `RefJoinOption` or `ListJoinOption` children before expressions that refer to joined mappings.
 4. Add exactly the intended operations in projection order: `GetQuery` or `WhereQuery`, then optional sort/limit/size operations.
-5. Build `MappingReference` nodes with both `mappingSource` and `fieldMapping` references. In a blueprint, set `mappingSource` to the name of the query's `EntityMapping` as a plain name (e.g. `"MapVet"`); it resolves to the enclosing `QueryFromMap`, even when the query is inserted in the same blueprint. For joined mappings use the joined mapping's name and check the dry-run warnings for unresolved names.
+5. Build `MappingReference` nodes with both `mappingSource` and `fieldMapping` references. In a blueprint, set `mappingSource` to the name of the query's `EntityMapping` as a plain name (e.g. `"MapRechnung"`); it resolves to the enclosing `QueryFromMap`, even when the query is inserted in the same blueprint. For joined mappings use the joined mapping's name and check the dry-run warnings for unresolved names.
 6. Validate types on both sides of every comparison.
 
 [query-from-map-where-subtree.json](blueprints/query-from-map-where-subtree.json) provides a complete `where` query that compares a mapped field with a parameter in one blueprint.

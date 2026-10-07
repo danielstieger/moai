@@ -1,13 +1,13 @@
 # Reference Formats and Resolution
 
 - Persistent references in MPS follow specific formats:
-    - **Node References** (used in `targetReference` or `target` fields): start with `r:` (regular) or `i:` (stub/internal). Format: `r:model-uuid(model-name)#node-id`.
-    - **Concept References** (used in `conceptReference` field): start with `c:`. Format: `c:language-uuid(language-name)/concept-id`.
+    - **Node References** (`reference`, `targetReference`, `target`): `r:<modelUUID>(<modelName>)/<nodeId>`, e.g. `r:00000000-0000-4000-0000-011c89590301(jetbrains.mps.lang.smodel.structure)/1138055754698`. Stub (JDK/library) nodes use a stub model id such as `…/java:javax.swing(JDK/)/~JButton` (`moai:mps-baselanguage`, `references/stub-references.md`).
+    - **Concept References** (`conceptReference`): `c:<langUUID>/<conceptId>:<FQN>` for concepts, `i:<langUUID>/<conceptId>:<FQN>` for interface concepts — `i:` is **not** a stub marker.
 - **CRITICAL**: never use a concept reference (`c:...`) where a node reference (`r:...`) is expected. If you need a reference to point to the **declaration node** of a concept (its definition), you must use its node reference.
 - To obtain the node reference (`r:...`) for a concept:
     - Use `mps_mcp_get_concept_details` and check the **`sourceNode`** field in the response.
     - Alternatively, use `mps_mcp_search_concepts` and check the `sourceNode` field for each match.
-- The `mps_mcp_insert_root_node_from_json` and `mps_mcp_update_node` tools will reject `c:...` strings in reference roles and will fail if a provided node reference cannot be resolved.
+- The blueprint readers (`mps_mcp_insert_root_node_from_json`, `mps_mcp_update_root_node_from_json`, `mps_mcp_update_node` `ADD`/`SET` × `CHILD`) do **not** reject a `c:...` string in a reference role — it silently yields an unresolved reference; an unresolvable plain name becomes a dynamic reference. Both surface only via `dryRun` warnings or `mps_mcp_check_root_node_problems`. Only `mps_mcp_update_node` `SET` × `REFERENCE` fails with `NOT_FOUND`. Forward-reference strategy: `moai:mps-node-editing`, `references/staged-construction.md`.
 
 ## MCP Response Envelope
 
@@ -46,10 +46,10 @@ Always inspect `warnings` after a dry-run response — an empty `warnings` list 
 Tools that return a node (e.g. `mps_mcp_get_current_editor_root_node`, `mps_mcp_create_root_node`, `mps_mcp_search_root_node_by_name`, the success path of node-mutation tools) return a common JSON envelope. Standard fields:
 
 - `name` — node name (when the concept implements `INamedConcept`).
-- `concept` — fully qualified concept name; use this as the `concept` field in JSON blueprints.
+- `concept` — short concept name (e.g. `Entity`); the fully qualified name is the suffix of `conceptReference` after the `:` (also returned as `qualifiedName` by `mps_mcp_get_concept_details` / `mps_mcp_search_concepts`) — use the FQN as `concept` in JSON blueprints.
 - `conceptReference` — persistent concept reference (`c:...`); informational.
 - `reference` — persistent node reference (`r:...`).
-- `parentReference` — persistent reference to the parent node (absent or null for roots).
+- `parentReference` — persistent reference to the parent node (`""` for roots).
 - `rootReference` — persistent reference to the containing root node.
 - `modelReference` — persistent reference to the containing model.
 - `moduleReference` — persistent reference to the containing module.

@@ -71,7 +71,7 @@ Operations come as `*Operation` concepts sitting in the `operation` role of a `D
 | `seq.take(n)` / `.skip(n)` / `.tail(n)` / `.cut(n)` / `.page(a,b)`         | `TakeOperation` etc. | ✓ | `sequence<T>` |
 | `seq.distinct`                                                             | `DistinctOperation` | ✓ | `sequence<T>` |
 | `seq.reverse`                                                              | `ReverseOperation` | — | `list<T>` (new list) |
-| `seq.sortBy{..}, asc` / `.sort{a,b=>cmp}`                                  | `SortByOperation` / `SortOperation` | force | `sequence<T>` |
+| `seq.sortBy{..}, asc` / `.alsoSortBy{..}, asc` / `.sort{a,b=>cmp}` | `SortOperation` (children `closure`, `ascending`) / `AlsoSortOperation` (extends `SortOperation`) / `ComparatorSortOperation` (`closure`, optional `ascending`) | force | `sequence<T>` |
 | `seq.concat(other)` / `.union` / `.intersect` / `.except` / `.disjunction` | matching `*Operation` | ✓ | `sequence<T>` |
 | `seq.any{..}` / `.all{..}`                                                 | `AnyOperation` / `AllOperation` | force | `boolean` |
 | `seq.contains(x)` / `.indexOf(x)`                                          | `ContainsOperation` / `IndexOfOperation` | force | `boolean` / `int` |

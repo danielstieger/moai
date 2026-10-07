@@ -7,17 +7,14 @@ Open before calling the Java parser. The parser understands plain Java plus the 
 Use `mps_mcp_parse_java_and_insert` freely for:
 
 - `featureKind: "METHOD"` — whole method including signature (see "Method return types" below for the caveat)
-- `featureKind: "EXPRESSION"` — replacing a single expression node
+- `featureKind: "EXPRESSION"` — replacing a single expression node (`insert.mode: "replace"` + `targetRef`); `contextNodeRef` must lie inside the same body so that parameters and locals resolve. Arguments in smodel syntax (casts, `.link`) cannot be parsed — pass the uncasted node and derive the narrower value inside the called method.
 - `featureKind: "STATEMENTS"` — replacing or inserting a statement block
 - `featureKind: "FIELD"` — single field declarations (for adding to LINKS/CONCEPTS classes)
 
 Things that resolve correctly:
 
-- Static Java method calls: `RulesFunctions_BaseLanguage.check(...)`, `SNodeOperations.xxx(...)`,
-  `AbstractCatchClause__BehaviorDescriptor.getCaughtTypes_id2FJPm3OMxhX.invoke(...)`
-- Identifiers that are **already known in the context** — local variables, parameters,
-  and references to the rule's applicable node (e.g. `throwStatement`) resolve to their
-  MPS model equivalents
+- Static Java method calls: `SomeHelper.check(...)`, `SNodeOperations.xxx(...)`, `<Concept>__BehaviorDescriptor.<method>_id<…>.invoke(...)`
+- Identifiers that are **already known in the context** — local variables and parameters — resolve to their MPS model equivalents
 - `LINKS.xxx` and `CONCEPTS.xxx` field references (inner-class constants) resolve fine
   as long as they already exist on the target class
 - `MetaAdapterFactory.getConcept(...)`, `MetaAdapterFactory.getReferenceLink(...)` resolve,
@@ -120,8 +117,7 @@ an MPS `sequence<node<Type>>` or `list<node<Type>>` variable.
 
 See `variable-declarations.md` for the full node blueprints.
 
-**Note**: Local variable types (`List<SNode> x = ...`) and constructor expressions
-(`new ArrayList<SNode>()`) ARE correctly parsed — only method return types are affected.
+**Note**: the parser never produces MPS collection/smodel types in any position — `List<SNode> x = …` and `new ArrayList<SNode>()` parse to Java `ClassifierType`s, which is fine as long as the code stays plain Java. Method return types are where this bites, because MPS callers expect `sequence<node<X>>`/`list<node<X>>`.
 
 ### Where the Java parser produces wrong types
 
@@ -134,8 +130,7 @@ The Java parser produces correct MPS types in most positions, but fails for
 | Method **return type** | `list<node<Type>>` | `ClassifierType(List<SNode>)` — **wrong** | Same |
 | Method parameter type | `node<CatchClause>` | `ClassifierType(SNode)` — Java type | Fine for most purposes; replace if MPS type checking fails |
 
-For local variable types and `new` expressions, don't use the Java parser —
-construct nodes directly using the blueprints in this file and `variable-declarations.md`.
+When a local variable or `new` expression must have an MPS type (`list<node<X>>`, `new arraylist<node<X>>`), construct it directly using the blueprints in this file and `variable-declarations.md` — the parser has no syntax for them.
 
 **After parsing a method**, check its `returnType` and parameter `type` children.
 If they should be MPS collection or smodel types, replace them using `mps_mcp_update_node`.
@@ -185,10 +180,8 @@ These concepts live in `jetbrains.mps.lang.smodel` and are not parseable from Ja
 | MPS notation | Concept | Workaround |
 |---|---|---|
 | `node.link` or `node:Concept.link` | `SLinkAccess` inside `DotExpression` | Already in tree; keep it, or use `SLinkOperations.getTarget` in parsed Java |
-| `node:CatchClause` (type-cast) | `SNodeTypeCastExpression` | Cannot be parsed; if you need the casted node as an argument, restructure: pass the outer node (`throwStatement`) and derive the cast inside the new Java method |
-| `throwStatement` (applicable-node ref) | `ApplicableNodeReference` | **Already resolves** when you parse an expression inside a rule body — the parser finds `throwStatement` in scope and creates an `ApplicableNodeReference` automatically |
-| `node` (predefined parameter in editor / intention / action / behavior query functions) | `ConceptFunctionParameter_node` (in the language that owns the function — e.g. `jetbrains.mps.lang.editor.structure.ConceptFunctionParameter_node` for editor query functions like `QueryFunction_ModelAccess_Getter`, `jetbrains.mps.lang.intentions.structure.ConceptFunctionParameter_node` for intentions) | **Does NOT auto-resolve** when parsing Java inside a query-function body — `node.someBehaviorMethod()` collapses into a single `UnknownDotCall` (callee=`someBehaviorMethod`, tokens=`node`). Replace it manually with `DotExpression { ConceptFunctionParameter_node, Node_ConceptMethodCall(→method) }`. Note: each aspect has its own `ConceptFunctionParameter_node` concept — pick the one in the language matching the surrounding query function. |
-| `.getCaughtTypes()` (behavior method call) | `Node_ConceptMethodCall` | Cannot be parsed; keep the existing call, or call the behavior descriptor directly: `AbstractCatchClause__BehaviorDescriptor.getCaughtTypes_id2FJPm3OMxhX.invoke(node)` |
+| `node:SomeConcept` (type-cast) | `SNodeTypeCastExpression` | Cannot be parsed; if you need the casted node as an argument, restructure: pass the uncasted node and derive the cast inside the Java method |
+| `.someBehaviorMethod()` (behavior method call) | `Node_ConceptMethodCall` | Cannot be parsed; build the `DotExpression` by hand (see `dot-expression-basics.md`) or call the generated behavior descriptor directly: `<Concept>__BehaviorDescriptor.<method>_id<…>.invoke(node)` |
 | `node.parent:C` | `DotExpression(Node_GetParentOperation, SNodeTypeCastExpression)` | Cannot be parsed; use `SNodeOperations.getParent(node)` + `SNodeOperations.cast(...)` in parsed Java |
 
 ### `MetaAdapterFactory.getContainmentLink` inside method bodies
@@ -198,14 +191,12 @@ reliably resolve when used inline inside a parsed method body.  This causes a ca
 `UnknownDotCall` errors because the return type of the unresolved call is `undefined`,
 breaking all downstream type inference.
 
-**Root cause**: the existing code in `RulesFunctions_BaseLanguage` (and all generated
-checking / behavior code) never calls `MetaAdapterFactory.getContainmentLink` inline.
-Instead it uses `LINKS.xxx` static inner-class constants.
+**Root cause**: generated MPS code never calls `MetaAdapterFactory.getContainmentLink` inline; it uses `LINKS.xxx` static inner-class constants.
 
 **Fix**: use the `LINKS.xxx` pattern:
 
 1. If the constant you need already exists in the class's `LINKS` inner class, use it directly.
-2. If it does not exist, add it first with `parse_java_and_insert`:
+2. If it does not exist, add it first with `mps_mcp_parse_java_and_insert`:
    ```json
    {
      "featureKind": "FIELD",
@@ -219,7 +210,7 @@ Instead it uses `LINKS.xxx` static inner-class constants.
 > The `LINKS` inner class node ref is found by printing the parent class (shallow depth)
 > and reading the node ref of the nested class child.
 
-### `collectUncaughtThrowables` and other behavior method invocations
+### Behavior method invocations through descriptors
 
 Behavior descriptor calls use the pattern:
 ```java

@@ -13,9 +13,7 @@ Die Sprache beschreibt vor allem, **welche fachlichen Daten wie visualisiert wer
 
 `org.modellwerkstatt.dataux.structure.ApiDescription` ist veraltet und nicht mehr zu verwenden.
 
-### Schreibkonventionen
-
-Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der **Konzeptname** bezeichnet das technische AST-Konzept; der **FQ-Name** ist dessen vollständig qualifizierter Name. Die Kapitellandkarten führen alle drei Bezeichnungen zusammen; bei dort fehlenden Konzepten ergänzt der Fließtext beim ersten Auftreten den Konzeptnamen beziehungsweise bei Konzepten aus anderen Sprachen den FQ-Namen in Klammern und verwendet danach nur noch den Namen. Hat ein Konzept keine als Wort benennbare Projektion, wird sein Konzeptname verwendet. Umschreibungen und Kurzformen treten nicht an die Stelle von Projektion oder Konzeptname.
+Name, Konzeptname und FQ-Name folgen der [Bezeichnung der Konzepte](moware-werkbank.md#bezeichnung-der-konzepte) in der Werkbank-Dokumentation.
 
 ## Teil I – UI-Modellierung
 
@@ -39,12 +37,26 @@ Die Page stellt die Daten bereit; das `Page Pane` stellt sie dar. Eine UI-Bindun
 | `Tab` | `Tab` | `org.modellwerkstatt.dataux.structure.Tab` | Beschrifteter Tab mit genau einem UI-Element |
 | `Include` | `Include` | `org.modellwerkstatt.dataux.structure.Include` | Einbindung eines bereits deklarierten bindbaren UI-Elements |
 | `Custom UI Element` | `CustomElement` | `org.modellwerkstatt.dataux.structure.CustomElement` | Projektspezifisches UI-Element mit eigener Implementierungsklasse |
+| `-1` | `MinWeight` | `org.modellwerkstatt.dataux.structure.MinWeight` | Minimalgewicht für Zeile oder Spalte im `Grid Layout`; nicht im `Delegate Form`. |
+| `1*` | `OneWeight` | `org.modellwerkstatt.dataux.structure.OneWeight` | Gewicht 1 für Zeile/Spalte im `Grid Layout` und Spaltengewicht im `Delegate Form`. |
+| `2*` | `TwoWeight` | `org.modellwerkstatt.dataux.structure.TwoWeight` | Gewicht 2 für Zeile/Spalte im `Grid Layout` und Spaltengewicht im `Delegate Form`. |
+| `3*` | `ThreeWeight` | `org.modellwerkstatt.dataux.structure.ThreeWeight` | Gewicht 3 für Zeile/Spalte im `Grid Layout` und Spaltengewicht im `Delegate Form`. |
+| `4*` | `FourWeight` | `org.modellwerkstatt.dataux.structure.FourWeight` | Gewicht 4 für Zeile/Spalte im `Grid Layout` und Spaltengewicht im `Delegate Form`. |
+| `5*` | `FiveWeight` | `org.modellwerkstatt.dataux.structure.FiveWeight` | Gewicht 5 für Zeile/Spalte im `Grid Layout` und Spaltengewicht im `Delegate Form`. |
+| `FLEXIBLE` | `FlexibleOption` | `org.modellwerkstatt.dataux.structure.FlexibleOption` | Erlaubt eine flexible Größenanpassung des `Grid Layout`s. |
+| `FOCUS FORWARD 2` | `SkipFocusOption` | `org.modellwerkstatt.dataux.structure.SkipFocusOption` | Verschiebt den initialen Fokus im `Grid Layout` auf ein späteres Element. |
+| `DISABLED` | `DisabledFOption` | `org.modellwerkstatt.dataux.structure.DisabledFOption` | Formular ist nicht editierbar. |
+| `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` | Beschriftung von Formular oder Tabelle; nicht am obersten Element eines `Page Pane`s. |
+| `SELECT FIRST` | `SelectFirstFOption` | `org.modellwerkstatt.dataux.structure.SelectFirstFOption` | Selektiert das erste Tabellenelement bei der Initialisierung. |
+| `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.SelectionSummaryLineFOption` | Berechnet eine Zusammenfassung für ausgewählte Tabellenobjekte. |
+| `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.TableSummaryLineFOption` | Berechnet eine Zusammenfassung über alle Tabellenobjekte. |
+| `CUSTOM CSV EXPORT` | `TableCustomCsvExportFOption` | `org.modellwerkstatt.dataux.structure.TableCustomCsvExportFOption` | Passt den CSV-Export der Tabelle an. |
 
 `Delegate Form`, `Table`, `Grid Layout`, `Tab Layout` und `Custom UI Element` können sowohl innerhalb eines `Page Pane`s als auch als eigenständige, wiederverwendbare Root Nodes deklariert werden.
 
 #### Datenbindung und Selektion
 
-DataUX bindet UI-Komponenten an fachliche Typen und deren Properties. Ein bindbares Element spezifiziert einen Entity- oder DTO-Typ (`boundClassifier`) und optional eine Property dieses Typs (`boundProperty`). Fehlt eine explizite Bindung, kann der Kontext vom umgebenden Element übernommen werden.
+DataUX bindet UI-Komponenten an fachliche Typen und deren Properties. Ein bindbares Element spezifiziert einen Entity- oder DTO-Typ (`boundClassifier`) und optional eine Property dieses Typs (`boundProperty`). Formulare, Tabellen, Custom Elements und Includes sind immer gebunden; nur Layouts innerhalb einer Hierarchie tragen keine Bindung und reichen den Kontext durch.
 
 Jedes `Page Pane` besitzt einen gemeinsamen **Selektionskontext**. Für jeden darin verwendeten Entity- oder DTO-Typ kann eine aktuell selektierte Instanz existieren. Diese Selektion gehört nicht einer einzelnen Tabelle oder einem einzelnen Formular, sondern steht allen Komponenten des `Page Pane`s zur Verfügung.
 
@@ -52,7 +64,7 @@ Im Modell kann ein Element als `boundClassifier` jedoch nur Typen wählen, die v
 
 ##### Typbindung
 
-Eine Bindung nur an einen Entity- oder DTO-Typ verwendet grundsätzlich die aktuelle Selektion dieses Typs. Ein an `Rechnung` gebundenes `Delegate Form` zeigt beispielsweise die aktuell selektierte `Rechnung`.
+Eine Bindung nur an einen Entity- oder DTO-Typ verwendet grundsätzlich die aktuelle Selektion dieses Typs. Ein an `Rechnung` gebundenes `Delegate Form` zeigt beispielsweise die aktuell selektierte `Rechnung`. Für eine `Table` ist diese reine Typbindung nur zulässig, wenn sie das oberste Element des `Page Pane`s ist oder in einem Layout der ersten Ebene liegt und an den Root-Typ des `Page Pane`s gebunden ist; jede andere Tabelle in der Hierarchie wird an eine Listen-Property eines selektierten Objekts gebunden.
 
 Wird einem `Page Pane` auf Root-Ebene genau eine Instanz seines Root-Typs bereitgestellt – unmittelbar oder als Liste mit genau einem Element –, ist diese Instanz automatisch selektiert. Ein direkt an den Root-Typ gebundenes Formular kann sie deshalb ohne eine Tabelle mit `SELECT FIRST` unmittelbar anzeigen. Diese automatische Selektion gilt für das Root-Objekt; eine untergeordnete Liste wird nicht allein deshalb selektiert, weil sie nur ein Element enthält.
 
@@ -66,7 +78,7 @@ Das Formular liest diesen Bindungskontext, erzeugt oder verändert aber keine Se
 
 Eine `Table` benötigt eine Liste von Entities oder DTOs. Listen von Value Objects sind kein Tabellen-Bindungsmodell in DataUX.
 
-Ist der Zeilentyp mit dem Root-Typ des `Page Pane`s identisch, kann die Tabelle direkt an diesen Typ gebunden werden und verwendet den Root-Datenbestand. Soll die Tabelle Objekte eines anderen Typs anzeigen, wird sie an eine Listen-Property eines selektierten Objekts gebunden. Eine Tabelle für `Rechnung.positionen` zeigt somit die Positionen der aktuell selektierten Rechnung; ihr Zeilentyp ist `Rechnungsposition`, nicht `Rechnung`.
+Ist der Zeilentyp mit dem Root-Typ des `Page Pane`s identisch, kann die Tabelle direkt an diesen Typ gebunden werden und verwendet den Root-Datenbestand; das gilt nur für eine Tabelle als oberstes Element des `Page Pane`s oder innerhalb eines Layouts der ersten Ebene, etwa die Rechnungstabelle oben in einem `Grid Layout` mit darunterliegendem Rechnungsformular. Soll die Tabelle Objekte eines anderen Typs anzeigen, wird sie an eine Listen-Property eines selektierten Objekts gebunden. Eine Tabelle für `Rechnung.positionen` zeigt somit die Positionen der aktuell selektierten Rechnung; ihr Zeilentyp ist `Rechnungsposition`, nicht `Rechnung`.
 
 Die Auswahl einer Tabellenzeile bestimmt die gemeinsame Selektion des Zeilentyps. Mit `SELECT FIRST` (`SelectFirstFOption`) kann eine Tabelle beim initialen Anzeigen das erste Element selektieren und so eine abhängige Detaildarstellung initialisieren.
 
@@ -74,7 +86,7 @@ Mehrere Tabellen mit demselben Zeilentyp teilen dieselbe Selektion. Enthält ein
 
 ##### Leere Selektion
 
-Für einen Entity- oder DTO-Typ kann keine Instanz selektiert sein. Ein ausschließlich an diesen Typ gebundenes Formular zeigt dann keine Daten. Tabellen können ihre Zeilen weiterhin darstellen, obwohl keine Zeile ausgewählt ist.
+Für einen Entity- oder DTO-Typ kann keine Instanz selektiert sein. Ein ausschließlich an diesen Typ gebundenes Formular zeigt dann keine Daten. Tabellen können ihre Zeilen weiterhin darstellen, obwohl keine Zeile ausgewählt ist. Aktionen und Ausdrücke müssen diesen Zustand vertragen oder deaktiviert sein.
 
 ##### Master-Detail
 
@@ -107,31 +119,49 @@ Der Delegate-Typ folgt dem fachlichen Property-Typ. Ein Delegate ersetzt keine f
 | `Image` | `ImageDelegate` | `org.modellwerkstatt.dataux.structure.ImageDelegate` | Bilddarstellung, nur im Formular |
 | `Upload` | `UploadDelegate` | `org.modellwerkstatt.dataux.structure.UploadDelegate` | Datei-Upload, nur im Formular |
 | `Dummy` | `DummyDelegate` | `org.modellwerkstatt.dataux.structure.DummyDelegate` | Platzhalter zur Anordnung von Formularfeldern |
+| `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` | Delegate im Formular nicht editierbar. |
+| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Keine Eingabe nötig; leeres Feld ergibt `null`, bei `Integer` `0`. |
+| `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` | Datumsauswahl für Datums-Delegates; bei `DateTime` nicht mit `OVERWRITE FORMAT`. |
+| `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` | Löst bei Scan oder Inhaltsänderung eine verfügbare Update-Conclusion (`SCAN_UPDATE`) aus. |
+| `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` | Numerischer Editor für einen `String`-Delegate. |
+| `ALTER` | `AlternativeDOption` | `org.modellwerkstatt.dataux.structure.AlternativeDOption` | Alternativer Editor für `Reference` und `Status`, sofern die Laufzeit ihn unterstützt. |
+| `WIDE` | `WideDOption` | `org.modellwerkstatt.dataux.structure.WideDOption` | Blendet das Label aus und gibt dem Editor die gesamte Breite. |
+| `NUM OF LINES` | `NumOfLinesDOption` | `org.modellwerkstatt.dataux.structure.NumOfLinesDOption` | Mehrzeiliger Text mit angegebener Zeilenzahl. |
+| `TIME PICKER ONLY` | `TimeOnlyDOption` | `org.modellwerkstatt.dataux.structure.TimeOnlyDOption` | Erfasst nur die Uhrzeit; als Datum gilt immer das aktuelle. |
+| `OVERWRITE LABEL` | `OverwriteLabelDOption` | `org.modellwerkstatt.dataux.structure.OverwriteLabelDOption` | Überschreibt die von der Datenstruktur vorgegebene Beschriftung. |
+| `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `org.modellwerkstatt.dataux.structure.OverwriteFormatDOption` | Überschreibt das von der Datenstruktur vorgegebene Format. |
+| `WIDTH` | `WidthDOption` | `org.modellwerkstatt.dataux.structure.WidthDOption` | Spaltenbreite in Prozent; Pflicht je Tabellenspalte, Summe höchstens 100 %. |
+| `EDITABLE` | `EditableDOption` | `org.modellwerkstatt.dataux.structure.EditableDOption` | Tabellenspalte (`Status`, `BigDecimal`) editierbar; höchstens eine je Tabelle, nicht mit `FOLD`. |
+| `IMPORTANT` | `ImportantDOption` | `org.modellwerkstatt.dataux.structure.ImportantDOption` | Hebt ein wichtiges Tabellenfeld hervor; höchstens einmal je Tabelle. |
+| `COLOR` | `DynColorDOption` | `org.modellwerkstatt.dataux.structure.DynColorDOption` | Berechnet die Farbe einer `BigDecimal`-Tabellenspalte dynamisch aus dem Wert. |
+| `LONG DESC` | `StatusLongDescDOption` | `org.modellwerkstatt.dataux.structure.StatusLongDescDOption` | Verwendet in der Tabelle die Langbeschreibung eines Status. |
+| `RIGHT ALIGN` | `RightAlignDOption` | `org.modellwerkstatt.dataux.structure.RightAlignDOption` | Richtet den Zelleninhalt einer `String`-Spalte rechtsbündig aus. |
+| `FOLD` | `FoldDOption` | `org.modellwerkstatt.dataux.structure.FoldDOption` | Tabelle: Spalte zunächst ausgeblendet (Doppelklick auf Spaltenkopf); Formular unter h2forms: verstecktes, per Scan befüllbares Feld. |
 
 Ein `Reference`-Delegate bietet die zulässigen Objekte zur Auswahl an. `scopeText` (projiziert als `reference description`) legt mit einem oder mehreren Pfaden fest, welche Properties des referenzierten Typs den angezeigten Text bilden: Für einen an `Rechnung.kunde` gebundenen Delegate verweist `name` auf `Kunde.name`. Die Auswahlmenge setzt die Scope-Funktion der Page mit `#Meta.setScope(…)`; siehe [ObjectFlow: Scopes](objectflow.md#scopes). Fehlt sie, führt eine Auswahl zu einer Exception. Ist der Delegate oder das Formular mit `DISABLED` gekennzeichnet, wird der Wert nur angezeigt und kein Scope benötigt.
 
 #### Delegate-Optionen
 
-| Name | Konzeptname | FQ-Name | Kontext | Delegate-Typen | Wirkung |
-| --- | --- | --- | --- | --- | --- |
-| `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` | Formular | alle | Delegate ist nicht editierbar |
-| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Formular | alle | Der Benutzer muss nichts eingeben; ein leeres Feld ergibt `null` (bei `Integer` `0`); siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
-| `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` | Formular | `LocalDate`, `DateTime (Date Only)`, `DateTime` | Verwendet nach Möglichkeit eine Datumsauswahl; bei `DateTime` nicht zusammen mit `OVERWRITE FORMAT` |
-| `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` | Formular | alle | Löst eine verfügbare Update-Conclusion aus |
-| `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` | Formular | `String` | Verwendet für einen `StringDelegate` einen numerischen Editor |
-| `ALTER` | `AlternativeDOption` | `org.modellwerkstatt.dataux.structure.AlternativeDOption` | Formular und Tabelle | `Reference`, `Status` | Verwendet einen alternativen Editor, sofern die Laufzeitumgebung diesen unterstützt |
-| `WIDE` | `WideDOption` | `org.modellwerkstatt.dataux.structure.WideDOption` | Formular | alle | Blendet nach Möglichkeit das Label links vom Editor aus und gibt dem Editor die gesamte Breite |
-| `NUM OF LINES` | `NumOfLinesDOption` | `org.modellwerkstatt.dataux.structure.NumOfLinesDOption` | Formular | `String` | Stellt den Text mehrzeilig mit der angegebenen Zeilenzahl dar |
-| `TIME PICKER ONLY` | `TimeOnlyDOption` | `org.modellwerkstatt.dataux.structure.TimeOnlyDOption` | Formular | `DateTime` | Erfasst nur die Uhrzeit; als Datum wird immer das aktuelle verwendet |
-| `OVERWRITE LABEL` | `OverwriteLabelDOption` | `org.modellwerkstatt.dataux.structure.OverwriteLabelDOption` | Formular und Tabelle | alle | Überschreibt die von der Datenstruktur vorgegebene Beschriftung |
-| `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `org.modellwerkstatt.dataux.structure.OverwriteFormatDOption` | Formular, Tabelle und Custom Element | `String`, `Integer`, `BigDecimal`, `DateTime`, `DateTime (Date Only)`, `LocalDate`, `Image` | Überschreibt das von der Datenstruktur vorgegebene Format |
-| `WIDTH` | `WidthDOption` | `org.modellwerkstatt.dataux.structure.WidthDOption` | Tabelle | alle | Legt die Breite der Spalte in Prozent fest; Pflicht für jede Spalte, die Summe darf 100 % nicht überschreiten |
-| `EDITABLE` | `EditableDOption` | `org.modellwerkstatt.dataux.structure.EditableDOption` | Tabelle | `Status`, `BigDecimal` | Property wird editierbar dargestellt; höchstens eine Spalte pro Tabelle, nicht zusammen mit `FOLD` |
-| `IMPORTANT` | `ImportantDOption` | `org.modellwerkstatt.dataux.structure.ImportantDOption` | Tabelle | alle | Hebt ein wichtiges Tabellenfeld hervor; höchstens einmal pro Tabelle |
-| `COLOR` | `DynColorDOption` | `org.modellwerkstatt.dataux.structure.DynColorDOption` | Tabelle | `BigDecimal` | Berechnet die Farbe dynamisch aus dem Wert |
-| `LONG DESC` | `StatusLongDescDOption` | `org.modellwerkstatt.dataux.structure.StatusLongDescDOption` | Tabelle | `Status` | Verwendet die Langbeschreibung eines Status |
-| `RIGHT ALIGN` | `RightAlignDOption` | `org.modellwerkstatt.dataux.structure.RightAlignDOption` | Tabelle | `String` | Richtet den Zelleninhalt rechtsbündig aus |
-| `FOLD` | `FoldDOption` | `org.modellwerkstatt.dataux.structure.FoldDOption` | Formular und Tabelle | alle | Tabelle: Blendet die Spalte zunächst aus; der Benutzer kann sie per Doppelklick auf den Spaltenkopf einblenden (in h2forms ohne Wirkung). Formular unter h2forms: Das Feld wird nicht angezeigt, bleibt aber als verstecktes Feld erhalten und kann etwa mit `ISSUE UPDATE/SCANABLE` per Scan befüllt werden |
+| Name | Konzeptname | Kontext | Delegate-Typen | Wirkung |
+| --- | --- | --- | --- | --- |
+| `DISABLED` | `DisabledDOption` | Formular | alle | Delegate ist nicht editierbar |
+| `OPTIONAL` | `OptionalDOption` | Formular | alle | Der Benutzer muss nichts eingeben; ein leeres Feld ergibt `null` (bei `Integer` `0`); siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
+| `PICKER` | `PickerDOption` | Formular | `LocalDate`, `DateTime (Date Only)`, `DateTime` | Verwendet nach Möglichkeit eine Datumsauswahl; bei `DateTime` nicht zusammen mit `OVERWRITE FORMAT` |
+| `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | Formular | alle | Löst eine verfügbare Update-Conclusion aus |
+| `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | Formular | `String` | Verwendet für einen `StringDelegate` einen numerischen Editor |
+| `ALTER` | `AlternativeDOption` | Formular und Tabelle | `Reference`, `Status` | Verwendet einen alternativen Editor, sofern die Laufzeitumgebung diesen unterstützt |
+| `WIDE` | `WideDOption` | Formular | alle | Blendet nach Möglichkeit das Label links vom Editor aus und gibt dem Editor die gesamte Breite |
+| `NUM OF LINES` | `NumOfLinesDOption` | Formular | `String` | Stellt den Text mehrzeilig mit der angegebenen Zeilenzahl dar |
+| `TIME PICKER ONLY` | `TimeOnlyDOption` | Formular | `DateTime` | Erfasst nur die Uhrzeit; als Datum wird immer das aktuelle verwendet |
+| `OVERWRITE LABEL` | `OverwriteLabelDOption` | Formular und Tabelle | alle | Überschreibt die von der Datenstruktur vorgegebene Beschriftung |
+| `OVERWRITE FORMAT` | `OverwriteFormatDOption` | Formular, Tabelle und Custom Element | `String`, `Integer`, `BigDecimal`, `DateTime`, `DateTime (Date Only)`, `LocalDate`, `Image` | Überschreibt das von der Datenstruktur vorgegebene Format |
+| `WIDTH` | `WidthDOption` | Tabelle | alle | Legt die Breite der Spalte in Prozent fest; Pflicht für jede Spalte, die Summe darf 100 % nicht überschreiten |
+| `EDITABLE` | `EditableDOption` | Tabelle | `Status`, `BigDecimal` | Property wird editierbar dargestellt; höchstens eine Spalte pro Tabelle, nicht zusammen mit `FOLD` |
+| `IMPORTANT` | `ImportantDOption` | Tabelle | alle | Hebt ein wichtiges Tabellenfeld hervor; höchstens einmal pro Tabelle |
+| `COLOR` | `DynColorDOption` | Tabelle | `BigDecimal` | Berechnet die Farbe dynamisch aus dem Wert |
+| `LONG DESC` | `StatusLongDescDOption` | Tabelle | `Status` | Verwendet die Langbeschreibung eines Status |
+| `RIGHT ALIGN` | `RightAlignDOption` | Tabelle | `String` | Richtet den Zelleninhalt rechtsbündig aus |
+| `FOLD` | `FoldDOption` | Formular und Tabelle | alle | Tabelle: Blendet die Spalte zunächst aus; der Benutzer kann sie per Doppelklick auf den Spaltenkopf einblenden (in h2forms ohne Wirkung). Formular unter h2forms: Das Feld wird nicht angezeigt, bleibt aber als verstecktes Feld erhalten und kann etwa mit `ISSUE UPDATE/SCANABLE` per Scan befüllt werden |
 
 Jede Option darf pro Delegate höchstens einmal verwendet werden. `Reference`-Delegates sind in Tabellen nicht zulässig.
 
@@ -152,29 +182,29 @@ Die Grenzen aus `LENGTH` und `RANGE` werden nicht zusätzlich als `validation` m
 
 #### Optionen für Formulare und Tabellen
 
-| Name | Konzeptname | FQ-Name | Element | Wirkung |
-| --- | --- | --- | --- | --- |
-| `DISABLED` | `DisabledFOption` | `org.modellwerkstatt.dataux.structure.DisabledFOption` | Formular | Formular ist nicht editierbar |
-| `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` | Formular und Tabelle | Setzt die Beschriftung des Elements. Nicht zulässig am obersten Element eines `Page Pane`s; dort kommt die Beschriftung aus dem Seitentitel |
-| `SELECT FIRST` | `SelectFirstFOption` | `org.modellwerkstatt.dataux.structure.SelectFirstFOption` | Tabelle | Selektiert das erste Tabellenelement bei der Initialisierung |
-| `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.SelectionSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung für ausgewählte Tabellenobjekte |
-| `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.TableSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung über alle Tabellenobjekte |
-| `CUSTOM CSV EXPORT` | `TableCustomCsvExportFOption` | `org.modellwerkstatt.dataux.structure.TableCustomCsvExportFOption` | Tabelle | Passt den CSV-Export an |
+| Name | Konzeptname | Element | Wirkung |
+| --- | --- | --- | --- |
+| `DISABLED` | `DisabledFOption` | Formular | Formular ist nicht editierbar |
+| `LABEL` | `LabelFOption` | Formular und Tabelle | Setzt die Beschriftung des Elements. Nicht zulässig am obersten Element eines `Page Pane`s; dort kommt die Beschriftung aus dem Seitentitel |
+| `SELECT FIRST` | `SelectFirstFOption` | Tabelle | Selektiert das erste Tabellenelement bei der Initialisierung |
+| `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung für ausgewählte Tabellenobjekte |
+| `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung über alle Tabellenobjekte |
+| `CUSTOM CSV EXPORT` | `TableCustomCsvExportFOption` | Tabelle | Passt den CSV-Export an |
 
 ### Layouts, Tabs und Wiederverwendung
 
-Ein `Grid Layout` ordnet UI-Elemente in Zeilen und Spalten an. Zeilen- und Spaltengewichte bestimmen die Größenverteilung. Die sichtbaren Gewichte `-1`, `1*`, `2*`, `3*`, `4*` und `5*` werden durch `MinWeight`, `OneWeight`, `TwoWeight`, `ThreeWeight`, `FourWeight` und `FiveWeight` repräsentiert. So kann beispielsweise eine Tabelle links und ein Formular rechts oder ein kompaktes Suchformular oberhalb einer flexiblen Ergebnistabelle stehen. Dieselben Gewichte werden auch im `Delegate Form` als Spaltengewichte verwendet, dort jedoch ohne `MinWeight`.
+Ein `Grid Layout` ordnet UI-Elemente in Zeilen und Spalten an. Zeilen- und Spaltengewichte bestimmen die Größenverteilung. Die sichtbaren Gewichte `-1`, `1*`, `2*`, `3*`, `4*` und `5*` werden durch `MinWeight`, `OneWeight`, `TwoWeight`, `ThreeWeight`, `FourWeight` und `FiveWeight` repräsentiert. So steht beispielsweise ein kompaktes Rechnungsformular (Zeilengewicht `-1`) über der Tabelle der `Rechnung.positionen` (Zeilengewicht `1*`); beide nutzen in einer Spalte `1*` die volle Breite. Dieselben Gewichte werden auch im `Delegate Form` als Spaltengewichte verwendet, dort jedoch ohne `MinWeight`.
 
 Für ein `Grid Layout` stehen insbesondere folgende Optionen zur Verfügung:
 
-| Name | Konzeptname | FQ-Name | Wirkung |
-| --- | --- | --- | --- |
-| `FLEXIBLE` | `FlexibleOption` | `org.modellwerkstatt.dataux.structure.FlexibleOption` | Erlaubt eine flexible Größenanpassung |
-| `FOCUS FORWARD 2` | `SkipFocusOption` | `org.modellwerkstatt.dataux.structure.SkipFocusOption` | Verschiebt den initialen Fokus auf ein späteres Element |
+| Name | Konzeptname | Wirkung |
+| --- | --- | --- |
+| `FLEXIBLE` | `FlexibleOption` | Erlaubt eine flexible Größenanpassung |
+| `FOCUS FORWARD 2` | `SkipFocusOption` | Verschiebt den initialen Fokus auf ein späteres Element |
 
 Ein `Tab Layout` enthält mindestens einen `Tab` (`Tab`). Jeder Tab besitzt eine als Ausdruck modellierte Beschriftung und genau ein UI-Element.
 
-Mit `Include` (`Include`) wird ein bereits deklariertes bindbares UI-Element wiederverwendet. Die Einbindung muss zur Datenbindung des umgebenden Kontexts passen. Sie erzeugt weder zusätzliche Daten noch einen unabhängigen Selektionsraum. Eine explizite Bindung am Include oder am eingebundenen Element kann den geerbten Kontext gezielt anpassen. Ein UI-Element wird nur benannt, wenn es mit `Include` wiederverwendet wird; für benannte Elemente erzeugt der Generator eine eigene Klasse.
+Mit `Include` (`Include`) wird ein bereits deklariertes bindbares UI-Element wiederverwendet. Die Bindung ist dabei nach Elementart festgelegt: Ein als Root Node deklariertes Element wird nur typisiert, d. h. es gibt lediglich seinen Entity- oder DTO-Typ an und keine Property. Das `Include` ist immer gebunden: Es gibt den Typ und gegebenenfalls die Property an, auf der das eingebundene Element am Verwendungsort arbeitet, etwa `Rechnung.positionen` für eine wiederverwendbare Positionstabelle; sein Inhaltstyp muss dem Typ des eingebundenen Elements entsprechen. Ein `Grid Layout` oder `Tab Layout` innerhalb einer UI-Hierarchie wird nicht gebunden; nur als Root Node ist es typisiert. Die Einbindung erzeugt weder zusätzliche Daten noch einen unabhängigen Selektionsraum. Ein UI-Element wird nur benannt, wenn es mit `Include` wiederverwendet wird; für benannte Elemente erzeugt der Generator eine eigene Klasse.
 
 Ein `Custom UI Element` (`CustomElement`) bindet eine projektspezifische UI-Implementierung ein. Es ist für Darstellungsfälle gedacht, die Form, Tabelle und Layouts nicht ausdrücken. Die fachliche Datenbindung, Delegates und Menüaktionen bleiben Teil des DataUX-Modells; nur die konkrete Darstellung wird projektspezifisch implementiert.
 
@@ -187,7 +217,7 @@ Ein `Page Pane` und eine `Table` besitzen Menüs, deren fachlicher Bezug untersc
 - Das Menü einer Tabelle richtet sich vor allem an die gebundenen Tabellenobjekte. Seine Aktionen arbeiten typischerweise mit der aktuell ausgewählten Zeile oder mit mehreren ausgewählten Zeilen.
 - Das Menü eines `Page Pane`s gehört zum gesamten Seitenkontext. Seine Aktionen betreffen daher eher das gebundene Wurzelobjekt, den vollständigen Aggregatgraphen oder den übergreifenden Ablauf der Page.
 
-Auch für ein `Custom UI Element` kann ein Menü modelliert werden. Ob und wie es sichtbar und bedienbar ist, hängt jedoch davon ab, ob die konkrete UI-Laufzeitkomponente diese Menüintegration unterstützt. Ein `Include` kann eigene Menüeinträge angeben und damit das Menü des eingebundenen Elements am jeweiligen Verwendungsort überschreiben. Das ist insbesondere beim Einbinden einer Tabelle oder eines Custom Elements nützlich.
+Auch für ein `Custom UI Element` kann ein Menü modelliert werden. Ob und wie es sichtbar und bedienbar ist, hängt jedoch davon ab, ob die konkrete UI-Laufzeitkomponente diese Menüintegration unterstützt. Ein `Include` kann eigene Menüeinträge nur angeben, wenn es eine `Table` einbindet; damit wird das Tabellenmenü am jeweiligen Verwendungsort überschrieben. Beim Einbinden eines Custom Elements, Formulars oder Layouts sind Menüeinträge am Include nicht zulässig.
 
 #### Kapitellandkarte: Menüs
 
@@ -195,12 +225,14 @@ Auch für ein `Custom UI Element` kann ein Menü modelliert werden. Ob und wie e
 | --- | --- | --- | --- |
 | `Action` | `MenuAction` | `org.modellwerkstatt.dataux.structure.MenuAction` | Ruft einen ObjectFlow-Command mit optionalem Label und Argumenten auf |
 | `Compound Action` | `MenuCompoundAction` | `org.modellwerkstatt.dataux.structure.MenuCompoundAction` | Verkettet mehrere Command-Aufrufe anhand ihrer Page-Conclusions |
-| `PageConclusionReference` | `PageConclusionReference` | `org.modellwerkstatt.dataux.structure.PageConclusionReference` | Referenziert die Abschlussart, unter der die Aktionskette fortgesetzt wird |
-| `USER_CANCEL` | `PageConclusionOptionUserCancel` | `org.modellwerkstatt.dataux.structure.PageConclusionOptionUserCancel` | Behandelt einen Benutzerabbruch als Fortsetzungsfall |
+| `PageConclusionReference` | `PageConclusionReference` | `org.modellwerkstatt.dataux.structure.PageConclusionReference` | Referenziert eine Conclusion des aufgerufenen Commands, die als automatische Conclusion ausgeführt wird |
+| `USER_CANCEL` | `PageConclusionOptionUserCancel` | `org.modellwerkstatt.dataux.structure.PageConclusionOptionUserCancel` | Automatische Conclusion, die den Command wie einen Benutzerabbruch mit `cancel` beendet |
 | `Submenu` | `MenuSub` | `org.modellwerkstatt.dataux.structure.MenuSub` | Gruppiert weitere Menüeinträge |
 | `- - - -` | `MenuSeparator` | `org.modellwerkstatt.dataux.structure.MenuSeparator` | Trennt Menügruppen optisch |
+| `getSelected` | `SelectedObject` | `org.modellwerkstatt.objectflow.structure.SelectedObject` | Action-Argument: das aktuell selektierte Objekt eines im `Page Pane` verwendeten Typs. |
+| `getSelectedObjects` | `SelectedList` | `org.modellwerkstatt.objectflow.structure.SelectedList` | Action-Argument: die ausgewählten Objekte einer Mehrfachselektion. |
 
-Ein Menü beginnt üblicherweise mit einem `Submenu` (`MenuSub`). Die Oberfläche stellt diese Gruppe als Overflow-Menü dar, vergleichbar mit dem bekannten Android-Muster. Nur wenige, außergewöhnlich wichtige Aktionen sollten direkt auf der obersten Ebene stehen; zu viele Top-Level-Aktionen nehmen Platz ein und verwässern die Priorisierung.
+Ein `Submenu` (`MenuSub`) ohne Text ist das Overflow-Menü eines `Page Pane`s oder einer Tabelle. Die Sprache prüft dafür drei Regeln: Auf der obersten Menüebene stehen `Action`s vor einem `Submenu`, nach einem `Submenu` folgen nur weitere `Submenu`s oder Trennstriche („Actions should be placed left before overflows/sub menus (on lowest menu level at least).“); das textlose `Submenu` ist nur auf der obersten Ebene erlaubt („Action overflow (submenu) is only valid as top level menu in ux elements.“) und nur einmal („Only one overflow (submenu) can be used.“).
 
 Eine `Action` (`MenuAction`) referenziert einen ObjectFlow-`Command`. Die im Command definierte Standardparametrisierung gilt auch für eine Action, sodass sie ohne explizite Argumente modelliert werden kann. Nur wenn der Aufrufkontext andere Werte verlangt, überschreibt die Action einzelne beziehungsweise alle Argumente mit Ausdrücken. Typische Quellen dafür sind:
 
@@ -220,7 +252,7 @@ Vor dem Modellieren einer Aktion ist deshalb zu klären:
 - Welche Command-Parameter müssen befüllt werden?
 - Soll die Aktion global, in einem Submenü oder nur an der fokussierten Komponente angeboten werden?
 
-Eine `Compound Action` (`MenuCompoundAction`) verbindet einen `GRAPH_OWNER_CMD` optional mit einem anschließenden `GRAPH_EDIT_CMD`. Wird für den `GRAPH_OWNER_CMD` unmittelbar eine Page-Conclusion angegeben, kann er ohne sichtbare UI bis zu diesem Abschluss ausgeführt werden. Zusätzlich kann die Compound Action in derselben Session und mit den vom Owner bereitgestellten Daten direkt einen `GRAPH_EDIT_CMD` starten. Sowohl für den `GRAPH_OWNER_CMD` als auch für den `GRAPH_EDIT_CMD` lässt sich optional eine automatische Conclusion angeben.
+Eine `Compound Action` (`MenuCompoundAction`) ruft einen `GRAPH_OWNER_CMD` oder `GRAPH_OWNER_CMD(modal)` auf und verbindet ihn optional mit einem anschließenden `GRAPH_EDIT_CMD`. Sie benötigt immer ein eigenes Label (`customLabel`) und immer eine automatische Conclusion für den Owner; ohne sie ist eine einfache `Action` zu verwenden. Der Owner wird damit ohne sichtbare UI bis zu diesem Abschluss ausgeführt. Folgt ein `GRAPH_EDIT_CMD`, läuft er in derselben Session mit den vom Owner bereitgestellten Daten; der Owner muss dann genau eine Page besitzen, und `getSelected(...)` im Edit-Aufruf darf nur den Typ dieser Page verwenden. Für den `GRAPH_EDIT_CMD` ist eine automatische Conclusion optional und nur möglich, wenn er Pages hat. Successor-Commands des Owners werden nicht unterstützt, mit Ausnahme genau eines unbedingten Successors.
 
 Damit kann beispielsweise aus einem Suchergebnis heraus eine Aktion auf einem vollständigen Aggregat ausgeführt werden: Der `GRAPH_OWNER_CMD` öffnet das ausgewählte Objekt, lädt den Aggregatgraphen vollständig und stellt die Session bereit. Anschließend führt der `GRAPH_EDIT_CMD` die fachliche Änderung aus. Dessen Conclusion bestätigt die Änderung; die Conclusion des Owners speichert und schließt den Aggregatgraphen. Ohne nachgelagerten `GRAPH_EDIT_CMD` eignet sich dasselbe Muster auch dazu, einen `GRAPH_OWNER_CMD` vollständig ohne UI auszuführen.
 
@@ -256,6 +288,7 @@ Ein `AppUI Module` beschreibt eine interaktive Anwendung. Neben Benutzerkontext 
 | `tileInit` | `TileInitFunction` | `org.modellwerkstatt.dataux.structure.TileInitFunction` | Initialisiert den Tile-Zustand |
 | `startup command to run` | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` | Command, der nach der Anmeldung gestartet wird |
 | `Action` | `MenuAction` | `org.modellwerkstatt.dataux.structure.MenuAction` | Verknüpft Menü oder Tile mit einem ObjectFlow-Command |
+| `isAuthenticated` | `AppAuthenticationFunction` | `org.modellwerkstatt.dataux.structure.AppAuthenticationFunction` | Initialisiert den Benutzerkontext: übernimmt den Benutzernamen in `userEnvironment` und setzt die Benutzer-ID; am `BatchJob Module` nur für eine gestartete UI wirksam. |
 
 - `mainMenu` bildet das fachliche Start- beziehungsweise Hauptmenü.
 - `extrasMenu` nimmt ergänzende, seltener benötigte Funktionen auf.
@@ -335,8 +368,6 @@ Ein Batchjob besitzt eine verpflichtende Exception-Strategie (`org.modellwerksta
 | `DELAY_EXECUTION` | Wartet vor der weiteren Verarbeitung beziehungsweise Neuplanung |
 | `CLEAR_INBOX` | Verwirft alle noch wartenden Inbox-Elemente und veranlasst eine Neuplanung |
 | `CONSUMER_RESTART` | Beendet den betroffenen Consumer und startet einen Ersatz-Consumer |
-| `JOB_SHUTDOWN` / `VM_SHUTDOWN` | Gegenwärtig nicht implementiert |
-| `JOB_RESTART` / `VM_RESTART` | Gegenwärtig nicht implementiert |
 | `SILENT_NO_LOG` | Unterdrückt die übliche Problemprotokollierung; der Vorgang bleibt als nicht protokollierte Exception gezählt |
 
 Bei mehreren gleichzeitig fehlschlagenden Consumern wartet die Laufzeit, bis kein Consumer mehr arbeitet, und verwendet dann die längste angeforderte Verzögerung. Nach einem Producerfehler wird eine positive Wiederanlaufzeit auf mindestens fünf Minuten angehoben. Ein fachlicher Abbruch wird separat als *canceled* gezählt: Er ist kein technischer Fehler und stellt das betroffene Element nicht automatisch erneut in die Inbox.
@@ -351,7 +382,7 @@ Die Exception-Strategie ersetzt keine fachliche Problembehandlung innerhalb des 
 | `DELAY` | `OptDelayPair` | `org.modellwerkstatt.dataux.structure.OptDelayPair` | Wartezeit zwischen vollständigen Durchläufen eines referenzierten Pairs |
 | `CONSUMERS` | `OptNumConsumersPair` | `org.modellwerkstatt.dataux.structure.OptNumConsumersPair` | Anzahl paralleler Consumer eines referenzierten Paars |
 | `DEPENDENT_CONSECUTIVE` | `OptBatchDependent` | `org.modellwerkstatt.dataux.structure.OptBatchDependent` | Paare werden abhängig und nacheinander behandelt |
-| `RUN_IN_CONSOLE` | `OptRunInConsole` | `org.modellwerkstatt.dataux.structure.OptRunInConsole` | Start ohne instanziierte UI |
+| `RUN_IN_CONSOLE` | `OptRunInConsole` | `org.modellwerkstatt.dataux.structure.OptRunInConsole` | Nicht mehr unterstützt; der Checker meldet einen Fehler. Konsolenbetrieb wird in der `OFXConfig` konfiguriert |
 | `OptIncludeBatchUi` | `OptIncludeBatchUi` | `org.modellwerkstatt.dataux.structure.OptIncludeBatchUi` | Bindet einen referenzierten Batchjob in einen UI-Modulkontext ein |
 | `VERSION` | `OptVersion` | `org.modellwerkstatt.dataux.structure.OptVersion` | Version des Moduls |
 | `OFFICIAL NAME` | `OptOfficialAppName` | `org.modellwerkstatt.dataux.structure.OptOfficialAppName` | Sichtbarer offizieller Modulname |
@@ -361,12 +392,12 @@ Die Exception-Strategie ersetzt keine fachliche Problembehandlung innerhalb des 
 Aus diesen Optionen ergeben sich drei typische Betriebsweisen:
 
 - **Zeitpunktausführung:** Ein `CRON`-Ausdruck startet den Producer zu einem bestimmten Zeitpunkt; die Consumer arbeiten die dadurch gefüllte Inbox ab.
-- **Zeitfenster:** `DELAY` schaltet das Pair in den kontinuierlichen Modus und legt den Abstand zwischen vollständigen Durchläufen fest. Zusätzliche `CRON`-Ausdrücke begrenzen diesen Modus auf Zeitfenster. Außerhalb des Fensters erhalten Consumer keine neue Arbeit; laufende Verarbeitungen dürfen enden und die restliche Inbox bleibt bis zum nächsten Fenster erhalten, solange der Prozess nicht neu gestartet wird.
+- **Zeitfenster:** `DELAY` schaltet das Pair in den kontinuierlichen Modus und legt den Abstand zwischen vollständigen Durchläufen fest; innerhalb einer gefüllten Inbox arbeiten freie Consumer ohne diese Pause weiter. Zusätzliche `CRON`-Ausdrücke begrenzen diesen Modus auf Zeitfenster. Außerhalb des Fensters erhalten Consumer keine neue Arbeit; laufende Verarbeitungen dürfen enden und die restliche Inbox bleibt bis zum nächsten Fenster erhalten, solange der Prozess nicht neu gestartet wird.
 - **Abhängige Folge:** Mit `DEPENDENT_CONSECUTIVE` werden mehrere Paare in ihrer modellierten Reihenfolge ausgeführt. Ein nachfolgendes Pair beginnt erst, wenn seine Vorgänger erfolgreich abgeschlossen sind. Nur das erste Pair darf `CRON` oder `DELAY` besitzen. Nach einem Fehler oder dem Verlassen des Zeitfensters beginnt die Kette beim erneuten Start wieder mit dem ersten Pair.
 
 Im zeitpunktspezifischen Modus muss der CRON-Ausdruck mit einem konkreten Sekundenwert beginnen. Im Zeitfenstermodus beginnen die Ausdrücke dagegen mit einem Sekunden-Wildcard. Wird `DELAY` ohne `CRON` verwendet, läuft das Pair grundsätzlich ohne tägliche Zeitfensterbegrenzung. Die Auswertung verwendet die Standardzeitzone der JVM.
 
-`CONSUMERS` legt die Anzahl der Consumer pro Pair fest und steuert damit die Parallelität pro Pair. Eine Erhöhung beschleunigt die Abarbeitung nur, wenn die verwendeten externen Systeme sowie Sperrstrategien dies vertragen. `RUN_IN_CONSOLE` unterdrückt die UI-Instanziierung; `OptIncludeBatchUi` bindet umgekehrt einen Batchjob in den UI-Kontext eines Moduls ein.
+`CONSUMERS` legt die Anzahl der Consumer pro Pair fest und steuert damit die Parallelität pro Pair. Eine Erhöhung beschleunigt die Abarbeitung nur, wenn die verwendeten externen Systeme sowie Sperrstrategien dies vertragen. Ob ein Batchjob mit oder ohne UI läuft, legt nicht das Modul, sondern die `OFXConfig` fest: Für den Konsolenbetrieb ohne instanziierte UI wird dort als Anwendungsfabrik eine `new instance` der Klasse `org.modellwerkstatt.objectflow.job.console.ConsoleBatchJobAppFactory` konfiguriert. Die frühere Modul-Option `RUN_IN_CONSOLE` wird nicht mehr unterstützt und vom Checker als Fehler gemeldet. `OptIncludeBatchUi` bindet umgekehrt einen Batchjob in den UI-Kontext eines Moduls ein.
 
 Ein typischer Batchablauf lautet:
 
@@ -419,127 +450,21 @@ Beide Modulformen können dieselben fachlichen Services und Repositories verwend
 3. Nach der Suche stellt eine weitere Page eine Ergebnisliste bereit; eine `Table` zeigt die Ergebnisse.
 4. Die ausgewählte Tabellenzeile wird zur gemeinsamen Selektion des Ergebnis- beziehungsweise Entity-Typs.
 5. Eine Tabellenaktion startet den Bearbeitungs-Command mit der selektierten ID oder Instanz.
-6. Die Bearbeitungs-Page nutzt ein `Page Pane` mit Formular, Detailtabelle und gegebenenfalls weiteren Detailformularen.
+6. Der Bearbeitungs-Command ist ein `GRAPH_OWNER_CMD`; seine Page zeigt die geladene Rechnung in einem `DISABLED` `Delegate Form` über der Tabelle der Positionen. Die Änderungen führen `GRAPH_EDIT_CMD`s mit editierbaren Formularen aus, die über das `Submenu` der Tabelle beziehungsweise des `Page Pane`s gestartet werden.
 
 ### Batchverarbeitung mit optionaler UI
 
 1. Ein `BatchJob Module` konfiguriert Pair, Zeitplan und Exception-Strategie.
 2. Der Producer stellt die zu verarbeitenden Objekte oder Schlüssel bereit.
 3. Ein Command verarbeitet jeweils eine Arbeitseinheit und kann definierte Pages besitzen.
-4. Bei `RUN_IN_CONSOLE` wird keine UI instanziiert.
+4. Die `OFXConfig` entscheidet über UI- oder Konsolenbetrieb; für die Konsole wird die `ConsoleBatchJobAppFactory` als Anwendungsfabrik konfiguriert.
 5. Wird der Batchjob in eine Anwendung eingebunden, können vorhandene Pages durch passende `Page Pane`s sichtbar gemacht werden.
-
-## Häufige Fehler und Diagnose
-
-- **UI-Bindung mit Laden verwechseln:** Eine gebundene Referenz oder Liste muss fachlich bereits geladen beziehungsweise bereitgestellt sein.
-- **Unabhängige Tabellenselektionen erwarten:** Tabellen desselben Zeilentyps teilen sich die Selektion innerhalb eines `Page Pane`s.
-- **Identität und fachliche Gleichheit verwechseln:** Die gemeinsame Selektion bezieht sich auf dieselbe Laufzeitinstanz.
-- **Leere Selektion nicht berücksichtigen:** Formulare zeigen dann keine Daten; Aktionen und Ausdrücke müssen diesen Zustand vertragen oder deaktiviert sein.
-- **Zeilen- und Parent-Typ verwechseln:** Bei einer Tabelle ist zwischen dem Eigentümer der Listen-Property und dem Zeilentyp zu unterscheiden.
-- **Value-Object-Liste an eine Tabelle binden:** Tabellen erwarten Listen von Entities oder DTOs.
-- **`Include` als neuen Kontext verstehen:** `Include` verwendet eine bestehende UI-Beschreibung, erzeugt aber weder Daten noch einen eigenen Selektionsraum.
-- **Unpassenden Delegate-Typ verwenden:** Delegate und fachlicher Property-Typ müssen zusammenpassen.
-- **Fachlogik in UI-Ausdrücke verschieben:** Dynamische Labels und Farben sind UI-Aufgaben; Geschäftsregeln gehören in fachliche Komponenten.
-- **Command-Argumente aus dem falschen Selektionskontext bilden:** Tabellenaktionen benötigen häufig die selektierte Zeile und nicht das Parent-Objekt des `Page Pane`s.
-- **Batchoption keinem Pair eindeutig zuordnen:** `CRON`, `DELAY` und `CONSUMERS` referenzieren jeweils ein konkretes Producer/Consumer-Paar.
-- **`DELAY` als Pause zwischen Inbox-Elementen verstehen:** Die Verzögerung liegt zwischen vollständigen Pair-Durchläufen; innerhalb einer gefüllten Inbox arbeiten freie Consumer ohne diese Pause weiter.
-- **Die Inbox als persistent ansehen:** Ihr Inhalt existiert nur im Arbeitsspeicher. Nach einem Neustart muss der Producer noch offene Arbeit erneut finden können.
-- **Automatischen Retry voraussetzen:** Ein fehlgeschlagenes Element wird nur mit `READD_TO_INBOX` erneut eingestellt. `CLEAR_INBOX` verwirft auch die übrigen wartenden Elemente.
-- **Manuellen Start während laufender Consumer auslösen:** Die Anforderung wird in diesem Zustand nicht für später vorgemerkt. Vor dem Start muss der Pair-Status geprüft werden.
-- **Parallele Consumer bei reihenfolgeabhängiger Verarbeitung verwenden:** Mehrere Consumer schließen Elemente nicht zwingend in Inbox-Reihenfolge ab.
-- **Externe Aufrufe ohne eigene Timeouts ausführen:** Die Job-Laufzeit begrenzt die Bearbeitungszeit eines einzelnen Inbox-Elements nicht zuverlässig.
-- **Serverzeitzone übersehen:** CRON-Ausdrücke werden in der Standardzeitzone der JVM ausgewertet.
-- **Exception-Strategie als fachliche Fehlerbehandlung behandeln:** Sie steuert den technischen Umgang mit Ausnahmen, nicht die Domänenentscheidung.
-- **Desktop-Layout unverändert mobil verwenden:** Unterschiedliche Geräteklassen benötigen häufig eigene `Page Pane`s oder Anwendungsmodule.
-- **Name und Konzeptname verwechseln:** Name, Konzeptname und FQ-Name nach der eingangs festgelegten Schreibweise unterscheiden.
 
 ## Weiterführende Dokumentation
 
 - [MoWare-Werkbank im Überblick](moware-werkbank.md)
 - [ObjectFlow – Fachliches Modell, Services und Anwendungsabläufe](objectflow.md)
 - [ManMap – Persistenz und Lesemodelle](manmap.md)
-
-## Konzeptindex für Agenten
-
-Der Index enthält die in dieser Dokumentation behandelten wichtigen DataUX-Konzepte sowie die unmittelbar benötigten ObjectFlow-Konzepte, nicht alle Konzepte der Sprachen.
-
-| Themenbereich | Name | Konzeptname | FQ-Name |
-| --- | --- | --- | --- |
-| UI-Root | `Page Pane` | `PagePane` | `org.modellwerkstatt.dataux.structure.PagePane` |
-| UI-Element | `Delegate Form` | `DelegateForm` | `org.modellwerkstatt.dataux.structure.DelegateForm` |
-| UI-Element | `Table` | `Table` | `org.modellwerkstatt.dataux.structure.Table` |
-| UI-Element | `Grid Layout` | `GridLayout` | `org.modellwerkstatt.dataux.structure.GridLayout` |
-| UI-Element | `Tab Layout` | `TabLayout` | `org.modellwerkstatt.dataux.structure.TabLayout` |
-| UI-Element | `Tab` | `Tab` | `org.modellwerkstatt.dataux.structure.Tab` |
-| UI-Element | `Include` | `Include` | `org.modellwerkstatt.dataux.structure.Include` |
-| UI-Element | `Custom UI Element` | `CustomElement` | `org.modellwerkstatt.dataux.structure.CustomElement` |
-| Layoutgewicht | `-1` | `MinWeight` | `org.modellwerkstatt.dataux.structure.MinWeight` |
-| Layoutgewicht | `1*` | `OneWeight` | `org.modellwerkstatt.dataux.structure.OneWeight` |
-| Layoutgewicht | `2*` | `TwoWeight` | `org.modellwerkstatt.dataux.structure.TwoWeight` |
-| Layoutgewicht | `3*` | `ThreeWeight` | `org.modellwerkstatt.dataux.structure.ThreeWeight` |
-| Layoutgewicht | `4*` | `FourWeight` | `org.modellwerkstatt.dataux.structure.FourWeight` |
-| Layoutgewicht | `5*` | `FiveWeight` | `org.modellwerkstatt.dataux.structure.FiveWeight` |
-| Delegate | `String` | `StringDelegate` | `org.modellwerkstatt.dataux.structure.StringDelegate` |
-| Delegate | `Integer` | `IntegerDelegate` | `org.modellwerkstatt.dataux.structure.IntegerDelegate` |
-| Delegate | `BigDecimal` | `BigDecimalDelegate` | `org.modellwerkstatt.dataux.structure.BigDecimalDelegate` |
-| Delegate | `DateTime` | `DateTimeDelegate` | `org.modellwerkstatt.dataux.structure.DateTimeDelegate` |
-| Delegate | `DateTime (Date Only)` | `DateTimeDateOnlyDelegate` | `org.modellwerkstatt.dataux.structure.DateTimeDateOnlyDelegate` |
-| Delegate | `LocalDate` | `LocalDateDelegate` | `org.modellwerkstatt.dataux.structure.LocalDateDelegate` |
-| Delegate | `Status` | `StatusDelegate` | `org.modellwerkstatt.dataux.structure.StatusDelegate` |
-| Delegate | `Reference` | `ReferenceDelegate` | `org.modellwerkstatt.dataux.structure.ReferenceDelegate` |
-| Delegate | `Image` | `ImageDelegate` | `org.modellwerkstatt.dataux.structure.ImageDelegate` |
-| Delegate | `Upload` | `UploadDelegate` | `org.modellwerkstatt.dataux.structure.UploadDelegate` |
-| Delegate | `Dummy` | `DummyDelegate` | `org.modellwerkstatt.dataux.structure.DummyDelegate` |
-| Delegate-Option | `WIDTH` | `WidthDOption` | `org.modellwerkstatt.dataux.structure.WidthDOption` |
-| Delegate-Option | `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` |
-| Delegate-Option | `EDITABLE` | `EditableDOption` | `org.modellwerkstatt.dataux.structure.EditableDOption` |
-| Delegate-Option | `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` |
-| Delegate-Option | `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` |
-| Delegate-Option | `IMPORTANT` | `ImportantDOption` | `org.modellwerkstatt.dataux.structure.ImportantDOption` |
-| Delegate-Option | `COLOR` | `DynColorDOption` | `org.modellwerkstatt.dataux.structure.DynColorDOption` |
-| Delegate-Option | `LONG DESC` | `StatusLongDescDOption` | `org.modellwerkstatt.dataux.structure.StatusLongDescDOption` |
-| Delegate-Option | `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` |
-| Delegate-Option | `OVERWRITE LABEL` | `OverwriteLabelDOption` | `org.modellwerkstatt.dataux.structure.OverwriteLabelDOption` |
-| Delegate-Option | `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `org.modellwerkstatt.dataux.structure.OverwriteFormatDOption` |
-| Delegate-Option | `FOLD` | `FoldDOption` | `org.modellwerkstatt.dataux.structure.FoldDOption` |
-| Delegate-Option | `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` |
-| Delegate-Option | `ALTER` | `AlternativeDOption` | `org.modellwerkstatt.dataux.structure.AlternativeDOption` |
-| Delegate-Option | `WIDE` | `WideDOption` | `org.modellwerkstatt.dataux.structure.WideDOption` |
-| Delegate-Option | `NUM OF LINES` | `NumOfLinesDOption` | `org.modellwerkstatt.dataux.structure.NumOfLinesDOption` |
-| Delegate-Option | `TIME PICKER ONLY` | `TimeOnlyDOption` | `org.modellwerkstatt.dataux.structure.TimeOnlyDOption` |
-| Delegate-Option | `RIGHT ALIGN` | `RightAlignDOption` | `org.modellwerkstatt.dataux.structure.RightAlignDOption` |
-| Formular-/Tabellenoption | `DISABLED` | `DisabledFOption` | `org.modellwerkstatt.dataux.structure.DisabledFOption` |
-| Formular-/Tabellenoption | `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` |
-| Formular-/Tabellenoption | `SELECT FIRST` | `SelectFirstFOption` | `org.modellwerkstatt.dataux.structure.SelectFirstFOption` |
-| Formular-/Tabellenoption | `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.SelectionSummaryLineFOption` |
-| Formular-/Tabellenoption | `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.TableSummaryLineFOption` |
-| Formular-/Tabellenoption | `CUSTOM CSV EXPORT` | `TableCustomCsvExportFOption` | `org.modellwerkstatt.dataux.structure.TableCustomCsvExportFOption` |
-| Gridlayout-Option | `FLEXIBLE` | `FlexibleOption` | `org.modellwerkstatt.dataux.structure.FlexibleOption` |
-| Gridlayout-Option | `FOCUS FORWARD 2` | `SkipFocusOption` | `org.modellwerkstatt.dataux.structure.SkipFocusOption` |
-| Menü | `Action` | `MenuAction` | `org.modellwerkstatt.dataux.structure.MenuAction` |
-| Menü | `Compound Action` | `MenuCompoundAction` | `org.modellwerkstatt.dataux.structure.MenuCompoundAction` |
-| Menü | `PageConclusionReference` | `PageConclusionReference` | `org.modellwerkstatt.dataux.structure.PageConclusionReference` |
-| Menü | `USER_CANCEL` | `PageConclusionOptionUserCancel` | `org.modellwerkstatt.dataux.structure.PageConclusionOptionUserCancel` |
-| Menü | `Submenu` | `MenuSub` | `org.modellwerkstatt.dataux.structure.MenuSub` |
-| Menü | `- - - -` | `MenuSeparator` | `org.modellwerkstatt.dataux.structure.MenuSeparator` |
-| Menüargument | `getSelected()` | `SelectedObject` | `org.modellwerkstatt.objectflow.structure.SelectedObject` |
-| Menüargument | `getSelectedObjects()` | `SelectedList` | `org.modellwerkstatt.objectflow.structure.SelectedList` |
-| Anwendung | `AppUI Module` | `AppUiModule` | `org.modellwerkstatt.dataux.structure.AppUiModule` |
-| Anwendung | `Tile` | `AppTile` | `org.modellwerkstatt.dataux.structure.AppTile` |
-| Anwendung | `tileInit` | `TileInitFunction` | `org.modellwerkstatt.dataux.structure.TileInitFunction` |
-| Anwendung | `startup command to run` | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` |
-| Modul | `isAuthenticated` | `AppAuthenticationFunction` | `org.modellwerkstatt.dataux.structure.AppAuthenticationFunction` |
-| Moduloption | `VERSION` | `OptVersion` | `org.modellwerkstatt.dataux.structure.OptVersion` |
-| Moduloption | `OFFICIAL NAME` | `OptOfficialAppName` | `org.modellwerkstatt.dataux.structure.OptOfficialAppName` |
-| Batchjob | `BatchJob Module` | `BatchJobModule` | `org.modellwerkstatt.dataux.structure.BatchJobModule` |
-| Batchjob | Producer/Consumer-Paar | `OFXProducerConsumerPair` | `org.modellwerkstatt.objectflow.structure.OFXProducerConsumerPair` |
-| Batchjob | Exception-Strategie | `OFXExceptionStrategy` | `org.modellwerkstatt.objectflow.structure.OFXExceptionStrategy` |
-| Batchoption | `CRON` | `OptCronPairExp` | `org.modellwerkstatt.dataux.structure.OptCronPairExp` |
-| Batchoption | `DELAY` | `OptDelayPair` | `org.modellwerkstatt.dataux.structure.OptDelayPair` |
-| Batchoption | `CONSUMERS` | `OptNumConsumersPair` | `org.modellwerkstatt.dataux.structure.OptNumConsumersPair` |
-| Batchoption | `DEPENDENT_CONSECUTIVE` | `OptBatchDependent` | `org.modellwerkstatt.dataux.structure.OptBatchDependent` |
-| Batchoption | `RUN_IN_CONSOLE` | `OptRunInConsole` | `org.modellwerkstatt.dataux.structure.OptRunInConsole` |
-| Batchoption | `OptIncludeBatchUi` | `OptIncludeBatchUi` | `org.modellwerkstatt.dataux.structure.OptIncludeBatchUi` |
 
 ## Dokumentstand
 

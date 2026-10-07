@@ -27,7 +27,8 @@ Used in `type` role of a `LocalVariableDeclaration`, `returnType`, parameter `ty
 | `SNodeTypeCastExpression` | `1140137987495` | `expr as C` / `expr : C` |
 | `SemanticDowncastExpression` | `1145404486709` | `expr /` — downcast smodel type (`node<C>`, `model<L>`) to Java API (`SNode`, `SModel`) |
 | `SConceptTypeCastExpression` | `1761385620274348152` | cast to `concept<C>` |
-| `SConceptTypeLiteral` | `5472444609684539882` | `concept/C/` concept literal |
+| `ConceptIdRefExpression` | `2644386474300074836` | `concept/C/` concept literal (expression; ref `conceptDeclaration`) |
+| `SConceptTypeLiteral` | `5472444609684539882` | concept-type literal — a `Type`, not an expression |
 | `RefConcept_Reference` | `1177026924588` | `<ConceptName>` concept argument wrapper |
 | `LinkIdRefExpression` | `2644386474301421077` | `link/C : role/` link literal |
 
@@ -60,7 +61,7 @@ All appear in the `operation` role of a `DotExpression`.
 
 ### Factory-initialized (NF_*) variants
 
-Concepts from `jetbrains.mps.lang.actions` (language `l:aee9cad2-acd4-4608-aef2-0004f6a1cdbd:jetbrains.mps.lang.actions`, virtual folder `nodeFactories`). They are structurally the same DotExpression operations as the smodel originals listed above but with a critical runtime difference: they invoke **the actions-aspect `NodeFactory`** of the created node's concept (see `mps-aspect-actions`). That factory sets up defaults, seeds mandatory children, and may carry data from a `sampleNode`. Non-`NF_` variants skip the factory — use `NF_` when a concept's newly inserted instance must behave like one created through the editor, and the plain operation when you want an uninitialised shell.
+Concepts from `jetbrains.mps.lang.actions` (language `l:aee9cad2-acd4-4608-aef2-0004f6a1cdbd:jetbrains.mps.lang.actions`, virtual folder `nodeFactories`). They are structurally the same DotExpression operations as the smodel originals listed above but with a critical runtime difference: they invoke **the actions-aspect `NodeFactory`** of the created node's concept. That factory sets up defaults, seeds mandatory children, and may carry data from a `sampleNode`. Non-`NF_` variants skip the factory — use `NF_` when a concept's newly inserted instance must behave like one created through the editor, and the plain operation when you want an uninitialised shell.
 
 Each NF_* op also accepts an optional `<default>` / `node<>` initializer block that runs after the factory. Surface syntax uses phrases `add new initialized`, `set new initialized`, `replace with new initialized`, `insert new initialized next/prev-sibling`, etc.
 
@@ -75,9 +76,9 @@ Each NF_* op also accepts an optional `<default>` / `node<>` initializer block t
 | `NF_Model_CreateNewRootNodeOperation` | `5480835971642160908` | `new root node initialized<C>` in `model` | `Model_CreateNewRootNodeOperation` |
 | `NF_Concept_NewInstance` | `7776141288922801652` | `c.new initialized()` — detached node with factory run | `Concept_NewInstance` (in smodel) |
 
-The `<default>` placeholder inside `add new initialized(<default>)` stands for an empty initializer (the concept is inferred from the containment role), equivalent to an explicit `add new initialized(C)` call without a custom block. Verbatim example from StateChart `AddOnEntry` intention's execute body: `node.onEntry.operations.add new initialized(<default>);` — this creates a new `Operation` child and runs any `NodeFactory` defined for it in the actions aspect.
+The `<default>` placeholder inside `add new initialized(<default>)` stands for an empty initializer (the concept is inferred from the containment role), equivalent to an explicit `add new initialized(C)` call without a custom block.
 
-⚠ **Used-language requirement** — because the NF_* concepts live in `jetbrains.mps.lang.actions`, the *containing model* (intention, behavior, typesystem, etc.) must import that language in its **used languages**. Without the import, the `add new initialized(...)` / `set new initialized(...)` / `replace with new initialized(...)` surface syntax is not offered and pasted blueprints will produce unresolved-concept errors. Add it via `mps_mcp_model_used_language(modelReference=<model>, usedLanguage="jetbrains.mps.lang.actions", kind="language")`. The plain (non-`NF_`) smodel variants need no extra import beyond `jetbrains.mps.lang.smodel` which is already present in every code-bearing MPS model.
+⚠ **Used-language requirement** — because the NF_* concepts live in `jetbrains.mps.lang.actions`, the *containing model* (e.g. a console command or an application model) must import that language in its **used languages**. Without the import, the `add new initialized(...)` / `set new initialized(...)` / `replace with new initialized(...)` surface syntax is not offered and pasted blueprints will produce unresolved-concept errors. Add it via `mps_mcp_model_used_language(modelReference=<model>, usedLanguage="jetbrains.mps.lang.actions", kind="language")`. The plain (non-`NF_`) smodel variants need no extra import beyond `jetbrains.mps.lang.smodel` which is already present in every code-bearing MPS model.
 
 ## Query operations
 
@@ -110,7 +111,8 @@ All in `operation` role of a `DotExpression`.
 | `Node_IsNotNullOperation` | `1172008320231` | `.isNotNull` |
 | `Node_IsNullOperation` | `1171999116870` | `.isNull` |
 | `Node_ConceptMethodCall` | `1179409122411` | `.behaviorMethod(args)` |
-| `Node_GetConceptOperation` | `1172323065820` | `.concept` (alias `conceptNode`) — **DEPRECATED since MPS 2018.3**; use `node.concept` via typesystem or `concept/C/` literal |
+| `Node_GetSConceptOperation` | `7453996997717780434` | `.concept` — the node's concept (`concept<>` value) |
+| `Node_GetConceptOperation` | `1172323065820` | `.conceptNode` — **DEPRECATED since MPS 2018.3**; use `.concept` (`Node_GetSConceptOperation`) |
 
 ## Concept operations
 

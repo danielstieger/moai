@@ -31,7 +31,7 @@ Pass the plain name as `target` in the JSON reference for unambiguous cases (sin
 
 ## 3. `GET_ASSIGNABLE_REFERENCES` (Completion Mode)
 
-For ambiguous overloads or when the declaring class in the hierarchy is unclear. Pass `contextNode`, `referenceRole`, `argumentTypes`, and `kindFilter`.
+For ambiguous overloads or when the declaring class in the hierarchy is unclear. Pass `contextNode` (an existing node — concept refs are rejected), `referenceRole`, `mode: "completion"`, and optionally `argumentTypes` and `kindFilter`.
 
 ## 4. `FIX_REFERENCES` After Insertion
 

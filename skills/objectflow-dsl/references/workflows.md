@@ -21,7 +21,7 @@ For Entity references, distinguish the key from the loaded object. `#Key` does n
 5. Use server date/time literals and `BigDecimal` literals for business time and exact decimals; do not use `double`/`float` for exact values. [Date/time/decimal literals](../../../docu/objectflow.md#literale-für-datum-zeitpunkt-und-dezimalzahl)
 6. Use `status switch` without a default when exhaustive handling should be checked. [Status switch](../../../docu/objectflow.md#statuswerte-mit-status-switch-behandeln)
 
-Load the MPS BaseLanguage skill whenever writing method bodies or expressions.
+Load `moai:mps-baselanguage` whenever writing method bodies or expressions.
 
 ## Create a command
 
@@ -43,7 +43,7 @@ Use Successors for one atomic Unit of Work; use `session queue next command` for
 ## Create an ObjectFlow test
 
 1. Insert [test-suite-skeleton.json](blueprints/test-suite-skeleton.json).
-2. Replace `TARGET_OFX_CONFIG` with a resolvable configuration in the destination model.
+2. Replace `TARGET_OFX_CONFIG` with the test `OFXConfig` from `<firma>.<app>.base`; add that model as a dependency of the `tests` model if it is missing. [Model layering](../../../conventions/moware-werkbank-modularisierung_v1.md#solutions-und-modelle)
 3. Add configured components and test content incrementally.
 4. Use `Simple Test` for session-aware domain/service/repository tests. [OFXTestSuit](../../../docu/objectflow.md#ofxtestsuit)
 5. Use `run command` to model expected Pages, forced Conclusions, child Commands, Successors, cancellation, and passed-forward values. [Commands without UI](../../../docu/objectflow.md#commands-ohne-ui-ausführen)
@@ -52,7 +52,7 @@ Use Successors for one atomic Unit of Work; use `session queue next command` for
 
 ## Integrate persistence with ManMap
 
-1. Load [the ManMap DSL skill](../../manmap-dsl/SKILL.md).
+1. Load `moai:manmap-dsl`.
 2. Map Entity properties in a `Persistence Description`; DTOs are normally read models rather than persisted aggregates.
 3. Explicitly load every reference/list needed by the use case; no lazy loading occurs. [Mapped queries and explicit loading](../../../docu/manmap.md#explizites-laden)
 4. Use ReadOnly for searches/evaluation and Checkout for modification; reuse the session instance instead of checking out the same identity twice. [Read-only, Checkout, and identity](../../../docu/manmap.md#read-only-checkout-und-session-identität)
@@ -63,7 +63,7 @@ Use Successors for one atomic Unit of Work; use `session queue next command` for
 1. Keep Page state/control flow in ObjectFlow and visible composition in a DataUX Page Pane. [DSL responsibilities](../../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin)
 2. Prepare and load the data before binding it; a binding never loads data. [Data binding](../../../docu/dataux.md#datenbindung-und-selektion)
 3. Match delegate type to Business Property type and handle empty selections. [Forms, tables, and delegates](../../../docu/dataux.md#formulare-tabellen-und-delegates)
-4. Place command actions in Page Pane menus; declaring a branching Command on a Page does not make it visible by itself. [Menus and command actions](../../../docu/dataux.md#menüs-und-command-aktionen)
+4. Place command actions in Page Pane menus; a Page declares no commands, its `branching commands:` cell only shows the commands from the menus of its linked Page Panes. [Menus and command actions](../../../docu/dataux.md#menüs-und-command-aktionen)
 5. Keep business rules out of UI expressions. [MoWare CheapCode principle](../../../docu/moware-werkbank.md#grundprinzipien-für-die-anwendungsentwicklung)
 
 ## Large-root editing

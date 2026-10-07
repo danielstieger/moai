@@ -2,11 +2,11 @@
 
 ## Binding is not loading
 
-A reference or list can be structurally bindable while still absent at runtime. Load the necessary graph in ObjectFlow/ManMap before the Page is displayed; DataUX performs no lazy loading. [PagePane data responsibility](../../../docu/dataux.md#page-panes), [ManMap loading rules](../../../docu/manmap.md#modellierungsumfang-und-ausdrucksmöglichkeiten)
+A reference or list can be structurally bindable while still absent at runtime. Load the necessary graph in ObjectFlow/ManMap before the Page is displayed; DataUX performs no lazy loading. [PagePane data responsibility](../../../docu/dataux.md#page-panes), [ManMap loading rules](../../../docu/manmap.md#explizites-laden)
 
-## Owner type, property, and row type differ
+## Owning classifier, list property, and row type differ
 
-For a table over `Owner.items`, use `Owner` as `boundClassifier`, `items` as `boundProperty`, and row-type properties inside delegates. Confusing these three layers can pass structural checks while producing a wrong or empty UI. [Table binding](../../../docu/dataux.md#tabellenbindung-und-selektion)
+For a table over `Rechnung.positionen`, use `Rechnung` as `boundClassifier`, `positionen` as `boundProperty`, and row-type (`Rechnungsposition`) properties inside delegates. Confusing these three layers can pass structural checks while producing a wrong or empty UI. [Table binding](../../../docu/dataux.md#tabellenbindung-und-selektion)
 
 ## Shared selection is type-wide
 
@@ -24,6 +24,7 @@ The raw descriptor exposes generic classifier/property references, but DataUX ta
 
 - `PagePane.uxChild`: exactly one.
 - `DelegateForm.colWeights`: one or more.
+- `DelegateForm.delegates` and `Table.delegates`: at least one; the checker reports "At least one delegate is necessary in a DelegateForm" / "… in a Table."
 - `GridLayout.uxChild`: one or more.
 - `TabLayout.tabs`: one or more.
 - `Tab.label` and `Tab.uxChild`: exactly one each.
@@ -35,7 +36,7 @@ The documentation explains the composition semantics; the live descriptors are a
 
 ## Include does not isolate context
 
-Include reuses a bindable element. It creates neither new data nor a separate selection scope. A binding override changes the context deliberately; a local menu can override the reused element's menu at that usage site. [Include behavior](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung)
+Include reuses a bindable element. It creates neither new data nor a separate selection scope. An Include is always bound (`boundClassifier` mandatory, `boundProperty` optional); roots are typed only, layouts inside a hierarchy carry no binding; local `menuItems` on the Include are allowed only when the target is a `Table` and then override its menu at that usage site. [Include behavior](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung)
 
 ## Menus run in the current UI context
 
@@ -43,7 +44,7 @@ Table actions usually need the selected row; PagePane actions usually need the r
 
 ## Compound actions are not ordinary action chains
 
-`MenuCompoundAction` coordinates Graph Owner/Edit calls and optional automatic conclusions in a shared session. Every referenced conclusion must exist on its Command. Treat `USER_CANCEL` explicitly when it should continue the chain. [Compound action semantics](../../../docu/dataux.md#menüs-und-command-aktionen), [ObjectFlow command types](../../../docu/objectflow.md#die-vier-command-typen)
+`MenuCompoundAction` coordinates a Graph Owner call (auto-conclusion and `customLabel` mandatory) with an optional Graph Edit call in a shared session. Every referenced conclusion must exist on its Command. `USER_CANCEL` as auto-conclusion ends the command like a user cancel; it never continues the chain. [Compound action semantics](../../../docu/dataux.md#menüs-und-command-aktionen), [ObjectFlow command types](../../../docu/objectflow.md#die-vier-command-typen)
 
 ## Disabled UI is not business validation
 
@@ -60,6 +61,50 @@ A wide desktop grid may be unsuitable for mobile or MDE devices. Model alternati
 ## Custom element integration is conditional
 
 `CustomElement` requires an implementation-class expression. Menu visibility/support depends on the concrete UI runtime component. Keep domain binding, delegates, and actions in DataUX and limit custom code to presentation. [Custom element semantics](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung), [menu runtime caveat](../../../docu/dataux.md#menüs-und-command-aktionen)
+
+## Modules need a configuration and a version
+
+`configuration` is `0..1` in the descriptor, but the checker reports "AppUi Module needs a configuration." / "BatchJob Module needs a configuration." Likewise one `VERSION` option is required: "Sepcify a version option for this app module." (sic, both modules). The `OFXConfig` lives in `<firma>.<app>.base`. [Executable modules](../../../docu/dataux.md#teil-ii--anwendung-und-batchjob)
+
+## Module options are single-use
+
+`IModuleOption` rule: "Use this option only once per module." Do not duplicate `VERSION`, `OFFICIAL NAME`, or `DEPENDENT_CONSECUTIVE`. Pair-scoped options (`CRON`, `DELAY`, `CONSUMERS`) are additionally checked per pair, see below.
+
+## Module startup and shutdown hooks are rejected
+
+`onStartup`/`onShutdown` still exist structurally; the checker reports "OnStartup() is no longer supported. Please remove the function." and "OnShutdown() is no longer supported. Please remove the function." Never create them from JSON. [Deprecated areas](../../../docu/dataux.md#teil-ii--anwendung-und-batchjob)
+
+## Module actions have no selection
+
+Menu and tile actions of a module run outside any PagePane. Arguments that use selections fail with "Parameters given for this action are not correct. (Selections are not available)". Rely on command defaults or pass constants/expressions without `getSelected()`.
+
+## CONSUMERS is per pair, exactly once
+
+"There is exactly one CONSUMERS option needed per producer/consumer pair." and, for a producer-only pair, "Do not specify any CONSUMERS for this producer/consumer pair - it does not have any." Each `CONSUMERS`, `CRON`, and `DELAY` option references its pair explicitly; with several pairs assign them deliberately. [Batch options](../../../docu/dataux.md#kapitellandkarte-batchoptionen)
+
+## CRON shape depends on the pair mode
+
+- With a `DELAY` option the pair is in continuous mode; crons must be windows (second `*`): "The pair is in continous/delay mode, specify cron windows only."
+- Without `DELAY` the pair needs at least one time-specific cron (concrete second): "Need more or one specific cron when not in continous/delay mode" and "The pair is in not in continous/delay mode, use only time specific crons."
+- At most one `DELAY` per pair: "There can be at most one DELAY option provided per producer/consumer pair."
+
+[Operating modes](../../../docu/dataux.md#kapitellandkarte-batchoptionen)
+
+## DEPENDENT_CONSECUTIVE needs several pairs and silent followers
+
+"DEPENDENT_CONSECUTIVE can only be used, if more than one consumer/producer pair is present." Only the first pair carries timing options; later pairs trigger "Do not specify any timing options for this pair in dependent mode."
+
+## Exception strategy ends with one default rule
+
+"A exception strategy should have a default behaviour without 'matches' as last strategy." and "There should be only one default strategy defined without exception name 'match'." Put `OFXStrategyForException` members with `exMatch` first and exactly one member without `exMatch` last. [Exception strategies](../../../docu/dataux.md#exception-strategien-und-wiederanlauf)
+
+## RUN_IN_CONSOLE is deprecated by the checker
+
+`OptRunInConsole` yields "No longer supported. Just use the 'org.modellwerkstatt.objectflow.job.console.ConsoleBatchJobAppFactory' in your configuration." The documentation still lists `RUN_IN_CONSOLE`; configure the console factory in the `OFXConfig` instead. `OptIncludeBatchUi` is checked with "The included job is not a batchjob containg relevant commands." when the referenced job has no commands with pages.
+
+## Module names without spaces
+
+`check_IModule` warns: "It's strongly recommended to use identifiers/names without spaces here (Typically '_' is used instead of spaces)."
 
 ## Reference and blueprint safety
 

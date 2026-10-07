@@ -2,9 +2,7 @@
 
 Attributes (annotations) graft extra children / references / property data onto nodes of a concept
 without that concept declaring them; the instance is stored in the host node's universal
-`smodelAttribute` child slot. (For the structure side — declaring an attribute concept, the four
-`NodeAttribute` / `PropertyAttribute` / `ChildAttribute` / `LinkAttribute` kinds, and the
-`AttributeInfo` extension-point spec — see `mps-aspect-structure-concepts/references/attributes-and-annotations.md`.)
+`smodelAttribute` child slot.
 
 In smodel code you reach an attached attribute through the **`.@` operator**, then read/write the
 attribute node with ordinary smodel operations. `.@` is a smodel extension the Java parser cannot

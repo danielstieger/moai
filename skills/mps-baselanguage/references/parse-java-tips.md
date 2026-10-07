@@ -75,7 +75,7 @@ The tool takes a single JSON-encoded `parameters` argument. Shape:
 ### Binary Expressions
 
 * Priorities are structural; use `ParenthesizedExpression` or ensure the hierarchy is correct (e.g., multiplication is a child of addition). All same-level binary operations are left-associative: `1 + 2 + 3` is equivalent to `(1 + 2) + 3` and the AST must be built that way.
-* **Pro-tip**: use `parse_java_and_insert` with placeholders (e.g. instances of `StringType`, `IntegerType`, `IntegerConstant`, `StringLiteral`) to create the skeleton, then replace them with concrete nodes.
+* **Pro-tip**: use `mps_mcp_parse_java_and_insert` with placeholders (e.g. instances of `StringType`, `IntegerType`, `IntegerConstant`, `StringLiteral`) to create the skeleton, then replace them with concrete nodes.
 
 ### Java Stub References
 
@@ -98,8 +98,3 @@ The tool takes a single JSON-encoded `parameters` argument. Shape:
 * **Lambdas are accepted.** A lambda expression is mapped to a `jetbrains.mps.baseLanguage.closures` `ClosureLiteral` (an expression-bodied lambda such as `() -> 42` becomes a closure whose trailing expression is its result; untyped parameters become the closures `var` type, inferred from the target). The closures language is auto-imported (when `postProcess.importUsedLanguages` is on). Like any MPS closure, a lambda only type-checks against a matching **functional-type** target — e.g. `() -> 42` fits a `{() => int}` slot but **not** an `int` slot. A mismatch is reported in the response `problems` array (see *After Insertion*), not as a parse failure.
 * Constructs the parser does not recognize (e.g. records) still fail with a parse error.
 
-## Validation
-
-* **Errors**: fix all errors.
-* **Warnings**: review before structural changes.
-* **Info-level cleanup**: ignore unless requested.

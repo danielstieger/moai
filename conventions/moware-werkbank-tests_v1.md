@@ -2,9 +2,9 @@
 
 ### Testdaten mit einer Custom Session anlegen
 
-Die Session eines Tests wird am Testende nicht committet. Testdaten, die für einen Test in der Datenbank stehen müssen, werden deshalb über eine eigene Custom Session angelegt und dort committet.
+Die Session eines `Simple Test` wird am Testende nicht committet. Testdaten, die für einen Test in der Datenbank stehen müssen, werden deshalb über eine eigene Custom Session angelegt und dort committet.
 
-- **KONVENTION:** Der Service `CS` aus der Solution `org.modellwerkstatt.wbkit` hat die Methoden `CREATE()` und `COMMIT()`. `CREATE()` erzeugt eine neue Custom Session; `COMMIT()` startet mit `startTransactionAndFlush()` eine Transaktion auf der Session des aktuellen Kontexts, führt die registrierten Session-Operationen aus und committet. Die Anwendung legt `CS` nicht selbst an.
+- **KONVENTION:** Der Service `CS` aus der Solution `org.modellwerkstatt.wbkit` liefert mit `CREATE()` eine neue Custom Session und committet mit `COMMIT()` die Session des aktuellen Kontexts samt der registrierten Session-Operationen. Die Anwendung legt `CS` nicht selbst an.
 - **KONVENTION:** Alle Methoden zum Anlegen von Testdaten liegen im Service `TestDaten` des jeweiligen `tests`-Modells. Eine solche Methode baut den Objektgraphen auf, registriert das Speichern mit `session operation add` und schließt mit `#CS.COMMIT()` ab.
 - **KONVENTION:** Der Test ruft Methoden zum Anlegen von Testdaten mit `#+ with #CS.CREATE()` auf. Innerhalb der Methode ist `session` damit die Custom Session; die Session des Tests bleibt unberührt.
 - **KONVENTION:** Persistierte Ergebnisse werden in einer frischen Custom Session zurückgelesen, etwa `#+ with #CS.CREATE() RechnungsRepo.get(id)`.
@@ -12,23 +12,24 @@ Die Session eines Tests wird am Testende nicht committet. Testdaten, die für ei
 ```objectflow
 component TestDaten
 
-  public Zahlungsart erzeugeZahlungsart(string name) {
-    final Zahlungsart zahlungsart = new Zahlungsart();
-    zahlungsart.name = name;
-    session operation add # ZahlungsartRepo.checkin(zahlungsart)
-      // "Testdaten Zahlungsart";
+  public Rechnung erzeugeRechnung(Kunde kunde) {
+    final Rechnung rechnung = new Rechnung();
+    rechnung.kunde = kunde;
+    session operation add # RechnungsRepo.checkin(rechnung)
+      // "Testdaten Rechnung";
     #CS.COMMIT();
-    return zahlungsart;
+    return rechnung;
   }
 ```
 
 Aufruf im Test:
 
 ```objectflow
-Zahlungsart ueberweisung = #+ with #CS.CREATE() TestDaten.erzeugeZahlungsart("Überweisung");
+Kunde mueller = #+ with #CS.CREATE() TestDaten.kunde("Müller");
+Rechnung rechnung = #+ with #CS.CREATE() TestDaten.erzeugeRechnung(mueller);
 ```
 
-Das funktioniert unabhängig von der Datenbank; nach dem Commit sind automatisch vergebene IDs gesetzt.
+Nach dem Commit sind automatisch vergebene IDs gesetzt.
 
 ### Plausible Testdaten
 

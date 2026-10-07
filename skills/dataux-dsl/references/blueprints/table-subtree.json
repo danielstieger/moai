@@ -12,6 +12,22 @@
     {
       "role": "options",
       "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.LabelFOption",
+          "children": [
+            {
+              "role": "expression",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+                  "properties": [
+                    { "name": "value", "value": "Positionen" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
         { "concept": "org.modellwerkstatt.dataux.structure.SelectFirstFOption" }
       ]
     },

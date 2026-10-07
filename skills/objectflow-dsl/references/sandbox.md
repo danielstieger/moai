@@ -29,7 +29,7 @@ Model: `r:40578ea0-bba5-4ae6-abfa-3691d42660ff(org.modellwerkstatt.objectflow.te
 - Test suite `RunCmdTests`: `r:40578ea0-bba5-4ae6-abfa-3691d42660ff(org.modellwerkstatt.objectflow.tests.OrderDocumentRunCmd)/5353263021888352480`
 - Graph-owner command `GO`: `r:40578ea0-bba5-4ae6-abfa-3691d42660ff(org.modellwerkstatt.objectflow.tests.OrderDocumentRunCmd)/5353263021888364202`
 - Graph-edit command `GE`: `r:40578ea0-bba5-4ae6-abfa-3691d42660ff(org.modellwerkstatt.objectflow.tests.OrderDocumentRunCmd)/5353263021888364229`
-- Search command `SEARCH_CMD`: `r:40578ea0-bba5-4ae6-abfa-3691d42660ff(org.modellwerkstatt.objectflow.tests.OrderDocumentRunCmd)/7464717488285058627`
+- Search command `SEARCH`: `r:40578ea0-bba5-4ae6-abfa-3691d42660ff(org.modellwerkstatt.objectflow.tests.OrderDocumentRunCmd)/7464717488285058627`
 
 Use these to compare command ownership and `run command` structures. Do not copy domain-specific references into portable blueprints; replace them with `TARGET_*` placeholders. [Command lifecycle](../../../docu/objectflow.md#grundablauf-eines-commands) and [headless command tests](../../../docu/objectflow.md#commands-ohne-ui-ausführen)
 
@@ -46,10 +46,10 @@ Use these for explicit merge and authorization shapes. [Session merge](../../../
 
 Model: `r:9a581386-85ce-41a3-b17b-b79192665eb8(org.modellwerkstatt.objectflow.tests.config)`
 
-- Configuration `Defaults`: `r:9a581386-85ce-41a3-b17b-b79192665eb8(org.modellwerkstatt.objectflow.tests.config)/5505654805890699853`
+- Configuration `Defaults`: `r:9a581386-85ce-41a3-b17b-b79192665eb8(org.modellwerkstatt.objectflow.tests.config)/5505654805890699853` — a structural example only (sections, `new instance`, `property`, constructor arguments, lazy refs); its contents are legacy test wiring, so do not copy section names, host names, URLs or credentials from it.
 - Static resources `RessourcesForTests`: `r:9a581386-85ce-41a3-b17b-b79192665eb8(org.modellwerkstatt.objectflow.tests.config)/8255348026212344894`
 
-Inspect these instead of inventing component-wiring or platform-resource child shapes. [Configuration](../../../docu/objectflow.md#konfiguration-mit-ofxconfig) and [static resources](../../../docu/objectflow.md#statische-ressourcen)
+Inspect these for the child shapes of component wiring and platform resources instead of inventing them. [Configuration](../../../docu/objectflow.md#konfiguration-mit-ofxconfig) and [static resources](../../../docu/objectflow.md#statische-ressourcen)
 
 ## Verification protocol
 

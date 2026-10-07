@@ -102,14 +102,14 @@ Contrast with `Node_IsInstanceOfOperation` which also matches subconcepts.
   "children": [{
     "role": "requestedConcept",
     "nodes": [{
-      "concept": "jetbrains.mps.lang.smodel.structure.SNodeType",
-      "references": [{ "role": "concept", "target": "<ConceptDeclaration-noderef>" }]
+      "concept": "jetbrains.mps.lang.smodel.structure.RefConcept_Reference",
+      "references": [{ "role": "conceptDeclaration", "target": "<ConceptDeclaration-noderef>" }]
     }]
   }]
 }
 ```
 
-Confirm the child role (`requestedConcept` in current MPS; older sources used `conceptArgument`) with `mps_mcp_get_concept_details` before emitting the blueprint.
+`requestedConcept` is typed `IRefConceptArg` (cardinality 1): assignable are `RefConcept_Reference` (static concept) or `PoundExpression` (`#expr#`, dynamic concept); an `SNodeType` here fails validation.
 
 ### `seq.ofAspect<aspect>` — filter by MPS aspect
 

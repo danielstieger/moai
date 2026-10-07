@@ -1,6 +1,6 @@
 # Concepts and verified AST roles
 
-These facts were verified against the live `org.modellwerkstatt.objectflow` runtime descriptors. Re-query with `mps_mcp_get_concept_details` before relying on a feature not listed here.
+These facts were verified against the live `org.modellwerkstatt.objectflow` runtime descriptors. Re-query with `mps_mcp_get_concept_details` before relying on a feature not listed here. Use the FQ names from the Kapitellandkarten in JSON blueprints; resolve references, child roles and cardinalities via MPS MCP in the current project before changing a model.
 
 ## Root concepts
 

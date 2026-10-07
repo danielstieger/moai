@@ -17,7 +17,7 @@ description: Author and edit MPS `jetbrains.mps.baseLanguage` (Java) nodes — c
 - **Variable declarations**: in method bodies wrap `LocalVariableDeclaration` in `LocalVariableDeclarationStatement`. In `ForStatement.variable` use `LocalVariableDeclaration` directly, no wrapper.
 - **Prefer primitives**: use `string` (`StringType`) over `String` (`ClassifierType`) where possible; same for `int`, `boolean`, etc.
 - **Compatibility**: BaseLanguage core is Java 7 (including generics). When building AST directly (JSON blueprints), there is no lambda/record syntax — use the `jetbrains.mps.baseLanguage.closures` extension for closures. The Java **parser** (`mps_mcp_parse_java_and_insert`) additionally accepts the Java 8+ syntax MPS recognizes — most notably **lambdas**, which it maps to `closures` `ClosureLiteral`s (auto-imported when `postProcess.importUsedLanguages` is on); a lambda only type-checks against a matching functional-type target. Constructs the parser does not recognize (e.g. records) still fail to parse. See `references/parse-java-tips.md`.
-- **Surgical edits**: when a single child changes prefer `mps_mcp_update_node` over rewriting the whole root — full-root rewrites churn persistent IDs and break incoming refs.
+- **Surgical edits**: when a single child changes prefer `mps_mcp_update_node` over rewriting the whole root — a full-root rewrite keeps only the root ID and re-creates all children, breaking incoming refs (`moai:mps-node-editing`, staged construction).
 
 ## Choose Your Path
 
@@ -31,7 +31,7 @@ Pick the right authoring tool before you start:
 ## Common Workflow
 
 1. **Scope**: call `mps_mcp_get_current_editor_root_node` to know where you are inserting (method body, field initializer, root, …).
-2. **Resolve dependencies**: confirm the containing model imports the right languages (`jetbrains.mps.baseLanguage` plus any extensions). Models for referenced nodes must also be imported.
+2. **Resolve dependencies**: in a MoWare model the DevKit `org.modellwerkstatt.MoWareWerkbank` provides BaseLanguage, closures and collections (see `moai:mps-node-editing`). Models for referenced nodes must also be imported.
 3. **Skeleton first**: for any non-trivial root, insert a placeholder skeleton (`mps_mcp_create_root_node` + `mps_mcp_update_root_node_from_json` or the parser) before filling member bodies.
 4. **Harvest references**: for own members, run `mps_mcp_print_node` on the skeleton to read persistent refs of constructors, methods, and fields. For JDK / library stubs, derive refs from the class ref using the URL-encoded signature formula (see references).
 5. **Apply bodies**: edit one subtree at a time with `mps_mcp_update_node`, or bulk-rewrite via `mps_mcp_update_root_node_from_json`.
@@ -44,11 +44,8 @@ Pick the right authoring tool before you start:
 
 ## Related Skills
 
-- **`mps-node-editing`** — general node mutation tools (`mps_mcp_update_node`, etc.). Load first if you have not seen them.
-- **`mps-aspect-structure-concepts`** — defines what concepts exist and what roles they expose. Read when authoring a brand-new language whose concepts extend BaseLanguage.
-- **`mps-quotations`** — light/quoted SNode literals embedded in BaseLanguage code (e.g. inside behavior or generator bodies).
-- **`mps-model-manipulation`** — `smodel` + `collections` + `closures` patterns layered on top of BaseLanguage; load when manipulating MPS nodes from BaseLanguage.
-- **`mps-aspect-behavior`**, **`mps-aspect-typesystem`**, **`mps-aspect-constraints`** — each owns a language whose function bodies are BaseLanguage; reach for those skills when the surrounding aspect matters.
+- **`moai:mps-node-editing`** — general node mutation tools (`mps_mcp_update_node`, etc.). Load first if you have not seen them.
+- **`moai:mps-model-manipulation`** — `smodel` + `collections` + `closures` patterns layered on top of BaseLanguage; load when manipulating MPS nodes from BaseLanguage.
 
 ## Reference Index
 

@@ -17,7 +17,7 @@
                 {
                   "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
                   "properties": [
-                    { "name": "value", "value": "Overview" }
+                    { "name": "value", "value": "Übersicht" }
                   ]
                 }
               ]
@@ -28,7 +28,8 @@
                 {
                   "concept": "org.modellwerkstatt.dataux.structure.Include",
                   "references": [
-                    { "role": "uxElement", "target": "TARGET_MODEL.ReusableUiRoot" }
+                    { "role": "uxElement", "target": "TARGET_MODEL.ReusableUiRoot" },
+                    { "role": "boundClassifier", "target": "TARGET_MODEL.RootClassifier" }
                   ]
                 }
               ]
@@ -54,6 +55,10 @@
               "nodes": [
                 {
                   "concept": "org.modellwerkstatt.dataux.structure.DelegateForm",
+                  "properties": [
+                    { "name": "isNamed", "value": "false" },
+                    { "name": "name", "value": "#" }
+                  ],
                   "references": [
                     { "role": "boundClassifier", "target": "TARGET_MODEL.RootClassifier" }
                   ],
@@ -63,11 +68,28 @@
                       "nodes": [
                         { "concept": "org.modellwerkstatt.dataux.structure.OneWeight" }
                       ]
+                    },
+                    {
+                      "role": "delegates",
+                      "nodes": [
+                        {
+                          "concept": "org.modellwerkstatt.dataux.structure.StringDelegate",
+                          "children": [
+                            {
+                              "role": "boundTo",
+                              "nodes": [
+                                {
+                                  "concept": "org.modellwerkstatt.dataux.structure.DuxLocalPropertyReference",
+                                  "references": [
+                                    { "role": "property", "target": "TARGET_MODEL.textProperty" }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     }
-                  ],
-                  "properties": [
-                    { "name": "isNamed", "value": "false" },
-                    { "name": "name", "value": "#" }
                   ]
                 }
               ]

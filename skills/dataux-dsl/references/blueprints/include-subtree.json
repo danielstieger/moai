@@ -1,6 +1,7 @@
 {
   "concept": "org.modellwerkstatt.dataux.structure.Include",
   "references": [
-    { "role": "uxElement", "target": "TARGET_MODEL.ReusableUiRoot" }
+    { "role": "uxElement", "target": "TARGET_MODEL.ReusableUiRoot" },
+    { "role": "boundClassifier", "target": "TARGET_MODEL.RootClassifier" }
   ]
 }

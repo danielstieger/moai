@@ -24,7 +24,7 @@ For ClassConcept dispatch, the default `Class <ClassName>` already matches what 
 
 Two MCP tools list and execute the same project run-config registry. Either works:
 
-- `mcp__mps-mcp-server___project_root___execute_run_configuration`
+- `mcp__mps-mcp__execute_run_configuration`
 - `mcp__idea-mcp-server___project_root___execute_run_configuration`
 
 ```

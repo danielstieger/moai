@@ -13,13 +13,17 @@ Model: `r:04e6a6ad-5d6d-449f-aceb-0afb0d6dad9e(org.modellwerkstatt.objectflow.te
   - Verified composition: `PagePane -> Table` with ordinary and compound menu actions.
   - Useful for `MenuCompoundAction`, `PageConclusionReference`, selected-object arguments, and table menus.
 
-Both roots resolved and passed `mps_mcp_check_root_node_problems` when this skill was generated. Re-check before relying on them after a package upgrade.
+- `OrderApp`: `r:04e6a6ad-5d6d-449f-aceb-0afb0d6dad9e(org.modellwerkstatt.objectflow.tests.OrderDocumentUi)/8255348026214790673`
+  - Verified composition: `AppUiModule` with `configuration`, `isAuthenticated` (body `true`), one `mainMenu` `MenuAction`, one `AppTile`, `VERSION` and `OFFICIAL NAME`.
+  - Useful for the minimal valid module shape; its `isAuthenticated` does not initialize the user context, so do not copy that part.
+
+All three roots resolved and passed `mps_mcp_check_root_node_problems` when this skill was generated. Re-check before relying on them after a package upgrade.
 
 These examples illustrate shape, not universal domain semantics. Interpret them through [DataUX UI modeling](../../../docu/dataux.md#teil-i--ui-modellierung) and the [ObjectFlow Page lifecycle](../../../docu/objectflow.md#pages-und-page-conclusions).
 
 ## Coverage limits
 
-The shipped tests do not provide representative roots for every UI construct. In particular, no packaged `TabLayout`, `Include`, or `CustomElement` instance was found during generation. Portable blueprints for tabs and includes were therefore derived from live language descriptors plus anonymized structural observations. They contain no application model names, identifiers, or persistent references.
+The shipped tests do not provide representative roots for every UI construct. In particular, no packaged `TabLayout`, `Include`, or `CustomElement` instance was found during generation. Portable blueprints for tabs and includes were therefore derived from live language descriptors plus anonymized structural observations. They contain no application model names, identifiers, or persistent references. No packaged `BatchJobModule` exists in `org.modellwerkstatt.dataux.tests`. The `batchjob-module-skeleton.json` blueprint was derived from the live `org.modellwerkstatt.dataux` and `org.modellwerkstatt.objectflow` descriptors plus anonymized structural observations of an application model; it contains no application names or persistent references. Its verification status is recorded in [blueprints.md](blueprints.md#placeholder-contract).
 
 Do not cite or persist references from non-package application models. If a task requires a shape absent from the packaged examples:
 

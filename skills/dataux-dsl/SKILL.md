@@ -5,7 +5,7 @@ description: "Use when creating, editing, validating, or inspecting MoWare DataU
 
 # DataUX UI DSL
 
-DataUX describes the presentation and UI interaction layer of a MoWare application. This skill deliberately covers only the UI-facing part of `org.modellwerkstatt.dataux`: `PagePane`, forms, tables, layouts, binding paths, delegates, reusable includes, and menus. ObjectFlow owns domain meaning, commands, pages, selections, and session behavior; ManMap owns loading and persistence.
+DataUX describes the presentation and UI interaction layer of a MoWare application and its executable entry points. This skill covers the UI part of `org.modellwerkstatt.dataux` (`PagePane`, forms, tables, layouts, binding paths, delegates, reusable includes, and menus) and the two module roots `AppUI Module` (`AppUiModule`) and `BatchJob Module` (`BatchJobModule`). ObjectFlow owns domain meaning, commands, pages, selections, producer/consumer pairs, and session behavior; ManMap owns loading and persistence.
 
 ## Source authority and portability
 
@@ -17,17 +17,18 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 
 ## Critical rules
 
-- Use MPS MCP tools; never read or edit serialized `.mps` or `.mpl` XML.
+- Use MPS MCP tools; never read or edit raw `.mps` / `.mpl` XML (rule and fallback: [`MPS_AGENT_GUIDE.md`](../../MPS_AGENT_GUIDE.md#never-read-raw-mps-model-files)).
 - Query concepts with `mps_mcp_get_concept_details` and `l:64adc67c-5fcf-45f5-82db-6a6771963d93:org.modellwerkstatt.dataux`, not the module-style reference.
 - Use fully qualified concept names in JSON blueprints.
 - A `PagePane` has exactly one `uxChild`. Use a `GridLayout` or `TabLayout` to compose several elements. See [UI composition](../../docu/dataux.md#kapitellandkarte-ui-komposition).
-- Binding never loads data. Ensure the ObjectFlow command/repository has already supplied the full data needed by the UI. See [binding and selection](../../docu/dataux.md#datenbindung-und-selektion) and [explicit graph loading](../../docu/manmap.md#modellierungsumfang-und-ausdrucksmöglichkeiten).
-- A table over a list property binds `boundClassifier` to the property owner and `boundProperty` to that list property; its delegates address properties of the row type. Lists of Value Objects are not valid DataUX table models. See [table binding](../../docu/dataux.md#tabellenbindung-und-selektion).
+- Binding never loads data. Ensure the ObjectFlow command/repository has already supplied the full data needed by the UI. See [binding and selection](../../docu/dataux.md#datenbindung-und-selektion) and [explicit graph loading](../../docu/manmap.md#explizites-laden).
+- A table over a list property binds `boundClassifier` to the property owner and `boundProperty` to that list property; its delegates address properties of the row type. A typed-only table (no `boundProperty`) is accepted only as the PagePane's top element or inside a first-level layout bound to the PagePane's root type. Lists of Value Objects are not valid DataUX table models. See [table binding](../../docu/dataux.md#tabellenbindung-und-selektion).
 - Prefer a root skeleton followed by surgical `ADD CHILD` operations for large or uncertain roots. Preserve existing node IDs.
 - Dry-run JSON first and inspect warnings. After a real change, run `mps_mcp_check_root_node_problems` on each changed root; generate or build when the task requires it.
 - Inner forms, tables, and layouts need `isNamed = false` and `name = "#"`; JSON insertion sets `isNamed = true`. Name an element only when it is reused with `Include`. See [inner UI elements](references/gotchas.md#inner-ui-elements-must-stay-unnamed).
 - `OPTIONAL` on a `StringDelegate` is allowed but usually unnecessary (an empty field then yields `null` instead of `""`); control required strings with `LENGTH` and do not repeat `LENGTH`/`RANGE` limits as `validation`. See [required values](../../docu/dataux.md#pflichtwerte-leere-eingaben-und-null).
 - Give the main table action hotkey `ENTER` (command `defaultHotkey` or the action's label); double-click and Enter on a row run the first menu action with `ENTER`, submenus included. See [menus](../../docu/dataux.md#menüs-und-command-aktionen).
+- Modules live in `<firma>.<app>.app` and reference an `OFXConfig` from `<firma>.<app>.base`. Both module kinds require `configuration`, `isAuthenticated`, and one `VERSION`; a `BatchJob Module` additionally requires an exception strategy ending with a default rule and exactly one `CONSUMERS` per pair with a consumer. Never create `onStartup`/`onShutdown`. See [module gotchas](references/gotchas.md#modules-need-a-configuration-and-a-version) and [executable modules](../../docu/dataux.md#teil-ii--anwendung-und-batchjob).
 - Keep business rules out of UI expressions. DataUX should remain presentation-oriented “CheapCode”; see the [MoWare development principles](../../docu/moware-werkbank.md#grundprinzipien-für-die-anwendungsentwicklung).
 
 ## Quick start
@@ -53,10 +54,10 @@ The shipped examples solution may be globally visible instead of belonging to th
 
 ## Related DSL skills
 
-- Load [ObjectFlow DSL](../objectflow-dsl/SKILL.md) when creating or changing the command, page, classifier, property, selection, conclusion, or expressions that a UI references.
-- Load [ManMap DSL](../manmap-dsl/SKILL.md) when UI data is missing, read-only unexpectedly, or must be loaded/saved differently. DataUX binding is not a persistence mechanism.
-- Load `mps-baselanguage` before authoring label, color, formatting, condition, argument, or custom-element expression subtrees.
-- Load `mps-node-editing` before inserting or restructuring nodes.
+- Load `moai:objectflow-dsl` when creating or changing the command, page, classifier, property, selection, conclusion, or expressions that a UI references, and for the producer/consumer commands and `OFXConfig` a module references.
+- Load `moai:manmap-dsl` when UI data is missing, read-only unexpectedly, or must be loaded/saved differently. DataUX binding is not a persistence mechanism.
+- Load `moai:mps-baselanguage` before authoring label, color, formatting, condition, argument, or custom-element expression subtrees.
+- Load `moai:mps-node-editing` before inserting or restructuring nodes.
 
 ## Documentation map
 
@@ -66,7 +67,9 @@ The shipped examples solution may be globally visible instead of belonging to th
 - [Layouts, tabs, includes, and custom elements](../../docu/dataux.md#layouts-tabs-und-wiederverwendung)
 - [Menus and command actions](../../docu/dataux.md#menüs-und-command-aktionen)
 - [Typical UI modeling workflow](../../docu/dataux.md#typischer-ui-modellierungsablauf)
-- [DataUX diagnostics](../../docu/dataux.md#häufige-fehler-und-diagnose)
+- [AppUI Module: navigation, tiles, isAuthenticated](../../docu/dataux.md#anwendung-mit-appui-module)
+- [BatchJob Module: pairs, options, exception strategy](../../docu/dataux.md#batchjob-mit-batchjob-module)
+- [Model layering: `base`, `app`](../../conventions/moware-werkbank-modularisierung_v1.md#solutions-und-modelle)
 - [ObjectFlow Pages and Page Conclusions](../../docu/objectflow.md#pages-und-page-conclusions)
 - [MoWare DSL interaction](../../docu/moware-werkbank.md#zusammenspiel-der-dsls)
 

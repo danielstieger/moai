@@ -1,6 +1,6 @@
 ---
 name: mps-node-editing
-description: Add, update, or delete MPS nodes using JSON blueprints — covers the unified blueprint format, staged construction for large subtrees, validation, and reference repair. Use whenever creating, editing, or restructuring nodes in any MPS model (structure, editor, behavior, generator, application code, etc.).
+description: Add, update, or delete MPS nodes using JSON blueprints — covers the unified blueprint format, staged construction for large subtrees, validation, and reference repair. Use whenever creating, editing, or restructuring nodes in any MPS model (application code, console commands, etc.).
 ---
 
 # MPS Node Editing
@@ -17,17 +17,14 @@ The core workflow for mutating MPS nodes through MCP tools. JSON blueprints desc
 
 ## `mps_mcp_update_node` — Unified Node-Mutation Tool
 
-All child, property, and reference operations on existing nodes go through `mps_mcp_update_node`. The operation is selected via `operation` (`ADD`/`SET`/`DELETE`) × `kind` (`CHILD`/`PROPERTY`/`REFERENCE`).
+All child, property, and reference operations on existing nodes go through `mps_mcp_update_node`. The operation is selected via `operation` (`ADD`/`SET`) × `kind` (`CHILD`/`PROPERTY`/`REFERENCE`). There is no `DELETE` operation — deletion is `SET` with a `null` value.
 
 | operation × kind        | Required parameters                                           | Notes |
 |-------------------------|---------------------------------------------------------------|-------|
 | `ADD` × `CHILD`         | `nodeReference` (parent), `childRole`, `childJson`            | Optional `position` (0-based; null/-1 = append) and `dryRun`. A `position` ≥ the current child count clamps to an append; a negative value other than -1 is rejected. The response's `data.index` reports the actual landing index. |
-| `SET` × `CHILD`         | `childNodeRef`, `childJson`                                   | Replaces an existing child; preserves its position in the role. Optional `dryRun`. |
-| `DELETE` × `CHILD`      | `childNodeRef`                                                | Removes the child from its parent. |
-| `SET` × `PROPERTY`      | `properties` = `[[nodeRef, propertyName, value], …]`          | Batch operation; returns per-row results. |
-| `DELETE` × `PROPERTY`   | `nodeReference`, `propertyName`                               | Clears a single property. |
+| `SET` × `CHILD`         | `childNodeRef`, `childJson`                                   | Replaces an existing child; preserves its position in the role. `childJson = null` **deletes** the child (returns the parent's envelope). Optional `dryRun`. |
+| `SET` × `PROPERTY`      | `properties` = `[[nodeRef, propertyName, value], …]`          | Batch operation; returns per-row results. `value = null` **deletes** the property. |
 | `SET` × `REFERENCE`     | `references` = `[[nodeRef, role, targetRefOrName], …]`        | Batch operation; `targetRefOrName` accepts an `r:...` ref or a plain name. A plain name is resolved within the reference role's search scope; if it cannot be resolved the call fails (`NOT_FOUND`), preserves the previous reference value, and stores no dangling reference. |
-| `DELETE` × `REFERENCE`  | `nodeReference`, `referenceRole`                              | Clears a single reference. |
 
 `ADD` × `PROPERTY` and `ADD` × `REFERENCE` are not valid combinations and return an error envelope.
 
@@ -37,19 +34,20 @@ All child, property, and reference operations on existing nodes go through `mps_
 
 ## Prerequisites
 
-- Load the `mps-language-analysis` skill if you do not yet know what concepts the model uses.
+- Load the `moai:mps-language-analysis` skill if you do not yet know what concepts the model uses.
 - Resolve the target node (unless creating a brand-new root):
     - `mps_mcp_get_current_editor_root_node` for the user's focus.
     - `mps_mcp_search_root_node_by_name` for a known name.
 - Resolve required languages and concepts:
     - Check used languages of the current model via `mps_mcp_get_project_structure`.
+    - **DevKit rule for MoWare models:** every new model gets the DevKit `org.modellwerkstatt.MoWareWerkbank` right after `mps_mcp_create_model`: `mps_mcp_model_used_language(modelReference, kind="devkit", usedLanguage="org.modellwerkstatt.MoWareWerkbank")`. It provides objectflow, manmap, dataux, baseLanguage, closures, collections and javadoc; do not add these languages individually. Inserting a node whose language is missing adds that language automatically (verified), but a model without the DevKit is incomplete.
     - Get concept details using `mps_mcp_get_concept_details` for specific languages.
     - Use `mps_mcp_search_concepts` for discovery.
 
 ## Common Workflow
 
 1. **Identify** the target node (existing) or parent model (new root).
-2. **Choose the right tool**: `mps_mcp_create_root_node` / `mps_mcp_insert_root_node_from_json` for new roots; `mps_mcp_update_node` (`ADD`/`SET`/`DELETE` × `CHILD`/`PROPERTY`/`REFERENCE`) for surgical edits; `mps_mcp_update_root_node_from_json` only for full-root rewrites.
+2. **Choose the right tool**: `mps_mcp_create_root_node` / `mps_mcp_insert_root_node_from_json` for new roots; `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`/`PROPERTY`/`REFERENCE`) for surgical edits; `mps_mcp_update_root_node_from_json` only for full-root rewrites.
 3. **Author the JSON** following the unified blueprint format.
 4. **Insert** with `dryRun: true` first if the blueprint is large. Check the response: an empty `warnings` array means staging was clean; a non-empty list means the production write will produce dynamic (unresolved) references for the listed targets — resolve those first or expect broken refs.
 5. **Validate** with `mps_mcp_check_root_node_problems`.
@@ -57,17 +55,15 @@ All child, property, and reference operations on existing nodes go through `mps_
 
 ## Related Skills
 
-- **`mps-aspect-structure-concepts`** — defines what concepts exist and what roles they expose.
-- **`mps-baselanguage`** — when the nodes you edit are BaseLanguage / Java.
-- **`mps-quotations`** — embedding inline node literals inside model code.
-- **`mps-language-analysis`** — exploring an unfamiliar language before editing.
-- **`mps-model-manipulation`** — when the edit also requires navigating the tree from model code (`.ancestor<C>`, `.descendants<C>`, siblings, containingRoot).
+- **`moai:mps-baselanguage`** — when the nodes you edit are BaseLanguage / Java.
+- **`moai:mps-language-analysis`** — exploring an unfamiliar language before editing.
+- **`moai:mps-model-manipulation`** — when the edit also requires navigating the tree from model code (`.ancestor<C>`, `.descendants<C>`, siblings, containingRoot).
 
 ## JSON Input — File-Path Semantics
 
-The tools that accept a node JSON blueprint (`mps_mcp_update_node` for `ADD`/`SET` × `CHILD`, `mps_mcp_insert_root_node_from_json`, `mps_mcp_update_root_node_from_json`) all use the same `childJson` / `json` parameter convention:
+The tools that accept a node JSON blueprint (`mps_mcp_update_node` for `ADD`/`SET` × `CHILD`, `mps_mcp_insert_root_node_from_json`, `mps_mcp_update_root_node_from_json`, `mps_mcp_insert_console_command_from_json`) take the blueprint in `childJson` / `json`:
 
-- The parameter can be **either** a JSON string (max 4 KB) **or** an absolute path to a local file containing the JSON.
+- The parameter is **either** an inline JSON string (max 4 KB) **or** an absolute file path. `mps_mcp_update_node.childJson` accepts any absolute path; the root/console tools (`insert_root_node_from_json`, `update_root_node_from_json`, `insert_console_command_from_json`) accept only a file **inside the system temp directory**. Bundled blueprint files (`references/blueprints/*.json` of the DSL skills) must therefore be copied to the temp directory, or their content passed inline (≤ 4 KB), before use.
 - Files may contain either a **raw node blueprint** or the **full MCP response envelope** produced by `mps_mcp_print_node`; in the latter case the `data` field is used.
 - **Ordinary input files are never deleted.** Only temporary JSON files created by this toolset may be cleaned up after reading (and only when `dryRun=false`).
 - Very large JSON inputs may be truncated by the MCP transport before the tool reads them. If that happens, insert a smaller blueprint first and add children in follow-up calls with `mps_mcp_update_node` (`ADD`/`CHILD` or `SET`/`CHILD`), or pass the JSON as a file path instead of an inline string. See `references/staged-construction.md` for the recommended pattern.

@@ -9,7 +9,7 @@ ManMap models relational persistence and read models for MoWare applications. `P
 
 ## Critical Rules
 
-- Use MPS MCP tools. Never read or edit serialized `.mps` or `.mpl` XML.
+- Use MPS MCP tools; never read or edit raw `.mps` / `.mpl` XML (rule and fallback: [`MPS_AGENT_GUIDE.md`](../../MPS_AGENT_GUIDE.md#never-read-raw-mps-model-files)).
 - Determine the target MPS project dynamically with `mps_mcp_list_open_projects`; never reuse a path recorded by this skill.
 - Discover the language by its qualified name `org.modellwerkstatt.manmap`. Query concepts with `l:5aaa957f-3447-4783-b1f7-b301fa3e0394:org.modellwerkstatt.manmap`, not the module reference syntax.
 - Use fully qualified concept names in JSON blueprints.
@@ -20,7 +20,7 @@ ManMap models relational persistence and read models for MoWare applications. `P
 - In a blueprint, set `MappingReference.mappingSource` to the name of the query's `EntityMapping`; it resolves to the enclosing query even within the same blueprint. See [mapped query workflow](references/workflows.md#build-a-mapped-query).
 - New `QueryFromMap` nodes default to `readOnly = true`. Set `readOnly = false` deliberately for queries that check out data for editing.
 - Validate changed roots with `mps_mcp_check_root_node_problems`; then run task-required generation or build checks.
-- Load `mps-baselanguage` and `mps-node-editing` before constructing repository methods or expression/statement subtrees.
+- Load `moai:mps-baselanguage` and `moai:mps-node-editing` before constructing repository methods or expression/statement subtrees.
 
 ## Quick Start
 

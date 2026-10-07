@@ -21,8 +21,8 @@ Paste-able JSON blueprints for the constructs that appear most often when author
 {
   "concept": "jetbrains.mps.baseLanguage.structure.NPEEqualsExpression",
   "children": [
-    { "role": "leftExpression", "nodes": [{ "concept": "VariableReference", "references": [{ "role": "variableDeclaration", "target": "node1" }] }] },
-    { "role": "rightExpression", "nodes": [{ "concept": "VariableReference", "references": [{ "role": "variableDeclaration", "target": "node2" }] }] }
+    { "role": "leftExpression", "nodes": [{ "concept": "jetbrains.mps.baseLanguage.structure.VariableReference", "references": [{ "role": "variableDeclaration", "target": "node1" }] }] },
+    { "role": "rightExpression", "nodes": [{ "concept": "jetbrains.mps.baseLanguage.structure.VariableReference", "references": [{ "role": "variableDeclaration", "target": "node2" }] }] }
   ]
 }
 ```
@@ -33,8 +33,8 @@ Paste-able JSON blueprints for the constructs that appear most often when author
 {
   "concept": "jetbrains.mps.baseLanguage.structure.DotExpression",
   "children": [
-    { "role": "operand", "nodes": [{ "concept": "VariableReference", "references": [{ "role": "variableDeclaration", "target": "name" }] }] },
-    { "role": "operation", "nodes": [{ "concept": "InstanceMethodCallOperation", "references": [{ "role": "baseMethodDeclaration", "target": "r:..." }] }] }
+    { "role": "operand", "nodes": [{ "concept": "jetbrains.mps.baseLanguage.structure.VariableReference", "references": [{ "role": "variableDeclaration", "target": "name" }] }] },
+    { "role": "operation", "nodes": [{ "concept": "jetbrains.mps.baseLanguage.structure.InstanceMethodCallOperation", "references": [{ "role": "baseMethodDeclaration", "target": "r:..." }] }] }
   ]
 }
 ```

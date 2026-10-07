@@ -31,9 +31,9 @@ Parameters:
 
 ## Additional Skills — Handling Unknown MPS Languages
 
-- Browse `skills/` for available companion skills, or consult the table at the top of `SKILL.md`.
-- Load the `mps-baselanguage` skill (`skills/mps-baselanguage/SKILL.md`) as soon as you need to write any code in BaseLanguage or Java.
-- Before starting unfamiliar DSL work, check `skills/*-dsl/` for a bundled DSL skill and use it before re-exploring the language.
+- Consult the skill table at the top of `SKILL.md` for the available `moai:` companion skills.
+- Load `moai:mps-baselanguage` as soon as you need to write any code in BaseLanguage or Java.
+- Before starting unfamiliar DSL work, check for a bundled DSL skill (`moai:objectflow-dsl`, `moai:manmap-dsl`, `moai:dataux-dsl`) and use it before re-exploring the language.
 
 ## `mps_mcp_print_node` — Output Format
 
@@ -42,12 +42,12 @@ Saves the node JSON to a local text file (path returned in `data`). Behaviour de
 - `deep=true` recursively inlines all descendants.
 - `deep=false` (shallow) lists properties, children roles with references, and reference roles.
 
-The saved file contains the full MCP response envelope; its `data` field contains the node JSON object shown below. **JSON mutation tools accept either that full envelope file or a file containing only the raw `data` object** — see `mps-node-editing/SKILL.md` (File-Path Semantics) and `references/json-format.md`.
+The saved file contains the full MCP response envelope; its `data` field contains the node JSON object shown below. **JSON mutation tools accept either that full envelope file or a file containing only the raw `data` object** — see `moai:mps-node-editing` (File-Path Semantics and `references/json-format.md`).
 
 ```
 {
   "name": "NodeName",
-  "concept": "FullyQualifiedConceptName",            // use as `concept` in blueprints
+  "concept": "ShortConceptName",                    // FQN = suffix of conceptReference; use the FQN as `concept` in blueprints
   "conceptReference": "PersistentConceptReference",  // informational; optional in blueprints
   "reference": "PersistentNodeReference",
   "properties": [
@@ -76,7 +76,9 @@ The saved file contains the full MCP response envelope; its `data` field contain
 
 ## `mps_mcp_check_root_node_problems` — Output Format
 
-Validates the specified node (and its descendants) or the specified model. Accepts either an `SNodeReference` or an `SModelReference`. If no problems are found, returns `data: "no problems found"`; otherwise saves the report to a temp file and returns its path.
+Validates the specified node and its descendants. If no problems are found, returns `data: "no problems found"`; otherwise saves the report to a temp file and returns its path.
+
+**Known limitation (reported to JetBrains):** the tool also accepts an `SModelReference`, but then does not check the model's roots and returns `no problems found` even when roots have errors. Never treat a model-level `no problems found` as a validation. To validate a model, list its roots with `mps_mcp_get_project_structure` (`startingPoint` = the model, `includeRootNodes: true`) and call the check for each root node reference.
 
 - `onlyNodesWithProblems=true` (default) returns a flat list of just the nodes that have problems — easier to skim.
 - `onlyNodesWithProblems=false` returns the full subtree with `problems` arrays attached to each node, property, reference, and child role; useful when sibling context matters.
@@ -119,10 +121,9 @@ Each entry has the shape:
 
 ## Workflow and Best Practices
 
-1.  **Initialize a session**: check `skills/*-dsl/` for bundled DSL skills and read this skill before any MPS work. If the user opens a specific concept/model, also call `mps_mcp_get_current_editor_root_node` to anchor on what they are looking at.
+1.  **Initialize a session**: check for the bundled DSL skills (`moai:objectflow-dsl`, `moai:manmap-dsl`, `moai:dataux-dsl`) and read this skill before any MPS work. If the user opens a specific concept/model, also call `mps_mcp_get_current_editor_root_node` to anchor on what they are looking at.
 2.  **Navigate with precision**: prefer using `startingPoint` and `reference` (ID) over names to avoid ambiguity.
 3.  **Respect the AST**: remember that you are editing a tree. When writing Java (`BaseLanguage`), use `ParenthesizedExpression` if you are unsure about operation priorities in the tree structure.
 4.  **Learn from samples**: study existing code to understand how to perform common tasks. Use `mps_mcp_query_nodes` (`FIND_INSTANCES`) to find existing nodes of a given concept.
 5.  **Defensive problem checking**: always use `mps_mcp_check_root_node_problems` immediately after inserting or modifying a complex node. A successful insertion `"ok": true` does not guarantee the resulting AST is semantically or structurally valid.
-6.  **Validate frequently**: make/rebuild languages with `mps_mcp_alter_nodes` (`MAKE`) after making changes so they can be imported and used, and so you see whether they generate and compile. Pass `MAKE` with a JSON parameters object that names what to build — `{"modules": ["<module-ref>"]}` for one or more modules (e.g. a language plus its generator), `{"models": ["<model-ref>"]}` to make individual models, or `{"wholeProject": true}` to rebuild everything. Combine with `mps_mcp_check_root_node_problems` afterwards to surface generation errors.
-7.  **Missed skill adoption**: when an MPS skill is offered that can find models/modules/languages by name, the agent should decide to learn and use it to perform the lookup.
+6.  **Validate frequently**: make/rebuild languages with `mps_mcp_alter_nodes` (`MAKE`) after making changes so they can be imported and used, and so you see whether they generate and compile. Pass `MAKE` with a JSON parameters object that names what to build — `{"modules": ["<module-ref>"]}` for one or more modules (e.g. a language plus its generator), `{"models": ["<model-ref>"]}` to make individual models, or `{"wholeProject": true}` to rebuild everything. Generation and compile errors appear in the `MAKE` result; `mps_mcp_check_root_node_problems` reports model-level problems per root and does not surface generator output, so run it on the changed roots before the make.

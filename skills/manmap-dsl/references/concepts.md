@@ -2,7 +2,7 @@
 
 The live MPS descriptor exposes 94 concepts. Exactly two are rootable: `PersistenceDescription` and `Repository`. No hollow runtime descriptors were observed during generation of this memory.
 
-Use `mps_mcp_get_concept_details` again before relying on this inventory after a language upgrade. The language reference is recorded in the parent [SKILL.md](../SKILL.md).
+Use `mps_mcp_get_concept_details` again before relying on this inventory after a language upgrade. The language reference is recorded in the parent [SKILL.md](../SKILL.md). Use the FQ names from the Kapitellandkarten in JSON blueprints; resolve references, child roles and cardinalities via MPS MCP in the current project before changing a model.
 
 ## Root Concepts
 
@@ -35,9 +35,9 @@ The live child-role spelling is `atomMpig`; keep it exactly as written. Table na
 Use the documentation for the runtime meaning of [fields, keys, and options](../../../docu/manmap.md#felder-schlüssel-und-optionen), [automatic IDs and sequences](../../../docu/manmap.md#automatische-ids-und-sequences), [optimistic locking and audit](../../../docu/manmap.md#optimistic-locking-und-audit), and [alternate tables](../../../docu/manmap.md#alternative-tabellen).
 
 - Key and ID: `KeyOption`, `AutoidOption`, `OverWriteAutoIdOption`.
-- Concurrency and audit: `OptimisticOption`, `CreatedAtFieldOption`, `CreatedByFieldOption`, `ModifiedAtFieldOption`, `ModifiedByFieldOption`.
+- Concurrency and audit: `OptimisticOption` (table option on `EntityMapping`, role `tableOption`), `CreatedAtFieldOption`, `CreatedByFieldOption`, `ModifiedAtFieldOption`, `ModifiedByFieldOption`.
 - Schema metadata: `IndexOption`, `NotnullOption`, `SizeOption`, `UniqueOption`.
-- Alternate storage: `AdditionalTableName` declares a table; `AdditionalTableReference` (projected as `WHEN <condition> <name>`; child `condition` [1], reference `alternativeAccess`) uses it for an operation when the condition holds.
+- Alternate storage: `AdditionalTableName` (table option on `EntityMapping`, role `tableOption`) declares a table; `AdditionalTableReference` (projected as `WHEN <condition> <name>`; child `condition` [1], reference `alternativeAccess`) uses it for an operation when the condition holds.
 
 `AutoidOption.sequenceName` and `AdditionalTableName.tablename` each require a `StringLiteral`. `OverWriteAutoIdOption` references the affected `FieldMapping` and supplies another sequence-name literal.
 
@@ -101,4 +101,4 @@ Prefer specific C2 references and named parameters. `C2SqlIntegration` exists fo
 
 The remaining abstract/interface concepts mainly constrain placement: `IAtomMapping`, `IKeyMapping`, `IReferenceMapping`, `IQueryOperation`, `IQueryOption`, `IJoinOption`, `ITableOption`, `IRepositoryContent`, `IMappingInstance`, `IDataBaseOperation`, `INeedsClassMapper`, `IMapsClassConcept`, and `IIncludeAbleMapsClassConcept`. Never instantiate abstract/interface concepts in blueprints; choose a concrete implementation accepted by the role.
 
-For a cross-topic index, use the package [ManMap concept index for agents](../../../docu/manmap.md#konzeptindex-für-agenten).
+For the complete concept list with projections and FQ names, use the Kapitellandkarten in the package documentation, starting with [Repository](../../../docu/manmap.md#kapitellandkarte-repository) and [Persistenz-Mappings](../../../docu/manmap.md#kapitellandkarte-persistenz-mappings).

@@ -456,7 +456,7 @@ No properties, no references.
 }
 ```
 
-For the negated check use `Node_IsNullOperation` in the `operation` slot. Commonly paired with `.prev-sibling` / `.next-sibling` to guard boundary cases (see `check_ExplicitBond` in `mps-aspect-typesystem`):
+For the negated check use `Node_IsNullOperation` in the `operation` slot. Commonly paired with `.prev-sibling` / `.next-sibling` to guard boundary cases:
 
 ```json
 {

@@ -17,4 +17,4 @@
 - If a descriptor is `hollow`, rebuild the language module before trusting empty features. After edits in compiled language aspects, reload/rebuild before validation.
 - Never copy persistent references, domain names, or identifiers from an application project into this skill or its blueprints.
 
-For deeper Collections/Closures/smodel interactions, use [the bundled model-manipulation diagnostics](../../mps-model-manipulation/references/golden-rules-and-pitfalls.md).
+For deeper Collections/Closures/smodel interactions, use `moai:mps-model-manipulation` (`references/golden-rules-and-pitfalls.md`).

@@ -9,7 +9,7 @@ Read this first when an error message looks weird or you're about to write your 
 
 ## Background: two worlds in one model
 
-A checking rule or behavior method uses:
+Model code mixing these languages uses:
 
 | Layer | Language | Generated Java | Examples |
 |---|---|---|---|
@@ -38,8 +38,6 @@ against a matching functional-type target; a mismatch is reported in the insert 
 | `UnknownDotCall` for `MetaAdapterFactory.getContainmentLink` | Java parser can't match the `(long,long,long,long,String)` overload in this context | Never call getContainmentLink in method bodies; always use LINKS/CONCEPTS constants |
 | `type undefined is not a subtype of SNode` (cascade) | A preceding unresolved call returned `undefined` type | Fix the first `UnknownDotCall` and the cascade disappears |
 | `type List<SNode> is not a subtype of sequence<node<Type>>` | Method return type was parsed as Java `List<SNode>` instead of MPS `SequenceType` | Replace the `returnType` child after parsing using `mps_mcp_update_node` |
-| `StaticMethodCall` inserts as root node (not into tree) | `parse_java_and_insert` with `mode: "replace"` silently failed to find the target | Verify the target node ref is correct and still in the tree; check that the parent still exists |
 | Smodel expression (e.g. `:CatchClause` cast) cannot be passed as argument | Java parser has no syntax for smodel casts | Change method signature to accept wider node and compute cast inside the method |
 | `access to link 'X' is not expected here` / `out of search scope` despite correct cardinality | Operand typed as `node<>` rather than `node<X>` (e.g. `ForEachVariable` over `sequence<node<>>`, loosely-typed parameter) | Wrap operand in `SNodeTypeCastExpression` to typed `node<X>` — see "Operand must be a typed `node<X>`" in `dot-expression-basics.md` |
-| Warning: "Prefer explicit node presentation" | `+` string concatenation with an SNode argument | Pre-existing warning in `RulesFunctions_BaseLanguage`; not introduced by your changes |
 | `"different parameter numbers"` on a `ClosureLiteral` + `"out of search scope"` / `"operation is not applicable to null"` inside the closure body | The `InferredClosureParameterDeclaration` was inserted without its required `type` child, so closure-signature inference fails and the parameter's type stays null | Add `{ "role": "type", "nodes": [{ "concept": "jetbrains.mps.baseLanguage.structure.UndefinedType" }] }` to every `InferredClosureParameterDeclaration` |

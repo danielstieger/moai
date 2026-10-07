@@ -62,7 +62,7 @@ Important operation families:
 | Mutation | `AddElementOperation`, `RemoveElementOperation`, `AddAllElementsOperation`, `RemoveAllElementsOperation` | required `argument` |
 | Map operations | `ContainsKeyOperation`, `ContainsValueOperation`, `MapRemoveOperation`, `PutAllOperation`, `GetKeysOperation`, `GetValuesOperation`, `MapClearOperation` | key/value/map child where applicable |
 
-For an exhaustive operation catalogue, including aliases, lazy/eager behavior, sorted ranges, and iterators, use [the bundled Collections catalogue](../../mps-model-manipulation/references/collections-catalog.md).
+For an exhaustive operation catalogue, including aliases, lazy/eager behavior, sorted ranges, and iterators, use `moai:mps-model-manipulation` (`references/collections-catalog.md`).
 
 ## Closures used by collection operations
 

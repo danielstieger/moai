@@ -68,7 +68,7 @@ Use `node-ptr<C>` when you need to remember a node across operations that might 
 }
 ```
 
-Populate with a `concept/C/` literal (`SConceptTypeLiteral`, id `5472444609684539882`) or the `.concept` operation on a node.
+Populate with a `concept/C/` literal (`ConceptIdRefExpression`, id `2644386474300074836`, see `link-and-concept-literals.md`) or the `.concept` operation on a node (`Node_GetSConceptOperation`).
 
 ### `search scope` and `enummember<E>`
 
@@ -121,7 +121,7 @@ Use these to correct a type that the Java parser produced incorrectly (usually a
 }
 ```
 
-### `new arraylist<node<Type>>` (parsed automatically; shown for manual construction)
+### `new arraylist<node<Type>>` (MPS collections syntax — not parseable as Java; manual construction)
 
 ```json
 {

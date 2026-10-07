@@ -1,0 +1,261 @@
+{
+  "concept": "org.modellwerkstatt.dataux.structure.BatchJobModule",
+  "properties": [
+    { "name": "name", "value": "ExampleJob" }
+  ],
+  "references": [
+    { "role": "configuration", "target": "TARGET_MODEL.OFXConfig" }
+  ],
+  "children": [
+    {
+      "role": "authFunction",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.AppAuthenticationFunction",
+          "children": [
+            {
+              "role": "body",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StatementList",
+                  "children": [
+                    {
+                      "role": "statement",
+                      "nodes": [
+                        {
+                          "concept": "jetbrains.mps.baseLanguage.structure.ExpressionStatement",
+                          "children": [
+                            {
+                              "role": "expression",
+                              "nodes": [
+                                {
+                                  "concept": "jetbrains.mps.baseLanguage.structure.BooleanConstant",
+                                  "properties": [
+                                    { "name": "value", "value": "true" }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "pairs",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.objectflow.structure.OFXProducerConsumerPair",
+          "properties": [
+            { "name": "name", "value": "ExamplePair" }
+          ],
+          "children": [
+            {
+              "role": "producerImpl",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.objectflow.structure.OFXProducerContext",
+                  "properties": [
+                    { "name": "name", "value": "inbox" }
+                  ],
+                  "children": [
+                    {
+                      "role": "keytype",
+                      "nodes": [
+                        {
+                          "concept": "jetbrains.mps.baseLanguage.structure.ClassifierType",
+                          "references": [
+                            { "role": "classifier", "target": "TARGET_MODEL.InboxClassifier" }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "runCommand",
+                      "nodes": [
+                        {
+                          "concept": "org.modellwerkstatt.objectflow.structure.OFXRunCmd",
+                          "children": [
+                            {
+                              "role": "commandCall",
+                              "nodes": [
+                                {
+                                  "concept": "org.modellwerkstatt.objectflow.structure.CommandCallBasis",
+                                  "references": [
+                                    { "role": "command", "target": "TARGET_MODEL.ProducerCommand" }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "consumerImpl",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.objectflow.structure.OFXConsumerContext",
+                  "properties": [
+                    { "name": "name", "value": "inboxElement" }
+                  ],
+                  "children": [
+                    {
+                      "role": "cmdCallContext",
+                      "nodes": [
+                        {
+                          "concept": "org.modellwerkstatt.objectflow.structure.OFXConsumerCmdCallContext",
+                          "children": [
+                            {
+                              "role": "runCommand",
+                              "nodes": [
+                                {
+                                  "concept": "org.modellwerkstatt.objectflow.structure.OFXRunCmd",
+                                  "children": [
+                                    {
+                                      "role": "commandCall",
+                                      "nodes": [
+                                        {
+                                          "concept": "org.modellwerkstatt.objectflow.structure.CommandCallBasis",
+                                          "references": [
+                                            { "role": "command", "target": "TARGET_MODEL.ConsumerCommand" }
+                                          ],
+                                          "children": [
+                                            {
+                                              "role": "actualArgument",
+                                              "nodes": [
+                                                {
+                                                  "concept": "org.modellwerkstatt.objectflow.structure.OFXRunCmdVarRef",
+                                                  "references": [
+                                                    { "role": "varRef", "target": "inboxElement" }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "exceptionStrategy",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.objectflow.structure.OFXExceptionStrategy",
+          "properties": [
+            { "name": "name", "value": "ExampleJobExceptionStrategy" }
+          ],
+          "children": [
+            {
+              "role": "member",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.objectflow.structure.OFXStrategyForException",
+                  "children": [
+                    {
+                      "role": "properties",
+                      "nodes": [
+                        {
+                          "concept": "org.modellwerkstatt.objectflow.structure.OFXDelayStratBehaviour",
+                          "properties": [
+                            { "name": "supendSeconds", "value": "60" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "options",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.OptCronPairExp",
+          "properties": [
+            { "name": "sec", "value": "0" },
+            { "name": "min", "value": "0" },
+            { "name": "hour", "value": "2" },
+            { "name": "dayOfMonth", "value": "*" },
+            { "name": "month", "value": "*" },
+            { "name": "dayOfWeek", "value": "*" }
+          ],
+          "references": [
+            { "role": "pair", "target": "ExamplePair" }
+          ]
+        },
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.OptNumConsumersPair",
+          "properties": [
+            { "name": "numConsumers", "value": "1" }
+          ],
+          "references": [
+            { "role": "pair", "target": "ExamplePair" }
+          ]
+        },
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.OptVersion",
+          "children": [
+            {
+              "role": "exp",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+                  "properties": [
+                    { "name": "value", "value": "0.1" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.OptOfficialAppName",
+          "children": [
+            {
+              "role": "exp",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+                  "properties": [
+                    { "name": "value", "value": "ExampleJob" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

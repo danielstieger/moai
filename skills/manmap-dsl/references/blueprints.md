@@ -33,5 +33,5 @@ Every JSON file in [blueprints](blueprints) uses fully qualified concept names a
 - [no-key-mapper-subtree.json](blueprints/no-key-mapper-subtree.json)
 - [custom-sql-statement-subtree.json](blueprints/custom-sql-statement-subtree.json)
 
-For complex BaseLanguage closures, method calls, or predicates, inspect a focused package-shipped node from [sandbox.md](sandbox.md), then rebuild the subtree with target-local references under the guidance of `mps-baselanguage`.
+For complex BaseLanguage closures, method calls, or predicates, inspect a focused package-shipped node from [sandbox.md](sandbox.md), then rebuild the subtree with target-local references under the guidance of `moai:mps-baselanguage`.
 

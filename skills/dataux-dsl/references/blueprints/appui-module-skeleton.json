@@ -1,0 +1,121 @@
+{
+  "concept": "org.modellwerkstatt.dataux.structure.AppUiModule",
+  "properties": [
+    { "name": "name", "value": "ExampleApp" }
+  ],
+  "references": [
+    { "role": "configuration", "target": "TARGET_MODEL.OFXConfig" }
+  ],
+  "children": [
+    {
+      "role": "authFunction",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.AppAuthenticationFunction",
+          "children": [
+            {
+              "role": "body",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StatementList",
+                  "children": [
+                    {
+                      "role": "statement",
+                      "nodes": [
+                        {
+                          "concept": "jetbrains.mps.baseLanguage.structure.ExpressionStatement",
+                          "children": [
+                            {
+                              "role": "expression",
+                              "nodes": [
+                                {
+                                  "concept": "jetbrains.mps.baseLanguage.structure.BooleanConstant",
+                                  "properties": [
+                                    { "name": "value", "value": "true" }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "mainMenu",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.MenuAction",
+          "references": [
+            { "role": "command", "target": "TARGET_MODEL.Command" }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "tiles",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.AppTile",
+          "children": [
+            {
+              "role": "action",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.dataux.structure.MenuAction",
+                  "references": [
+                    { "role": "command", "target": "TARGET_MODEL.Command" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "options",
+      "nodes": [
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.OptVersion",
+          "children": [
+            {
+              "role": "exp",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+                  "properties": [
+                    { "name": "value", "value": "0.1" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.OptOfficialAppName",
+          "children": [
+            {
+              "role": "exp",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+                  "properties": [
+                    { "name": "value", "value": "ExampleApp" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

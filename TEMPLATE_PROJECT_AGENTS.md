@@ -6,8 +6,9 @@ JetBrains MPS workflow.
 
 ## MoAI Package Boundary
 
-- Treat `moai/` as a versioned dependency. Do not modify files below `moai/`
-  during normal application development.
+- Treat `moai/` as a versioned dependency. Do not modify files below `moai/`;
+  anything project-specific, including runtime registration files, lives in
+  the application project outside the submodule.
 
 ## Skills
 
@@ -19,9 +20,11 @@ Use the skills supplied by the installed MoAI plugin:
   and direct SQL;
 - `moai:dataux-dsl` for pages, forms, tables, layouts, bindings, includes, menus,
   applications, and batch jobs;
-- `moai:mps-mcp-workflow` as the entry point for MPS tooling and workflow;
-- the matching MPS support skill for node editing, BaseLanguage, console work,
-  model manipulation, language analysis, or run configurations.
+- `moai:baselanguage-collections-dsl` for BaseLanguage collection types,
+  creators, operations, and foreach statements;
+- `moai:mps-mcp-workflow` for MPS tooling and workflow; its skill table names
+  the matching MPS support skill (node editing, BaseLanguage, console work,
+  model manipulation, language analysis, run configurations).
 
 If the runtime does not expose these skills, report that the MoAI plugin is not
 installed or enabled. Do not recreate MoAI skills as project-local skills.
@@ -38,10 +41,10 @@ Use these package documents for the intended MoWare semantics:
 Read them in stages. For research and planning, `moai/docu/moware-werkbank.md`
 together with the sections "Modellierungsumfang und Ausdrucksmöglichkeiten" and
 the chapter maps ("Kapitellandkarte") of the three DSL documents is sufficient;
-they name every concept with its projection and FQ name. Read the full part of a
-DSL document only when modeling that layer, following the section links in the
-skills. Reading all four documents up front costs about 140,000 tokens and is
-rarely needed.
+they name every concept the documentation treats with its projection and FQ
+name. Read the full part of a DSL document only when modeling that layer,
+following the section links in the skills. Reading all four documents up front
+costs about 140,000 tokens and is rarely needed.
 
 ## Conventions
 
@@ -54,9 +57,16 @@ this project states otherwise in the section below.
 None.
 
 A project may change individual conventions or replace them with its own. List
-here what deviates and what applies instead. Do not edit or delete files below
-`moai/` for this purpose. An agent never deviates on its own; a deviation is a
-project decision.
+here what deviates and what applies instead. An agent never deviates on its
+own; a deviation is a project decision.
+
+## Hand-Authored Code Outside MPS
+
+None.
+
+If the project contains hand-written JVM or build code (custom runtime
+libraries, Gradle build scripts, test harnesses), list it here together with
+the tools appropriate for it.
 
 ## MPS Workflow
 

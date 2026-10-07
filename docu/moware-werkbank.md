@@ -4,7 +4,9 @@
 
 Dieses Dokument ist die architektonische Einstiegsseite zur **modellwerkstatt MoWare-Werkbank**. Es erklärt die Zuständigkeiten und das Zusammenspiel der drei DSLs, die gemeinsamen Grundprinzipien sowie den Weg vom fachlichen Modell zur laufenden Anwendung.
 
-Die Beispiele sind fachliche Skizzen und keine ausführbare DSL-Syntax. Konkrete Konzepte, Eigenschaften, Einschränkungen und Modellierungsmuster werden in den jeweiligen DSL-Dokumentationen beschrieben. Bei Abweichungen zwischen Dokumentation und den geladenen MPS-Sprachen sind die Sprachdefinitionen und ihre Prüfregeln die technische Quelle der Wahrheit. Ein Agent soll unbekannte Syntax oder Regeln nicht ableiten oder erfinden, sondern die Modelle mit MPS-Werkzeugen untersuchen.
+Die Beispiele sind fachliche Skizzen und keine ausführbare DSL-Syntax. Konkrete Konzepte, Eigenschaften, Einschränkungen und Modellierungsmuster werden in den jeweiligen DSL-Dokumentationen beschrieben. Bei Abweichungen zwischen Dokumentation und den geladenen MPS-Sprachen sind die Sprachdefinitionen und ihre Prüfregeln die technische Quelle der Wahrheit.
+
+Die Dokumentation beschreibt beobachtete und technisch bestätigte Praxis. Sie legt keine zusätzliche, von der Sprache nicht erzwungene Architektur fest; das tun die [verbindlichen Konventionen](#verbindliche-konventionen). Wo sich aus bestehenden Anwendungen wiederkehrende Empfehlungen ergeben, werden diese als solche benannt.
 
 ## Modellierungssprachen und Laufzeitumgebungen
 
@@ -48,6 +50,10 @@ Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimm
 | Benutzeroberfläche                 | `Page Pane`, `Table`, `Delegate Form`, `Grid Layout`, `Tab Layout`, `Custom UI Element` | `org.modellwerkstatt.dataux` |
 | Ausführbare Module                 | `AppUI Module`, `BatchJob Module`                                               | `org.modellwerkstatt.dataux`     |
 | Querschnitt                        | `OFXConfig`, `OFXTestSuit`, Roles and Permissions, Static Ressources         | `org.modellwerkstatt.objectflow` |
+
+### Bezeichnung der Konzepte
+
+Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der **Konzeptname** bezeichnet das technische AST-Konzept; der **FQ-Name** ist dessen vollständig qualifizierter Name. Die Kapitellandkarten in diesem Dokument und in den DSL-Dokumentationen führen alle drei Bezeichnungen zusammen; bei dort fehlenden Konzepten ergänzt der Fließtext beim ersten Auftreten den Konzeptnamen beziehungsweise bei Konzepten aus anderen Sprachen den FQ-Namen in Klammern und verwendet danach nur noch den Namen. Hat ein Konzept keine als Wort benennbare Projektion, wird sein Konzeptname verwendet. Umschreibungen und Kurzformen treten nicht an die Stelle von Projektion oder Konzeptname. Zwei Ausnahmen: `Service` und `OFXConfig` werden mit ihrem Konzeptnamen bezeichnet, obwohl der Editor `component` beziehungsweise `Configuration` zeigt.
 
 ### Kapitellandkarte: ManMap
 
@@ -173,7 +179,7 @@ Für das vereinfachte Beispiel müssen Mengen positiv und Einzelpreise nicht neg
 
 Eine `Persistence Description` enthält die Mappings für `Rechnung` und `Rechnungsposition`. Die Positionstabelle besitzt eine Zuordnung zur jeweiligen Rechnung.
 
-Zwei Repositories kapseln die Datenbankzugriffe. Das `RechnungsRepo` lädt und speichert das Aggregat Rechnung; das `RechnungsLeseRepo` enthält die Abfragen, die nur lesen. Nach den [Konventionen für den Aufbau einer Anwendung](../conventions/moware-werkbank-modularisierung_v1.md) liegt das erste im `domain`-Modell des Bereichs `rechnung`, das zweite in dessen `read`-Modell.
+Zwei Repositories kapseln die Datenbankzugriffe. Das `RechnungsRepo` lädt und speichert das Aggregat Rechnung; das `RechnungsLeseRepo` enthält die Abfragen, die nur lesen.
 
 | Repository          | Beispielhafte Methode        | Aufgabe                                                                                                                                                                       |
 | ------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -191,7 +197,8 @@ Auch für die Summe aller Rechnungen werden keine vollständigen Rechnungsgraphe
 | Beispiel-Command                  | Command-Typ       | Aufgabe                                                                                                                       |
 | --------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `Rechnungen suchen`               | `SEARCH_CMD`      | Erfasst Suchkriterien und zeigt die als `RechnungInfo`-DTOs geladenen Treffer auf einer zweiten Seite an.                     |
-| `Rechnung bearbeiten`             | `GRAPH_OWNER_CMD` | Lädt eine Rechnung anhand ihrer ID zur Bearbeitung und registriert Repository-Methoden zum Speichern als Session-Operationen. |
+| `Rechnung bearbeiten`             | `GRAPH_OWNER_CMD` | Lädt eine Rechnung anhand ihrer ID, zeigt Kopf und Positionen an und registriert Repository-Methoden zum Speichern als Session-Operationen. |
+| `Rechnungskopf bearbeiten`        | `GRAPH_EDIT_CMD`  | Bearbeitet die Kopfdaten innerhalb der bestehenden Session des `GRAPH_OWNER_CMD`.                                              |
 | `Rechnungsposition bearbeiten`    | `GRAPH_EDIT_CMD`  | Bearbeitet eine Position innerhalb der bestehenden Session des `GRAPH_OWNER_CMD`.                                             |
 | `Summe aller Rechnungen anzeigen` | `SEARCH_CMD`      | Ruft die SQL-Aggregation im `RechnungsLeseRepo` auf und zeigt das Ergebnis an.                                                |
 
@@ -206,13 +213,13 @@ Der Command `Rechnungen suchen` startet eine eigene Read-only-Session und besteh
 
 Bei der Suche werden weder `Rechnung`-Entitäten noch deren Positionen geladen. Die Session des `SEARCH_CMD` kann nicht committed werden. Die Eingabe von Suchkriterien und das Befüllen von `results` im DTO sind davon unabhängig: Diese Daten dienen dem Suchablauf und werden nicht in die Datenbank geschrieben. Auch die `RechnungInfo`-Ergebnisse des No-Key-Mapper sind read-only und nicht Bestandteil der Session-Identity-Map.
 
-Ein Doppelklick auf eine Tabellenzeile startet `Rechnung bearbeiten`. Als Parameter wird die Rechnungs-ID aus dem ausgewählten `RechnungInfo`-DTO übergeben.
+Ein Doppelklick auf eine Tabellenzeile startet `Rechnung bearbeiten`. Als Parameter wird die Rechnungs-ID aus dem ausgewählten `RechnungInfo`-DTO übergeben. Bei erfolgreichem Abschluss pusht `Rechnung bearbeiten` die bearbeitete `Rechnung`; der Termination Handler der Suchseite übernimmt die geänderten Werte mit gewöhnlichen Anweisungen aus der Entity in das zugehörige `RechnungInfo`-DTO der Ergebnisliste. Die Suche wird dafür nicht wiederholt.
 
 #### Rechnung und Positionen bearbeiten
 
 Der Command `Rechnung bearbeiten` hat den Typ `GRAPH_OWNER_CMD` und startet eine eigene Session. Er ist dafür verantwortlich, die Daten zur Bearbeitung zu laden (**Checkout**). Dazu ruft er `checkout(id)` des `RechnungsRepo` mit der übergebenen Rechnungs-ID auf. Die Repository-Methode lädt den Rechnungskopf und die zugehörigen Positionen.
 
-Der Benutzer kann den Rechnungskopf und die Positionen bearbeiten. Für die Bearbeitung einer einzelnen Position wird `Rechnungsposition bearbeiten` vom Typ `GRAPH_EDIT_CMD` verwendet. Dieser Command arbeitet innerhalb der bestehenden Session des `GRAPH_OWNER_CMD` und eröffnet keine eigene Session. Änderungen werden direkt an der Entität Rechnungsposition durchgeführt.
+Der `GRAPH_OWNER_CMD` zeigt Rechnungskopf und Positionen an, bearbeitet sie aber nicht selbst; sein `Delegate Form` ist `DISABLED`. Zum Bearbeiten öffnet er `Rechnungskopf bearbeiten` und `Rechnungsposition bearbeiten` vom Typ `GRAPH_EDIT_CMD`. Diese Commands arbeiten innerhalb der bestehenden Session des `GRAPH_OWNER_CMD` und eröffnen keine eigene Session. Änderungen werden direkt an den Entities durchgeführt.
 
 Der `RechnungsService` übernimmt fachliche Prüfungen und Berechnungen. Der `GRAPH_OWNER_CMD` registriert die zum Speichern benötigten Repository-Methoden (**Check-in**) als **Session-Operationen**. Im Beispiel dient dazu `checkin(rechnung)`.
 
@@ -233,7 +240,8 @@ Eine **Page** beschreibt eine Seite im Ablauf eines Commands. Das zugehörige **
 | `AppUI Module`                           | Einstieg in die Rechnungsverwaltung mit Menüeinträgen für `Rechnungen suchen` und `Summe aller Rechnungen anzeigen`.                                                       |
 | `Page Pane` für die Suchfilter-Page      | Enthält ein `Delegate Form`, dessen Eingabefelder an die Suchkriterien des DTOs `RechnungFilter` gebunden sind.                                                             |
 | `Page Pane` für die Suchergebnis-Page    | Enthält eine `Table`, die die `RechnungInfo`-DTOs aus `RechnungFilter.results` zeigt. Ein Doppelklick startet `Rechnung bearbeiten` mit der Rechnungs-ID aus dem DTO.    |
-| `Page Pane` für die Rechnungsbearbeitung | Enthält ein `Delegate Form` für den Rechnungskopf und eine `Table` für die geladenen Rechnungspositionen. Ein `Grid Layout` oder `Tab Layout` strukturiert diese Komponenten. |
+| `Page Pane` für die Rechnungsbearbeitung | Enthält ein `Delegate Form` (`DISABLED`) für den Rechnungskopf und eine `Table` für die geladenen Rechnungspositionen; die Aktionen öffnen `Rechnungskopf bearbeiten` und `Rechnungsposition bearbeiten`. Ein `Grid Layout` oder `Tab Layout` strukturiert diese Komponenten. |
+| `Page Pane` für die Kopfbearbeitung     | Enthält ein `Delegate Form` zur Bearbeitung des Rechnungskopfs im Command `Rechnungskopf bearbeiten`.                                                                      |
 | `Page Pane` für die Positionsbearbeitung | Enthält ein `Delegate Form` zur Bearbeitung einer einzelnen Rechnungsposition im Command `Rechnungsposition bearbeiten`.                                                    |
 | `Page Pane` für die Summenanzeige        | Enthält ein `Delegate Form` zur Anzeige des DTOs `RechnungsSummenErgebnis`.                                                                                                 |
 
@@ -245,7 +253,7 @@ Eine `OFXTestSuit` kann beispielsweise folgende Fälle abdecken:
 
 - Zwei Positionen mit `2 × 50 EUR` und `1 × 30 EUR` ergeben eine Rechnungssumme von `130 EUR`.
 - Eine Position mit Menge `0` wird fachlich abgelehnt.
-- Die Suche nach einem Merkmal, das nur dieser Testlauf anlegt, liefert genau die dafür angelegten Rechnungen als `RechnungInfo`-DTOs.
+- Die Rechnungssuche liefert die im Test angelegten Rechnungen als `RechnungInfo`-DTOs.
 
 ### ExpensiveCode und CheapCode im Beispiel
 
@@ -255,11 +263,11 @@ Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion m
 
 ## Von der Modellierung zur Ausführung
 
-1. **Solutions anlegen:** Eine kleine Anwendung besteht aus einer MPS-Solution. Jede Solution hat eine Modulabhängigkeit auf `JDK`; ihre Modelle verwenden das DevKit `org.modellwerkstatt.MoWareWerkbank`. Weitere Abhängigkeiten, etwa auf Laufzeitmodule wie `org.modellwerkstatt.objectflow.runtime` oder auf Java-Bibliotheken wie einen JDBC-Treiber, werden nur ergänzt, wenn Inhalte daraus direkt verwendet werden.
+1. **Solutions anlegen:** Jede Solution hat eine Modulabhängigkeit auf `JDK`; ihre Modelle verwenden das DevKit `org.modellwerkstatt.MoWareWerkbank`. Weitere Abhängigkeiten, etwa auf Laufzeitmodule wie `org.modellwerkstatt.objectflow.runtime` oder auf Java-Bibliotheken wie einen JDBC-Treiber, werden nur ergänzt, wenn Inhalte daraus direkt verwendet werden.
 
-2. **Modellieren und versionieren:** Die Anwendung wird mit den DSLs in MPS modelliert und mit Git versioniert. MPS speichert die Modelle als XML-Dateien. Diese enthalten strukturierte Modelle mit Referenzen und Identitäten; ein rein textueller Merge kann deren Konsistenz verletzen. Für die Versionsverwaltung werden deshalb die Git-Unterstützung von MPS und der MPS-Merge-Driver verwendet. Modellkonflikte werden mit den modellbewussten Werkzeugen von MPS aufgelöst. Agenten bearbeiten Modelle über die MPS-Werkzeuge und führen keine manuellen Text-Merges der XML-Modelldateien durch.
+2. **Modellieren und versionieren:** Die Anwendung wird mit den DSLs in MPS modelliert und mit Git versioniert. MPS speichert die Modelle als XML-Dateien. Diese enthalten strukturierte Modelle mit Referenzen und Identitäten; ein rein textueller Merge kann deren Konsistenz verletzen. Für die Versionsverwaltung werden deshalb die Git-Unterstützung von MPS und der MPS-Merge-Driver verwendet. Modellkonflikte werden mit den modellbewussten Werkzeugen von MPS aufgelöst.
 
-3. **Datenbankschema erstellen:** Das Datenbankschema erstellt der Entwickler in MPS aus den `EntityMapping`s der Persistence Descriptions. Agenten erzeugen oder ändern keine Datenbankschemata.
+3. **Datenbankschema erstellen:** Das Datenbankschema erstellt der Entwickler in MPS aus den `EntityMapping`s der Persistence Descriptions.
 
 4. **Laufzeitkonfiguration auswählen:** In der `OFXConfig` wird über **AppFactories** festgelegt, welche Laufzeitumgebung tatsächlich verwendet wird. Ein Projekt enthält häufig mehrere Konfigurationen.
 
@@ -308,15 +316,15 @@ Die Detaildokumentationen beschreiben Konzepte, Möglichkeiten, Einschränkungen
 
 ### Detaildokumentationen zu DSLs
 
-| DSL | Dokumentation | Status |
-| --- | --- | --- |
-| `org.modellwerkstatt.manmap` | [manmap.md](manmap.md) | ausgearbeitet |
-| `org.modellwerkstatt.objectflow` | [objectflow.md](objectflow.md) | ausgearbeitet |
-| `org.modellwerkstatt.dataux` | [dataux.md](dataux.md) | ausgearbeitet |
+| DSL | Dokumentation | 
+| --- | --- |
+| `org.modellwerkstatt.manmap` | [manmap.md](manmap.md) |
+| `org.modellwerkstatt.objectflow` | [objectflow.md](objectflow.md) |
+| `org.modellwerkstatt.dataux` | [dataux.md](dataux.md) |
 
 ### Verbindliche Konventionen
 
-Die Dokumentation beschreibt, was die Sprachen können. Wie eine Anwendung das verwenden muss, legen die verbindlichen Konventionen unter `conventions/` fest: [Aufbau einer Anwendung](../conventions/moware-werkbank-modularisierung_v1.md), [Benutzeroberflächen](../conventions/moware-werkbank-ui_v1.md), [Tests](../conventions/moware-werkbank-tests_v1.md) und [allgemeine Konventionen](../conventions/moware-werkbank-konventionen_v1.md).
+Die Dokumentation beschreibt, was die Sprachen können. Wie eine Anwendung das verwenden muss, legen die verbindlichen Konventionen im Verzeichnis `conventions/` fest. 
 
 ## Stand der Dokumentation
 

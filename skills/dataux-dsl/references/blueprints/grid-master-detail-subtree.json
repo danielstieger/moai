@@ -8,63 +8,27 @@
     {
       "role": "rowWeights",
       "nodes": [
+        { "concept": "org.modellwerkstatt.dataux.structure.MinWeight" },
         { "concept": "org.modellwerkstatt.dataux.structure.OneWeight" }
       ]
     },
     {
       "role": "colWeights",
       "nodes": [
-        { "concept": "org.modellwerkstatt.dataux.structure.OneWeight" },
-        { "concept": "org.modellwerkstatt.dataux.structure.TwoWeight" }
+        { "concept": "org.modellwerkstatt.dataux.structure.OneWeight" }
       ]
     },
     {
       "role": "uxChild",
       "nodes": [
         {
-          "concept": "org.modellwerkstatt.dataux.structure.Table",
-          "references": [
-            { "role": "boundClassifier", "target": "TARGET_MODEL.TableOwnerClassifier" },
-            { "role": "boundProperty", "target": "TARGET_MODEL.items" }
-          ],
-          "children": [
-            {
-              "role": "options",
-              "nodes": [
-                { "concept": "org.modellwerkstatt.dataux.structure.SelectFirstFOption" }
-              ]
-            },
-            {
-              "role": "delegates",
-              "nodes": [
-                {
-                  "concept": "org.modellwerkstatt.dataux.structure.StringDelegate",
-                  "children": [
-                    {
-                      "role": "boundTo",
-                      "nodes": [
-                        {
-                          "concept": "org.modellwerkstatt.dataux.structure.LocalPropertyReference",
-                          "references": [
-                            { "role": "property", "target": "TARGET_MODEL.rowText" }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
+          "concept": "org.modellwerkstatt.dataux.structure.DelegateForm",
           "properties": [
             { "name": "isNamed", "value": "false" },
             { "name": "name", "value": "#" }
-          ]
-        },
-        {
-          "concept": "org.modellwerkstatt.dataux.structure.DelegateForm",
+          ],
           "references": [
-            { "role": "boundClassifier", "target": "TARGET_MODEL.RowClassifier" }
+            { "role": "boundClassifier", "target": "TARGET_MODEL.RootClassifier" }
           ],
           "children": [
             {
@@ -83,9 +47,9 @@
                       "role": "boundTo",
                       "nodes": [
                         {
-                          "concept": "org.modellwerkstatt.dataux.structure.LocalPropertyReference",
+                          "concept": "org.modellwerkstatt.dataux.structure.DuxLocalPropertyReference",
                           "references": [
-                            { "role": "property", "target": "TARGET_MODEL.detail" }
+                            { "role": "property", "target": "TARGET_MODEL.textProperty" }
                           ]
                         }
                       ]
@@ -94,10 +58,73 @@
                 }
               ]
             }
-          ],
+          ]
+        },
+        {
+          "concept": "org.modellwerkstatt.dataux.structure.Table",
           "properties": [
             { "name": "isNamed", "value": "false" },
             { "name": "name", "value": "#" }
+          ],
+          "references": [
+            { "role": "boundClassifier", "target": "TARGET_MODEL.TableOwnerClassifier" },
+            { "role": "boundProperty", "target": "TARGET_MODEL.items" }
+          ],
+          "children": [
+            {
+              "role": "options",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.dataux.structure.LabelFOption",
+                  "children": [
+                    {
+                      "role": "expression",
+                      "nodes": [
+                        {
+                          "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral",
+                          "properties": [
+                            { "name": "value", "value": "Positionen" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                { "concept": "org.modellwerkstatt.dataux.structure.SelectFirstFOption" }
+              ]
+            },
+            {
+              "role": "delegates",
+              "nodes": [
+                {
+                  "concept": "org.modellwerkstatt.dataux.structure.StringDelegate",
+                  "children": [
+                    {
+                      "role": "boundTo",
+                      "nodes": [
+                        {
+                          "concept": "org.modellwerkstatt.dataux.structure.DuxLocalPropertyReference",
+                          "references": [
+                            { "role": "property", "target": "TARGET_MODEL.rowText" }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "option",
+                      "nodes": [
+                        {
+                          "concept": "org.modellwerkstatt.dataux.structure.WidthDOption",
+                          "properties": [
+                            { "name": "percent", "value": "100" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
           ]
         }
       ]

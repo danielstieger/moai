@@ -197,7 +197,7 @@ All take a single `argument` / initializer child on the corresponding `DotExpres
 
 The plain operations above (`LinkList_AddNewChildOperation`, `Link_SetNewChildOperation`, `Node_ReplaceWithNewOperation`, `Node_InsertNewNextSiblingOperation`, `Node_InsertNewPrevSiblingOperation`, `Model_CreateNewNodeOperation`, `Model_CreateNewRootNodeOperation`, `Concept_NewInstance`) all have **factory-initialized** counterparts in `jetbrains.mps.lang.actions` (language `l:aee9cad2-acd4-4608-aef2-0004f6a1cdbd`, virtual folder `nodeFactories`).
 
-Structurally identical to the smodel originals but with a critical runtime difference: NF_* operations invoke **the actions-aspect `NodeFactory`** of the created node's concept (see `mps-aspect-actions`). That factory sets up defaults, seeds mandatory children, and may carry data from a `sampleNode`. Non-`NF_` variants skip the factory.
+Structurally identical to the smodel originals but with a critical runtime difference: NF_* operations invoke **the actions-aspect `NodeFactory`** of the created node's concept. That factory sets up defaults, seeds mandatory children, and may carry data from a `sampleNode`. Non-`NF_` variants skip the factory.
 
 | Concept | ID | Surface | Counterpart |
 |---|---|---|---|
@@ -212,13 +212,13 @@ Structurally identical to the smodel originals but with a critical runtime diffe
 
 Each NF_* op also accepts an optional `<default>` / `node<>` initializer block that runs after the factory. Surface syntax: `add new initialized`, `set new initialized`, `replace with new initialized`, `insert new initialized next/prev-sibling`, etc.
 
-The `<default>` placeholder inside `add new initialized(<default>)` stands for an empty initializer (the concept is inferred from the containment role), equivalent to an explicit `add new initialized(C)` call without a custom block. Verbatim example from StateChart `AddOnEntry` intention's execute body: `node.onEntry.operations.add new initialized(<default>);` — this creates a new `Operation` child and runs any `NodeFactory` defined for it in the actions aspect.
+The `<default>` placeholder inside `add new initialized(<default>)` stands for an empty initializer (the concept is inferred from the containment role), equivalent to an explicit `add new initialized(C)` call without a custom block.
 
 > When to use NF_* vs plain: use `NF_` when a concept's newly inserted instance must behave like one created through the editor; use the plain operation when you want an uninitialised shell.
 
 ### ⚠ Used-language requirement
 
-Because the NF_* concepts live in `jetbrains.mps.lang.actions`, the *containing model* (intention, behavior, typesystem, etc.) must import that language in its **used languages**. Without the import, the `add new initialized(...)` / `set new initialized(...)` / `replace with new initialized(...)` surface syntax is not offered and pasted blueprints will produce unresolved-concept errors.
+Because the NF_* concepts live in `jetbrains.mps.lang.actions`, the *containing model* (e.g. a console command or an application model) must import that language in its **used languages**. Without the import, the `add new initialized(...)` / `set new initialized(...)` / `replace with new initialized(...)` surface syntax is not offered and pasted blueprints will produce unresolved-concept errors.
 
 Add it via:
 

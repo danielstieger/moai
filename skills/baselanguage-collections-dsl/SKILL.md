@@ -17,7 +17,7 @@ description: Use when creating, editing, validating, or inspecting jetbrains.mps
 
 ## Critical rules
 
-- Use MPS MCP tools; never hand-edit serialized `.mps` or `.mpl` XML.
+- Use MPS MCP tools; never read or edit raw `.mps` / `.mpl` XML (rule and fallback: [`MPS_AGENT_GUIDE.md`](../../MPS_AGENT_GUIDE.md#never-read-raw-mps-model-files)).
 - Query concepts with `mps_mcp_get_concept_details` and `l:83888646-71ce-4f1c-9c53-c54016f6ad4f:jetbrains.mps.baseLanguage.collections`, not the module-style reference.
 - Use fully qualified concept names in JSON blueprints.
 - Collections operations are usually the `operation` child of a BaseLanguage `DotExpression`; do not insert them as standalone expressions.
@@ -29,11 +29,11 @@ description: Use when creating, editing, validating, or inspecting jetbrains.mps
 ## Quick start
 
 1. Call `mps_mcp_list_open_projects` and choose the intended MPS project dynamically.
-2. Inspect the destination model with `mps_mcp_get_project_structure`; confirm that BaseLanguage, Collections, and—when closures are used—BaseLanguage Closures are available.
+2. Inspect the destination model with `mps_mcp_get_project_structure`; in a MoWare model the DevKit `org.modellwerkstatt.MoWareWerkbank` provides BaseLanguage, Collections and Closures (see `moai:mps-node-editing`).
 3. Load [references/concepts.md](references/concepts.md), then select a recipe from [references/workflows.md](references/workflows.md).
 4. Inspect a packaged example from [references/sandbox.md](references/sandbox.md) if a concrete AST shape is needed.
 5. Start from [references/blueprints/](references/blueprints/), and replace all placeholders.
-6. Dry-run ordinary Collections subtrees with the matching node-update operation against a host node. For the specialized `CustomContainers` root, dry-run [its root skeleton](references/blueprints/custom-containers-root-skeleton.json) with `mps_mcp_insert_root_node_from_json`; use the BaseLanguage skill for other host-language roots.
+6. Dry-run ordinary Collections subtrees with the matching node-update operation against a host node. For the specialized `CustomContainers` root, dry-run [its root skeleton](references/blueprints/custom-containers-root-skeleton.json) with `mps_mcp_insert_root_node_from_json` (copy the skeleton to the system temp directory or pass it inline; see `moai:mps-node-editing`, File-Path Semantics); use the BaseLanguage skill for other host-language roots.
 7. Insert or replace the smallest subtree possible and preserve existing node IDs.
 8. Run `mps_mcp_check_root_node_problems` on the containing root and any task-required make/generation checks.
 
@@ -43,7 +43,7 @@ description: Use when creating, editing, validating, or inspecting jetbrains.mps
 - Concept-tools language ref: `l:83888646-71ce-4f1c-9c53-c54016f6ad4f:jetbrains.mps.baseLanguage.collections`
 - Runtime solution: `9b80526e-f0bf-4992-bdf5-cee39c1833f3(collections.runtime)`
 - Packaged example solution: `3c6ef8ca-6366-4c8b-8839-0277eaca1f7e(org.modellwerkstatt.dataux.tests)`
-- The language builds on BaseLanguage and BaseLanguage Closures. Load [the BaseLanguage skill](../mps-baselanguage/SKILL.md) for host Java nodes and [the model-manipulation skill](../mps-model-manipulation/SKILL.md) for combined Collections/Closures/smodel code.
+- The language builds on BaseLanguage and BaseLanguage Closures. Load `moai:mps-baselanguage` for host Java nodes and `moai:mps-model-manipulation` for combined Collections/Closures/smodel code.
 
 ## References
 

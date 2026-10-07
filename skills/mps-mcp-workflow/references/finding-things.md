@@ -8,7 +8,7 @@
 
 ## Finding Concepts
 
-- To find a concept by name, alias, or short description, use `mps_mcp_search_concepts` (`searchTexts`; optionally scope to a model's languages via `modelReference`). It also returns each feature's `featureId` and the declaration's `sourceNode` ref.
+- To find a concept by name, alias, or short description, use `mps_mcp_search_concepts` (`searchTexts`; optionally scope to a model's languages via `modelReference`). It returns the declaration's `sourceNode` ref but no feature lists; `featureId`s come from `mps_mcp_get_concept_details`.
 - There is no "list all concepts" operation: `mps_mcp_query_structure` has no such op. Use `mps_mcp_search_concepts`, or `GET_SUB_CONCEPTS` / `GET_ASSIGNABLE_CONCEPTS` to enumerate the sub/assignable concepts of a given concept.
 
 ## Finding Models, Modules, and Languages

@@ -19,14 +19,16 @@ moai/
 
 The MoWare skills are:
 
-- `objectflow-dsl` for the domain model, services, commands, tests and
+- `moai:objectflow-dsl` for the domain model, services, commands, tests and
   configuration;
-- `manmap-dsl` for persistence mappings, repositories, queries and SQL;
-- `dataux-dsl` for user interfaces, applications and batch jobs.
+- `moai:manmap-dsl` for persistence mappings, repositories, queries and SQL;
+- `moai:dataux-dsl` for user interfaces, applications and batch jobs;
+- `moai:baselanguage-collections-dsl` for BaseLanguage collections inside
+  MoWare code.
 
-Additional MPS skills support node editing, BaseLanguage, model manipulation,
-language analysis, the MPS console and run configurations. `mps-mcp-workflow`
-is the entry point for MPS work.
+`moai:mps-mcp-workflow` is the hub skill for MPS work; its skill table lists
+the remaining MPS skills (BaseLanguage, node editing, model manipulation,
+language analysis, MPS console, run configurations).
 
 ## Documentation (in German)
 
@@ -35,9 +37,9 @@ is the entry point for MPS work.
 - [ManMap](docu/manmap.md) – relational persistence and repositories;
 - [DataUX](docu/dataux.md) – user interfaces, applications and batch jobs.
 
-The documentation describes the intended domain semantics. The loaded MPS
-language models are authoritative for the technical AST structure, roles,
-cardinalities, references and validation rules.
+The documentation describes the intended domain semantics; its relation to
+the loaded MPS languages is stated in "Zweck und Geltungsbereich" of
+`docu/moware-werkbank.md`.
 
 ## Installation as a Git Submodule
 
@@ -51,8 +53,9 @@ project.
    git submodule update --init --recursive
    ```
 
-2. Hand the rest of the installation to a coding agent [INSTALL_INSTRUCTIONS.md](INSTALL_INSTRUCTIONS.md) is written as a
-   prompt for this. In the root of the application project, this is enough:
+2. Hand the rest of the installation to a coding agent;
+   [INSTALL_INSTRUCTIONS.md](INSTALL_INSTRUCTIONS.md) is written as a prompt
+   for this. In the root of the application project, this is enough:
 
    > Read `INSTALL_INSTRUCTIONS.md` from ./moai and perform the installation
    > for this project.
@@ -73,9 +76,9 @@ git submodule update --remote --merge moai
 git add moai
 ```
 
-Package files under `moai/` are not modified directly during regular
-application development. Project-specific instructions and skills stay outside
-the submodule.
+The rules for working with the package (read-only `moai/`, project-specific
+instructions and skills outside the submodule) are stated in
+`TEMPLATE_PROJECT_AGENTS.md`.
 
 ## Prerequisites
 
