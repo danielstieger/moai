@@ -10,27 +10,25 @@ Die Dokumentation beschreibt beobachtete und technisch bestätigte Praxis. Sie l
 
 ## Modellierungssprachen und Laufzeitumgebungen
 
-Die **modellwerkstatt MoWare-Werkbank** basiert auf JetBrains MPS und umfasst drei eng integrierte domänenspezifische Sprachen (DSLs) zur Erstellung von Geschäftsanwendungen. Sie decken Persistenz, Geschäftslogik und Benutzeroberflächen ab. Die Architektur orientiert sich stark an **Domain-Driven Design (DDD)** und übernimmt ausgewählte Konzepte: Entities und Value Objects beschreiben fachliche Daten, Repositories ermöglichen deren Laden und Speichern, und Services bündeln Geschäftslogik.
+Die **modellwerkstatt MoWare-Werkbank** basiert auf JetBrains MPS und umfasst drei eng integrierte domänenspezifische Sprachen (DSLs) zur Erstellung von Geschäftsanwendungen. Sie decken Persistenz, Geschäftslogik und Benutzeroberflächen ab.
 
-**ManMap** (`org.modellwerkstatt.manmap`) bildet die Persistenzschicht der Anwendung. Die Sprache definiert die Zuordnung zwischen relationalen Datenbanktabellen und Entitäten und stellt Operationen zum Laden, Speichern und Löschen bereit. Diese bilden die Grundlage für den Datenzugriff über Repositories. Komplexe Objektstrukturen werden explizit geladen und zusammengestellt; auf automatisches Lazy Loading wird bewusst verzichtet. Darüber hinaus unterstützt ManMap die Arbeit mit Lesemodellen (Read Models) und Tabellenmodellen (Table Models): Komplexe SQL-Abfragen lassen sich formulieren und ihre Ergebnismengen über spezialisierte Mapper in DTOs (Data Transfer Objects) überführen.
+**ManMap** (`org.modellwerkstatt.manmap`) bildet die Persistenzschicht der Anwendung. Die Sprache definiert die Zuordnung zwischen relationalen Datenbanktabellen und Entitäten und stellt Operationen zum Laden, Speichern und Löschen bereit. Diese bilden die Grundlage für den Datenzugriff über Repositories. Darüber hinaus unterstützt ManMap die Arbeit mit Lesemodellen (Read Models) und Tabellenmodellen (Table Models): Komplexe SQL-Abfragen lassen sich formulieren und ihre Ergebnismengen über spezialisierte Mapper in DTOs (Data Transfer Objects) überführen.
 
 **ObjectFlow** (`org.modellwerkstatt.objectflow`) dient der Modellierung von Service-Komponenten und Geschäftslogik. Die Sprache umfasst fachliche Datenstrukturen wie Entities und Value Objects sowie Commands zur Beschreibung von Aktionen und Anwendungsabläufen. Darüber hinaus unterstützt ObjectFlow die Modellierung von Testabläufen in Testsuiten sowie die Definition von Rollen und Berechtigungen.
 
-**DataUX** (`org.modellwerkstatt.dataux`) dient der Modellierung von Benutzeroberflächen, Anwendungen und Batchjobs. Tabellen und Formulare werden durch ihre Spalten, Felder, Formatierungen und Datenbindungen beschrieben; Layouts strukturieren die Darstellung und ermöglichen die Zusammenstellung komplexerer Oberflächen. Anwendungen dienen für Endanwender als Einstiegspunkt und verfügen über das Hauptmenü. Für die automatisierte Verarbeitung lassen sich Batchjobs modellieren, die direkt als Anwendung gestartet, zeitgesteuert über Cron ausgeführt oder kontinuierlich mit einer konfigurierten Wartezeit zwischen den Durchläufen betrieben werden können.
+**DataUX** (`org.modellwerkstatt.dataux`) dient der Modellierung von Benutzeroberflächen, Anwendungen und Batchjobs. Tabellen und Formulare werden durch ihre Spalten, Felder, Formatierungen und Datenbindungen beschrieben; Layouts strukturieren die Darstellung und ermöglichen die Zusammenstellung komplexerer Oberflächen. Anwendungen dienen für Endanwender als Einstiegspunkt und verfügen über das Hauptmenü. Für die automatisierte Verarbeitung lassen sich Batchjobs modellieren.
 
-Aus den in MPS modellierten Anwendungen wird Java-Code generiert. Für die Ausführung stehen drei Laufzeitumgebungen zur Verfügung: `org.modellwerkstatt.fx8forms` für JavaFX-Desktop-Anwendungen, `org.modellwerkstatt.turkuforms` für Vaadin-Webanwendungen auf Tomcat und `org.modellwerkstatt.h2forms` für HTML5-Webanwendungen mit Pebble Templates auf Tomcat. Während fx8forms und turkuforms primär auf Desktop-PCs ausgerichtet sind, richtet sich h2forms an mobile Datenerfassungsgeräte und Smartphones. Die Anwendungsmodelle sind mit wenigen Ausnahmen zwischen diesen Laufzeitumgebungen portabel; bei der Oberflächengestaltung sind insbesondere die unterschiedlichen Bildschirmgrößen zu berücksichtigen.
+Aus den in MPS modellierten Anwendungen wird Java-Code generiert; die drei Laufzeitumgebungen sind unter [Laufzeitumgebungen](#laufzeitumgebungen) beschrieben.
 
-## Grundprinzipien und Ziele
+## Ziele der Werkbank
 
 Die **modellwerkstatt MoWare-Werkbank** stellt die fachliche Gestaltung von Geschäftsanwendungen in den Mittelpunkt: Welche Daten werden benötigt, wie hängen sie zusammen, welche Geschäftsregeln gelten und wie arbeiten Benutzer mit ihnen? Die Modellsprachen bieten dafür passende Ausdrucksmittel. Generatoren und Laufzeitumgebungen übernehmen wiederkehrende technische Aufgaben und Infrastruktur-Code. Dadurch konzentriert sich die Anwendungsentwicklung auf fachliche Datenstrukturen, Geschäftslogik und Benutzerinteraktionen.
 
-**Fachliche Modellierung.** Die Architektur orientiert sich an ausgewählten Konzepten des Domain-Driven Design. Entities und Value Objects beschreiben fachliche Daten, Repositories deren Laden und Speichern, Services die Geschäftslogik. Die Entwicklung geeigneter Datenstrukturen und korrekter Geschäftsregeln bleibt die zentrale Entwurfsaufgabe.
+**Fachliche Modellierung.** Die Entwicklung geeigneter Datenstrukturen und korrekter Geschäftsregeln bleibt die zentrale Entwurfsaufgabe (Einordnung unter [Zentrale Konzepte](#zentrale-konzepte-der-moware-werkbank)).
 
 **Ausdrucksstarke Geschäftslogik.** Berechnungen, Prüfungen und Änderungen werden unmittelbar an den fachlichen Datenstrukturen formuliert. Java-Ausdrücke und Mengenoperationen unterstützen diese Arbeit. Technische Details der verwendeten UI-Frameworks und Laufzeitumgebungen werden weitgehend durch die Werkzeugkette gekapselt.
 
 **Einheitliche Architektur und klare Zuständigkeiten.** Die Sprachkonzepte geben vor, wo Datenzugriff, Geschäftslogik und Benutzeroberflächen beschrieben werden. Diese gemeinsame Struktur erleichtert die Orientierung, die Wiederverwendung und die Zusammenarbeit. Fachliche Begriffe bleiben im Modell sichtbar und unterstützen die Abstimmung zwischen Entwicklern und Fachverantwortlichen.
-
-**Schrittweise Entwicklung und überprüfbare Anforderungen.** Anwendungen werden anhand konkreter Anwendungsfälle modelliert und schrittweise verfeinert. Beispiele, Testdaten und Testabläufe helfen, fachliche Annahmen früh zu prüfen und Änderungen abzusichern. Die zugehörige Dokumentation wird möglichst direkt bei den beschriebenen Modellelementen gepflegt.
 
 **ExpensiveCode und CheapCode.** MoWare unterscheidet zwischen aufwendig erarbeitetem Fachwissen (*ExpensiveCode*) und leichter überprüfbaren und anpassbaren Teilen einer Anwendung (*CheapCode*). Zum ExpensiveCode gehören insbesondere fachliche Datenstrukturen, Geschäftsregeln und Verarbeitungslogik. Ihre Entwicklung erfordert Domänenwissen und sorgfältige Abstimmung; Fehler sind häufig erst durch eine fachliche Prüfung erkennbar. CheapCode umfasst dagegen UI-Beschreibungen, Menüs und die Gestaltung der Interaktion mit dem fachlichen Modell. Fehler in diesen Bereichen fallen beim Ausprobieren meist schnell auf und lassen sich gezielt korrigieren. Das fachliche Modell verlangt besondere Sorgfalt, während Oberflächen und Bedienabläufe durch kurze Feedbackzyklen schrittweise verbessert werden können.
 
@@ -42,58 +40,18 @@ Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimm
 
 ### Einordnung entlang der fachlichen Architektur
 
-| Schicht                            | Konzept                                                                         | DSL                              |
-| ---------------------------------- | ------------------------------------------------------------------------------- | -------------------------------- |
-| Fachliches Modell                  | `Entity`, `Value Object`, `DTO`                                                 | `org.modellwerkstatt.objectflow` |
-| Geschäftslogik und Anwendungsfälle | `Service`, `Command`                                                            | `org.modellwerkstatt.objectflow` |
-| Persistenz                         | `Persistence Description`, `Repository`                                         | `org.modellwerkstatt.manmap`     |
-| Benutzeroberfläche                 | `Page Pane`, `Table`, `Delegate Form`, `Grid Layout`, `Tab Layout`, `Custom UI Element` | `org.modellwerkstatt.dataux` |
-| Ausführbare Module                 | `AppUI Module`, `BatchJob Module`                                               | `org.modellwerkstatt.dataux`     |
-| Querschnitt                        | `OFXConfig`, `OFXTestSuit`, Roles and Permissions, Static Ressources         | `org.modellwerkstatt.objectflow` |
+| Schicht | Konzept | DSL | Kapitellandkarte |
+| --- | --- | --- | --- |
+| Fachliches Modell | `Entity`, `Value Object`, `DTO` | `org.modellwerkstatt.objectflow` | [Fachliche Datenmodellierung](objectflow.md#kapitellandkarte-fachliche-datenmodellierung) |
+| Geschäftslogik und Anwendungsfälle | `Service`, `Command` | `org.modellwerkstatt.objectflow` | [Services und Domänenlogik](objectflow.md#kapitellandkarte-services-und-domänenlogik), [Commands und Anwendungsabläufe](objectflow.md#kapitellandkarte-commands-und-anwendungsabläufe) |
+| Persistenz | `Persistence Description`, `Repository` | `org.modellwerkstatt.manmap` | [Persistenz-Mappings](manmap.md#kapitellandkarte-persistenz-mappings), [Repository](manmap.md#kapitellandkarte-repository) |
+| Benutzeroberfläche | `Page Pane`, `Table`, `Delegate Form`, `Grid Layout`, `Tab Layout`, `Custom UI Element` | `org.modellwerkstatt.dataux` | [UI-Komposition](dataux.md#kapitellandkarte-ui-komposition) |
+| Ausführbare Module | `AppUI Module`, `BatchJob Module` | `org.modellwerkstatt.dataux` | [Anwendung](dataux.md#kapitellandkarte-anwendung), [Batchjob](dataux.md#kapitellandkarte-batchjob) |
+| Querschnitt | `OFXConfig`, `OFXTestSuit`, Roles and Permissions, Static Ressources | `org.modellwerkstatt.objectflow` | [Querschnittsthemen](objectflow.md#kapitellandkarte-querschnittsthemen), [Tests](objectflow.md#kapitellandkarte-tests) |
 
 ### Bezeichnung der Konzepte
 
-Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der **Konzeptname** bezeichnet das technische AST-Konzept; der **FQ-Name** ist dessen vollständig qualifizierter Name. Die Kapitellandkarten in diesem Dokument und in den DSL-Dokumentationen führen alle drei Bezeichnungen zusammen; bei dort fehlenden Konzepten ergänzt der Fließtext beim ersten Auftreten den Konzeptnamen beziehungsweise bei Konzepten aus anderen Sprachen den FQ-Namen in Klammern und verwendet danach nur noch den Namen. Hat ein Konzept keine als Wort benennbare Projektion, wird sein Konzeptname verwendet. Umschreibungen und Kurzformen treten nicht an die Stelle von Projektion oder Konzeptname. Zwei Ausnahmen: `Service` und `OFXConfig` werden mit ihrem Konzeptnamen bezeichnet, obwohl der Editor `component` beziehungsweise `Configuration` zeigt.
-
-### Kapitellandkarte: ManMap
-
-`org.modellwerkstatt.manmap` bildet die Persistenzschicht und verbindet fachliche Objekte mit der relationalen Datenbank (Oracle, MySQL oder MariaDB). Neben der Persistierung von Entitäten unterstützt die Sprache benutzerdefinierte SQL-Abfragen und das Überführen ihrer Ergebnismengen in Datencontainer.
-
-| Name | Konzeptname | FQ-Name | Aufgabe |
-| --- | --- | --- | --- |
-| `Persistence Description` | `PersistenceDescription` | `org.modellwerkstatt.manmap.structure.PersistenceDescription` | Bündelt die Persistenzabbildungen eines Modells. Die enthaltenen `EntityMapping`s ordnen fachliche Objekte und ihre Eigenschaften Tabellen, Spalten und Beziehungen zu. |
-| `Repository` | `Repository` | `org.modellwerkstatt.manmap.structure.Repository` | Kapselt den Datenbankzugriff. Enthält Methoden zum Abfragen, Laden, Zusammensetzen, Speichern und Löschen fachlicher Objekte. Unterstützt außerdem benutzerdefinierte SQL-Abfragen und spezialisierte Mapper, die Ergebnismengen in Objekte, insbesondere DTOs, überführen. |
-
-### Kapitellandkarte: ObjectFlow
-
-`org.modellwerkstatt.objectflow` beschreibt das fachliche Modell, Service-Komponenten, Anwendungsoperationen und Geschäftsabläufe. Ergänzend stellt die Sprache Konzepte für Konfiguration, Tests, Berechtigungen und gemeinsame Ressourcen bereit.
-
-| Name | Konzeptname | FQ-Name | Aufgabe |
-| --- | --- | --- | --- |
-| `Entity` | `Entity` | `org.modellwerkstatt.objectflow.structure.Entity` | Beschreibt ein fachliches Objekt mit eigener Identität und Lebenszyklus. Trägt fachliche Eigenschaften und Verhalten und ist typischerweise persistent. |
-| `Value Object` | `ValueObject` | `org.modellwerkstatt.objectflow.structure.ValueObject` | Beschreibt einen fachlichen Wert ohne eigene Identität. Seine Gleichheit kann über ausgewählte Eigenschaften definiert werden. |
-| `DTO` | `DTO` | `org.modellwerkstatt.objectflow.structure.DTO` | Definiert einen Datencontainer für die Benutzeroberfläche oder die Ergebnisse von Datenbankabfragen. Kann durch Mapper aus Result-Sets befüllt werden, ohne selbst ein persistentes Domänenobjekt zu sein. |
-| `Service` | `Service` | `org.modellwerkstatt.objectflow.structure.Service` | Bündelt fachliche oder anwendungsbezogene Operationen, die nicht sinnvoll einer einzelnen Entity oder einem Value Object zugeordnet werden. Erlaubt Zugriff auf Repositories und andere Infrastrukturkomponenten. |
-| `Command` | `Command` | `org.modellwerkstatt.objectflow.structure.Command` | Modelliert einen Anwendungsfall beziehungsweise eine Benutzeraktion. Koordiniert Parameter, Zustandsvariablen, Seiten sowie Initialisierung und Abschluss bei Bestätigung oder Abbruch. Steuert Session-Logik. |
-| `OFXConfig` | `OFXConfig` | `org.modellwerkstatt.objectflow.structure.OFXConfig` | Definiert die zentrale Konfiguration der Anwendungskomponenten und ihrer Abhängigkeiten. Ist konzeptionell mit einer XML-basierten Spring-Bean-Konfiguration vergleichbar: Komponenten werden konfiguriert und ihre Abhängigkeiten miteinander verdrahtet. |
-| `OFXTestSuit` | `OFXTestSuit` | `org.modellwerkstatt.objectflow.structure.OFXTestSuit` | Definiert eine eigenständig ausführbare Testsuite mit konfigurierten Komponenten, Start-/Ende-Logik und Testinhalten. |
-| Roles and Permissions | `RolesAndPermissions` | `org.modellwerkstatt.objectflow.structure.RolesAndPermissions` | Beschreibt das Berechtigungsmodell mit Rollen, Geltungsbereichen und Identitäten. Dient als zentrale Grundlage für Zugriffskontrollen. |
-| Static Ressources | `StaticRessources` | `org.modellwerkstatt.objectflow.structure.StaticRessources` | Bündelt wiederverwendbare, plattformbezogene Ressourcen wie Bezeichnungen und Farben. Ressourcensätze können aufeinander aufbauen. |
-
-### Kapitellandkarte: DataUX
-
-`org.modellwerkstatt.dataux` beschreibt Benutzeroberflächen, ausführbare Anwendungen und Batch-Verarbeitung.
-
-| Name | Konzeptname | FQ-Name | Aufgabe |
-| --- | --- | --- | --- |
-| `AppUI Module` | `AppUiModule` | `org.modellwerkstatt.dataux.structure.AppUiModule` | Definiert eine ausführbare Anwendung mit Benutzeroberfläche. Bündelt Konfiguration, Authentifizierung, Haupt- und Zusatzmenüs sowie Kacheln. |
-| `BatchJob Module` | `BatchJobModule` | `org.modellwerkstatt.dataux.structure.BatchJobModule` | Definiert einen automatisiert ausführbaren Batchjob. Bündelt Konfiguration, Fehlerstrategie und Producer-Consumer-Verarbeitung; Betriebsart und Zeitsteuerung werden über Optionen festgelegt. |
-| `Page Pane` | `PagePane` | `org.modellwerkstatt.dataux.structure.PagePane` | Kapselt den Inhalt einer Anwendungsseite als wiederverwendbares UI-Element und kann seitenspezifische Optionen und Menüeinträge bereitstellen. |
-| `Table` | `Table` | `org.modellwerkstatt.dataux.structure.Table` | Beschreibt eine tabellarische Darstellung gebundener Daten. Delegates, Optionen und Menüeinträge bestimmen Spalten, Darstellung und Interaktionen. |
-| `Delegate Form` | `DelegateForm` | `org.modellwerkstatt.dataux.structure.DelegateForm` | Beschreibt ein an ein fachliches Objekt oder eine Eigenschaft gebundenes Formular, dessen Felder aus Delegates zusammengesetzt werden. |
-| `Grid Layout` | `GridLayout` | `org.modellwerkstatt.dataux.structure.GridLayout` | Ordnet UI-Elemente in Zeilen und Spalten an. Gewichtungen steuern die Größenverteilung im Raster. |
-| `Tab Layout` | `TabLayout` | `org.modellwerkstatt.dataux.structure.TabLayout` | Strukturiert eine Oberfläche in mehrere Registerkarten und bündelt deren jeweilige Inhalte. |
-| `Custom UI Element` | `CustomElement` | `org.modellwerkstatt.dataux.structure.CustomElement` | Deklariert ein projektspezifisches UI-Element mit eigener Implementierungsklasse, optionaler Datenbindung, Delegates und Menüaktionen. |
+Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der **Konzeptname** bezeichnet das technische AST-Konzept; der **FQ-Name** ist dessen vollständig qualifizierter Name. Die Kapitellandkarten der DSL-Dokumentationen führen alle drei Bezeichnungen zusammen; bei dort fehlenden Konzepten ergänzt der Fließtext beim ersten Auftreten den Konzeptnamen beziehungsweise bei Konzepten aus anderen Sprachen den FQ-Namen in Klammern und verwendet danach nur noch den Namen. Hat ein Konzept keine als Wort benennbare Projektion, wird sein Konzeptname verwendet. Umschreibungen und Kurzformen treten nicht an die Stelle von Projektion oder Konzeptname. Zwei Ausnahmen: `Service` und `OFXConfig` werden mit ihrem Konzeptnamen bezeichnet, obwohl der Editor `component` beziehungsweise `Configuration` zeigt.
 
 ## Zusammenspiel der DSLs
 
@@ -159,7 +117,7 @@ Batchjobs können direkt gestartet, zeitgesteuert über Cron ausgeführt oder ko
 
 ## Gesamtbeispiel: Rechnungsverwaltung
 
-Das Beispiel umfasst die Suche nach Rechnungen, die Bearbeitung einer Rechnung mit ihren Positionen und die Anzeige der Summe aller Rechnungen. Die verwendeten Namen sind beispielhaft; die Beschreibung ist eine fachliche Skizze, keine ausführbare DSL-Syntax.
+Das Beispiel umfasst die Suche nach Rechnungen, die Bearbeitung einer Rechnung mit ihren Positionen und die Anzeige der Summe aller Rechnungen. Die verwendeten Namen sind beispielhaft.
 
 ### Fachliches Modell mit der DSL `org.modellwerkstatt.objectflow`
 
@@ -245,7 +203,7 @@ Eine **Page** beschreibt eine Seite im Ablauf eines Commands. Das zugehörige **
 | `Page Pane` für die Positionsbearbeitung | Enthält ein `Delegate Form` zur Bearbeitung einer einzelnen Rechnungsposition im Command `Rechnungsposition bearbeiten`.                                                    |
 | `Page Pane` für die Summenanzeige        | Enthält ein `Delegate Form` zur Anzeige des DTOs `RechnungsSummenErgebnis`.                                                                                                 |
 
-Die Seitenfolge wird im jeweiligen Command beschrieben. Die zugeordneten `Page Pane`s und ihre enthaltenen UI-Komponenten legen Darstellung, Datenbindungen und angebotene Interaktionen fest. Fachliche Prüfungen und Berechnungen bleiben in der Geschäftslogik; Datenbankabfragen und Speicheroperationen liegen in den Repositories.
+Die Seitenfolge wird im jeweiligen Command beschrieben. Die zugeordneten `Page Pane`s und ihre enthaltenen UI-Komponenten legen Darstellung, Datenbindungen und angebotene Interaktionen fest.
 
 ### Fachliche Prüfung und Qualitätssicherung
 
@@ -302,13 +260,13 @@ Für die Entwicklung von Anwendungen gelten folgende Grundprinzipien:
    Fachliche Voraussetzungen und Precondition-Prüfungen sollen grundsätzlich erfolgen, bevor ein Objektgraph verändert wird. Dadurch hinterlässt ein abgebrochener Vorgang möglichst keinen teilweise veränderten Zustand. Abweichungen davon müssen eine bewusste fachliche Bedeutung haben und dürfen nicht zufällig aus der Reihenfolge technischer Operationen entstehen.
 
 7. **Die Benutzeroberfläche bleibt möglichst „CheapCode“.**
-   DataUX beschreibt Bindung, Darstellung, Layout und Interaktionsmöglichkeiten. Fachliche Entscheidungen und schwer überprüfbare Geschäftsregeln gehören nicht in die Oberfläche. Dadurch können Oberflächen in kurzen Feedbackzyklen verändert und erprobt werden, ohne das fachliche Modell unnötig zu beeinflussen.
+   DataUX beschreibt Bindung, Darstellung, Layout und Interaktionsmöglichkeiten (CheapCode, siehe [Ziele der Werkbank](#ziele-der-werkbank)). Fachliche Entscheidungen und schwer überprüfbare Geschäftsregeln gehören nicht in die Oberfläche. Dadurch können Oberflächen in kurzen Feedbackzyklen verändert und erprobt werden, ohne das fachliche Modell unnötig zu beeinflussen.
 
 8. **Fachliches Wissen soll unabhängig von der technischen Laufzeit bleiben.**
-    Modelle sollen möglichst keine unnötigen Abhängigkeiten von einem konkreten UI-Framework oder einer bestimmten Ausführungsplattform enthalten. Plattformunterschiede sollen, soweit von der Werkbank vorgesehen, von Generatoren und Laufzeitumgebungen behandelt werden. Plattformspezifische Modellierung ist nur dort sinnvoll, wo sich die fachliche oder ergonomische Anforderung tatsächlich unterscheidet.
+    Modelle sollen möglichst keine unnötigen Abhängigkeiten von einem konkreten UI-Framework oder einer bestimmten Ausführungsplattform enthalten. Plattformspezifische Modellierung ist nur dort sinnvoll, wo sich die fachliche oder ergonomische Anforderung tatsächlich unterscheidet.
 
 9. **Anwendungsfälle müssen überprüfbar bleiben.**
-    Fachliche Regeln und Abläufe sollen so modelliert werden, dass sie durch Beispiele und Tests nachvollzogen werden können. Besonders sorgfältig zu prüfen sind Änderungen an fachlichen Datenstrukturen und Geschäftsregeln, da Fehler dort häufig nicht allein durch technische Tests oder das Ausprobieren der Oberfläche erkennbar werden.
+    Fachliche Regeln und Abläufe sollen so modelliert werden, dass sie durch Beispiele und Tests nachvollzogen werden können. Besonders sorgfältig zu prüfen sind Änderungen an fachlichen Datenstrukturen und Geschäftsregeln, da Fehler dort häufig nicht allein durch technische Tests oder das Ausprobieren der Oberfläche erkennbar werden. Die zugehörige Dokumentation wird möglichst direkt bei den beschriebenen Modellelementen gepflegt.
 
 ## Weiterführende Dokumentation
 

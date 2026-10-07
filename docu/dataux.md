@@ -120,7 +120,7 @@ Der Delegate-Typ folgt dem fachlichen Property-Typ. Ein Delegate ersetzt keine f
 | `Upload` | `UploadDelegate` | `org.modellwerkstatt.dataux.structure.UploadDelegate` | Datei-Upload, nur im Formular |
 | `Dummy` | `DummyDelegate` | `org.modellwerkstatt.dataux.structure.DummyDelegate` | Platzhalter zur Anordnung von Formularfeldern |
 | `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` | Delegate im Formular nicht editierbar. |
-| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Keine Eingabe nötig; leeres Feld ergibt `null`, bei `Integer` `0`. |
+| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Hebt die Pflichteingabe auf. |
 | `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` | Datumsauswahl für Datums-Delegates; bei `DateTime` nicht mit `OVERWRITE FORMAT`. |
 | `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` | Löst bei Scan oder Inhaltsänderung eine verfügbare Update-Conclusion (`SCAN_UPDATE`) aus. |
 | `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` | Numerischer Editor für einen `String`-Delegate. |
@@ -145,7 +145,7 @@ Ein `Reference`-Delegate bietet die zulässigen Objekte zur Auswahl an. `scopeTe
 | Name | Konzeptname | Kontext | Delegate-Typen | Wirkung |
 | --- | --- | --- | --- | --- |
 | `DISABLED` | `DisabledDOption` | Formular | alle | Delegate ist nicht editierbar |
-| `OPTIONAL` | `OptionalDOption` | Formular | alle | Der Benutzer muss nichts eingeben; ein leeres Feld ergibt `null` (bei `Integer` `0`); siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
+| `OPTIONAL` | `OptionalDOption` | Formular | alle | Hebt die Pflichteingabe auf; siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
 | `PICKER` | `PickerDOption` | Formular | `LocalDate`, `DateTime (Date Only)`, `DateTime` | Verwendet nach Möglichkeit eine Datumsauswahl; bei `DateTime` nicht zusammen mit `OVERWRITE FORMAT` |
 | `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | Formular | alle | Löst eine verfügbare Update-Conclusion aus |
 | `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | Formular | `String` | Verwendet für einen `StringDelegate` einen numerischen Editor |
@@ -167,7 +167,7 @@ Jede Option darf pro Delegate höchstens einmal verwendet werden. `Reference`-De
 
 #### Pflichtwerte, leere Eingaben und `null`
 
-`OPTIONAL` bedeutet, dass der Benutzer nichts eingeben muss; lässt er das Feld leer, liefert der Delegate `null`, bei `Integer` `0`. Ein optionaler Text an `OPTIONAL` legt fest, wie der fehlende Wert dargestellt wird, etwa „weiß ich nicht“; ohne Angabe erscheint `--`. Ohne `OPTIONAL` ist eine Eingabe erforderlich; bei Strings bestimmt stattdessen `LENGTH`, ob das Feld leer bleiben darf.
+`OPTIONAL` hebt die Pflichteingabe auf. Ein optionaler Text an `OPTIONAL` legt fest, wie der fehlende Wert dargestellt wird, etwa „weiß ich nicht“; ohne Angabe erscheint `--`. Was eine leere Eingabe liefert, zeigt die Tabelle:
 
 | Delegate | Leere Eingabe ohne `OPTIONAL` | Leere Eingabe mit `OPTIONAL` | Grenzen aus der Property |
 | --- | --- | --- | --- |
@@ -176,7 +176,7 @@ Jede Option darf pro Delegate höchstens einmal verwendet werden. `Reference`-De
 | `BigDecimal` | Eingabefehler | `null` | `RANGE`: Bereich und Skala |
 | `Reference`, `Status`, Datums-Delegates | Eingabe erforderlich | `null` | – |
 
-Ob ein String leer bleiben darf, steuert `LENGTH[min-max]` an der Business Property: `min ≥ 1` erzwingt eine Eingabe, `min = 0` erlaubt ein leeres Feld, das dann `""` liefert. `OPTIONAL` ist an einem `String`-Delegate deshalb nicht nötig, aber möglich: Ein leeres Feld liefert dann `null` statt `""` und kann gegen `null` geprüft werden. Die Oberfläche trimmt Eingaben nicht, auch nicht für die Längenprüfung; ein fachlich gefordertes Trimmen gehört ins Modell.
+Bei Strings steuert `LENGTH[min-max]` an der Business Property die Pflichteingabe: `min ≥ 1` erzwingt eine Eingabe, `min = 0` erlaubt ein leeres Feld. `OPTIONAL` ist dort nur nötig, wenn ein leeres Feld `null` statt `""` liefern und gegen `null` geprüft werden soll. Die Oberfläche trimmt Eingaben nicht, auch nicht für die Längenprüfung; ein fachlich gefordertes Trimmen gehört ins Modell.
 
 Die Grenzen aus `LENGTH` und `RANGE` werden nicht zusätzlich als `validation` modelliert, außer die Regel ist fachlich zwingend oder die Eingabe kommt ohne Oberfläche, etwa aus einem Batch oder über eine Schnittstelle.
 
@@ -287,13 +287,12 @@ Ein `AppUI Module` beschreibt eine interaktive Anwendung. Neben Benutzerkontext 
 | `Tile` | `AppTile` | `org.modellwerkstatt.dataux.structure.AppTile` | Hervorgehobener Command-Einstieg mit optionalem Label- und Farbausdruck |
 | `tileInit` | `TileInitFunction` | `org.modellwerkstatt.dataux.structure.TileInitFunction` | Initialisiert den Tile-Zustand |
 | `startup command to run` | `StartupCommandCall` | `org.modellwerkstatt.dataux.structure.StartupCommandCall` | Command, der nach der Anmeldung gestartet wird |
-| `Action` | `MenuAction` | `org.modellwerkstatt.dataux.structure.MenuAction` | Verknüpft Menü oder Tile mit einem ObjectFlow-Command |
 | `isAuthenticated` | `AppAuthenticationFunction` | `org.modellwerkstatt.dataux.structure.AppAuthenticationFunction` | Initialisiert den Benutzerkontext: übernimmt den Benutzernamen in `userEnvironment` und setzt die Benutzer-ID; am `BatchJob Module` nur für eine gestartete UI wirksam. |
 
 - `mainMenu` bildet das fachliche Start- beziehungsweise Hauptmenü.
 - `extrasMenu` nimmt ergänzende, seltener benötigte Funktionen auf.
 - `helpMenu` bündelt Hilfe- und Dokumentationsaktionen.
-- `Tile` (`AppTile`) sind die Kacheln/Schaltflächen auf der Startoberfläche mit einer `Action` sowie optional dynamischem Text und dynamischer Farbe.
+- `Tile` (`AppTile`) sind die Kacheln/Schaltflächen auf der Startoberfläche mit einer `Action` (siehe [Menüs und Command-Aktionen](#menüs-und-command-aktionen)) sowie optional dynamischem Text und dynamischer Farbe.
 - `tileInit` (`TileInitFunction`) initialisiert Werte, die für Tiles benötigt werden.
 - `startup command to run` (`StartupCommandCall`) startet nach der Anmeldung einen Command; eine optionale Bedingung legt fest, ob er ausgeführt wird. Ist er beendet, erscheinen die Tiles. Beim Einstieg über eine URL läuft zuerst der Start-Command und danach der über die URL angesprochene Command, siehe [Command-Optionen](objectflow.md#command-optionen).
 - `VERSION` (`OptVersion`) und `OFFICIAL NAME` (`OptOfficialAppName`) beschreiben Modulmetadaten.
@@ -398,15 +397,6 @@ Aus diesen Optionen ergeben sich drei typische Betriebsweisen:
 Im zeitpunktspezifischen Modus muss der CRON-Ausdruck mit einem konkreten Sekundenwert beginnen. Im Zeitfenstermodus beginnen die Ausdrücke dagegen mit einem Sekunden-Wildcard. Wird `DELAY` ohne `CRON` verwendet, läuft das Pair grundsätzlich ohne tägliche Zeitfensterbegrenzung. Die Auswertung verwendet die Standardzeitzone der JVM.
 
 `CONSUMERS` legt die Anzahl der Consumer pro Pair fest und steuert damit die Parallelität pro Pair. Eine Erhöhung beschleunigt die Abarbeitung nur, wenn die verwendeten externen Systeme sowie Sperrstrategien dies vertragen. Ob ein Batchjob mit oder ohne UI läuft, legt nicht das Modul, sondern die `OFXConfig` fest: Für den Konsolenbetrieb ohne instanziierte UI wird dort als Anwendungsfabrik eine `new instance` der Klasse `org.modellwerkstatt.objectflow.job.console.ConsoleBatchJobAppFactory` konfiguriert. Die frühere Modul-Option `RUN_IN_CONSOLE` wird nicht mehr unterstützt und vom Checker als Fehler gemeldet. `OptIncludeBatchUi` bindet umgekehrt einen Batchjob in den UI-Kontext eines Moduls ein.
-
-Ein typischer Batchablauf lautet:
-
-1. Ein CRON-Ausdruck, ein manueller Start oder ein anderer Trigger aktiviert ein Producer/Consumer-Paar.
-2. Der Producer ermittelt Arbeitseinheiten beziehungsweise Schlüssel und füllt die Inbox.
-3. Die konfigurierte Zahl von Consumern entnimmt Arbeitseinheiten aus der Inbox.
-4. Der Consumer prüft die Vorbedingung und verarbeitet die Arbeit über die vorgesehenen Commands.
-5. Bei Erfolg wird das Element abgeschlossen; bei einer technischen Ausnahme bestimmt die Exception-Strategie die Laufzeitreaktion.
-6. Bei `DEPENDENT_CONSECUTIVE` wird nach erfolgreichem Abschluss mit dem nächsten Pair fortgefahren.
 
 #### Manuelle Ausführung und Konsolenbetrieb
 

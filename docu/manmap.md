@@ -65,7 +65,7 @@ Ein `sql string` benennt einen wiederverwendbaren SQL-Text, der im gesamten Repo
 
 ## `Persistence Description` und Mapping-Möglichkeiten
 
-`Persistence Description` und `Repository` sind die beiden rootfähigen ManMap-Konzepte. Eine `Persistence Description` gruppiert `EntityMapping`-Knoten. Jedes `EntityMapping` verbindet eine ObjectFlow-Klasse mit einer relationalen Tabelle und enthält die atomaren Mappings ihrer Eigenschaften und Beziehungen.
+`Persistence Description` und `Repository` sind die beiden rootfähigen ManMap-Konzepte. Eine `Persistence Description` gruppiert `EntityMapping`-Knoten. Jedes `EntityMapping` verbindet eine ObjectFlow-Klasse mit einer relationalen Tabelle und enthält die atomaren Mappings ihrer Eigenschaften und Beziehungen sowie optional Tabellenoptionen.
 
 ### Kapitellandkarte: Persistenz-Mappings
 
@@ -94,18 +94,9 @@ Ein `sql string` benennt einen wiederverwendbaren SQL-Text, der im gesamten Repo
 | `SIZE` | `SizeOption` | `org.modellwerkstatt.manmap.structure.SizeOption` | Schemahinweis: Größe beziehungsweise Präzision und Nachkommastellen der Spalte; keine Schema-Migration. |
 | `UNIQUE` | `UniqueOption` | `org.modellwerkstatt.manmap.structure.UniqueOption` | Schemahinweis: Eindeutigkeitsanforderung an die Spalte; keine Schema-Migration. |
 
-### Aufbau eines `EntityMapping`s
-
-Ein `EntityMapping` besitzt mindestens:
-
-- die Referenz `classConcept` auf die gemappte ObjectFlow-Entity,
-- ein `tableName` als Stringliteral,
-- atomare Mappings im internen Child-Role `atomMpig`,
-- optional Tabellenoptionen in `tableOption`.
-
 ### Felder, Schlüssel und Optionen
 
-Ein `FieldMapping` referenziert die fachliche Property und enthält den Spaltennamen als Stringliteral. Optionen gelten entweder für ein einzelnes `FieldMapping` (Feldoption) oder für das ganze `EntityMapping` (Tabellenoption in `tableOption`). Wichtige Optionen sind:
+Ein `FieldMapping` referenziert die fachliche Property und enthält den Spaltennamen als Stringliteral. Optionen gelten entweder für ein einzelnes `FieldMapping` (Feldoption) oder für das ganze `EntityMapping` (Tabellenoption). Wichtige Optionen sind:
 
 | Bereich | Name (Konzeptname) | Ebene | Bedeutung |
 | --- | --- | --- | --- |
@@ -134,11 +125,11 @@ Beim Insert werden die mit `CREATEDAT`/`CREATEDBY` und `MODIFIEDAT`/`MODIFIEDBY`
 
 Ein `EntityMapping` kann mit `ADDITIONAL_TABLE_NAME` benannte alternative physische Tabellen für dasselbe Mapping deklarieren, beispielsweise eine Archiv-Tabelle. `WHEN <Bedingung> <Name>` (`AdditionalTableReference`) verwendet eine solche Tabelle für eine Abfrage, ein `save with` oder ein `delete with`, wenn die Bedingung zutrifft. Bei einer Abfrage mit Joins muss gegebenenfalls auch für die beteiligten Mappings die jeweils passende alternative Tabelle ausgewählt werden.
 
-Die alternative Tabelle ändert nur das physische Tabellenziel. Sie ist keine zusätzliche Mapping-Instanz und erweitert deshalb nicht den Scope der `MappingReference`s.
+Die alternative Tabelle ändert nur das physische Tabellenziel. Sie ist keine Mapping-Instanz und stellt deshalb keine Felder für `where`/`sortBy` bereit (siehe [Spezifikum - Filterausdrücke und gemappte Felder](#spezifikum---filterausdrücke-und-gemappte-felder)).
 
 ### Referenzen, eingebettete Werte und Listen
 
-`ReferenceMapping` wählt die Entity-Property, welche auf die Ziel-Entität verweist; deren deklarierter Typ bestimmt somit den Entitätstyp der Referenz. Das enthaltene Schlüsselmapping ordnet anschließend die Schlüssel-Property der Ziel-Entität der Fremdschlüsselspalte in der Tabelle der Quell-Entität zu. Bei einem zusammengesetzten Zielschlüssel kann dieses Schlüsselmapping entsprechend mehrere Teilmappings enthalten. Das Mapping speichert beziehungsweise liest nur den Fremdschlüssel und lädt das Zielobjekt nicht automatisch.
+`ReferenceMapping` wählt die Entity-Property, welche auf die Ziel-Entität verweist; deren deklarierter Typ bestimmt somit den Entitätstyp der Referenz. Das enthaltene Schlüsselmapping ordnet anschließend die Schlüssel-Property der Ziel-Entität der Fremdschlüsselspalte in der Tabelle der Quell-Entität zu. Bei einem zusammengesetzten Zielschlüssel kann dieses Schlüsselmapping entsprechend mehrere Teilmappings enthalten. Das Mapping liest und schreibt nur den Fremdschlüssel; das Zielobjekt wird explizit geladen (siehe [Explizites Laden](#explizites-laden)).
 
 `EmbeddedMapping` wählt eine Value-Object-Property und enthält die Mappings für deren einzelne Properties. Diese werden als Spalten derselben Tabellenzeile wie die umgebende Entität gespeichert; für das Value Object wird keine eigene Tabelle oder eigenständige Identität angelegt. Da `EmbeddedMapping` selbst als Schlüsselmapping verwendbar ist, kann es auch einen zusammengesetzten Value-Object-Schlüssel beschreiben.
 
@@ -149,11 +140,11 @@ Für Listen gibt es zwei wichtige Formen:
 | `ListMapping` mit Rückreferenz (`MappedFieldRef`) | Das Kindelement besitzt ein echtes `ReferenceMapping` zurück auf den Parent. |
 | `ListMapping` mit reiner Schlüsselreferenz (`KeyOnlyReferenceMapping`) | Die Kindtabelle trägt den Parent-Schlüssel, das Kindobjekt besitzt aber keine fachliche Rückreferenz. |
 
-Im Regelfall genügt die Schlüsselreferenz: Das Kind muss den Parent nicht kennen, und in einem Command liefert `getSelected()` den Parent ohnehin. Die Rückreferenz lohnt sich, wenn innerhalb des Aggregats vom Kind zum Parent navigiert werden muss. Beide Formen beschreiben nur die Beziehung. Sie laden die Liste nicht automatisch und führen beim Speichern des Parents nicht zu einem automatischen Speichern der Listenelemente.
+Im Regelfall genügt die Schlüsselreferenz: Das Kind muss den Parent nicht kennen, und in einem Command liefert `getSelected()` den Parent ohnehin. Die Rückreferenz lohnt sich, wenn innerhalb des Aggregats vom Kind zum Parent navigiert werden muss. Beide Formen beschreiben nur die Beziehung; Laden und Speichern der Listenelemente bleiben explizit (siehe [Explizites Laden](#explizites-laden) und [Speichern von Objektgraphen](#speichern-von-objektgraphen)).
 
 ### Grenzen von `IncludeMapping`
 
-`IncludeMapping` dient der Wiederverwendung vorhandener Feldabbildungen. Es lädt oder speichert keinen Objektgraphen und ersetzt kein fachlich passendes Mapping. Wird ein `EntityMapping` in einem `nokeystore/read-only map` eingebunden, bleibt das erzeugte Ergebnis trotz der wiederverwendeten Feldabbildungen read-only.
+`IncludeMapping` dient der Wiederverwendung vorhandener Feldabbildungen. Es lädt oder speichert keinen Objektgraphen und ersetzt kein fachlich passendes Mapping.
 
 ## Gemappte Abfragen mit `QueryFromMap`
 
@@ -161,7 +152,7 @@ Im Regelfall genügt die Schlüsselreferenz: Das Kind muss den Parent nicht kenn
 
 `get` erwartet einen Schlüssel und liefert eine Instanz oder `null`. Erkennt ManMap einen Integer-, String- oder zusammengesetzten Schlüssel nach seiner typabhängigen Null-Key-Semantik als nicht vergeben, liefert `get` unmittelbar `null`; dieselbe Schlüsselprüfung entscheidet bei `save with` ohne erzwingende Option zwischen Insert und Update. Die konkreten Null-Key-Werte sind im Abschnitt „Insert oder Update“ aufgeführt. `get` steht allein: Weitere Operationen und Join-Optionen sind nicht zulässig.
 
-`where` (`WhereQuery`) enthält im Child `filter` genau eine BaseLanguage-Expression und liefert eine Liste. Die geschweiften Klammern und die Parameterdarstellung im Editor sind eine Closure-ähnliche Projektion, aber keine BaseLanguage-Closure im AST. Nach `where` sind beliebig viele `sortBy` zulässig, als letztes Element optional `limit` oder `size`; eine Abfrage mit `size` ist read-only. Join-Optionen (`refJoin`, `listJoin`) gibt es nur bei `where`.
+`where` (`WhereQuery`) filtert mit genau einem booleschen Ausdruck und liefert eine Liste. Nach `where` sind beliebig viele `sortBy` zulässig, als letztes Element optional `limit` oder `size`; eine Abfrage mit `size` ist read-only. Join-Optionen (`refJoin`, `listJoin`) gibt es nur bei `where`.
 
 `reload` liest die gemappten Felder der übergebenen Entity erneut aus der Datenbank und aktualisiert diese Entity. Wie `get` steht `reload` allein, ohne weitere Operationen und Join-Optionen.
 
@@ -185,22 +176,19 @@ Im Regelfall genügt die Schlüsselreferenz: Das Kind muss den Parent nicht kenn
 
 ### Spezifikum - Filterausdrücke und gemappte Felder
 
-Für den Modellierer lässt `MappingReference` die in einer Abfrage verfügbare Mapping-Instanz wie eine Instanz der gemappten Entity erscheinen. Ein dargestellter Zugriff auf eine Entity-Property ist im AST eine BaseLanguage-Expression vom Konzept `MappingReference`. Sie besitzt zwei erforderliche Referenzen:
-
-- `mappingSource` bestimmt die Mapping-Instanz, deren Felder verwendet werden können.
-- `fieldMapping` bestimmt das konkrete `FieldMapping` innerhalb dieser Mapping-Instanz.
+Für den Modellierer lässt `MappingReference` die in einer Abfrage verfügbare Mapping-Instanz wie eine Instanz der gemappten Entity erscheinen. Ein dargestellter Zugriff auf eine Entity-Property ist eine `MappingReference`. Sie benennt die Mapping-Instanz, deren Felder verwendet werden, und das darin gemappte Feld.
 
 Der Typ der `MappingReference` entspricht grundsätzlich dem Typ der Property, auf die das ausgewählte `FieldMapping` verweist. Eine `MappingReference` kann nicht mit einem normalen Dot-Ausdruck weiter spezifiziert werden. Sie ist nur innerhalb von `where` und `sortBy` (`SortByQuery`) zulässig.
 
-Der Scope von `mappingSource` wird aus dem umgebenden `QueryFromMap` gebildet. Er enthält dessen Basismapping und die tatsächlich deklarierten Join-Optionen, die selbst eine Mapping-Instanz darstellen:
+Welche Mapping-Instanzen eine `MappingReference` adressieren kann, bestimmt die umgebende Abfrage: ihr Basismapping und die tatsächlich deklarierten Join-Optionen, die selbst eine Mapping-Instanz darstellen:
 
-| Mapping-Instanz im Scope | Verfügbare `FieldMapping`s |
+| Mapping-Instanz | Verfügbare Felder |
 | --- | --- |
-| Basisabfrage | Die `FieldMapping`-Knoten des von der Basisabfrage referenzierten `EntityMapping` |
-| `refJoin` (`RefJoinOption`) | Die `FieldMapping`-Knoten des vom Join referenzierten Ziel-`EntityMapping` |
-| `listJoin` (`ListJoinOption`) | Die `FieldMapping`-Knoten des Ziel-`EntityMapping`s, das über die Rückreferenz des `ListMapping` bestimmt wird |
+| Basisabfrage | Die Felder des von der Basisabfrage referenzierten `EntityMapping`s |
+| `refJoin` (`RefJoinOption`) | Die Felder des vom Join referenzierten Ziel-`EntityMapping`s |
+| `listJoin` (`ListJoinOption`) | Die Felder des Ziel-`EntityMapping`s, das über die Rückreferenz des `ListMapping`s bestimmt wird |
 
-Nur auf der Abfrage vorhandene Ref- und List-Joins erweitern diesen Scope. Eine mit `ADDITIONAL_TABLE_NAME` deklarierte Tabelle ist keine Mapping-Instanz und stellt deshalb keine weiteren `MappingReference`s bereit.
+Nur auf der Abfrage vorhandene Ref- und List-Joins erweitern diese Auswahl. Eine mit `ADDITIONAL_TABLE_NAME` deklarierte Tabelle ist keine Mapping-Instanz und stellt deshalb keine weiteren `MappingReference`s bereit.
 
 Die Property `option` von `MappingReference` beeinflusst die Behandlung des gemappten Werts:
 
@@ -228,7 +216,7 @@ Eine deklarierte Beziehung ist noch keine geladene Beziehung:
 - Eine nicht geladene Referenz wirft beim Zugriff `org.modellwerkstatt.objectflow.runtime.OFXNotInitializedException`.
 - Eine nicht geladene Liste ist leer (`size == 0`) und wirft diese Ausnahme nicht.
 - Referenzen und Listen werden entweder mit separaten Abfragen geladen, deren Ergebnis der Property explizit zugewiesen wird, oder mit `refJoin` beziehungsweise `listJoin` in derselben Abfrage mitgeladen und in die Session integriert. Die Zuweisung ist auch bei einer read-only geladenen Entity zulässig: Das Laden von Referenzen und Listen durch eine Repository-Methode gilt nicht als Änderung.
-- Ein Join wird vor allem empfohlen, wenn die Abfrage auf Felder des verbundenen Mappings filtert oder sortiert; nur vorhandene Joins erweitern den Scope von `mappingSource`. Zum reinen Laden sind zwei separate Abfragen in der Praxis häufig und transparenter; sie sind auch nicht per se langsamer als ein Join.
+- Ein Join wird vor allem empfohlen, wenn die Abfrage auf Felder des verbundenen Mappings filtert oder sortiert; nur vorhandene Joins machen die Felder des verbundenen Mappings in `where` und `sortBy` adressierbar (siehe [Spezifikum - Filterausdrücke und gemappte Felder](#spezifikum---filterausdrücke-und-gemappte-felder)). Zum reinen Laden sind zwei separate Abfragen in der Praxis häufig und transparenter; sie sind auch nicht per se langsamer als ein Join.
 
 Eine leere Liste beweist daher nicht, dass in der Datenbank keine Kindzeilen vorhanden sind. Vor einer solchen Schlussfolgerung ist die Ladestrategie der Repository-Methode zu prüfen.
 
@@ -316,8 +304,6 @@ Innerhalb des `SQL`-Blocks stehen alle Variablen zur Verfügung, die im umgebend
 | `:` | `C2SqlWordVarReference` | `org.modellwerkstatt.manmap.structure.C2SqlWordVarReference` | Bindet eine sichtbare Variable als SQL-Parameter. |
 | `C2Dot` | `C2Dot` | `org.modellwerkstatt.manmap.structure.C2Dot` | Bindet eine Property oder parameterlose Methode als SQL-Parameter. |
 | `+` | `C2SqlIntegration` | `org.modellwerkstatt.manmap.structure.C2SqlIntegration` | Integriert dynamischen SQL-Text mit gebundenen Argumenten. |
-| `row mapper` | `RowMapperField` | `org.modellwerkstatt.manmap.structure.RowMapperField` | Konvertiert eine Ergebniszeile mit einer wiederverwendbaren Closure. |
-| `nokeystore/read-only map` | `NoKeyMapperField` | `org.modellwerkstatt.manmap.structure.NoKeyMapperField` | Bildet Ergebnisse ohne verwendbaren Schlüssel auf read-only Objekte ab. |
 | `C2PropertyReference` | `C2PropertyReference` | `org.modellwerkstatt.manmap.structure.C2PropertyReference` | Property-Referenz in einem `C2Dot`-Zugriff (`:rechnung_id`). |
 | `C2SqlStatusReference` | `C2SqlStatusReference` | `org.modellwerkstatt.manmap.structure.C2SqlStatusReference` | Referenziert einen deklarierten ObjectFlow-Statuswert im SQL-Text, ohne dessen Persistenzwert einzutragen. |
 | `RowMapperFieldRef` | `RowMapperFieldRef` | `org.modellwerkstatt.manmap.structure.RowMapperFieldRef` | Referenziert im Ergebnis-Mapping eines `SQL` vom Typ `QUERY` einen `row mapper` des Repositorys. |
@@ -332,7 +318,7 @@ Die Property `sqlType` legt fest, wie die zusammengesetzte SQL-Anweisung ausgef�
 
 | Wert        | Zweck                                                                        | Ergebnis                                                                                                                                                                            |
 | ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `QUERY`     | Führt eine SQL-Abfrage aus und verarbeitet deren Ergebnismenge.              | Das Ergebnis-Mapping wird durch eine Closure der BaseLanguage, eine Row-Mapper-Referenz (`RowMapperFieldRef`) oder eine No-Key-Mapper-Referenz (`NoKeyMapperFieldRef`) beschrieben. |
+| `QUERY`     | Führt eine SQL-Abfrage aus und verarbeitet deren Ergebnismenge.              | Ergebnis-Mapping siehe [Row-Mapper und No-Key-Mapper](#row-mapper-und-no-key-mapper). |
 | `STATEMENT` | Führt eine SQL-Anweisung zur Datenänderung aus, beispielsweise ein `UPDATE`. | Gibt die Anzahl der betroffenen Datenbankzeilen als `int` zurück. Ein Ergebnis-Mapping ist nicht vorgesehen.                                                                        |
 
 Wird ein `STATEMENT` innerhalb einer Session-Operation ausgeführt, unterliegt es deren Session- und Transaktionskontext. Die direkte SQL-Ausführung umgeht diesen Kontext nicht. Sie sollte gezielt eingesetzt werden, wenn eine Änderung unmittelbar per SQL erfolgen soll.
@@ -386,11 +372,9 @@ Für eine einmalige kleine skalare Abfrage kann dieselbe Logik als Inline-Closur
 
 #### `nokeystore/read-only map`
 
-`nokeystore/read-only map` referenziert über `classConcept` den Ergebnistyp und enthält seine Feldmappings in der Rolle `atomMpig`. Es kann alle Spalten selbst mappen oder über `IncludeMapping` ein geeignetes bestehendes Mapping wiederverwenden.
+`nokeystore/read-only map` benennt den Ergebnistyp und enthält dessen Feldmappings. Es kann alle Spalten selbst mappen oder über `IncludeMapping` ein bestehendes `EntityMapping` wiederverwenden; ein `EntityMapping` kann im Ergebnis-Mapping eines `SQL` nicht direkt angegeben werden.
 
-Jedes von einem `nokeystore/read-only map` erzeugte Objekt ist read-only. Das gilt auch dann, wenn ein bestehendes `EntityMapping` über `IncludeMapping` wiederverwendet wird. Das No-Key-Ergebnis selbst wird nicht in die Session integriert, das heißt nicht in die Session-Identity-Map aufgenommen. Für transiente Such-, Tabellen- und Aggregationsergebnisse ist ein ObjectFlow-`DTO` die bevorzugte Standardwahl. Ein `nokeystore/read-only map` kann jedoch auch ein vorhandenes `EntityMapping` einbinden und dadurch Entity-förmige read-only Ergebnisse erzeugen. Solche Objekte bleiben Projektionen außerhalb der Session-Identity-Map und dürfen nicht wie regulär geladene oder ausgecheckte Entities behandelt werden. Diese Variante eignet sich insbesondere dann, wenn die Wiederverwendung der vorhandenen Feldabbildungen sinnvoll ist und die Verwendung strikt read-only bleibt. Soll ein solches Objekt geändert werden, ist die betreffende Entity zuvor regulär über ihr `EntityMapping` zu laden beziehungsweise auszuchecken. Für neue, stark auf einen Such-, Darstellungs- oder Auswertungsfall zugeschnittene Ergebnisse bleibt ein DTO die klarere Standardwahl. Bei Bedarf nimmt `session.ensureInSession(…)` ein Entity-förmiges No-Key-Ergebnis in die Session auf, siehe [Session und Unit of Work](objectflow.md#session-und-unit-of-work).
-
-Ein `EntityMapping` kann im Ergebnis-Mapping eines `SQL` nicht direkt als Row-Mapper angegeben werden. Soll ein vollständiges Mapping wiederverwendet werden, führt der Pfad über `nokeystore/read-only map` und dessen `IncludeMapping`.
+Die erzeugten Objekte sind read-only und liegen außerhalb der Session-Identity-Map (siehe [Read-only, Checkout und Session-Identität](#read-only-checkout-und-session-identität)); das gilt auch für Entity-förmige Ergebnisse über `IncludeMapping`. Für Such-, Tabellen- und Aggregationsergebnisse ist ein ObjectFlow-`DTO` die Standardwahl; Entity-förmige Ergebnisse eignen sich, wenn vorhandene Feldabbildungen wiederverwendet werden sollen und die Verwendung strikt read-only bleibt. Soll ein solches Objekt geändert werden, ist die Entity regulär über ihr `EntityMapping` auszuchecken; `session.ensureInSession(…)` nimmt es bei Bedarf in die Session auf, siehe [Session und Unit of Work](objectflow.md#session-und-unit-of-work).
 
 Bei Mappingfehlern sind zuerst SQL-Aliase und Ergebnisspalten mit den Namen der Mapper-Felder und den Properties der Zielklasse zu vergleichen. Danach ist zu prüfen, ob der `SQL` tatsächlich den beabsichtigten Mapper-Member referenziert.
 

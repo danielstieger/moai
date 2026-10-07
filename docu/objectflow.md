@@ -318,7 +318,7 @@ Eine Methode mit `TO_SESSION_OPS` darf keine Preconditions besitzen. Eine solche
 
 ### Komponenten mit `#` aufrufen
 
-Service- und Repository-Methoden müssen mit dem Komponentenaufruf `#` aufgerufen werden. Er ist nicht nur eine kürzere Schreibweise für einen Java-Methodenaufruf. Das Sprachkonzept referenziert die konfigurierte Komponente und ihre Methode und kann optional einen expliziten Session-Ausdruck enthalten. Entscheidend ist außerdem, ob der Aufruf im `FINAL OK_CONCLUSION`-Kontext eines Commands verwendet wird.
+Service- und Repository-Methoden werden ausschließlich mit dem Komponentenaufruf `#` aufgerufen; ein direkter Java-Aufruf ist nicht vorgesehen, er würde die Komponenten-, Session- und Transaktionssemantik umgehen. Das Sprachkonzept referenziert die konfigurierte Komponente und ihre Methode und kann optional einen expliziten Session-Ausdruck enthalten. Entscheidend ist außerdem, ob der Aufruf im `FINAL OK_CONCLUSION`-Kontext eines Commands verwendet wird.
 
 | Ziel des `OperationCall` | Typisches Verhalten |
 | --- | --- |
@@ -332,8 +332,6 @@ Service- und Repository-Methoden müssen mit dem Komponentenaufruf `#` aufgerufe
 | Aufruf an der Position `cancelMarkerOperation` oder `cancelJournalOperation` im Command | Wird als dafür vorgesehene Cancel-Operation behandelt; eigene Transaktion, Session-Operations werden nicht abgearbeitet |
 
 Ein beliebiger Aufruf innerhalb von `FINAL CANCEL_CONCLUSION` ist damit noch keine Cancel-Operation. Dafür muss der `OperationCall` ausdrücklich in der strukturell vorgesehenen Marker- oder Journal-Position stehen. Diese Positionen gibt es nur in einem `GRAPH_OWNER_CMD`; in anderen Command-Typen meldet der Checker einen Fehler.
-
-Für normale fachliche Aufrufe ist `OperationCall` zu verwenden. Ein direkter Java-Aufruf ist gar nicht möglich. Er würde die Komponenten-, Session- und Transaktionssemantik umgehen.
 
 Der optionale Session-Ausdruck `#+ with <Session>` (`OperationCall`) übergibt für diesen Aufruf eine Custom Session an die aufgerufene Komponente. Innerhalb der aufgerufenen Methode ist `session` diese Custom Session; Aufrufe, die von dort ohne eigenen Session-Ausdruck ausgehen, verwenden sie ebenfalls. Ohne diesen Ausdruck verwendet der Aufruf die Session des aktuellen Kontexts. Dies ermöglicht einen gezielten Session-Wechsel innerhalb eines bereits bestehenden Session-Kontexts, beispielsweise in einer Service Method. Eine weitere Service- oder Repository-Methode kann dadurch mit einer anderen Session ausgeführt werden. Damit lässt sich ein Objekt unabhängig von den bereits ausgecheckten Entities der aktuellen Session laden oder auschecken; insbesondere kann so ein Double-Checkout in derselben Session bewusst vermieden werden. Eine separat verwaltete Custom Session kann außerdem für eine kurze, eigenständige Transaktion verwendet werden, deren Commit nicht vom späteren Abschluss der äußeren Session abhängt. Der Session-Ausdruck soll sparsam eingesetzt werden, weil die Transaktionsgrenze am Aufruf nicht ohne Weiteres erkennbar ist. Ein Commit in der Custom Session wird durch einen späteren Abbruch der äußeren Session nicht zurückgenommen (zudem doppelter  Objektbestand, unterschiedliche Instanzen, etc.). 
 
@@ -354,9 +352,9 @@ ObjectFlow unterscheidet fachlich beziehungsweise für den Benutzer behandelbare
 
 | Mechanismus | Zweck | Wirkung im Command-Ablauf |
 | --- | --- | --- |
-| Precondition (`Precondition`) | Verständliche, grundsätzlich korrigierbare Voraussetzung | Stoppt außerhalb einer `validation` den aktuellen Programmfluss; die Meldung wird in der UI angezeigt. In Jobs beendet sie den Command in `FINAL CANCEL_CONCLUSION` |
+| Precondition (`Precondition`) | Verständliche, grundsätzlich korrigierbare Voraussetzung | Stoppt außerhalb einer `validation` den aktuellen Programmfluss; die Meldung wird in der UI angezeigt; ohne UI siehe [`FINAL CANCEL_CONCLUSION`](#final-ok_conclusion-final-cancel_conclusion-und-final_user_cancel) |
 | `validation` (`ValidationStatement`) | Mehrere Voraussetzungen gemeinsam prüfen | Führt die enthaltenen Prüfungen aus und sammelt alle verletzten Preconditions in einem Problembericht, der dann ebenfalls in der UI angezeigt wird. |
-| `guard` (`Guard`) | Unerwarteten beziehungsweise nicht durch den Benutzer korrigierbaren Zustand absichern | Beendet den Command in `FINAL CANCEL_CONCLUSION` (falls `GRAPH_EDIT_CMD`, auch der Parent-`GRAPH_OWNER_CMD`); Benutzer erhalten eine neutrale Systemmeldung, Entwickler Diagnoseinformationen und Stacktrace |
+| `guard` (`Guard`) | Unerwarteten beziehungsweise nicht durch den Benutzer korrigierbaren Zustand absichern | Beendet den Command in `FINAL CANCEL_CONCLUSION`; Benutzer erhalten eine neutrale Systemmeldung, Entwickler Diagnoseinformationen und Stacktrace |
 | Exception | Technischer Ausnahmefall | Beendet den betroffenen Command in `FINAL CANCEL_CONCLUSION` |
 
 Bei einer Precondition beschreibt `condition` den gültigen Zustand: Nur wenn der Ausdruck `true` ergibt, läuft die Ausführung weiter. Bei `false` erzeugt die Precondition ein fachliches Problem. Für einen statischen benutzergerichteten Problemtext wird das ObjectFlow-Konzept `StringFormatString` verwendet, beispielsweise 'Hallo Fehler-Text', und kein BaseLanguage-String in doppelten Anführungszeichen. Platzhalter und Argumente können mit `%` ergänzt werden.
@@ -523,7 +521,7 @@ Dieser Teil beschreibt ausführbare Anwendungsfälle, ihre Pages, Abschlüsse, S
 
 Ein `Command` modelliert einen ausführbaren Anwendungsfall oder einen abgegrenzten Teil einer Benutzerinteraktion. Er verbindet Eingaben, lokalen Ablaufzustand, fachliche Prüfungen, Pages und den erfolgreichen oder fehlerhaften Abschluss mit einer klaren Session-Grenze. Ein Command ist damit weder bloß eine UI-Aktion noch nur eine Methode: Er beschreibt den gesamten kontrollierten Ablauf zwischen Aufruf und Termination.
 
-Bevor eine Command-Aktion gestartet werden kann, müssen ihre Parameter beziehungsweise Default-Selektionen verfügbar sein, alle Ausdrücke unter `generally enabled` `true` liefern und eine passende Command-Berechtigung erfüllt sein. Die Berechtigungen heißen konkret `CAN_OPEN_RO` für eine reine Ansicht und `CAN_OPEN_RW` für den bedienbaren Command (siehe [Rollen, Scopes und Identities](#rollen-scopes-und-identities)) und werden jeweils mit einer Rolle verbunden. Eine Rollenprüfung kann zusätzlich Teil von `generally enabled` sein, soll die deklarierte Command-Berechtigung aber nicht ersetzen.
+Bevor eine Command-Aktion gestartet werden kann, müssen ihre Parameter beziehungsweise Default-Selektionen verfügbar sein, alle Ausdrücke unter `generally enabled` `true` liefern und eine passende Command-Berechtigung (`CAN_OPEN_RO`/`CAN_OPEN_RW`, siehe [Rollen, Scopes und Identities](#rollen-scopes-und-identities)) erfüllt sein. Eine Rollenprüfung kann zusätzlich Teil von `generally enabled` sein, soll die deklarierte Command-Berechtigung aber nicht ersetzen.
 
 ### Grundablauf eines Commands
 
@@ -533,9 +531,9 @@ Der reguläre Ablauf folgt einer festen Reihenfolge:
 2. Lokale Variablen bilden den internen Zustand der Command-Instanz.
 3. `command init` lädt oder erzeugt die benötigten Daten und kann den Start mit einer Precondition verhindern.
 4. Nach erfolgreichem `command init` wird der Window Title berechnet.
-5. Ohne explizite Abzweigung wird die erste deklarierte Page initialisiert und angezeigt. `page <Name>` kann stattdessen gezielt eine andere Page wählen; `done` überspringt die Pages und wechselt unmittelbar in `FINAL OK_CONCLUSION`.
-6. Auf einer Page führt der Benutzer Commands aus Menüs oder Page Conclusions aus. Eine Conclusion bleibt bei einer verletzten Precondition auf derselben Page, wechselt mit `page <Name>` zu einer anderen Page oder löst mit `done` (`DoneCommand`) den erfolgreichen Abschluss aus; eine Conclusion ohne `page`, `done` oder Precondition meldet der Checker als Fehler.
-7. `FINAL OK_CONCLUSION` führt den Erfolgsabschluss aus. Guards, Exceptions und technische Fehler führen nach `FINAL CANCEL_CONCLUSION`, in Jobs zusätzlich verletzte Preconditions; ein bewusster Benutzerabbruch führt nach `FINAL_USER_CANCEL`.
+5. Ohne explizite Abzweigung wird die erste deklarierte Page initialisiert und angezeigt. `page <Name>` kann stattdessen gezielt eine andere Page wählen; `done` überspringt die Pages (siehe Tabelle unten).
+6. Auf einer Page führt der Benutzer Commands aus Menüs oder Page Conclusions aus. Eine Conclusion bleibt bei einer verletzten Precondition auf derselben Page, wechselt mit `page <Name>` zu einer anderen Page oder löst mit `done` den erfolgreichen Abschluss aus.
+7. `FINAL OK_CONCLUSION` führt den Erfolgsabschluss aus; welche Fälle nach `FINAL CANCEL_CONCLUSION` beziehungsweise `FINAL_USER_CANCEL` führen, beschreibt [der Abschnitt zu den Abschlüssen](#final-ok_conclusion-final-cancel_conclusion-und-final_user_cancel).
 
 Typische Varianten lassen sich damit einheitlich lesen:
 
@@ -570,7 +568,7 @@ Ein Command kann folgende Bestandteile enthalten:
 | --- | --- | --- | --- |
 | Parameter und Defaults | Typisierte Parameterdeklaration mit optionalem Ausdruck | Eingaben des Aufrufs festlegen | Schlüssel, ausgewählte Entity oder DTO, Filterwert; Default über `getSelected()` oder Konstante |
 | `generally enabled` | Liste boolescher Ausdrücke, logisch UND-verknüpft | Sichtbare Command-Aktion fachlich aktivieren oder deaktivieren | Zulässiger Status, vorhandene Selektion, passende Betriebsart |
-| Permissions | `CAN_OPEN_RO`- oder `CAN_OPEN_RW`-Eintrag mit Rolle; fehlt beides, dann uneingeschränkter Zugriff | Command als reine Ansicht beziehungsweise bedienbar öffnen | Beobachterrolle für Anzeige, Sachbearbeiterrolle für Änderung |
+| Permissions | `CAN_OPEN_RO`- oder `CAN_OPEN_RW`-Eintrag mit Rolle | Bedienbarkeit des Commands festlegen, siehe [Rollen, Scopes und Identities](#rollen-scopes-und-identities) | Beobachterrolle für Anzeige, Sachbearbeiterrolle für Änderung |
 | Preconditions | Liste von `Precondition`-Knoten | Verständliche Voraussetzungen vor dem Start prüfen | Vollständige Parameter, fachlich erlaubter Ausgangszustand |
 | Lokale Variablen | Typisierte Variablendeklaration | Zustand einer Command-Instanz halten | Geladener Graph, Filter-DTO, Ergebnisliste, Ablaufkennzeichen |
 | Command Settings | Deklarative Einstellungen und Ausdrücke | Darstellung und Laufzeitverhalten konfigurieren | Label, Icon, Hotkey, Farbe, Revert-Objekte, [Locks](#pessimistische-sperren-mit-acquire-locks), Optionen |
@@ -640,7 +638,7 @@ Bei einem `GRAPH_OWNER_CMD` wird der bearbeitete Graph üblicherweise bereits im
 
 Eine nicht warnende Precondition im Page Init unterbricht den Aufbau beziehungsweise die erneute Initialisierung der Page. Dort sollen deshalb nur `WARNING_HINT`-Preconditions verwendet werden. Abbrechende Voraussetzungen gehören in `command init`, wenn der Command gar nicht erst geöffnet werden soll, oder in eine Page Conclusion, wenn der Benutzer seine Eingaben auf der sichtbaren Page korrigieren können soll. Das gilt auch für Preconditions, die mittelbar in einem von Page Init aufgerufenen Service ausgelöst werden.
 
-Eine Conclusion kann mit `page <dieselbe Page>` bewusst auf die aktuelle Page zurückwechseln. Dadurch wird Page Init erneut ausgeführt und die Darstellung aktualisiert. So entsteht beispielsweise eine Refresh-Conclusion für ein `SEARCH_CMD`, ohne den Command neu zu starten. Ein Wechsel mit `page <andere Page>` initialisiert entsprechend den nächsten Interaktionsschritt.
+Ein `page`-Wechsel auf dieselbe Page führt Page Init erneut aus, siehe [Page Conclusions](#page-conclusions).
 
 #### Window Title, Page Title und Subtitle
 
@@ -711,13 +709,13 @@ Das Beispiel ist Pseudocode. Entscheidend ist, mit dem von `session merge` gelie
 
 #### Page Conclusions
 
-Eine `PageConclusion` besitzt ein Label, eine optionale `enabledWhen`-Bedingung, den Modus `ConclusionSaveType` und eine Funktion ohne Rückgabewert. Ihre Labels erscheinen typischerweise als Schaltflächen am unteren Rand der Page. Zusätzlich steht der Benutzerabbruch über Escape zur Verfügung, solange der Command nicht die Option `NO_ESC` trägt.
+Eine `PageConclusion` besitzt ein Label, eine optionale `enabledWhen`-Bedingung, den Modus `ConclusionSaveType` und eine Funktion ohne Rückgabewert. Ihre Labels erscheinen typischerweise als Schaltflächen am unteren Rand der Page. Zusätzlich steht der Benutzerabbruch zur Verfügung (siehe [`FINAL_USER_CANCEL`](#final-ok_conclusion-final-cancel_conclusion-und-final_user_cancel)).
 
 `ConclusionSaveType` hat die Werte `save` (`SAVE_CONCLUSION`, Standard) und `no_save` (`NOSAVE_CONCLUSION`). `save` übernimmt vor der Conclusion die aktuellen Editorwerte in die gebundenen Objekte. Das soll auch bei nicht editierbaren oder situationsabhängig deaktivierten UI-Elementen der normale Modus bleiben; deaktiviert bedeutet nicht, dass die übrigen Page-Werte verworfen werden sollen. `no_save` ist nur passend, wenn die noch im Editor befindlichen Änderungen für diese Aktion ausdrücklich nicht übernommen werden dürfen.
 
 Innerhalb der Conclusion steuern zwei spezielle Statements den weiteren Ablauf:
 
-- `page <Name>` (`PageCommand`) wechselt auf die angegebene Page und führt deren Page Init aus. Ein Verweis auf die aktuelle Page wirkt als Refresh.
+- `page <Name>` (`PageCommand`) wechselt auf die angegebene Page und führt deren Page Init aus. Ein Verweis auf die aktuelle Page wirkt als Refresh; so entsteht etwa eine Refresh-Conclusion für ein `SEARCH_CMD`, ohne den Command neu zu starten.
 - `done` beendet den interaktiven Teil erfolgreich und führt `FINAL OK_CONCLUSION` aus.
 
 Preconditions in einer Conclusion prüfen die vom Editor übernommenen Eingaben unmittelbar vor dem Übergang. Ein `GRAPH_EDIT_CMD` kann so seine Teilbearbeitung vor `done` prüfen; ein `GRAPH_OWNER_CMD` kann vor `done` die Voraussetzungen für das anschließende Registrieren und Ausführen der Speicheroperationen absichern. Eine Conclusion muss mindestens `page`, `done` oder eine Precondition enthalten; andernfalls meldet der Checker einen Fehler. Schlägt eine Precondition fehl, endet die Conclusion an dieser Stelle ohne Übergang: Die Page bleibt sichtbar und der Benutzer kann anhand der Meldung korrigieren oder eine andere Aktion wählen.
@@ -754,7 +752,7 @@ Damit ist `pushSelection` in einem Termination-Handler zwar sprachseitig zuläss
 
 Mit `user toast message` (`CommandCreationInfo`) zeigt ein Command nach dem erfolgreichen Abschluss eine Meldung an den Benutzer an. Zusätzlich kann er damit einen Wert, etwa die ID eines neu angelegten Objekts, unter einem Namen an einen aufrufenden Test weiterreichen (passed forward); siehe [Commands ohne UI ausführen](#commands-ohne-ui-ausführen). Zulässig ist das nur in Commands, die ihre Session committen (`GRAPH_OWNER_CMD`), und jeder Eintrag braucht einen innerhalb des Commands eindeutigen Identifier.
 
-Schlägt eine Session-Operation fehl, wird die Transaktion nicht committed. Ein `SEARCH_CMD` durchläuft zwar ebenfalls seinen erfolgreichen Command-Abschluss, seine Session wird anschließend aber ausdrücklich nicht committed.
+Schlägt eine Session-Operation fehl, wird die Transaktion nicht committed.
 
 `FINAL CANCEL_CONCLUSION` ist ein vom Command beziehungsweise System ausgelöster Abbruch. Guards und Exceptions führen in diesen Abschluss. In Jobs führt zusätzlich eine verletzte Precondition dorthin, weil sie dort nicht durch einen Benutzer korrigiert werden kann; so wird in der Praxis eine Unit of Work im Job gezielt abgebrochen. Registrierte normale Session-Operationen werden nicht als erfolgreicher Check-in ausgeführt. Für Fehlerstatus, Marker oder Journale stehen gesonderte Cancel-Operationen zur Verfügung, die in einem dafür vorgesehenen privaten Transaktionskontext ausgeführt werden.
 
@@ -782,7 +780,7 @@ Bei Listen hängt diese Revert-Kopie von der Veränderbarkeit ihrer Elemente ab:
 
 - Bei `FINAL CANCEL_CONCLUSION` und `FINAL_USER_CANCEL` wird der ursprüngliche Zustand wiederhergestellt.
 - Wird die Wurzel eines Graphen angegeben, wird der gesamte darunterliegende Objekt-Graph zurückgesetzt.
-- Session-Operationen eines abgebrochenen `GRAPH_EDIT_CMD` werden durch Revert nicht aus dem Stack entfernt.
+- Registrierte Session-Operationen nimmt Revert nicht zurück (siehe [Die vier Command-Typen](#die-vier-command-typen)).
 
 Revert ist ausdrücklich auf die unter `revert on FINAL_ / USER_CANCEL` aufgeführten Parameter begrenzt. Das ist bei einem `GRAPH_EDIT_CMD` besonders wichtig, weil er in der Session seines Parent-Commands arbeitet: Verändert das Child einen gemeinsam genutzten Graphen und ist dessen Wurzel beim Child nicht als Revert-Objekt angegeben, bleiben diese In-Memory-Änderungen auch nach einem Benutzerabbruch des Childs im Parent sichtbar. Sollen sämtliche Änderungen des Childs verworfen werden, wird deshalb die gemeinsam bearbeitete Graph-Wurzel als Revert-Objekt des Child-Commands angegeben.
 
@@ -793,7 +791,7 @@ Revert ist damit eine In-Memory-Rücknahme des bearbeiteten Objekt-Graphen und n
 | Name | Konzeptname | Wirkung |
 | --- | --- | --- |
 | `IN_BACKGROUND` | `CommandBackgroundOption` | Führt `command init` im Hintergrund aus |
-| `NO_ESC` | `CommandNoEscOption` | Schaltet den Benutzerabbruch ab: Abbrechen-Button deaktiviert, Escape ohne Wirkung; `FINAL_USER_CANCEL` ist nicht erreichbar |
+| `NO_ESC` | `CommandNoEscOption` | Schaltet den Benutzerabbruch ab, siehe [`FINAL_USER_CANCEL`](#final-ok_conclusion-final-cancel_conclusion-und-final_user_cancel) |
 | `NEWSTYLE_CMD_TERM_HANDLING` | `CommandNoPushNewTermOption` | Deaktiviert die alte automatische Übernahme gepushter Objekte; Merge muss explizit behandelt werden; erforderlich für `any cmd term`-Handler und Handler mit Classifier |
 | `URL` | `CommandUrlOption` | Macht einen Command in webfähigen Laufzeiten über einen Pfad und optionale URL-Parameter startbar |
 
@@ -885,7 +883,7 @@ Die Varianten mit Entities liefern die tatsächlichen Session-Instanzen und mach
 
 Dieses Konzept eignet sich für einen Folgeablauf, der einen bereits erfolgreich persistierten Zustand benötigt. Da der einzureihende Command und seine Argumente zur Laufzeit gewählt werden können, lassen sich damit auch längere fachliche Prozesse modellieren: Der aktuelle Schritt entscheidet anhand seines Ergebnisses, welcher Command nach dem Commit als nächster beginnt. Diese Entscheidung kann in einem wiederverwendbaren Service gekapselt sein, sofern er innerhalb des aktuellen UI-Command- und Session-Kontexts ausgeführt wird.
 
-Jeder solche Übergang bildet eine klare Sicherungsgrenze: Erst der erfolgreiche Commit des aktuellen Session Owners gibt den nächsten Command frei. Ein mehrstufiger Workflow kann dadurch aus mehreren eigenständigen Commands mit jeweils eigener Benutzerinteraktion und Transaktion bestehen. Der Mechanismus ersetzt jedoch keine allgemeine Job- oder Workflow-Engine: Ohne UI wird die Queue ignoriert, und bei Abbruch oder fehlgeschlagenem Commit findet kein Übergang statt.
+Jeder solche Übergang bildet eine klare Sicherungsgrenze: Erst der erfolgreiche Commit des aktuellen Session Owners gibt den nächsten Command frei. Ein mehrstufiger Workflow kann dadurch aus mehreren eigenständigen Commands mit jeweils eigener Benutzerinteraktion und Transaktion bestehen. Der Mechanismus ersetzt jedoch keine allgemeine Job- oder Workflow-Engine.
 
 ### Explizites Command-Termination-Handling und Session Merge
 
@@ -929,7 +927,7 @@ Für die weitere Verarbeitung ist stets der Rückgabewert des Merge-Ausdrucks zu
 
 ### Successor-Commands
 
-Ein Command kann Successor-Commands deklarieren. Sie modellieren einen fachlichen Folgeablauf, der aus dem Abschluss des aktuellen Commands hervorgeht. Davon zu unterscheiden ist `session queue next command`: Dieses Konzept plant gezielt einen Command nach erfolgreichem Commit des Session Owners.
+Ein Command kann Successor-Commands deklarieren. Sie modellieren einen fachlichen Folgeablauf, der aus dem Abschluss des aktuellen Commands hervorgeht.
 
 Ein Successor wird im Bereich `FINAL OK_CONCLUSION` als `SuccessorCommandCall` modelliert. Mehrere Einträge werden in ihrer Reihenfolge geprüft; bedingte Varianten stehen zuerst und der letzte Eintrag ist der unbedingte Default. Der Ziel-Command erhält seine Argumente direkt aus dem Zustand des Vorgängers und muss zum Startzeitpunkt enabled und für den Benutzer erlaubt sein.
 
@@ -1021,14 +1019,7 @@ Jeder `Simple Test` (`OFXTestMethod`) erhält eine eigene Session. Diese Session
 
 ### Testoptionen
 
-| Name | Konzeptname | Bedeutung |
-| --- | --- | --- |
-| `PATH` | `OFXTestPathOption` | Deklariert ein vom Test verwendetes Verzeichnis |
-| `DEBUG_TEST` | `OFXTestSuitDebugOption` | Aktiviert zusätzliche Debugausgabe für einen ausgewählten Test |
-| `DEFAULT_DATETIME` | `OFXTestSuitDefaultDateTimeOption` | Fixiert Standarddatum und -zeit für reproduzierbare Tests |
-| `DEPENDENT_TEST` | `OFXTestSuitDependentOption` | Kennzeichnet einen Test als abhängig und nicht eigenständig auszuführen |
-| `INCLUDE_SUIT` | `OFXTestSuitIncludeSuit` | Bindet eine weitere Testsuite einschließlich Start-/Ende-Logik ein |
-| `DONT_EXEC` | `OFXTestSuitNoExecOption` | Schließt einen ausgewählten Test von der normalen Ausführung aus |
+Die Optionen sind in der [Kapitellandkarte: Tests](#kapitellandkarte-tests) aufgeführt.
 
 Testsuites lassen sich hierarchisch zusammensetzen. `INCLUDE_SUIT` kann eine andere Suite einschließlich ihrer Start-/Ende-Logik einbinden und über `exec tests` festlegen, ob auch deren Tests laufen. Damit kann eine Suite beispielsweise nur den gemeinsamen Datenbankaufbau einer Basissuite verwenden oder mehrere fachliche Suites zu einem Gesamtlauf aggregieren. `DEPENDENT_TEST` markiert einen Test, der nicht alleinig als selbständiger Test ausgeführt werden kann. Er wird von einem anderen Test verwendet.  
 
@@ -1045,7 +1036,7 @@ Ein `run command` kann:
 - in `before conclude` Werte setzen oder Assertions ausführen,
 - das gebundene Page-Objekt unter einem lokalen Namen verfügbar machen; in diesem Block stehen auch `getSelected()` und `pushSelection()` zur Verfügung,
 - eine Page als optional kennzeichnen, wenn sie abhängig vom getesteten Pfad erscheinen darf,
-- bei einem `SEARCH_CMD` statt einer Conclusion den Benutzerabbruch erzwingen (leere Conclusion, `<user_cancel>`),
+- statt einer Conclusion den Benutzerabbruch erzwingen (leere Conclusion, `<user_cancel>`; Einschränkung siehe unten),
 - einen innerhalb der Page gestarteten Child-Command wiederum mit `run command` beantworten,
 - Successor-Commands über `when successor command ...` samt eigener Page-Abfolge behandeln.
 
@@ -1077,9 +1068,9 @@ run command unit. Rechnung anlegen()
 assert gespeicherteRechnungId != 0;
 ```
 
-Die Testbeschreibung simuliert damit die Entscheidungen, die sonst ein Benutzer über die UI trifft. Die DataUX-Darstellung wird nicht benötigt. UI-abhängige Mechanismen wie `session queue next command` werden bei einer Ausführung ohne UI ignoriert.
+Die Testbeschreibung simuliert damit die Entscheidungen, die sonst ein Benutzer über die UI trifft. Die DataUX-Darstellung wird nicht benötigt. Zum Verhalten von `session queue next command` ohne UI siehe [Command nach dem Commit einplanen](#command-nach-dem-commit-einplanen).
 
-Einen Benutzerabbruch (`<user_cancel>`) kann ein Test nur bei einem `SEARCH_CMD` erzwingen. Bei allen anderen Command-Typen meldet der Checker einen Fehler; einen `GRAPH_OWNER_CMD` oder `GRAPH_EDIT_CMD` über einen ESC-Abbruch zu testen, ist auch fachlich nicht sinnvoll. Abbrüche dieser Commands werden über `FINAL CANCEL_CONCLUSION` getestet: Eine Precondition in der erzwungenen Conclusion scheitert und führt, da der Test ohne UI läuft, wie in einem Job zu `FINAL CANCEL_CONCLUSION`. Den erwarteten Abbruch beschreibt der Test mit `FAIL IN OFXJobWorkCanceledException` am `run command`; danach kann er Revert und Zustand prüfen. Die Revert-Liste gilt für `FINAL CANCEL_CONCLUSION` ebenso wie für `FINAL_USER_CANCEL`.
+Einen Benutzerabbruch (`<user_cancel>`) kann ein Test nur bei einem `SEARCH_CMD` erzwingen. Bei allen anderen Command-Typen meldet der Checker einen Fehler; einen `GRAPH_OWNER_CMD` oder `GRAPH_EDIT_CMD` über einen ESC-Abbruch zu testen, ist auch fachlich nicht sinnvoll. Abbrüche dieser Commands werden über `FINAL CANCEL_CONCLUSION` getestet: Eine Precondition in der erzwungenen Conclusion scheitert und führt, da der Test ohne UI läuft, wie in einem Job zu `FINAL CANCEL_CONCLUSION`. Den erwarteten Abbruch beschreibt der Test mit `FAIL IN OFXJobWorkCanceledException` am `run command`; danach kann er Revert (siehe [Revert beim Abbruch](#revert-beim-abbruch)) und Zustand prüfen.
 
 Ein `GRAPH_EDIT_CMD` benötigt die Session seines Owners und kann deshalb nicht auf oberster Ebene eines Tests ausgeführt werden. Er wird als Child-Command in einer Page des `run command` für den zugehörigen `GRAPH_OWNER_CMD` beantwortet.
 
@@ -1179,11 +1170,11 @@ Bei einer interaktiven Anwendung ist [`isAuthenticated`](dataux.md#anwendung-mit
 | auch nach der Anmeldung | dynamische Statusinformation | `userEnvironment.setDynamicStatusInfo(String)` | Kann laufenden fachlichen Kontext anzeigen; umfangreichere Benutzerlogik gehört in einen Service |
 | im Session-Kontext | User Service | `session.getUserServices()` | Liefert `IOFXUserServices`; die Anwendungs-Laufzeit stellt denselben Dienst über `getUserService()` bereit |
 
-Außerhalb der Authentifizierungsfunktion liefert der Ausdruck `session` (`Session`, FQ-Name `org.modellwerkstatt.objectflow.structure.Session`) die aktuelle ObjectFlow-Session. Innerhalb von `isAuthenticated` wird der gleich dargestellte Parameter durch `UserAuthSession` (`org.modellwerkstatt.objectflow.structure.UserAuthSession`) repräsentiert; `userEnvironment` ist dort ein `UserEnvironmentParameter`. Anwendungslogik soll den Kontext über diese Zugriffe lesen und keine eigene globale Benutzerinstanz führen.
+Außerhalb von `isAuthenticated` liefert `session` die aktuelle ObjectFlow-Session (siehe [Session und Unit of Work](#session-und-unit-of-work)); innerhalb von `isAuthenticated` sind `session` und `userEnvironment` die Parameter der Funktion. Anwendungslogik soll den Kontext über diese Zugriffe lesen und keine eigene globale Benutzerinstanz führen.
 
 Für Rollen, Scopes und Identities stehen eigene DSL-Ausdrücke zur Verfügung: `StaticRoleReference`, `ScopeReference` und `IdentityReference`. Sie kapseln die generierten Zugriffe und deren Cache-Semantik. Anwendungscode soll diese Konzepte verwenden und keine eigenen String-Schlüssel für `getValue(...)` oder `getIdentity(...)` erfinden.
 
-Bei einem headless Batchjob wird `isAuthenticated` nicht ausgeführt; beim `BatchJobModule` ist diese Funktion nur für eine gegebenenfalls gestartete UI relevant. Die verwendete `OFXConfig` muss deshalb eine `OFXConfigInstance` für eine Implementierung von `IOFXUserEnvironment` bereitstellen, üblicherweise `org.modellwerkstatt.objectflow.runtime.UserEnvironmentInformation`. Technischer Benutzername und Benutzer-ID werden dort mit `OFXConfigProperty` vorkonfiguriert. Zusätzlich benötigt der Job eine `IOFXUserServices`-Implementierung, beispielsweise `OFXSimpleUserServices`. Die Job-Laufzeit übernimmt beide Komponenten in die Sessions der Producer- und Consumer-Abläufe.
+Bei einem headless Batchjob wird `isAuthenticated` nicht ausgeführt; beim `BatchJobModule` ist diese Funktion nur für eine gegebenenfalls gestartete UI relevant. Die verwendete `OFXConfig` muss deshalb je eine Implementierung von `IOFXUserEnvironment` und `IOFXUserServices` als Instanz bereitstellen (siehe Tabelle); die Job-Laufzeit übernimmt beide Komponenten in die Sessions der Producer- und Consumer-Abläufe.
 
 | Konfigurationselement | Typische Job-Konfiguration |
 | --- | --- |
@@ -1200,11 +1191,11 @@ Der User Service bündelt benutzer- beziehungsweise laufzeitabhängige Infrastru
 
 | Name | Konzeptname | Aufgabe |
 | --- | --- | --- |
-| statische Rolle | `StaticRole` | Prüft anhand der User Environment, ob ein Benutzer eine Rolle besitzt; Rollen können weitere Rollen einschließen |
+| statische Rolle | `StaticRole` | Prüft anhand der User Environment, ob ein Benutzer eine Rolle besitzt |
 | Scope | `Scope` | Liefert die für einen Benutzer beziehungsweise Kontext zugänglichen Objekte eines Typs |
 | Identity | `Identity` | Hält ein einzelnes, für den Anwendungskontext zentrales Objekt beziehungsweise dessen Schlüssel |
 
-Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN_OPEN_RW role ...`. Die Art der Berechtigung beschreibt nicht den Datenzugriff, sondern die Bedienbarkeit des Commands: Öffnet ein Benutzer den Command über `CAN_OPEN_RO`, läuft dieser mit einer Read-only-Session (siehe [Session-weites Read-only und Dirty](#session-weites-read-only-und-dirty)) und ist damit eine reine Ansicht. Erfüllt ein Benutzer sowohl einen `CAN_OPEN_RO`- als auch einen `CAN_OPEN_RW`-Eintrag, gilt `CAN_OPEN_RW`. Ein `GRAPH_EDIT_CMD` darf kein `CAN_OPEN_RO` deklarieren, weil Read-only an der Session des Owners hängt; der Checker meldet einen Fehler. Ein `SEARCH_CMD` mit Filterformular braucht `CAN_OPEN_RW` oder gar keine Berechtigung; weil seine Session nie committet wird, ist damit kein Schreibrecht verbunden. Rollen sind hierarchisch modellierbar: Eine übergeordnete Rolle kann die Fähigkeiten einer weiteren Rolle einschließen.
+Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN_OPEN_RW role ...`. Fehlt beides, ist der Command uneingeschränkt zugänglich. Die Art der Berechtigung beschreibt nicht den Datenzugriff, sondern die Bedienbarkeit des Commands: Öffnet ein Benutzer den Command über `CAN_OPEN_RO`, läuft dieser mit einer Read-only-Session (siehe [Session-weites Read-only und Dirty](#session-weites-read-only-und-dirty)) und ist damit eine reine Ansicht. Erfüllt ein Benutzer sowohl einen `CAN_OPEN_RO`- als auch einen `CAN_OPEN_RW`-Eintrag, gilt `CAN_OPEN_RW`. Ein `GRAPH_EDIT_CMD` darf kein `CAN_OPEN_RO` deklarieren, weil Read-only an der Session des Owners hängt; der Checker meldet einen Fehler. Ein `SEARCH_CMD` mit Filterformular braucht `CAN_OPEN_RW` oder gar keine Berechtigung; weil seine Session nie committet wird (siehe [Die vier Command-Typen](#die-vier-command-typen)), ist damit kein Schreibrecht verbunden.
 
 Scopes sind nicht nur Berechtigungsflags, sondern liefern eine eingeschränkte Objektmenge. Sie können Parameter und lokale Variablen besitzen und Services beziehungsweise Repositories über `OperationCall` verwenden.
 
@@ -1216,7 +1207,7 @@ Die Ergebnisse statischer Rollen werden in der User Environment gecacht. Ändert
 
 ### Statische Ressourcen
 
-`Static Ressources` (`StaticRessources`) bündelt wiederverwendbare Labels und Farben für eine oder mehrere Plattformen. Ein Ressourcensatz kann einen anderen erweitern.
+`Static Ressources` (`StaticRessources`) bündelt wiederverwendbare Labels und Farben für eine oder mehrere Plattformen.
 
 - Ein Label (`Label`) kann mehrere plattformspezifische Spezifikationen besitzen.
 - Eine Farbe (`Color`) deklariert einen benannten Farbwert.

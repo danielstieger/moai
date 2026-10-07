@@ -10,7 +10,7 @@
 6. Add status declarations under the structure's `status` role, not as roots. Ensure every element has technical value plus short/long descriptions. [Status](../../../docu/objectflow.md#status)
 7. Validate the root and generate/build if the target project workflow requires it.
 
-For Entity references, distinguish the key from the loaded object. `#Key` does not load; direct property access requires the repository method to have loaded the reference. [Relationships and object graphs](../../../docu/objectflow.md#beziehungen-und-objektgraphen)
+`#Key` versus the loaded reference: see [Beziehungen und Objektgraphen](../../../docu/objectflow.md#beziehungen-und-objektgraphen).
 
 ## Add or change domain logic
 
@@ -28,12 +28,12 @@ Load `moai:mps-baselanguage` whenever writing method bodies or expressions.
 1. Pick the command type from its ownership and commit semantics, not its visual appearance. [Command types](../../../docu/objectflow.md#die-vier-command-typen)
 2. Insert [command-skeleton.json](blueprints/command-skeleton.json) and set a space-containing user-facing name.
 3. Add parameters/default selections and `generally enabled` conditions. Defaults do not replace business validation. [Parameters and selection](../../../docu/objectflow.md#parameter-defaults-und-selektion)
-4. In `command init`, load/checkout the graph and reject startup with Preconditions before mutation. `IN_BACKGROUND` applies only to init. [Command init](../../../docu/objectflow.md#command-init-und-hintergrundinitialisierung)
+4. In `command init`, load/checkout the graph and reject startup with Preconditions before mutation. [Command init](../../../docu/objectflow.md#command-init-und-hintergrundinitialisierung)
 5. Add Pages incrementally. Each normal Page requires a Page Init and at least one Page Pane link; keep an unconditional link last. [Pages](../../../docu/objectflow.md#pages-und-page-conclusions)
 6. Put Page-specific `#Meta` changes in scopes; keep server-side validation as well. [Property metadata](../../../docu/objectflow.md#ui-metadaten-einer-property-mit-meta-steuern)
 7. Use `save` conclusions normally; use `no_save` only to discard editor state intentionally. [Page Conclusions](../../../docu/objectflow.md#page-conclusions)
 8. Register check-in/delete operations in the session owner. Do not register normal session operations in a Graph Edit. [Session and Unit of Work](../../../docu/objectflow.md#session-und-unit-of-work)
-9. Add the aggregate root to `revert` when a child edit must be undone on cancel. Revert is in-memory, not a database rollback. [Revert](../../../docu/objectflow.md#revert-beim-abbruch)
+9. Add the aggregate root to `revert` when a child edit must be undone on cancel. [Revert](../../../docu/objectflow.md#revert-beim-abbruch)
 10. Validate the command, then test it with `run command`.
 
 Prefer `NEWSTYLE_CMD_TERM_HANDLING`: consume pushed values in a termination handler, merge explicitly, and continue with the merge result. [Explicit termination and merge](../../../docu/objectflow.md#explizites-command-termination-handling-und-session-merge)
@@ -48,7 +48,7 @@ Use Successors for one atomic Unit of Work; use `session queue next command` for
 4. Use `Simple Test` for session-aware domain/service/repository tests. [OFXTestSuit](../../../docu/objectflow.md#ofxtestsuit)
 5. Use `run command` to model expected Pages, forced Conclusions, child Commands, Successors, cancellation, and passed-forward values. [Commands without UI](../../../docu/objectflow.md#commands-ohne-ui-ausführen)
 6. Use `FAIL IN` for expected failures and `DEFAULT_DATETIME` for deterministic business time. [Test options](../../../docu/objectflow.md#testoptionen)
-7. Only the `Simple Test` session is not committed; a `run command` on a Graph Owner commits as in production. Verify persisted effects by reading them back, in a fresh Custom Session where needed. [Typical test levels](../../../docu/objectflow.md#typische-testebenen)
+7. Verify persisted effects by reading them back, in a fresh Custom Session where needed. [Typical test levels](../../../docu/objectflow.md#typische-testebenen)
 
 ## Integrate persistence with ManMap
 
