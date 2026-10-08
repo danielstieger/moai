@@ -12,11 +12,11 @@ Die Dokumentation beschreibt beobachtete und technisch bestätigte Praxis. Sie l
 
 Die **modellwerkstatt MoWare-Werkbank** basiert auf JetBrains MPS und umfasst drei eng integrierte domänenspezifische Sprachen (DSLs) zur Erstellung von Geschäftsanwendungen. Sie decken Persistenz, Geschäftslogik und Benutzeroberflächen ab.
 
-**ManMap** (`org.modellwerkstatt.manmap`) bildet die Persistenzschicht der Anwendung. Die Sprache definiert die Zuordnung zwischen relationalen Datenbanktabellen und Entitäten und stellt Operationen zum Laden, Speichern und Löschen bereit. Diese bilden die Grundlage für den Datenzugriff über Repositories. Darüber hinaus unterstützt ManMap die Arbeit mit Lesemodellen (Read Models) und Tabellenmodellen (Table Models): Komplexe SQL-Abfragen lassen sich formulieren und ihre Ergebnismengen über spezialisierte Mapper in DTOs (Data Transfer Objects) überführen.
+**ManMap** (`org.modellwerkstatt.manmap`) bildet die Persistenzschicht der Anwendung. Die Sprache definiert die Zuordnung zwischen relationalen Datenbanktabellen und Entities und stellt Operationen zum Laden, Speichern und Löschen bereit. Diese bilden die Grundlage für den Datenzugriff über Repositories. Darüber hinaus unterstützt ManMap die Arbeit mit Lesemodellen (Read Models) und Tabellenmodellen (Table Models): Komplexe SQL-Abfragen lassen sich formulieren und ihre Ergebnismengen über spezialisierte Mapper in DTOs (Data Transfer Objects) überführen.
 
 **ObjectFlow** (`org.modellwerkstatt.objectflow`) dient der Modellierung von Service-Komponenten und Geschäftslogik. Die Sprache umfasst fachliche Datenstrukturen wie Entities und Value Objects sowie Commands zur Beschreibung von Aktionen und Anwendungsabläufen. Darüber hinaus unterstützt ObjectFlow die Modellierung von Testabläufen in Testsuiten sowie die Definition von Rollen und Berechtigungen.
 
-**DataUX** (`org.modellwerkstatt.dataux`) dient der Modellierung von Benutzeroberflächen, Anwendungen und Batchjobs. Tabellen und Formulare werden durch ihre Spalten, Felder, Formatierungen und Datenbindungen beschrieben; Layouts strukturieren die Darstellung und ermöglichen die Zusammenstellung komplexerer Oberflächen. Anwendungen dienen für Endanwender als Einstiegspunkt und verfügen über das Hauptmenü. Für die automatisierte Verarbeitung lassen sich Batchjobs modellieren.
+**DataUX** (`org.modellwerkstatt.dataux`) dient der Modellierung von Benutzeroberflächen, Anwendungen und Batchjobs. Tabellen und Formulare werden durch ihre Spalten, Felder, Formatierungen und Datenbindungen beschrieben; Layouts strukturieren die Darstellung und ermöglichen die Zusammenstellung komplexerer Oberflächen. Anwendungen dienen Endanwendern als Einstiegspunkt und verfügen über das Hauptmenü. Für die automatisierte Verarbeitung lassen sich Batchjobs modellieren.
 
 Aus den in MPS modellierten Anwendungen wird Java-Code generiert; die drei Laufzeitumgebungen sind unter [Laufzeitumgebungen](#laufzeitumgebungen) beschrieben.
 
@@ -47,7 +47,7 @@ Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimm
 | Persistenz | `Persistence Description`, `Repository` | `org.modellwerkstatt.manmap` | [Persistenz-Mappings](manmap.md#kapitellandkarte-persistenz-mappings), [Repository](manmap.md#kapitellandkarte-repository) |
 | Benutzeroberfläche | `Page Pane`, `Table`, `Delegate Form`, `Grid Layout`, `Tab Layout`, `Custom UI Element` | `org.modellwerkstatt.dataux` | [UI-Komposition](dataux.md#kapitellandkarte-ui-komposition) |
 | Ausführbare Module | `AppUI Module`, `BatchJob Module` | `org.modellwerkstatt.dataux` | [Anwendung](dataux.md#kapitellandkarte-anwendung), [Batchjob](dataux.md#kapitellandkarte-batchjob) |
-| Querschnitt | `OFXConfig`, `OFXTestSuit`, Roles and Permissions, Static Ressources | `org.modellwerkstatt.objectflow` | [Querschnittsthemen](objectflow.md#kapitellandkarte-querschnittsthemen), [Tests](objectflow.md#kapitellandkarte-tests) |
+| Querschnitt | `OFXConfig`, `OFXTestSuit`, `Roles and Permissions`, `Static Ressources` | `org.modellwerkstatt.objectflow` | [Querschnittsthemen](objectflow.md#kapitellandkarte-querschnittsthemen), [Tests](objectflow.md#kapitellandkarte-tests) |
 
 ### Bezeichnung der Konzepte
 
@@ -65,7 +65,7 @@ Entity / Value Object / DTO / Service / Command
         │   Mapping / Repository / SQL / DTO-Mapping
         │
         └── DataUX
-            Page Pane / Form / Table / Layout / Interaktion
+            Page Pane / Delegate Form / Table / Layout / Interaktion
                     │
                     ▼
              AppUI Module / BatchJob Module
@@ -74,16 +74,18 @@ Entity / Value Object / DTO / Service / Command
                  OFXConfig
                     │
                     ▼
-        fx8forms / turkuforms / h2forms
+   org.modellwerkstatt.fx8forms /
+   org.modellwerkstatt.turkuforms /
+   org.modellwerkstatt.h2forms
 ```
 
 - **ObjectFlow** definiert die fachlichen Daten, Regeln und Anwendungsfälle.
 - **ManMap** verbindet Entities und DTOs mit der relationalen Persistenz und stellt den Datenzugriff über Repositories bereit.
-- **DataUX** projiziert Commands und deren Daten in Seiten, Formulare, Tabellen und ausführbare Module.
+- **DataUX** projiziert Commands und deren Daten in `Page Pane`s, Formulare, Tabellen und ausführbare Module.
 
 ### Wo gehört eine Änderung hin?
 
-| Änderungswunsch                                         | mit DSL                                                                         | Primärer Modellierungsort                                                                         |
+| Änderungswunsch                                         | DSL                                                                             | Primärer Modellierungsort                                                                         |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | Neue fachliche Eigenschaft                              | `org.modellwerkstatt.objectflow`                                                | `Entity`, `Value Object` oder `DTO`, abhängig von der Bedeutung der Daten                         |
 | Neue Geschäftsregel oder Berechnung                     | `org.modellwerkstatt.objectflow`                                                | Fachliches Verhalten in `Entity`, `Value Object` oder `Service`                                   |
@@ -119,7 +121,7 @@ Batchjobs können direkt gestartet, zeitgesteuert über Cron ausgeführt oder ko
 
 Das Beispiel umfasst die Suche nach Rechnungen, die Bearbeitung einer Rechnung mit ihren Positionen und die Anzeige der Summe aller Rechnungen. Die verwendeten Namen sind beispielhaft.
 
-### Fachliches Modell mit der DSL `org.modellwerkstatt.objectflow`
+### Fachliches Modell mit ObjectFlow
 
 | Element       | Beispiel                  | Aufgabe                                                                                                                                                       |
 | ------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -133,7 +135,7 @@ Das Beispiel umfasst die Suche nach Rechnungen, die Bearbeitung einer Rechnung m
 
 Für das vereinfachte Beispiel müssen Mengen positiv und Einzelpreise nicht negativ sein. Alle Rechnungen verwenden dieselbe Währung. Die Summe einer Rechnung ergibt sich aus ihren Positionswerten. Steuern und Rundungsregeln werden in diesem Beispiel nicht behandelt.
 
-### Persistenz mit der DSL `org.modellwerkstatt.manmap`
+### Persistenz mit ManMap
 
 Eine `Persistence Description` enthält die Mappings für `Rechnung` und `Rechnungsposition`. Die Positionstabelle besitzt eine Zuordnung zur jeweiligen Rechnung.
 
@@ -143,18 +145,18 @@ Zwei Repositories kapseln die Datenbankzugriffe. Das `RechnungsRepo` lädt und s
 | ------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `RechnungsRepo`     | `checkout(id)`               | Lädt die Rechnung und explizit ihre Positionen zur Bearbeitung. Stellt den vollständigen Rechnungsgraphen zusammen.                                                           |
 | `RechnungsRepo`     | `checkin(rechnung)`          | Speichert die bearbeitete Rechnung einschließlich der zugehörigen Änderungen an ihren Positionen.                                                                             |
-| `RechnungsLeseRepo` | `sucheRechnungen(filter)`    | Übersetzt die Suchkriterien aus `RechnungFilter` in eine benutzerdefinierte SQL-Abfrage. Ein No-Key-Mapper überführt jede Ergebniszeile in ein read-only `RechnungInfo`-DTO. |
-| `RechnungsLeseRepo` | `ladeSummeAllerRechnungen()` | Führt die Aggregation direkt per SQL in der Datenbank aus. Ein No-Key-Mapper überführt das Ergebnis in das read-only DTO `RechnungsSummenErgebnis`.                           |
+| `RechnungsLeseRepo` | `sucheRechnungen(filter)`    | Übersetzt die Suchkriterien aus `RechnungFilter` in eine benutzerdefinierte SQL-Abfrage. Ein `nokeystore/read-only map` überführt jede Ergebniszeile in ein read-only `RechnungInfo`-DTO. |
+| `RechnungsLeseRepo` | `ladeSummeAllerRechnungen()` | Führt die Aggregation direkt per SQL in der Datenbank aus. Ein `nokeystore/read-only map` überführt das Ergebnis in das read-only DTO `RechnungsSummenErgebnis`.                           |
 
-Die Suche lädt keine `Rechnung`-Entitäten. Die benutzerdefinierte SQL-Abfrage liest nur die für die Ergebnisliste benötigten Daten und bildet jede Zeile auf ein `RechnungInfo`-DTO ab. Diese No-Key-Ergebnisse sind read-only und werden nicht in die Session-Identity-Map integriert. Erst beim Öffnen eines Suchergebnisses wird anhand seiner Rechnungs-ID die zugehörige `Rechnung` einschließlich ihrer Positionen zur Bearbeitung explizit geladen.
+Die Suche lädt keine `Rechnung`-Entities. Die benutzerdefinierte SQL-Abfrage liest nur die für die Ergebnisliste benötigten Daten; das `nokeystore/read-only map` bildet jede Zeile auf ein `RechnungInfo`-DTO ab. Diese DTOs sind read-only und werden nicht in die Session-Identity-Map integriert. Erst beim Öffnen eines Suchergebnisses wird anhand seiner Rechnungs-ID die zugehörige `Rechnung` einschließlich ihrer Positionen zur Bearbeitung explizit geladen.
 
 Auch für die Summe aller Rechnungen werden keine vollständigen Rechnungsgraphen aufgebaut. Die Datenbank berechnet das Aggregationsergebnis, das anschließend als DTO zur Anzeige bereitsteht. Diese Auswertung umfasst alle Rechnungen und ist unabhängig vom aktuellen Suchfilter.
 
-### Anwendungsfälle mit der DSL `org.modellwerkstatt.objectflow`
+### Anwendungsfälle mit ObjectFlow
 
 | Beispiel-Command                  | Command-Typ       | Aufgabe                                                                                                                       |
 | --------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `Rechnungen suchen`               | `SEARCH_CMD`      | Erfasst Suchkriterien und zeigt die als `RechnungInfo`-DTOs geladenen Treffer auf einer zweiten Seite an.                     |
+| `Rechnungen suchen`               | `SEARCH_CMD`      | Erfasst Suchkriterien und zeigt die als `RechnungInfo`-DTOs geladenen Treffer auf einer zweiten Page an.                     |
 | `Rechnung bearbeiten`             | `GRAPH_OWNER_CMD` | Lädt eine Rechnung anhand ihrer ID, zeigt Kopf und Positionen an und registriert Repository-Methoden zum Speichern als Session-Operationen. |
 | `Rechnungskopf bearbeiten`        | `GRAPH_EDIT_CMD`  | Bearbeitet die Kopfdaten innerhalb der bestehenden Session des `GRAPH_OWNER_CMD`.                                              |
 | `Rechnungsposition bearbeiten`    | `GRAPH_EDIT_CMD`  | Bearbeitet eine Position innerhalb der bestehenden Session des `GRAPH_OWNER_CMD`.                                             |
@@ -166,12 +168,12 @@ Der ebenfalls verfügbare Typ `GRAPH_OWNER_CMD(modal)` wird in diesem Beispiel n
 
 Der Command `Rechnungen suchen` startet eine eigene Read-only-Session und besteht aus zwei Pages:
 
-1. **Suchfilter eingeben:** Ein Formular ist an das DTO `RechnungFilter` gebunden. Der Benutzer legt die Suchkriterien fest.
-2. **Suchergebnisse anzeigen:** Mit den Kriterien aus dem DTO wird die Methode `sucheRechnungen(filter)` des `RechnungsLeseRepo` aufgerufen. Sie führt benutzerdefiniertes SQL aus und legt die über ein No-Key-Mapper erzeugten `RechnungInfo`-DTOs in der Property `results` des Filter-DTOs ab. Eine Tabelle auf der zweiten Page zeigt diese Liste an.
+1. **Suchfilter eingeben:** Ein `Delegate Form` im `Page Pane` dieser Page ist an das DTO `RechnungFilter` gebunden. Der Benutzer legt die Suchkriterien fest.
+2. **Suchergebnisse anzeigen:** Mit den Kriterien aus dem DTO wird die Methode `sucheRechnungen(filter)` des `RechnungsLeseRepo` aufgerufen. Sie führt benutzerdefiniertes SQL aus und legt die über ein `nokeystore/read-only map` erzeugten `RechnungInfo`-DTOs in der Property `results` des Filter-DTOs ab. Eine `Table` im `Page Pane` der zweiten Page zeigt diese Liste an.
 
-Bei der Suche werden weder `Rechnung`-Entitäten noch deren Positionen geladen. Die Session des `SEARCH_CMD` kann nicht committed werden. Die Eingabe von Suchkriterien und das Befüllen von `results` im DTO sind davon unabhängig: Diese Daten dienen dem Suchablauf und werden nicht in die Datenbank geschrieben. Auch die `RechnungInfo`-Ergebnisse des No-Key-Mapper sind read-only und nicht Bestandteil der Session-Identity-Map.
+Bei der Suche werden weder `Rechnung`-Entities noch deren Positionen geladen. Die Session des `SEARCH_CMD` kann nicht committed werden. Die Eingabe von Suchkriterien und das Befüllen von `results` im DTO sind davon unabhängig: Diese Daten dienen dem Suchablauf und werden nicht in die Datenbank geschrieben. Auch die vom `nokeystore/read-only map` erzeugten `RechnungInfo`-DTOs sind read-only und nicht Bestandteil der Session-Identity-Map.
 
-Ein Doppelklick auf eine Tabellenzeile startet `Rechnung bearbeiten`. Als Parameter wird die Rechnungs-ID aus dem ausgewählten `RechnungInfo`-DTO übergeben. Bei erfolgreichem Abschluss pusht `Rechnung bearbeiten` die bearbeitete `Rechnung`; der Termination Handler der Suchseite übernimmt die geänderten Werte mit gewöhnlichen Anweisungen aus der Entity in das zugehörige `RechnungInfo`-DTO der Ergebnisliste. Die Suche wird dafür nicht wiederholt.
+Ein Doppelklick auf eine Tabellenzeile startet `Rechnung bearbeiten`. Als Parameter wird die Rechnungs-ID aus dem ausgewählten `RechnungInfo`-DTO übergeben. Bei erfolgreichem Abschluss pusht `Rechnung bearbeiten` die bearbeitete `Rechnung`; der Termination Handler der Suchergebnis-Page übernimmt die geänderten Werte mit gewöhnlichen Anweisungen aus der Entity in das zugehörige `RechnungInfo`-DTO der Ergebnisliste. Die Suche wird dafür nicht wiederholt.
 
 #### Rechnung und Positionen bearbeiten
 
@@ -187,9 +189,9 @@ Beim vorgesehenen Abschluss des `GRAPH_OWNER_CMD` wird eine Datenbanktransaktion
 
 Der Command `Summe aller Rechnungen anzeigen` hat den Typ `SEARCH_CMD` und verwendet eine eigene Read-only-Session. Er ruft `ladeSummeAllerRechnungen()` im `RechnungsLeseRepo` auf.
 
-Die Repository-Methode führt eine aggregierende SQL-Abfrage direkt auf der Datenbank aus. Ein No-Key-Mapper überführt deren Ergebnis in das read-only DTO `RechnungsSummenErgebnis`, das nicht in die Session-Identity-Map integriert wird. Der Command stellt dieses DTO für die Anzeige bereit. Ein Laden und anschließendes Durchlaufen aller Rechnungsentitäten in der Anwendung ist dafür nicht erforderlich.
+Die Repository-Methode führt eine aggregierende SQL-Abfrage direkt auf der Datenbank aus. Ein `nokeystore/read-only map` überführt deren Ergebnis in das read-only DTO `RechnungsSummenErgebnis`, das nicht in die Session-Identity-Map integriert wird. Der Command stellt dieses DTO für die Anzeige bereit. Ein Laden und anschließendes Durchlaufen aller `Rechnung`-Entities in der Anwendung ist dafür nicht erforderlich.
 
-### Benutzeroberfläche mit der DSL `org.modellwerkstatt.dataux`
+### Benutzeroberfläche mit DataUX
 
 Eine **Page** beschreibt eine Seite im Ablauf eines Commands. Das zugehörige **`Page Pane`** bildet ihr Gegenstück in der Benutzeroberfläche und nimmt deren UI-Inhalte auf. Formulare, Tabellen, Layouts und andere UI-Komponenten müssen jeweils innerhalb eines `Page Pane`s eingebunden sein, gegebenenfalls über darin enthaltene Layouts. `Page Pane`s können wiederverwendet werden.
 
@@ -203,7 +205,7 @@ Eine **Page** beschreibt eine Seite im Ablauf eines Commands. Das zugehörige **
 | `Page Pane` für die Positionsbearbeitung | Enthält ein `Delegate Form` zur Bearbeitung einer einzelnen Rechnungsposition im Command `Rechnungsposition bearbeiten`.                                                    |
 | `Page Pane` für die Summenanzeige        | Enthält ein `Delegate Form` zur Anzeige des DTOs `RechnungsSummenErgebnis`.                                                                                                 |
 
-Die Seitenfolge wird im jeweiligen Command beschrieben. Die zugeordneten `Page Pane`s und ihre enthaltenen UI-Komponenten legen Darstellung, Datenbindungen und angebotene Interaktionen fest.
+Die Folge der Pages wird im jeweiligen Command beschrieben. Die zugeordneten `Page Pane`s und ihre enthaltenen UI-Komponenten legen Darstellung, Datenbindungen und angebotene Interaktionen fest.
 
 ### Fachliche Prüfung und Qualitätssicherung
 
@@ -225,7 +227,7 @@ Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion m
 
 2. **Modellieren und versionieren:** Die Anwendung wird mit den DSLs in MPS modelliert und mit Git versioniert. MPS speichert die Modelle als XML-Dateien. Diese enthalten strukturierte Modelle mit Referenzen und Identitäten; ein rein textueller Merge kann deren Konsistenz verletzen. Für die Versionsverwaltung werden deshalb die Git-Unterstützung von MPS und der MPS-Merge-Driver verwendet. Modellkonflikte werden mit den modellbewussten Werkzeugen von MPS aufgelöst.
 
-3. **Datenbankschema erstellen:** Das Datenbankschema erstellt der Entwickler in MPS aus den `EntityMapping`s der Persistence Descriptions.
+3. **Datenbankschema erstellen:** Das Datenbankschema erstellt der Entwickler in MPS aus den `EntityMapping`s der `Persistence Description`s.
 
 4. **Laufzeitkonfiguration auswählen:** In der `OFXConfig` wird über **AppFactories** festgelegt, welche Laufzeitumgebung tatsächlich verwendet wird. Ein Projekt enthält häufig mehrere Konfigurationen.
 
@@ -254,7 +256,7 @@ Für die Entwicklung von Anwendungen gelten folgende Grundprinzipien:
 5. **Session und Transaktion gehören zum Anwendungsablauf, nicht zu einzelnen Repository-Aufrufen.**
    Repository-Methoden führen Datenzugriffsoperationen aus, bestimmen aber nicht selbst die fachliche Transaktionsgrenze. Der Session Owner – typischerweise ein `GRAPH_OWNER_CMD` – koordiniert Session und Transaktion. Speicher- und Löschoperationen werden als Session-Operationen registriert und erst beim erfolgreichen Abschluss ausgeführt und committed; bei einem Abbruch werden sie nicht ausgeführt.
 
-   Das gilt auch für datenbankveränderndes Custom SQL. `UPDATE`-, `DELETE`- oder andere `STATEMENT`-Operationen dürfen nicht unmittelbar ausgeführt werden, wenn ihre Wirkung zum erfolgreichen Abschluss des Anwendungsfalls gehört, sondern müssen in den Session-Operations-Ablauf eingebunden werden. Andernfalls könnten Änderungen bereits wirksam sein, obwohl der Benutzer den Graph Owner anschließend noch mit `ESC` abbricht.
+   Das gilt auch für datenbankveränderndes Custom SQL. `UPDATE`-, `DELETE`- oder andere `STATEMENT`-Operationen dürfen nicht unmittelbar ausgeführt werden, wenn ihre Wirkung zum erfolgreichen Abschluss des Anwendungsfalls gehört, sondern müssen in den Session-Operations-Ablauf eingebunden werden. Andernfalls könnten Änderungen bereits wirksam sein, obwohl der Benutzer den `GRAPH_OWNER_CMD` anschließend noch mit `ESC` abbricht.
 
 6. **Prüfen und Verändern sind möglichst klar zu trennen.**
    Fachliche Voraussetzungen und Precondition-Prüfungen sollen grundsätzlich erfolgen, bevor ein Objektgraph verändert wird. Dadurch hinterlässt ein abgebrochener Vorgang möglichst keinen teilweise veränderten Zustand. Abweichungen davon müssen eine bewusste fachliche Bedeutung haben und dürfen nicht zufällig aus der Reihenfolge technischer Operationen entstehen.

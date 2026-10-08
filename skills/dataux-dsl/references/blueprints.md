@@ -26,12 +26,12 @@ Every JSON string beginning with `TARGET_MODEL.` is intentionally unresolved and
 
 Prefer persistent `r:` references when the destination target has been resolved uniquely. Plain names are acceptable only when they are unambiguous in the role's scope.
 
-Names without the `TARGET_MODEL.` prefix inside a blueprint (`ExamplePair`, `inbox`, `inboxElement`) are intra-root references to sibling nodes of the same blueprint; keep them consistent when renaming, and check the dry-run warnings for them. Both module blueprints were verified by a real insert into a throwaway model: the only checker problems were placeholder-related (unresolved `configuration`, placeholder command call), while the intra-root name references (`pair`, `varRef`) resolved.
+Property values beginning with `Example` (`ExampleFormPage`, `ExampleApp`, `ExampleJob`, `ExamplePair`, `ExampleJobExceptionStrategy`) are sample names; replace them with the destination names. Names without the `TARGET_MODEL.` prefix inside a blueprint (`ExamplePair`, `inbox`, `inboxElement`) are intra-root references to sibling nodes of the same blueprint; keep them consistent when renaming, and check the dry-run warnings for them. Both module blueprints were verified by a real insert into a throwaway model: the only checker problems were placeholder-related (unresolved `configuration`, placeholder command call), while the intra-root name references (`pair`, `varRef`) resolved.
 
 ## Files
 
 - [page-pane-form-skeleton.json](blueprints/page-pane-form-skeleton.json): small complete PagePane root with a single form.
-- [table-subtree.json](blueprints/table-subtree.json): table over an owner list property with one column, `LABEL` and `SELECT FIRST`. Remove the `LabelFOption` when the table is the Page Pane's top element (its label is the Page Title). [UI conventions](../../../conventions/moware-werkbank-ui_v1.md)
+- [table-subtree.json](blueprints/table-subtree.json): table over an owner list property with one column, `LABEL` and `SELECT FIRST`. Remove the `LabelFOption` when the table is the Page Pane's top element (its label is the Page Title). [UI conventions](../../../conventions/mw-oberflaeche_v1.md)
 - [grid-master-detail-subtree.json](blueprints/grid-master-detail-subtree.json): compact form (row `-1`) above the list table (row `1*`), one column `1*`, table with `LABEL` and `SELECT FIRST`.
 - [tab-layout-subtree.json](blueprints/tab-layout-subtree.json): two tabs, one reusable include and one form.
 - [include-subtree.json](blueprints/include-subtree.json): minimal reusable UI reference.

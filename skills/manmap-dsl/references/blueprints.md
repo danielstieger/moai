@@ -6,7 +6,7 @@ Every JSON file in [blueprints](blueprints) uses fully qualified concept names a
 
 - Values named `$TARGET_*` are unresolved placeholders, not stable package references.
 - Before insertion, resolve each placeholder in the target model's applicable reference scope. Replace it with an unambiguous target name or, preferably for overloaded/duplicate names, the target model's persistent `r:` reference.
-- `$TARGET_*_NAME$`, `$TARGET_*_COLUMN$`, `$TARGET_*_TABLE$`, and `$TARGET_VIRTUAL_PACKAGE$` are property/literal placeholders and must be replaced with the intended text.
+- Text placeholders sit in property values and must be replaced with the intended text: `$TARGET_*_NAME$` (mapping, mapper, method, repository, persistence, sequence names), `$TARGET_TABLE$`, `$TARGET_COLUMN$`, `$TARGET_FOREIGN_KEY_COLUMN$`, `$TARGET_SQL_COLUMN_OR_ALIAS$` (column name or SQL alias in a `nokeystore/read-only map` field mapping), `$TARGET_ASSIGNMENT$` (the `column = value` part of the `UPDATE ... SET` statement), and `$TARGET_VIRTUAL_PACKAGE$`. Every other `$TARGET_*$` value is a reference target.
 - A dry-run warning about a remaining `$TARGET_*` reference means the production write would create a dynamic reference. Do not accept that warning accidentally.
 
 ## Root Skeletons

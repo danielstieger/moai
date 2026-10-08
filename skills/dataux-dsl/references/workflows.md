@@ -37,7 +37,7 @@ This separation follows the [MoWare ownership map](../../../docu/moware-werkbank
 4. Bind the form to the page root and the table to the owner/list property; one column `1*`, the form row `-1`, the table row `1*`, no left/right split.
 5. Keep the table's `LabelFOption` (set the text) unless the table is the Page Pane's top element; keep `SelectFirstFOption` only when an initial selection is desired.
 6. Add delegates for both types; give every table delegate a `WidthDOption` (percentages add up to 100).
-7. Put the table's actions, including the `ENTER` main action, into one text-less `MenuSub` (see [menu-submenu-subtree.json](blueprints/menu-submenu-subtree.json)). [UI conventions](../../../conventions/moware-werkbank-ui_v1.md)
+7. Put the table's actions, including the `ENTER` main action, into one text-less `MenuSub` (see [menu-submenu-subtree.json](blueprints/menu-submenu-subtree.json)). [UI conventions](../../../conventions/mw-oberflaeche_v1.md)
 8. Validate behavior for empty lists and cleared selection. [Empty selection](../../../docu/dataux.md#leere-selektion) and [master-detail behavior](../../../docu/dataux.md#master-detail)
 
 ## Add tabs
@@ -65,11 +65,11 @@ This separation follows the [MoWare ownership map](../../../docu/moware-werkbank
 5. Use `MenuCompoundAction` only after confirming Graph Owner/Edit and conclusion semantics. [Compound action behavior](../../../docu/dataux.md#menüs-und-command-aktionen)
 6. Validate the DataUX root and the referenced Command root.
 
-Put the entries in the text-less `Submenu`, including the `ENTER` main action; actions before submenus, one overflow, top level only (checker). [UI conventions](../../../conventions/moware-werkbank-ui_v1.md), [menu rules](../../../docu/dataux.md#menüs-und-command-aktionen)
+Put the entries in the text-less `Submenu`, including the `ENTER` main action; actions before submenus, one overflow, top level only (checker). [UI conventions](../../../conventions/mw-oberflaeche_v1.md), [menu rules](../../../docu/dataux.md#menüs-und-command-aktionen)
 
 ## Create an AppUI Module
 
-1. Place the root in the application's `app` model (`<firma>.<app>.app`), the only model that holds `AppUI Module` and `BatchJob Module`. [Model layering](../../../conventions/moware-werkbank-modularisierung_v1.md#solutions-und-modelle)
+1. Place the root in the application's `app` model (`<firma>.<app>.app`), the only model that holds `AppUI Module` and `BatchJob Module`. [Model layering](../../../conventions/mw-anwendungsaufbau_v1.md#solutions-und-modelle)
 2. Resolve the `OFXConfig` root in `<firma>.<app>.base` and set it as `TARGET_MODEL.OFXConfig`. `configuration` is always required although only start-ups from MPS, FX8, or standalone use it. [Configuration note](../../../docu/dataux.md#teil-ii--anwendung-und-batchjob)
 3. Copy [appui-module-skeleton.json](blueprints/appui-module-skeleton.json); give the module a name without spaces.
 4. Replace `TARGET_MODEL.Command` in `mainMenu` and in the tile with the commands the user starts; add one `MenuAction` per entry command to `mainMenu` (business entries), `extrasMenu` (rare functions), or `helpMenu`. Use `MenuSub` for grouping. Module actions have no selection, so give them no `getSelected()` arguments. [Navigation](../../../docu/dataux.md#anwendung-mit-appui-module)

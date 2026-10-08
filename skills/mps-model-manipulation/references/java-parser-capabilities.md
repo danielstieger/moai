@@ -70,7 +70,7 @@ These concepts live in `jetbrains.mps.lang.smodel` and are not parseable from Ja
 | MPS notation | Concept | Workaround |
 |---|---|---|
 | `node.link` or `node:Concept.link` | `SLinkAccess` inside `DotExpression` | Already in tree; keep it, or use `SLinkOperations.getTarget` in parsed Java |
-| `node:SomeConcept` (type-cast) | `SNodeTypeCastExpression` | Cannot be parsed; if you need the casted node as an argument, restructure: pass the uncasted node and derive the cast inside the Java method |
+| `node:SomeConcept` (type-cast) | `SNodeTypeCastExpression` | Cannot be parsed; if you need the cast node as an argument, restructure: pass the node before the cast and derive the cast inside the Java method |
 | `.someBehaviorMethod()` (behavior method call) | `Node_ConceptMethodCall` | Cannot be parsed; build the `DotExpression` by hand (see `dot-expression-basics.md`) or call the generated behavior descriptor directly: `<Concept>__BehaviorDescriptor.<method>_id<…>.invoke(node)` |
 | `node.parent:C` | `DotExpression(Node_GetParentOperation, SNodeTypeCastExpression)` | Cannot be parsed; use `SNodeOperations.getParent(node)` + `SNodeOperations.cast(...)` in parsed Java |
 

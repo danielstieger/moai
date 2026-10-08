@@ -56,7 +56,7 @@ Menu and tile actions of a module run outside any PagePane. Arguments that use s
 
 ## RUN_IN_CONSOLE is deprecated by the checker
 
-`OptRunInConsole` yields "No longer supported. Just use the 'org.modellwerkstatt.objectflow.job.console.ConsoleBatchJobAppFactory' in your configuration." The documentation still lists `RUN_IN_CONSOLE`; configure the console factory in the `OFXConfig` instead. `OptIncludeBatchUi` is checked with "The included job is not a batchjob containg relevant commands." when the referenced job has no commands with pages.
+`OptRunInConsole` yields "No longer supported. Just use the 'org.modellwerkstatt.objectflow.job.console.ConsoleBatchJobAppFactory' in your configuration." Configure the console factory in the `OFXConfig` instead. `OptIncludeBatchUi` is checked with "The included job is not a batchjob containg relevant commands." when the referenced job has no commands with pages.
 
 ## Module names without spaces
 

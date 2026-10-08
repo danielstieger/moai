@@ -1,6 +1,6 @@
 # ManMap Concept and Role Map
 
-The live MPS descriptor exposes 94 concepts. Exactly two are rootable: `PersistenceDescription` and `Repository`. No hollow runtime descriptors were observed during generation of this memory.
+The live MPS descriptor exposes 94 concepts. Exactly two are rootable: `PersistenceDescription` and `Repository`. No hollow runtime descriptors were observed when this inventory was recorded.
 
 Use `mps_mcp_get_concept_details` again before relying on this inventory after a language upgrade. The language reference is recorded in the parent [SKILL.md](../SKILL.md). Use the FQ names from the Kapitellandkarten in JSON blueprints; resolve references, child roles and cardinalities via MPS MCP in the current project before changing a model.
 

@@ -13,7 +13,7 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 - Use the packaged solution `org.modellwerkstatt.dataux.tests` for stable examples. Its verified model and node references are in [references/sandbox.md](references/sandbox.md).
 - Use the package documentation for semantics and runtime behavior; start with the [ObjectFlow scope](../../docu/objectflow.md#modellierungsumfang-und-ausdrucksmöglichkeiten) and the [MoWare responsibility map](../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin).
 - Never persist a project path, editor-session state, or references from an application project.
-- For targets outside the packaged solution, use explicit placeholders such as `TARGET_OFX_CONFIG`, then resolve them before writing. `OFXConfig`s live in `<firma>.<app>.base`; the destination model imports that model and references the config, it never holds its own copy. [Model layering](../../conventions/moware-werkbank-modularisierung_v1.md#solutions-und-modelle)
+- For targets outside the packaged solution, use explicit placeholders such as `TARGET_OFX_CONFIG`, then resolve them before writing. `OFXConfig`s live in `<firma>.<app>.base`; the destination model imports that model and references the config, it never holds its own copy. [Model layering](../../conventions/mw-anwendungsaufbau_v1.md#solutions-und-modelle)
 
 ## Critical rules
 

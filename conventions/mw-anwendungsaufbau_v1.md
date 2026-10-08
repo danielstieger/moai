@@ -34,7 +34,7 @@ Die folgende Tabelle ist verbindlich: Ein Modell enthält, was unter „Inhalt�
 | `…<bereich>.read` | 2 | Alles, was nur liest: Abfragen und lesende Repositories; Lesemodelle als DTO mit Custom SQL oder als gemappte Abfrage; read-only Entities, gemappt mit `EntityMapping` oder `nokeystore/read-only map`, bei Bedarf mit eigener, lesender Persistence Description; Such- und Filter-DTOs; Regeln, Berechnungen und Services, die nur lesen | Ebenen 1 und 2 | Code, der Entities verändert |
 | `…<bereich>.unit` | 3 | Commands mit oder ohne Page samt Pages, Page Panes und Menüs; DTOs, die nur einem Command und seinen Page Panes dienen | Ebenen 1 und 2; von anderen `unit` nur deren Commands | fachliche Logik (gehört ins `domain` oder `read`) |
 | `<firma>.<app>.app` | 4 | `AppUI Module`, `BatchJob Module` | Ebenen 1 bis 3 | – |
-| `…<bereich>.tests` | – | Tests der Regeln, der Persistenz, der Lesemodelle und der Commands; Testdaten nach den [Konventionen für Tests](moware-werkbank-tests_v1.md) | alle Modelle der Anwendung, andere `tests`, Modelle der Solution `org.modellwerkstatt.wbkit` | – |
+| `…<bereich>.tests` | – | Tests der Regeln, der Persistenz, der Lesemodelle und der Commands; Testdaten nach den [Konventionen für Tests](mw-tests_v1.md) | alle Modelle der Anwendung, andere `tests`, Modelle der Solution `org.modellwerkstatt.wbkit` | – |
 | `…gate.<fremdsystem>.tests` | – | Tests des Gates; schreibende Mappings auf das Fremdsystem, die nur Tests brauchen | wie `tests` | – |
 
 ### Abhängigkeiten
@@ -55,7 +55,6 @@ Die folgende Tabelle ist verbindlich: Ein Modell enthält, was unter „Inhalt�
 
 ### Bereiche schneiden
 
-- **KONVENTION:** Invarianten gehören zum Aggregat und werden am vollständig geladenen Aggregat geprüft. Reicht eine Regel über das Aggregat hinaus, wird zuerst geprüft, ob das Aggregat richtig geschnitten ist. Bleibt die Regel aggregatübergreifend, liegt sie in einem Service, der die nötigen Fakten liest.
 - **KONVENTION:** Ein Aggregat-Bereich enthält in der Regel ein Aggregat. Mehrere Aggregate liegen in einem Bereich, wenn keines ohne die anderen verwendet wird. Der Bereich heißt nach dem führenden Aggregat, wenn die anderen ihm nur zuarbeiten, sonst nach dem Fachbegriff für das Ganze; findet sich keiner, gehören die Aggregate in getrennte Bereiche. Jedes Aggregat bleibt eine eigene Konsistenzgrenze mit eigenem Repository.
 - **KONVENTION:** Ein Use Case liegt in dem Bereich, zu dem er gehört, auch mit eigenen DTOs, Commands oder Lese-Services. Betrifft er zwei Bereiche und führt einer davon, liegt er im führenden Bereich; dessen Service liest die Fakten aus dem anderen.
 - **KONVENTION:** Ein Use-Case-Bereich entsteht nur, wenn ein Ablauf mehrere eigenständige Bereiche gleichrangig verändert oder eigene Daten führt, die nur diesem Ablauf dienen.

@@ -13,7 +13,7 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 - Use the package documentation for semantics and runtime behavior; start with [DataUX UI modeling](../../docu/dataux.md#teil-i--ui-modellierung) and the [MoWare responsibility map](../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin).
 - The shipped solution `org.modellwerkstatt.dataux.tests` supplies the stable examples recorded in [references/sandbox.md](references/sandbox.md). It is useful but does not cover every UI shape.
 - Never persist a project path, editor-session state, or references from an application project.
-- For target-model classifiers, properties, commands, conclusions, labels, and reusable UI roots, replace the explicit `TARGET_MODEL.*` placeholders immediately before insertion.
+- For target-model classifiers, properties, commands, the `OFXConfig`, and reusable UI roots, replace the explicit `TARGET_MODEL.*` placeholders immediately before insertion.
 
 ## Critical rules
 
@@ -27,7 +27,7 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 - Dry-run JSON first and inspect warnings. After a real change, run `mps_mcp_check_root_node_problems` on each changed root; generate or build when the task requires it.
 - Inner forms, tables, and layouts need `isNamed = false` and `name = "#"`; JSON insertion sets `isNamed = true`. Name an element only when it is reused with `Include`. See [inner UI elements](references/gotchas.md#inner-ui-elements-must-stay-unnamed).
 - `OPTIONAL`, `LENGTH`/`RANGE`, empty input and `null`: see [Pflichtwerte, leere Eingaben und `null`](../../docu/dataux.md#pflichtwerte-leere-eingaben-und-null).
-- Main table action with hotkey `ENTER` (double-click/Enter): see [Menüs und Command-Aktionen](../../docu/dataux.md#menüs-und-command-aktionen) and the [UI conventions](../../conventions/moware-werkbank-ui_v1.md).
+- Main table action with hotkey `ENTER` (double-click/Enter): see [Menüs und Command-Aktionen](../../docu/dataux.md#menüs-und-command-aktionen) and the [UI conventions](../../conventions/mw-oberflaeche_v1.md).
 - Modules live in `<firma>.<app>.app` and reference an `OFXConfig` from `<firma>.<app>.base`. Both module kinds require `configuration`, `isAuthenticated`, and one `VERSION`; a `BatchJob Module` additionally requires an exception strategy ending with a default rule and exactly one `CONSUMERS` per pair with a consumer. Never create `onStartup`/`onShutdown`. See [module gotchas](references/gotchas.md#modules-need-a-configuration-and-a-version) and [executable modules](../../docu/dataux.md#teil-ii--anwendung-und-batchjob).
 - Keep business rules out of UI expressions. DataUX should remain presentation-oriented “CheapCode”; see the [MoWare development principles](../../docu/moware-werkbank.md#grundprinzipien-für-die-anwendungsentwicklung).
 
@@ -69,7 +69,7 @@ The shipped examples solution may be globally visible instead of belonging to th
 - [Typical UI modeling workflow](../../docu/dataux.md#typischer-ui-modellierungsablauf)
 - [AppUI Module: navigation, tiles, isAuthenticated](../../docu/dataux.md#anwendung-mit-appui-module)
 - [BatchJob Module: pairs, options, exception strategy](../../docu/dataux.md#batchjob-mit-batchjob-module)
-- [Model layering: `base`, `app`](../../conventions/moware-werkbank-modularisierung_v1.md#solutions-und-modelle)
+- [Model layering: `base`, `app`](../../conventions/mw-anwendungsaufbau_v1.md#solutions-und-modelle)
 - [ObjectFlow Pages and Page Conclusions](../../docu/objectflow.md#pages-und-page-conclusions)
 - [MoWare DSL interaction](../../docu/moware-werkbank.md#zusammenspiel-der-dsls)
 

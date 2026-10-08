@@ -43,7 +43,7 @@ Use Successors for one atomic Unit of Work; use `session queue next command` for
 ## Create an ObjectFlow test
 
 1. Insert [test-suite-skeleton.json](blueprints/test-suite-skeleton.json).
-2. Replace `TARGET_OFX_CONFIG` with the test `OFXConfig` from `<firma>.<app>.base`; add that model as a dependency of the `tests` model if it is missing. [Model layering](../../../conventions/moware-werkbank-modularisierung_v1.md#solutions-und-modelle)
+2. Replace `TARGET_OFX_CONFIG` with the test `OFXConfig` from `<firma>.<app>.base`; add that model as a dependency of the `tests` model if it is missing. [Model layering](../../../conventions/mw-anwendungsaufbau_v1.md#solutions-und-modelle)
 3. Add configured components and test content incrementally.
 4. Use `Simple Test` for session-aware domain/service/repository tests. [OFXTestSuit](../../../docu/objectflow.md#ofxtestsuit)
 5. Use `run command` to model expected Pages, forced Conclusions, child Commands, Successors, cancellation, and passed-forward values. [Commands without UI](../../../docu/objectflow.md#commands-ohne-ui-ausführen)

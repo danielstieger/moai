@@ -108,7 +108,7 @@ See [form and table options](../../../docu/dataux.md#optionen-für-formulare-und
 | `PageConclusionOptionUserCancel` | auto-conclusion option that ends the command like a user cancel (`cancel`); no continuation |
 | `MenuSeparator` | separator marker |
 
-Menu placement (overflow `MenuSub`, checker rules) and selection context: see [Menüs und Command-Aktionen](../../../docu/dataux.md#menüs-und-command-aktionen) and the [UI conventions](../../../conventions/moware-werkbank-ui_v1.md).
+Menu placement (overflow `MenuSub`, checker rules) and selection context: see [Menüs und Command-Aktionen](../../../docu/dataux.md#menüs-und-command-aktionen) and the [UI conventions](../../../conventions/mw-oberflaeche_v1.md).
 
 Command availability, parameters, permissions, and conclusions remain ObjectFlow concerns. [ObjectFlow command parameters and selection](../../../docu/objectflow.md#parameter-defaults-und-selektion) and [Page Conclusions](../../../docu/objectflow.md#page-conclusions)
 
