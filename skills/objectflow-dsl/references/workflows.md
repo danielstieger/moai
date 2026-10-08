@@ -14,6 +14,8 @@
 
 ## Add or change domain logic
 
+Apply the domain conventions (invariants, state transitions as Service Methods, values). [Domain conventions](../../../conventions/mw-domaenenmodell_v1.md)
+
 1. Keep calculations and invariant-preserving behavior on the domain structure when they need no infrastructure.
 2. Use a stateless Service for cross-object coordination or repository/service access. [Service placement](../../../docu/objectflow.md#service-komponenten)
 3. Invoke configured components through `OperationCall` (`#`). [Operation calls](../../../docu/objectflow.md#komponenten-mit--aufrufen)
@@ -24,6 +26,8 @@
 Load `moai:mps-baselanguage` whenever writing method bodies or expressions.
 
 ## Create a command
+
+Apply the command conventions (naming, owner/edit split, returning results to a search). [Command conventions](../../../conventions/mw-commands_v1.md)
 
 1. Pick the command type from its ownership and commit semantics, not its visual appearance. [Command types](../../../docu/objectflow.md#die-vier-command-typen)
 2. Insert [command-skeleton.json](blueprints/command-skeleton.json) and set a space-containing user-facing name.
@@ -41,6 +45,8 @@ Prefer `NEWSTYLE_CMD_TERM_HANDLING`: consume pushed values in a termination hand
 Use Successors for one atomic Unit of Work; use `session queue next command` for a post-commit UI flow. [Successors](../../../docu/objectflow.md#successor-commands) and [post-commit queue](../../../docu/objectflow.md#command-nach-dem-commit-einplanen)
 
 ## Create an ObjectFlow test
+
+Apply the test conventions (test data through `CS` and `TestDaten`, one test per state transition and per blocking Precondition). [Test conventions](../../../conventions/mw-tests_v1.md)
 
 1. Insert [test-suite-skeleton.json](blueprints/test-suite-skeleton.json).
 2. Replace `TARGET_OFX_CONFIG` with the test `OFXConfig` from `<firma>.<app>.base`; add that model as a dependency of the `tests` model if it is missing. [Model layering](../../../conventions/mw-anwendungsaufbau_v1.md#solutions-und-modelle)
