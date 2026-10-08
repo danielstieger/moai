@@ -51,7 +51,7 @@ Der gesamte Stack orientiert sich stark an Domain-Driven Design (DDD), übernimm
 
 ### Bezeichnung der Konzepte
 
-Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der **Konzeptname** bezeichnet das technische AST-Konzept; der **FQ-Name** ist dessen vollständig qualifizierter Name. Die Kapitellandkarten der DSL-Dokumentationen führen alle drei Bezeichnungen zusammen; bei dort fehlenden Konzepten ergänzt der Fließtext beim ersten Auftreten den Konzeptnamen beziehungsweise bei Konzepten aus anderen Sprachen den FQ-Namen in Klammern und verwendet danach nur noch den Namen. Hat ein Konzept keine als Wort benennbare Projektion, wird sein Konzeptname verwendet. Umschreibungen und Kurzformen treten nicht an die Stelle von Projektion oder Konzeptname. Zwei Ausnahmen: `Service` und `OFXConfig` werden mit ihrem Konzeptnamen bezeichnet, obwohl der Editor `component` beziehungsweise `Configuration` zeigt.
+Der **Name** eines Konzepts entspricht seiner sichtbaren Projektion in MPS. Der **Konzeptname** bezeichnet das technische AST-Konzept; der **FQ-Name** ist dessen vollständig qualifizierter Name. Die Kapitellandkarten der DSL-Dokumentationen führen alle drei Bezeichnungen zusammen; bei dort fehlenden Konzepten ergänzt der Fließtext beim ersten Auftreten den Konzeptnamen beziehungsweise bei Konzepten aus anderen Sprachen den FQ-Namen in Klammern und verwendet danach nur noch den Namen. Hat ein Konzept keine als Wort benennbare Projektion, wird sein Konzeptname verwendet. Umschreibungen und Kurzformen treten nicht an die Stelle von Projektion oder Konzeptname. Zwei Ausnahmen: `Service` und `OFXConfig` werden mit ihrem Konzeptnamen bezeichnet, obwohl der Editor `component` beziehungsweise `Configuration` zeigt. Die Schreibweisen `OFXTestSuit` und `Static Ressources` sind historisch beibehalten und keine Tippfehler.
 
 ## Zusammenspiel der DSLs
 
@@ -145,10 +145,12 @@ Zwei Repositories kapseln die Datenbankzugriffe. Das `RechnungsRepo` lädt und s
 | ------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `RechnungsRepo`     | `checkout(id)`               | Lädt die Rechnung und explizit ihre Positionen zur Bearbeitung. Stellt den vollständigen Rechnungsgraphen zusammen.                                                           |
 | `RechnungsRepo`     | `checkin(rechnung)`          | Speichert die bearbeitete Rechnung einschließlich der zugehörigen Änderungen an ihren Positionen.                                                                             |
-| `RechnungsLeseRepo` | `sucheRechnungen(filter)`    | Übersetzt die Suchkriterien aus `RechnungFilter` in eine benutzerdefinierte SQL-Abfrage. Ein `nokeystore/read-only map` überführt jede Ergebniszeile in ein read-only `RechnungInfo`-DTO. |
-| `RechnungsLeseRepo` | `ladeSummeAllerRechnungen()` | Führt die Aggregation direkt per SQL in der Datenbank aus. Ein `nokeystore/read-only map` überführt das Ergebnis in das read-only DTO `RechnungsSummenErgebnis`.                           |
+| `RechnungsLeseRepo` | `sucheRechnungen(filter)`    | Übersetzt die Suchkriterien aus `RechnungFilter` in eine benutzerdefinierte SQL-Abfrage und liefert je Ergebniszeile ein `RechnungInfo`-DTO. |
+| `RechnungsLeseRepo` | `ladeSummeAllerRechnungen()` | Führt die Aggregation direkt per SQL in der Datenbank aus und liefert das Ergebnis als DTO `RechnungsSummenErgebnis`.                           |
 
-Die Suche lädt keine `Rechnung`-Entities. Die benutzerdefinierte SQL-Abfrage liest nur die für die Ergebnisliste benötigten Daten; das `nokeystore/read-only map` bildet jede Zeile auf ein `RechnungInfo`-DTO ab. Diese DTOs sind read-only und werden nicht in die Session-Identity-Map integriert. Erst beim Öffnen eines Suchergebnisses wird anhand seiner Rechnungs-ID die zugehörige `Rechnung` einschließlich ihrer Positionen zur Bearbeitung explizit geladen.
+Beide Methoden des `RechnungsLeseRepo` bilden ihre Ergebniszeilen über ein `nokeystore/read-only map` auf DTOs ab. Diese DTOs sind read-only und werden nicht in die Session-Identity-Map integriert.
+
+Die Suche lädt keine `Rechnung`-Entities. Die benutzerdefinierte SQL-Abfrage liest nur die für die Ergebnisliste benötigten Daten. Erst beim Öffnen eines Suchergebnisses wird anhand seiner Rechnungs-ID die zugehörige `Rechnung` einschließlich ihrer Positionen zur Bearbeitung explizit geladen.
 
 Auch für die Summe aller Rechnungen werden keine vollständigen Rechnungsgraphen aufgebaut. Die Datenbank berechnet das Aggregationsergebnis, das anschließend als DTO zur Anzeige bereitsteht. Diese Auswertung umfasst alle Rechnungen und ist unabhängig vom aktuellen Suchfilter.
 
@@ -169,9 +171,9 @@ Der ebenfalls verfügbare Typ `GRAPH_OWNER_CMD(modal)` wird in diesem Beispiel n
 Der Command `Rechnungen suchen` startet eine eigene Read-only-Session und besteht aus zwei Pages:
 
 1. **Suchfilter eingeben:** Ein `Delegate Form` im `Page Pane` dieser Page ist an das DTO `RechnungFilter` gebunden. Der Benutzer legt die Suchkriterien fest.
-2. **Suchergebnisse anzeigen:** Mit den Kriterien aus dem DTO wird die Methode `sucheRechnungen(filter)` des `RechnungsLeseRepo` aufgerufen. Sie führt benutzerdefiniertes SQL aus und legt die über ein `nokeystore/read-only map` erzeugten `RechnungInfo`-DTOs in der Property `results` des Filter-DTOs ab. Eine `Table` im `Page Pane` der zweiten Page zeigt diese Liste an.
+2. **Suchergebnisse anzeigen:** Mit den Kriterien aus dem DTO wird die Methode `sucheRechnungen(filter)` des `RechnungsLeseRepo` aufgerufen. Sie führt benutzerdefiniertes SQL aus und legt die erzeugten `RechnungInfo`-DTOs in der Property `results` des Filter-DTOs ab. Eine `Table` im `Page Pane` der zweiten Page zeigt diese Liste an.
 
-Bei der Suche werden weder `Rechnung`-Entities noch deren Positionen geladen. Die Session des `SEARCH_CMD` kann nicht committed werden. Die Eingabe von Suchkriterien und das Befüllen von `results` im DTO sind davon unabhängig: Diese Daten dienen dem Suchablauf und werden nicht in die Datenbank geschrieben. Auch die vom `nokeystore/read-only map` erzeugten `RechnungInfo`-DTOs sind read-only und nicht Bestandteil der Session-Identity-Map.
+Bei der Suche werden weder `Rechnung`-Entities noch deren Positionen geladen. Die Session des `SEARCH_CMD` kann nicht committed werden. Die Eingabe von Suchkriterien und das Befüllen von `results` im DTO sind davon unabhängig: Diese Daten dienen dem Suchablauf und werden nicht in die Datenbank geschrieben.
 
 Ein Doppelklick auf eine Tabellenzeile startet `Rechnung bearbeiten`. Als Parameter wird die Rechnungs-ID aus dem ausgewählten `RechnungInfo`-DTO übergeben. Bei erfolgreichem Abschluss pusht `Rechnung bearbeiten` die bearbeitete `Rechnung`; der Termination Handler der Suchergebnis-Page übernimmt die geänderten Werte mit gewöhnlichen Anweisungen aus der Entity in das zugehörige `RechnungInfo`-DTO der Ergebnisliste. Die Suche wird dafür nicht wiederholt.
 
@@ -189,7 +191,7 @@ Beim vorgesehenen Abschluss des `GRAPH_OWNER_CMD` wird eine Datenbanktransaktion
 
 Der Command `Summe aller Rechnungen anzeigen` hat den Typ `SEARCH_CMD` und verwendet eine eigene Read-only-Session. Er ruft `ladeSummeAllerRechnungen()` im `RechnungsLeseRepo` auf.
 
-Die Repository-Methode führt eine aggregierende SQL-Abfrage direkt auf der Datenbank aus. Ein `nokeystore/read-only map` überführt deren Ergebnis in das read-only DTO `RechnungsSummenErgebnis`, das nicht in die Session-Identity-Map integriert wird. Der Command stellt dieses DTO für die Anzeige bereit. Ein Laden und anschließendes Durchlaufen aller `Rechnung`-Entities in der Anwendung ist dafür nicht erforderlich.
+Die Repository-Methode führt eine aggregierende SQL-Abfrage direkt auf der Datenbank aus. Der Command stellt das resultierende DTO `RechnungsSummenErgebnis` für die Anzeige bereit. Ein Laden und anschließendes Durchlaufen aller `Rechnung`-Entities in der Anwendung ist dafür nicht erforderlich.
 
 ### Benutzeroberfläche mit DataUX
 
