@@ -10,13 +10,13 @@ ManMap models relational persistence and read models for MoWare applications. `P
 ## Critical Rules
 
 - Use MPS MCP tools; never read or edit raw `.mps` / `.mpl` XML (rule and fallback: [`MPS_AGENT_GUIDE.md`](../../MPS_AGENT_GUIDE.md#never-read-raw-mps-model-files)).
-- Determine the target MPS project dynamically with `mps_mcp_list_open_projects`; never reuse a path recorded by this skill.
+- Never persist a project path or IDE-session state.
 - Discover the language by its qualified name `org.modellwerkstatt.manmap`. Query concepts with `l:5aaa957f-3447-4783-b1f7-b301fa3e0394:org.modellwerkstatt.manmap`, not the module reference syntax.
-- Use fully qualified concept names in JSON blueprints.
+- Use the `qualifiedName` as `concept` in blueprints (`moai:mps-mcp-workflow`, `references/node-editing-rules.md`).
 - Treat every `$TARGET_*` value in a blueprint as a required target-model placeholder. Resolve it by scope or replace it with a persistent `r:` node reference from the target model immediately before insertion.
 - Never copy persistent references from an application example into another model. The stable references in [sandbox.md](references/sandbox.md) are read-only navigation and verification anchors, not insertion values.
 - Prefer skeleton-plus-subtree construction for persistence descriptions and repositories. Preserve existing node IDs with surgical updates.
-- A mapping never implies lazy loading, cascading save, or cascading delete. Load references and lists explicitly: usually with separate queries, or with `refJoin`/`listJoin`, which is recommended mainly when the query filters or sorts on the joined mapping. [Explicit loading](../../docu/manmap.md#explizites-laden)
+- No lazy loading, no cascading save/delete; references and lists are loaded explicitly (separate queries or `refJoin`/`listJoin`): see [Explizites Laden](../../docu/manmap.md#explizites-laden) and [Referenzen, eingebettete Werte und Listen](../../docu/manmap.md#referenzen-eingebettete-werte-und-listen).
 - In a blueprint, set `MappingReference.mappingSource` to the name of the query's `EntityMapping`; it resolves to the enclosing query even within the same blueprint. See [mapped query workflow](references/workflows.md#build-a-mapped-query).
 - New `QueryFromMap` nodes default to `readOnly = true`. Set `readOnly = false` deliberately for queries that check out data for editing.
 - Validate changed roots with `mps_mcp_check_root_node_problems`; then run task-required generation or build checks.
@@ -24,7 +24,7 @@ ManMap models relational persistence and read models for MoWare applications. `P
 
 ## Quick Start
 
-1. Call `mps_mcp_list_open_projects` and select the intended target project from the user's task or editor focus. Ask when multiple candidates remain ambiguous.
+1. Identify the target project (`moai:mps-mcp-workflow`, "Which project the tools act on"); call `mps_mcp_list_open_projects` only after a "no/multiple projects" error.
 2. Resolve the editable target model and its ObjectFlow entity/property declarations.
 3. Start with a JSON file from [references/blueprints](references/blueprints) and replace every `$TARGET_*` placeholder.
 4. Dry-run a new root with `mps_mcp_insert_root_node_from_json`.

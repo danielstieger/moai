@@ -50,7 +50,7 @@ The AST inventory below complements the semantic rules in [repositories and the 
 Other reusable repository members include:
 
 - `RowMapperField`: property `name`; required `rowMapper: ClosureLiteral`.
-- `NoKeyMapperField`: property `name`; required `classConcept` reference; `atomMpig` field/include mappings.
+- `NoKeyMapperField`: property `name`; required `classConcept` reference; `atomMpig` field/include mappings. To reuse an `EntityMapping` for custom SQL results, put an `IncludeMapping` into its `atomMpig`; an `EntityMapping` cannot be referenced directly as a SQL row mapper.
 - `SqlStringField`: property `name`; required `sqlString: SqlString`.
 - `RowMapperFieldRef`, `NoKeyMapperFieldRef`, and `SqlStringFieldRef`: references to those members.
 
@@ -64,16 +64,18 @@ For operation ordering, filter semantics, joins, and loading behavior, see [mapp
 | --- | --- |
 | `GetQuery` | required `argument: Expression` |
 | `WhereQuery` | required `filter: Expression` |
-| `SortByQuery` | required `toComparable: Expression`; `sortDirection = ASC|DESC` |
+| `SortByQuery` | required `toComparable: Expression`; `sortDirection = ASC\|DESC` |
 | `LimitQuery` | required `count: Expression` |
 | `SizeQuery` | no additional child |
 | `ReloadQuery` | required `argument: Expression` |
-| `RefJoinOption` | references `refMapping` and target `entityMapping`; `readOnly = ReadOnly|Checkout` |
-| `ListJoinOption` | reference `listMapping`; `readOnly = ReadOnly|Checkout` |
-| `MappingReference` | references `mappingSource` and `fieldMapping`; `option = NOP|TO_LOCALDATE|TO_LOWERCASE|TO_UPPERCASE` |
+| `RefJoinOption` | references `refMapping` and target `entityMapping`; `readOnly = ReadOnly\|Checkout` |
+| `ListJoinOption` | reference `listMapping`; `readOnly = ReadOnly\|Checkout` |
+| `MappingReference` | references `mappingSource` and `fieldMapping`; `option = NOP\|TO_LOCALDATE\|TO_LOWERCASE\|TO_UPPERCASE` |
 | `InOperation` | `operand: MappingReference`, `targetList: Expression` |
 | `LikeOperator` | `operand: Expression`, `target: Expression` |
 | `OptionalOperator` | `expression: Expression` |
+
+`WhereQuery.filter`, `SortByQuery.toComparable` and `LimitQuery.count` take a plain `Expression`; the editor's brace/parameter projection of `where` is not a `ClosureLiteral` — never wrap the filter in a closure. `MappingReference` is itself an `Expression` (type = type of the referenced property), requires both `mappingSource` and `fieldMapping`, and is valid only inside `where`/`sortBy`.
 
 Only joins present on the query extend the `MappingReference.mappingSource` scope. An alternate table is not a mapping instance and does not extend that scope.
 
@@ -82,7 +84,7 @@ Only joins present on the query extend the `MappingReference.mappingSource` scop
 The operational semantics are documented under [`save with`](../../../docu/manmap.md#speichern-mit-save-with), [saving object graphs](../../../docu/manmap.md#speichern-von-objektgraphen), and [`delete with`](../../../docu/manmap.md#löschen-mit-delete-with).
 
 - `SaveWithMap`: statement; required `entityMapping` reference and `expression` child; optional `SaveOption` children.
-- `DeleteWithMap`: statement; same essential shape; delete uses the loaded entity key.
+- `DeleteWithMap`: statement; same essential shape.
 - Save options: `InsertSaveOption`, `UpdateSaveOption`, `BatchSaveOption`, `ForceAuditSaveOption`, `SkipAuditSaveOption`, and `AdditionalTableReference`.
 
 ## Direct SQL (C2)
@@ -93,7 +95,7 @@ Use [Custom SQL](../../../docu/manmap.md#custom-sql-mit-sql), [SQL query versus 
 
 Key concepts are `C2SqlText`, `C2SqlWordVarReference`, `C2Dot`, `C2PropertyReference`, `C2EntityKeyPropReference`, `C2MethodReference`, `C2SqlStatusReference`, `C2SqlIntegration`, and `SqlNamedParameter`.
 
-Prefer specific C2 references and named parameters. `C2SqlIntegration` exists for legacy or strongly dynamic SQL and supports optional SQL expression, ordered arguments, and named parameters.
+`C2SqlIntegration` has an optional `sqlString` expression, ordered `arguments`, and `SqlNamedParameter` children; when to use it: see [Custom SQL](../../../docu/manmap.md#custom-sql-mit-sql).
 
 `QueryFromSql` and `UpdateFormSql` are marked deprecated in the live descriptor. Do not use them for new models.
 

@@ -2,7 +2,7 @@
 
 ## Resolve context before editing
 
-1. Call `mps_mcp_list_open_projects`; select the intended target from the user's task or current editor focus.
+1. Identify the target project (`moai:mps-mcp-workflow`, "Which project the tools act on"); call `mps_mcp_list_open_projects` only after a "no/multiple projects" error.
 2. Resolve the destination model with `mps_mcp_get_project_structure`, including dependencies and used languages.
 3. Confirm that DataUX, ObjectFlow, and any needed BaseLanguage expressions are available.
 4. Resolve every target-model classifier, property, command, conclusion, label, and reusable UI root. Do not carry references across projects.
@@ -19,19 +19,15 @@ This separation follows the [MoWare ownership map](../../../docu/moware-werkbank
 5. Dry-run, insert, then link the ObjectFlow Page to the new PagePane in the ObjectFlow model.
 6. Validate both the PagePane root and the owning Command root.
 
-Use a direct `DelegateForm` as `uxChild` only when it is the sole visible element. `PagePane.uxChild` has cardinality `1`. [UI composition](../../../docu/dataux.md#kapitellandkarte-ui-komposition)
-
 ## Create a table over a list property
 
 1. Ensure the owner object and list are already populated; UI binding never loads them. [Binding does not load](../../../docu/dataux.md#page-panes)
 2. Confirm that the list element is an Entity or DTO, not a Value Object. [Table binding restrictions](../../../docu/dataux.md#tabellenbindung-und-selektion)
 3. Use [table-subtree.json](blueprints/table-subtree.json).
-4. Set `TARGET_MODEL.TableOwnerClassifier` to the classifier owning the list and `TARGET_MODEL.items` to the list property.
+4. Set `TARGET_MODEL.TableOwnerClassifier` to the classifier owning the list and `TARGET_MODEL.items` to the list property (see [gotchas](gotchas.md#owning-classifier-list-property-and-row-type-differ)).
 5. Set each delegate path to a property of the row type, such as `TARGET_MODEL.rowText`.
 6. Add `SelectFirstFOption` only when the first row should initialize the shared row-type selection.
 7. Add the subtree under an `uxChild` role, then validate the containing root.
-
-Do not set `boundClassifier` to the row type when `boundProperty` belongs to a different owner. This is a frequent source of misleading bindings.
 
 ## Build master-detail UI
 
@@ -41,7 +37,7 @@ Do not set `boundClassifier` to the row type when `boundProperty` belongs to a d
 4. Bind the form to the page root and the table to the owner/list property; one column `1*`, the form row `-1`, the table row `1*`, no left/right split.
 5. Keep the table's `LabelFOption` (set the text) unless the table is the Page Pane's top element; keep `SelectFirstFOption` only when an initial selection is desired.
 6. Add delegates for both types; give every table delegate a `WidthDOption` (percentages add up to 100).
-7. Put the table's actions, including the `ENTER` main action, into one text-less `MenuSub` (see [menu-submenu-subtree.json](blueprints/menu-submenu-subtree.json)). The selected row updates the PagePane-wide selection for its type. [UI conventions](../../../conventions/moware-werkbank-ui_v1.md)
+7. Put the table's actions, including the `ENTER` main action, into one text-less `MenuSub` (see [menu-submenu-subtree.json](blueprints/menu-submenu-subtree.json)). [UI conventions](../../../conventions/moware-werkbank-ui_v1.md)
 8. Validate behavior for empty lists and cleared selection. [Empty selection](../../../docu/dataux.md#leere-selektion) and [master-detail behavior](../../../docu/dataux.md#master-detail)
 
 ## Add tabs
@@ -58,7 +54,7 @@ Do not set `boundClassifier` to the row type when `boundProperty` belongs to a d
 2. Use [include-subtree.json](blueprints/include-subtree.json).
 3. Resolve `TARGET_MODEL.ReusableUiRoot` in the destination model.
 4. `boundClassifier` is mandatory on an Include (the checker reports "An include needs to be bound on an object."); add `boundProperty` when the reused element works on a property of the selected object. The content type must match the reused root's type.
-5. Remember that Include creates neither data nor an independent selection space. It may override menus at the usage site only when a `Table` is included. [Include semantics](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung)
+5. Local `menuItems` (menu override at the usage site) only when a `Table` is included. Include semantics: see [Layouts, Tabs und Wiederverwendung](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung).
 
 ## Add menus and command actions
 

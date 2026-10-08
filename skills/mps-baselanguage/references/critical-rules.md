@@ -47,7 +47,7 @@ Rules that, if violated, make the AST fail structural / assignability / typesyst
 
 * `ClassCreator.baseMethodDeclaration`: points to a **constructor**, not the class.
 * `InstanceMethodCallOperation.baseMethodDeclaration`: points to the **method declaration**.
-* **Stale Refs**: re-harvest refs after significant root rewrites as identities may change.
+* Full-root rewrites invalidate harvested member refs — `moai:mps-node-editing` (`references/staged-construction.md`).
 
 ## Preflight for Large JSON ASTs
 * Validate JSON syntax locally before calling the insert tool.

@@ -81,6 +81,8 @@ Populate with a `concept/C/` literal (`ConceptIdRefExpression`, id `264438647430
 }
 ```
 
+Generic creator roles (`initValue`, `copyFrom`, `initSize`) and string-typed examples: `moai:baselanguage-collections-dsl` (`references/concepts.md`, `references/blueprints.md`).
+
 ## Collection type blueprints (for use with `mps_mcp_update_node`)
 
 Use these to correct a type that the Java parser produced incorrectly (usually a method return type).
@@ -123,6 +125,8 @@ Use these to correct a type that the Java parser produced incorrectly (usually a
 
 ### `new arraylist<node<Type>>` (MPS collections syntax — not parseable as Java; manual construction)
 
+`GenericNewExpression` wraps the creator via role `creator`. MPS syntax has no `()` on these constructors — `new arraylist<T>`, unlike Java's `new ArrayList<T>()`.
+
 ```json
 {
   "concept": "jetbrains.mps.baseLanguage.structure.GenericNewExpression",
@@ -145,7 +149,7 @@ Use these to correct a type that the Java parser produced incorrectly (usually a
 }
 ```
 
-Replace the `target` ref with the concept declaration node ref appropriate for your element type (e.g. `CatchClause`, `Expression`, etc.). Use `mps_mcp_search_concepts` to find the node ref for a given concept name.
+Replace the `target` ref with the concept declaration node ref appropriate for your element type (e.g. `CatchClause`, `Expression`, etc.). Use `mps_mcp_search_concepts` to find the node ref for a given concept name, or print an existing `sequence<node<X>>` variable's type with `mps_mcp_print_node` to copy the exact ref.
 
 ### `new hashset<node<Classifier>>` (manually constructed set)
 
@@ -170,14 +174,3 @@ Replace the `target` ref with the concept declaration node ref appropriate for y
   }]
 }
 ```
-
-## Variable initializers for collections
-
-| MPS expression | Creator concept | Wrapping concept |
-|---|---|---|
-| `new arraylist<node<C>>` | `ListCreatorWithInit` | `GenericNewExpression` |
-| `new hashset<node<C>>` | `HashSetCreator` | `GenericNewExpression` |
-
-Both creators take a single `elementType` child (an `SNodeType` with `concept` reference). `GenericNewExpression` wraps the creator via the `creator` role.
-
-**Note**: MPS syntax has no `()` on these constructors — `new arraylist<T>` is written without parentheses, unlike Java's `new ArrayList<T>()`.

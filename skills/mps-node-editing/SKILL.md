@@ -9,7 +9,7 @@ The core workflow for mutating MPS nodes through MCP tools. JSON blueprints desc
 
 ## Critical Directives
 
-- **Always use the fully qualified concept name** in the `concept` field — it is unambiguous and does not require a `conceptReference`.
+- **Always use the fully qualified concept name** (`qualifiedName`) in `concept` — rule: `moai:mps-mcp-workflow` (`references/node-editing-rules.md`).
 - **Resolve before editing** — call `mps_mcp_get_current_editor_root_node` (for the user's focus) or `mps_mcp_search_root_node_by_name` (by name) to lock onto the target. Don't guess refs.
 - **Prefer surgical edits** — `mps_mcp_update_node` (`ADD`/`CHILD` or `SET`/`CHILD`) preserves persistent IDs. `mps_mcp_update_root_node_from_json` rewrites the entire root and is wasteful when only one subtree changed.
 - **Don't delete-and-reinsert** to make a small change — deletion destroys persistent IDs and breaks incoming references.
@@ -30,8 +30,6 @@ All child, property, and reference operations on existing nodes go through `mps_
 
 `mps_mcp_update_node` (PROPERTY / REFERENCE / CHILD) and `mps_mcp_alter_nodes` MOVE_CHILD / MOVE_NODE_TO_PARENT also work on nodes inside the **current MPS Console input command** — pass the node's normal persistent reference; no extra parameter is needed. The node must be inside the current unexecuted console input (not history/stale). MOVE_NODE_TO_PARENT only relocates a node *within* the current console command — moving a node between the console and a project model, or making a console node a root, is refused. Edits to console nodes skip disk-persistence and refresh the console's imports instead. Nodes outside the selected project are rejected as before.
 
-`childJson` accepts either an inline JSON string (max 4 KB) **or** an absolute path to a file containing the JSON blueprint. Use the file form for large blueprints to avoid MCP-transport truncation.
-
 ## Prerequisites
 
 - Load the `moai:mps-language-analysis` skill if you do not yet know what concepts the model uses.
@@ -49,7 +47,7 @@ All child, property, and reference operations on existing nodes go through `mps_
 1. **Identify** the target node (existing) or parent model (new root).
 2. **Choose the right tool**: `mps_mcp_create_root_node` / `mps_mcp_insert_root_node_from_json` for new roots; `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`/`PROPERTY`/`REFERENCE`) for surgical edits; `mps_mcp_update_root_node_from_json` only for full-root rewrites.
 3. **Author the JSON** following the unified blueprint format.
-4. **Insert** with `dryRun: true` first if the blueprint is large. Check the response: an empty `warnings` array means staging was clean; a non-empty list means the production write will produce dynamic (unresolved) references for the listed targets — resolve those first or expect broken refs.
+4. **Insert** with `dryRun: true` first for large blueprints and read `warnings` (`references/json-format.md`).
 5. **Validate** with `mps_mcp_check_root_node_problems`.
 6. **Repair** broken refs with `mps_mcp_alter_nodes FIX_REFERENCES` if validation surfaces resolvable-but-unresolved targets.
 
@@ -71,5 +69,5 @@ The tools that accept a node JSON blueprint (`mps_mcp_update_node` for `ADD`/`SE
 ## Reference Index
 
 - Open `references/json-format.md` when you need the unified JSON blueprint shape — concept/properties/children/references layout, optional-section rules, and reference-resolution semantics (`r:...` vs name auto-resolution).
-- Open `references/staged-construction.md` when the subtree is large (>~4 KB) or its child refs are needed for later edits — the skeleton → validate → incremental-fill → targeted-update → cleanup pattern.
+- Open `references/staged-construction.md` when the subtree exceeds the inline limit or its child refs are needed for later edits — the skeleton → validate → incremental-fill → targeted-update → cleanup pattern.
 - Open `references/troubleshooting.md` when an insert call fails with `JsonElement.getAsString()` errors or when the JSON shape diverges from the user's textual notation.

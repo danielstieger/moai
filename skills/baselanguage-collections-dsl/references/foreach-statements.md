@@ -11,7 +11,7 @@ The **collections** variant is the idiomatic one for MPS code that works with no
 
 ## Collections `ForEachStatement` (preferred for MPS sequences)
 
-Role layout: `variable` → `ForEachVariable`, `inputSequence` → `Expression`, `body` → `StatementList`. The loop-variable **type is not stored on the `ForEachVariable`** — it is inferred from the `inputSequence`'s element type.
+Role layout: `variable` → `ForEachVariable` (required), `inputSequence` → `Expression` (required), `body` → `StatementList` (required), optional `loopLabel` child, optional `label` property. `ForEachVariable` stores `name` and `resolveInfo`; its **type is not stored on the `ForEachVariable`** — it is inferred from the `inputSequence`'s element type.
 
 ```json
 {

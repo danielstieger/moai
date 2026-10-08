@@ -15,9 +15,9 @@ The technical facts below were verified against the live `org.modellwerkstatt.da
 | `org.modellwerkstatt.dataux.structure.Include` | no | `uxElement: IBindable [1]` reference, `boundClassifier [1]` (checker-mandatory) | `boundProperty`, `menuItems` (Table targets only), `options` |
 | `org.modellwerkstatt.dataux.structure.CustomElement` | yes | `implClassFqName: Expression [1]` | `fullSize`, binding refs, delegates, menus, custom options |
 
-`PagePane` is the visible counterpart of an ObjectFlow Page. ObjectFlow owns data and control flow; DataUX owns layout and menus. A `PagePane` always has one top-level UI element, so combine siblings inside a grid or tabs. [Page Pane semantics and composition](../../../docu/dataux.md#page-panes)
+`PagePane` is the UI counterpart of an ObjectFlow `PageCrtl`: see [Page Panes](../../../docu/dataux.md#page-panes).
 
-`DelegateForm`, `Table`, `GridLayout`, `TabLayout`, and `CustomElement` may also be declared as reusable roots. `Include` references an already declared bindable UI element and does not create data or a new selection space. [Layouts, tabs, and reuse](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung)
+`DelegateForm`, `Table`, `GridLayout`, `TabLayout`, and `CustomElement` may be declared as reusable roots for `Include`: see [Layouts, Tabs und Wiederverwendung](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung).
 
 ## Binding model
 
@@ -28,14 +28,9 @@ Every bindable concept exposes optional references:
 
 Interpret them operationally:
 
-- Classifier-only binding uses the current selection of that Entity/DTO type.
-- A root object supplied as exactly one instance is selected automatically; nested single-element lists are not.
-- Property binding is evaluated on the current selection of the property's owner type.
 - For a table bound to an owner list property, `boundClassifier` names the owner classifier and `boundProperty` names its list property; delegate paths then address row properties.
-- The selection is shared per Entity/DTO type across the complete `PagePane` and uses runtime instance identity.
-- Data must already be loaded. A UI binding does not trigger repository loading.
 
-See [binding and selection](../../../docu/dataux.md#datenbindung-und-selektion), [table binding](../../../docu/dataux.md#tabellenbindung-und-selektion), and [ObjectFlow Page data preparation](../../../docu/objectflow.md#page-init-und-datenbereitstellung).
+See [binding and selection](../../../docu/dataux.md#datenbindung-und-selektion), [Typbindung](../../../docu/dataux.md#typbindung), [Property-Bindung](../../../docu/dataux.md#property-bindung), [table binding](../../../docu/dataux.md#tabellenbindung-und-selektion), [Leere Selektion](../../../docu/dataux.md#leere-selektion), and [ObjectFlow Page data preparation](../../../docu/objectflow.md#page-init-und-datenbereitstellung).
 
 ## Binding paths
 
@@ -67,7 +62,7 @@ All typed delegates below are non-rootable and implement `IDelegate`. Except for
 | upload | `UploadDelegate` | Form-only according to the documentation. |
 | spacer | `DummyDelegate` | Layout placeholder; it has no `boundTo` role. |
 
-Delegate kind must match the ObjectFlow property type. Delegates control presentation and interaction, not business validation. [Forms, tables, and delegates](../../../docu/dataux.md#formulare-tabellen-und-delegates)
+Delegate kind must match the ObjectFlow property type. [Forms, tables, and delegates](../../../docu/dataux.md#formulare-tabellen-und-delegates)
 
 ### Delegate options
 
@@ -113,7 +108,7 @@ See [form and table options](../../../docu/dataux.md#optionen-für-formulare-und
 | `PageConclusionOptionUserCancel` | auto-conclusion option that ends the command like a user cancel (`cancel`); no continuation |
 | `MenuSeparator` | separator marker |
 
-Prefer a submenu/overflow group and keep only exceptional actions at the top level. A table menu normally acts on row selections; a PagePane menu normally acts on the page/root context, but typed `getSelected(...)` may address any type participating in the shared selection. [Menus and command actions](../../../docu/dataux.md#menüs-und-command-aktionen)
+Menu placement (overflow `MenuSub`, checker rules) and selection context: see [Menüs und Command-Aktionen](../../../docu/dataux.md#menüs-und-command-aktionen) and the [UI conventions](../../../conventions/moware-werkbank-ui_v1.md).
 
 Command availability, parameters, permissions, and conclusions remain ObjectFlow concerns. [ObjectFlow command parameters and selection](../../../docu/objectflow.md#parameter-defaults-und-selektion) and [Page Conclusions](../../../docu/objectflow.md#page-conclusions)
 

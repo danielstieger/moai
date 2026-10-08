@@ -10,7 +10,7 @@ Workflow for inspecting an MPS language from a name (e.g. `jetbrains.mps.lang.co
 ## Critical Directives
 
 - Use the **fully qualified** language name (e.g. `jetbrains.mps.lang.core`) — single-letter shorthand (`j.m.l.core`) requires resolution first via `mps_mcp_get_project_structure`.
-- For the `qualifiedName` returned by `mps_mcp_get_concept_details`, use it as the `concept` field in JSON blueprints. It is unambiguous.
+- Use the returned `qualifiedName` as `concept` in JSON blueprints (`moai:mps-mcp-workflow`, `references/node-editing-rules.md`).
 
 ## Analyzing a Language by Name
 

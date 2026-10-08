@@ -17,15 +17,7 @@ Paste-able JSON blueprints for the constructs that appear most often when author
 
 ## Node Equality (`:eq:` / `:ne:`)
 
-```json
-{
-  "concept": "jetbrains.mps.baseLanguage.structure.NPEEqualsExpression",
-  "children": [
-    { "role": "leftExpression", "nodes": [{ "concept": "jetbrains.mps.baseLanguage.structure.VariableReference", "references": [{ "role": "variableDeclaration", "target": "node1" }] }] },
-    { "role": "rightExpression", "nodes": [{ "concept": "jetbrains.mps.baseLanguage.structure.VariableReference", "references": [{ "role": "variableDeclaration", "target": "node2" }] }] }
-  ]
-}
-```
+Node equality (`:eq:`/`:ne:`) blueprint: `moai:mps-model-manipulation` (`references/node-equality.md`).
 
 ## Instance Method Call
 

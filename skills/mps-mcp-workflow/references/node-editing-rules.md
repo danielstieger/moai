@@ -27,25 +27,4 @@
 
 ## JSON Format for Nodes
 
-```json
-{
-  "concept": "fully.qualified.ConceptName",
-  "properties": [
-    { "name": "propName", "value": "propValue" }
-  ],
-  "children": [
-    {
-      "role": "childRole",
-      "nodes": [
-        { "concept": "...", "properties": [...], ... }
-      ]
-    }
-  ],
-  "references": [
-    { "role": "refRole", "target": "targetNodeRefOrName" }
-  ]
-}
-```
-
-- **Concept identification**: use the fully qualified concept name in the `concept` field.
-- **Automatic reference resolution**: for `target` values that are persistent node references (`r:...` or `i:...`), the tool resolves them directly. For plain names (no prefix), the reference is deferred to MPS's scope system after insertion — this works correctly for local variables, parameters, and other non-root declarations. For root nodes in another model, prefer the `"ModelName.RootName"` dotted format or a full `r:...` reference to avoid ambiguity.
+Blueprint shape and reference resolution: `moai:mps-node-editing` (`references/json-format.md`).

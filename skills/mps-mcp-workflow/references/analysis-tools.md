@@ -29,12 +29,6 @@ Parameters:
 }
 ```
 
-## Additional Skills — Handling Unknown MPS Languages
-
-- Consult the skill table at the top of `SKILL.md` for the available `moai:` companion skills.
-- Load `moai:mps-baselanguage` as soon as you need to write any code in BaseLanguage or Java.
-- Before starting unfamiliar DSL work, check for a bundled DSL skill (`moai:objectflow-dsl`, `moai:manmap-dsl`, `moai:dataux-dsl`) and use it before re-exploring the language.
-
 ## `mps_mcp_print_node` — Output Format
 
 Saves the node JSON to a local text file (path returned in `data`). Behaviour depends on `deep`:
@@ -121,9 +115,8 @@ Each entry has the shape:
 
 ## Workflow and Best Practices
 
-1.  **Initialize a session**: check for the bundled DSL skills (`moai:objectflow-dsl`, `moai:manmap-dsl`, `moai:dataux-dsl`) and read this skill before any MPS work. If the user opens a specific concept/model, also call `mps_mcp_get_current_editor_root_node` to anchor on what they are looking at.
-2.  **Navigate with precision**: prefer using `startingPoint` and `reference` (ID) over names to avoid ambiguity.
-3.  **Respect the AST**: remember that you are editing a tree. When writing Java (`BaseLanguage`), use `ParenthesizedExpression` if you are unsure about operation priorities in the tree structure.
-4.  **Learn from samples**: study existing code to understand how to perform common tasks. Use `mps_mcp_query_nodes` (`FIND_INSTANCES`) to find existing nodes of a given concept.
-5.  **Defensive problem checking**: always use `mps_mcp_check_root_node_problems` immediately after inserting or modifying a complex node. A successful insertion `"ok": true` does not guarantee the resulting AST is semantically or structurally valid.
-6.  **Validate frequently**: make/rebuild languages with `mps_mcp_alter_nodes` (`MAKE`) after making changes so they can be imported and used, and so you see whether they generate and compile. Pass `MAKE` with a JSON parameters object that names what to build — `{"modules": ["<module-ref>"]}` for one or more modules (e.g. a language plus its generator), `{"models": ["<model-ref>"]}` to make individual models, or `{"wholeProject": true}` to rebuild everything. Generation and compile errors appear in the `MAKE` result; `mps_mcp_check_root_node_problems` reports model-level problems per root and does not surface generator output, so run it on the changed roots before the make.
+1.  **Navigate with precision**: prefer using `startingPoint` and `reference` (ID) over names to avoid ambiguity.
+2.  **Respect the AST**: remember that you are editing a tree. When writing Java (`BaseLanguage`), use `ParenthesizedExpression` if you are unsure about operation priorities in the tree structure.
+3.  **Learn from samples**: study existing code to understand how to perform common tasks. Use `mps_mcp_query_nodes` (`FIND_INSTANCES`) to find existing nodes of a given concept.
+4.  **Defensive problem checking**: always use `mps_mcp_check_root_node_problems` immediately after inserting or modifying a complex node. A successful insertion `"ok": true` does not guarantee the resulting AST is semantically or structurally valid.
+5.  **Validate frequently**: make/rebuild languages with `mps_mcp_alter_nodes` (`MAKE`) after making changes so they can be imported and used, and so you see whether they generate and compile. Pass `MAKE` with a JSON parameters object that names what to build — `{"modules": ["<module-ref>"]}` for one or more modules (e.g. a language plus its generator), `{"models": ["<model-ref>"]}` to make individual models, or `{"wholeProject": true}` to rebuild everything. Generation and compile errors appear in the `MAKE` result; `mps_mcp_check_root_node_problems` reports model-level problems per root and does not surface generator output, so run it on the changed roots before the make.

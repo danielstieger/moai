@@ -98,4 +98,4 @@ with (#project) {
 }
 ```
 
-See `moai:mps-model-manipulation` for `.where` / `.select` / `.ofConcept<C>` / `replace with new(C)` / `:eq:` and the closure-literal rules used in these bodies.
+See `moai:mps-model-manipulation` for `.ofConcept<C>` / `replace with new(C)` / `:eq:` and the closure-literal rules used in these bodies, and `moai:baselanguage-collections-dsl` for `.where` / `.select`.

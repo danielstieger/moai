@@ -12,14 +12,14 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 - Treat the live `org.modellwerkstatt.objectflow` language as the technical authority for concepts, features, cardinalities, and assignability.
 - Use the packaged solution `org.modellwerkstatt.dataux.tests` for stable examples. Its verified model and node references are in [references/sandbox.md](references/sandbox.md).
 - Use the package documentation for semantics and runtime behavior; start with the [ObjectFlow scope](../../docu/objectflow.md#modellierungsumfang-und-ausdrucksmöglichkeiten) and the [MoWare responsibility map](../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin).
-- Determine the active MPS target dynamically with `mps_mcp_list_open_projects`. Never persist a project path, editor-session state, or references from an application project.
+- Never persist a project path, editor-session state, or references from an application project.
 - For targets outside the packaged solution, use explicit placeholders such as `TARGET_OFX_CONFIG`, then resolve them before writing. `OFXConfig`s live in `<firma>.<app>.base`; the destination model imports that model and references the config, it never holds its own copy. [Model layering](../../conventions/moware-werkbank-modularisierung_v1.md#solutions-und-modelle)
 
 ## Critical rules
 
 - Use MPS MCP tools; never read or edit raw `.mps` / `.mpl` XML (rule and fallback: [`MPS_AGENT_GUIDE.md`](../../MPS_AGENT_GUIDE.md#never-read-raw-mps-model-files)).
 - Query concepts with `mps_mcp_get_concept_details` and `l:ec097fca-5b84-41f2-847d-6a5690cae277:org.modellwerkstatt.objectflow`, not the module-style reference.
-- Use fully qualified concept names in JSON blueprints.
+- Use the `qualifiedName` as `concept` in blueprints (`moai:mps-mcp-workflow`, `references/node-editing-rules.md`).
 - Prefer a root skeleton followed by surgical `ADD CHILD` operations for large or uncertain roots.
 - Dry-run JSON first and inspect warnings. After real changes, run `mps_mcp_check_root_node_problems` on each changed root; build or generate when the task requires it.
 - Never infer that a successful insert is semantically valid.
@@ -31,7 +31,7 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 
 ## Quick start
 
-1. Call `mps_mcp_list_open_projects` and select the intended MPS project dynamically. For a new application module, follow [From modeling to execution](../../docu/moware-werkbank.md#von-der-modellierung-zur-ausführung) and wire it with `mps_mcp_module_dependency` and `mps_mcp_model_used_language`.
+1. Identify the target project (`moai:mps-mcp-workflow`, "Which project the tools act on"); call `mps_mcp_list_open_projects` only after a "no/multiple projects" error. For a new application module, follow [From modeling to execution](../../docu/moware-werkbank.md#von-der-modellierung-zur-ausführung) and wire it with `mps_mcp_module_dependency` and `mps_mcp_model_used_language`.
 2. Inspect the destination model's dependencies and used languages with `mps_mcp_get_project_structure`.
 3. Load [references/concepts.md](references/concepts.md) and the task-specific recipe in [references/workflows.md](references/workflows.md).
 4. Inspect a packaged reference root from [references/sandbox.md](references/sandbox.md) when a concrete shape is needed.

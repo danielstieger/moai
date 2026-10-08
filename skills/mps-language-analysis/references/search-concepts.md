@@ -71,5 +71,3 @@ superInterfaces, superInterfaceDetails,
 sourceNode, isAbstract, isInterfaceConcept, isRootable, virtualFolder,
 containingProject?, editableFromCurrentProject?, present:true
 ```
-
-Use the `qualifiedName` field (e.g. `"jetbrains.mps.baseLanguage.structure.ClassConcept"`) as the `concept` field in JSON node blueprints — it is unambiguous and does not require a `conceptReference`.

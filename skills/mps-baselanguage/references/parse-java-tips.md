@@ -94,7 +94,4 @@ The tool takes a single JSON-encoded `parameters` argument. Shape:
 
 ### Compatibility
 
-* Supports Java 7 (including generics) plus the Java 8+ syntax the MPS parser recognizes.
-* **Lambdas are accepted.** A lambda expression is mapped to a `jetbrains.mps.baseLanguage.closures` `ClosureLiteral` (an expression-bodied lambda such as `() -> 42` becomes a closure whose trailing expression is its result; untyped parameters become the closures `var` type, inferred from the target). The closures language is auto-imported (when `postProcess.importUsedLanguages` is on). Like any MPS closure, a lambda only type-checks against a matching **functional-type** target — e.g. `() -> 42` fits a `{() => int}` slot but **not** an `int` slot. A mismatch is reported in the response `problems` array (see *After Insertion*), not as a parse failure.
-* Constructs the parser does not recognize (e.g. records) still fail with a parse error.
-
+Supported syntax, lambda→closure mapping and what the parser cannot produce: `moai:mps-model-manipulation` (`references/java-parser-capabilities.md`).

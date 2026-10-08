@@ -8,7 +8,7 @@ Use this workflow when authoring non-trivial BaseLanguage code via JSON blueprin
 
 ## Core Principles
 
-* **Stage large roots**: don't insert a full complex root at once; use a staged approach (Skeleton → Members → Bodies).
+* **Stage large roots** (skeleton → fill): `moai:mps-node-editing` (`references/staged-construction.md`).
 * **Reference stability**: references (especially `baseMethodDeclaration`) are fragile. Use persistent refs (`r:...`) instead of names for stable wiring.
 * **Validation gates**: always use `dryRun` (structure), `mps_mcp_check_root_node_problems` (semantics), and `MAKE` (generation/compilation).
 * **Generated Java as signal**: if `MAKE` fails, check the generated Java for hints (`new ()` or `???()`).
@@ -37,7 +37,6 @@ Use this workflow when authoring non-trivial BaseLanguage code via JSON blueprin
 
 ## Practical Authoring Tips
 
-* Use fully qualified concept names in JSON.
 * Keep helper JSON-generation scripts outside the model.
 * If only one subtree changes, prefer `mps_mcp_update_node` over a full root rewrite to reduce reference churn.
 * Harvest refs from live AST with `mps_mcp_print_node` for own-class members; member identities do not survive a full-root rewrite.

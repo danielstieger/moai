@@ -12,28 +12,28 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 - Treat the live `org.modellwerkstatt.dataux` language as the technical authority for concepts, roles, cardinalities, reference targets, and assignability.
 - Use the package documentation for semantics and runtime behavior; start with [DataUX UI modeling](../../docu/dataux.md#teil-i--ui-modellierung) and the [MoWare responsibility map](../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin).
 - The shipped solution `org.modellwerkstatt.dataux.tests` supplies the stable examples recorded in [references/sandbox.md](references/sandbox.md). It is useful but does not cover every UI shape.
-- Determine the target MPS project dynamically with `mps_mcp_list_open_projects`. Never persist a project path, editor-session state, or references from an application project.
+- Never persist a project path, editor-session state, or references from an application project.
 - For target-model classifiers, properties, commands, conclusions, labels, and reusable UI roots, replace the explicit `TARGET_MODEL.*` placeholders immediately before insertion.
 
 ## Critical rules
 
 - Use MPS MCP tools; never read or edit raw `.mps` / `.mpl` XML (rule and fallback: [`MPS_AGENT_GUIDE.md`](../../MPS_AGENT_GUIDE.md#never-read-raw-mps-model-files)).
 - Query concepts with `mps_mcp_get_concept_details` and `l:64adc67c-5fcf-45f5-82db-6a6771963d93:org.modellwerkstatt.dataux`, not the module-style reference.
-- Use fully qualified concept names in JSON blueprints.
-- A `PagePane` has exactly one `uxChild`. Use a `GridLayout` or `TabLayout` to compose several elements. See [UI composition](../../docu/dataux.md#kapitellandkarte-ui-komposition).
-- Binding never loads data. Ensure the ObjectFlow command/repository has already supplied the full data needed by the UI. See [binding and selection](../../docu/dataux.md#datenbindung-und-selektion) and [explicit graph loading](../../docu/manmap.md#explizites-laden).
-- A table over a list property binds `boundClassifier` to the property owner and `boundProperty` to that list property; its delegates address properties of the row type. A typed-only table (no `boundProperty`) is accepted only as the PagePane's top element or inside a first-level layout bound to the PagePane's root type. Lists of Value Objects are not valid DataUX table models. See [table binding](../../docu/dataux.md#tabellenbindung-und-selektion).
+- Use the `qualifiedName` as `concept` in blueprints (`moai:mps-mcp-workflow`, `references/node-editing-rules.md`).
+- `PagePane.uxChild` is exactly one (`1`); composition with `GridLayout`/`TabLayout`: see [Page Panes](../../docu/dataux.md#page-panes).
+- Binding does not load data: see [Datenbindung und Selektion](../../docu/dataux.md#datenbindung-und-selektion) and [Explizites Laden](../../docu/manmap.md#explizites-laden).
+- Table binding (`boundClassifier` = list owner, `boundProperty` = list property, delegates on the row type; typed-only tables only as top element or in a first-level layout; no Value Object lists): see [Tabellenbindung und Selektion](../../docu/dataux.md#tabellenbindung-und-selektion) and [gotchas](references/gotchas.md#owning-classifier-list-property-and-row-type-differ).
 - Prefer a root skeleton followed by surgical `ADD CHILD` operations for large or uncertain roots. Preserve existing node IDs.
 - Dry-run JSON first and inspect warnings. After a real change, run `mps_mcp_check_root_node_problems` on each changed root; generate or build when the task requires it.
 - Inner forms, tables, and layouts need `isNamed = false` and `name = "#"`; JSON insertion sets `isNamed = true`. Name an element only when it is reused with `Include`. See [inner UI elements](references/gotchas.md#inner-ui-elements-must-stay-unnamed).
-- `OPTIONAL` on a `StringDelegate` is allowed but usually unnecessary (an empty field then yields `null` instead of `""`); control required strings with `LENGTH` and do not repeat `LENGTH`/`RANGE` limits as `validation`. See [required values](../../docu/dataux.md#pflichtwerte-leere-eingaben-und-null).
-- Give the main table action hotkey `ENTER` (command `defaultHotkey` or the action's label); double-click and Enter on a row run the first menu action with `ENTER`, submenus included. See [menus](../../docu/dataux.md#menüs-und-command-aktionen).
+- `OPTIONAL`, `LENGTH`/`RANGE`, empty input and `null`: see [Pflichtwerte, leere Eingaben und `null`](../../docu/dataux.md#pflichtwerte-leere-eingaben-und-null).
+- Main table action with hotkey `ENTER` (double-click/Enter): see [Menüs und Command-Aktionen](../../docu/dataux.md#menüs-und-command-aktionen) and the [UI conventions](../../conventions/moware-werkbank-ui_v1.md).
 - Modules live in `<firma>.<app>.app` and reference an `OFXConfig` from `<firma>.<app>.base`. Both module kinds require `configuration`, `isAuthenticated`, and one `VERSION`; a `BatchJob Module` additionally requires an exception strategy ending with a default rule and exactly one `CONSUMERS` per pair with a consumer. Never create `onStartup`/`onShutdown`. See [module gotchas](references/gotchas.md#modules-need-a-configuration-and-a-version) and [executable modules](../../docu/dataux.md#teil-ii--anwendung-und-batchjob).
 - Keep business rules out of UI expressions. DataUX should remain presentation-oriented “CheapCode”; see the [MoWare development principles](../../docu/moware-werkbank.md#grundprinzipien-für-die-anwendungsentwicklung).
 
 ## Quick start
 
-1. Call `mps_mcp_list_open_projects` and select the intended target dynamically. If several projects remain plausible, ask the user.
+1. Identify the target project (`moai:mps-mcp-workflow`, "Which project the tools act on"); call `mps_mcp_list_open_projects` only after a "no/multiple projects" error.
 2. Resolve the destination model and inspect its used languages and dependencies with `mps_mcp_get_project_structure`.
 3. Load [references/concepts.md](references/concepts.md), then select the relevant recipe in [references/workflows.md](references/workflows.md).
 4. Inspect a stable package example from [references/sandbox.md](references/sandbox.md) when its shape matches the task. Use application models only as transient evidence and never retain their names or references.

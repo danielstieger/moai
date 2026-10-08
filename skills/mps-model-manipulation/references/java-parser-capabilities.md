@@ -22,79 +22,7 @@ Things that resolve correctly:
 
 ## Java 8 lambdas → closures
 
-Lambda expressions parse and insert: each becomes a `jetbrains.mps.baseLanguage.closures.ClosureLiteral`, and the closures language is auto-imported. They are **not** plain Java in the MPS sense — they cross into the `closures` extension. A lambda only type-checks against a matching **functional-type** target (e.g. `() -> 42` fits a `{() => int}` slot, but not an `int` slot); untyped parameters get the closures `var` type and rely on the target to infer. A type mismatch at the destination is surfaced in the tool response's `problems` array — **not** as a parse error — so inspect `problems` after inserting a lambda.
-
-## Collection types: MPS concepts for `list<node<X>>` and `new arraylist<node<X>>`
-
-When writing code in MPS using the `collections` and `smodel` languages, the correct
-concepts to use are the following. These were confirmed by inspecting manually-written
-MPS code (not produced by the Java parser).
-
-**`node<X>` — a typed node reference** is represented by `SNodeType` from the `smodel`
-language, with a `concept` reference pointing to the concept declaration of `X`.
-
-**`list<node<X>>` as a variable type** uses `ListType` from `collections`, containing
-an `elementType` child of type `SNodeType`.
-
-**`new arraylist<node<X>>` as a constructor expression** uses `GenericNewExpression`
-wrapping a `ListCreatorWithInit` creator (both from `collections`).
-
-**Confirmed AST for `list<node<Type>> preciseTypes = new arraylist<node<Type>>;`**
-(manually written in MPS; note: no `()` — MPS syntax has no parens on the constructor):
-
-```json
-{
-  "concept": "jetbrains.mps.baseLanguage.structure.LocalVariableDeclarationStatement",
-  "children": [{
-    "role": "localVariableDeclaration",
-    "nodes": [{
-      "concept": "jetbrains.mps.baseLanguage.structure.LocalVariableDeclaration",
-      "properties": [{ "name": "name", "value": "preciseTypes" }],
-      "children": [
-        {
-          "role": "type",
-          "nodes": [{
-            "concept": "jetbrains.mps.baseLanguage.collections.structure.ListType",
-            "children": [{
-              "role": "elementType",
-              "nodes": [{
-                "concept": "jetbrains.mps.lang.smodel.structure.SNodeType",
-                "references": [{ "role": "concept", "target": "r:00000000-0000-4000-0000-011c895902ca(jetbrains.mps.baseLanguage.structure)/1068431790189" }]
-              }]
-            }]
-          }]
-        },
-        {
-          "role": "initializer",
-          "nodes": [{
-            "concept": "jetbrains.mps.baseLanguage.structure.GenericNewExpression",
-            "children": [{
-              "role": "creator",
-              "nodes": [{
-                "concept": "jetbrains.mps.baseLanguage.collections.structure.ListCreatorWithInit",
-                "children": [{
-                  "role": "elementType",
-                  "nodes": [{
-                    "concept": "jetbrains.mps.lang.smodel.structure.SNodeType",
-                    "references": [{ "role": "concept", "target": "r:00000000-0000-4000-0000-011c895902ca(jetbrains.mps.baseLanguage.structure)/1068431790189" }]
-                  }]
-                }]
-              }]
-            }]
-          }]
-        }
-      ]
-    }]
-  }]
-}
-```
-
-> **Note**: `LocalVariableDeclarationStatement` (the wrapping statement node) and
-> `LocalVariableDeclaration` (the inner declaration node) are separate concepts.
-> The statement wraps the declaration via role `localVariableDeclaration`.
-
-Replace the `target` in `"role": "concept"` with the node ref of whatever concept
-you want `node<X>` to refer to. Use `mps_mcp_search_concepts` to find concept node refs.
+Lambda expressions parse and insert: each becomes a `jetbrains.mps.baseLanguage.closures.ClosureLiteral` (an expression-bodied lambda such as `() -> 42` becomes a closure whose trailing expression is its result), and the closures language is auto-imported when `postProcess.importUsedLanguages` is on. They are **not** plain Java in the MPS sense — they cross into the `closures` extension. A lambda only type-checks against a matching **functional-type** target (e.g. `() -> 42` fits a `{() => int}` slot, but not an `int` slot); untyped parameters get the closures `var` type and rely on the target to infer. A type mismatch at the destination is surfaced in the tool response's `problems` array — **not** as a parse error — so inspect `problems` after inserting a lambda. Java constructs the MPS parser does not recognize (e.g. records) still fail with a parse error; JSON blueprints have no lambda syntax — build a `closures` `ClosureLiteral` (`closures-catalog.md`).
 
 ## What the Java parser CANNOT handle (and how to work around it)
 
@@ -115,7 +43,7 @@ an MPS `sequence<node<Type>>` or `list<node<Type>>` variable.
 | `sequence<node<Type>>` | `SequenceType(elementType: SNodeType(concept: Type))` |
 | `list<node<Type>>` | `ListType(elementType: SNodeType(concept: Type))` |
 
-See `variable-declarations.md` for the full node blueprints.
+Full blueprints: `variable-declarations.md`.
 
 **Note**: the parser never produces MPS collection/smodel types in any position — `List<SNode> x = …` and `new ArrayList<SNode>()` parse to Java `ClassifierType`s, which is fine as long as the code stays plain Java. Method return types are where this bites, because MPS callers expect `sequence<node<X>>`/`list<node<X>>`.
 
@@ -130,48 +58,10 @@ The Java parser produces correct MPS types in most positions, but fails for
 | Method **return type** | `list<node<Type>>` | `ClassifierType(List<SNode>)` — **wrong** | Same |
 | Method parameter type | `node<CatchClause>` | `ClassifierType(SNode)` — Java type | Fine for most purposes; replace if MPS type checking fails |
 
-When a local variable or `new` expression must have an MPS type (`list<node<X>>`, `new arraylist<node<X>>`), construct it directly using the blueprints in this file and `variable-declarations.md` — the parser has no syntax for them.
+When a local variable or `new` expression must have an MPS type (`list<node<X>>`, `new arraylist<node<X>>`), construct it directly using the blueprints in `variable-declarations.md` — the parser has no syntax for them.
 
 **After parsing a method**, check its `returnType` and parameter `type` children.
 If they should be MPS collection or smodel types, replace them using `mps_mcp_update_node`.
-
-Node blueprints for common MPS types (use in `mps_mcp_update_node`):
-
-```text
-// sequence<node<Type>>
-{
-  "concept": "jetbrains.mps.baseLanguage.collections.structure.SequenceType",
-  "children": [
-    { "role": "elementType", "nodes": [
-      {
-        "concept": "jetbrains.mps.lang.smodel.structure.SNodeType",
-        "references": [
-          { "role": "concept", "target": "<concept-declaration-noderef>" }
-        ]
-      }
-    ]}
-  ]
-}
-
-// list<node<Type>>  (same, swap concept name)
-{
-  "concept": "jetbrains.mps.baseLanguage.collections.structure.ListType",
-  "children": [
-    { "role": "elementType", "nodes": [
-      {
-        "concept": "jetbrains.mps.lang.smodel.structure.SNodeType",
-        "references": [
-          { "role": "concept", "target": "<concept-declaration-noderef>" }
-        ]
-      }
-    ]}
-  ]
-}
-```
-
-The `target` of the `concept` reference must be the persistent node ref of the concept declaration
-(obtainable via `mps_mcp_search_concepts` or from the type of an existing `sequence<node<X>>`
-variable — print it with `mps_mcp_print_node` to get the exact ref).
 
 ### smodel language expressions
 

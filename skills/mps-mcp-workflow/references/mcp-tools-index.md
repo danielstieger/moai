@@ -22,7 +22,7 @@
 - `mps_mcp_query_nodes`: read-only node queries — FIND_INSTANCES (find nodes of a concept; `sampleOnly` for one example), FIND_USAGES (nodes referencing a given node), GET_PARENT, GET_ROOT, GET_MODEL_FOR_NODE, NODE_INDEX, SIBLINGS, GET_CHILD_ROLE. Default scopes are selected-project based; explicit model/module/root scopes may target another open project read-only.
 - `mps_mcp_alter_nodes`: structural node mutations and code generation — MOVE_CHILD, MOVE_NODE_TO_PARENT, MAKE, FIX_REFERENCES.
 - `mps_mcp_print_node`: shows the underlying JSON structure or it shows the "visual" projection of a node.
-- `mps_mcp_insert_root_node_from_json`: creates one or more roots from a blueprint (top-level array = atomic batch). Forward references: `moai:mps-node-editing`, `references/staged-construction.md`.
+- `mps_mcp_insert_root_node_from_json`: creates one or more roots from a blueprint (top-level array = atomic batch, rolled back as a whole on any failure). Forward references and staged construction: `moai:mps-node-editing` (`references/staged-construction.md`).
 - `mps_mcp_update_node`: unified node-mutation tool for child, property, and reference roles (`ADD`/`SET` × `CHILD`/`PROPERTY`/`REFERENCE`; deletion = `SET` with `null`). The node being mutated must belong to the selected project; reference targets may point to another open project if the target is in scope/imported. Operation table: `moai:mps-node-editing`.
 - `mps_mcp_check_root_node_problems`: validation tool. Use this frequently to ensure your changes are correct.
 - `mps_mcp_search_root_node_by_name`: finds root nodes by name (`names` = single name or JSON array; `scope` `editable`/`all`/`models`/`modules`); returns node-info envelopes.

@@ -19,7 +19,6 @@
 - **Model names include their stereotype.** The `name` a tool reports for a model is its full name with any stereotype attached (e.g. `foo.bar@tests`, `foo.bar@generator`), matching the `@stereotype` form `mps_mcp_create_model` expects. The stereotype is part of the model's identity — when you address a model by name, pass it verbatim (`foo.bar@tests`, not `foo.bar`). Two models can share a long name and differ only by stereotype.
 - If given an incomplete or shortened name (e.g. `j.m.l.core`), use `mps_mcp_get_project_structure` with eager filtering to find the full name.
 - Single-letter packages usually expand: `j` → `jetbrains`, `m` → `mps`, `l` → `lang`.
-- For incomplete names call `mps_mcp_get_project_structure` with eager filtering.
 - Newly created languages might not be discoverable by specialized language tools until they are compiled. Use `mps_mcp_get_project_structure` to find them as modules and investigate their `structure` model.
 - Use `mps_mcp_get_project_structure` to read the organization of an MPS project and to understand the dependencies of a module or dependencies and used languages of a model.
 - Use `includeStubModules=true` when you need read-only libraries/stubs or modules from other open MPS projects in project-structure output.

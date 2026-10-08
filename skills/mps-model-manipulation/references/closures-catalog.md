@@ -7,7 +7,7 @@ The closures language (`jetbrains.mps.baseLanguage.closures`) is an extension of
 | Concept | Full `conceptReference` | MPS notation |
 |---|---|---|
 | `ClosureLiteral` | `c:fd392034-7849-419d-9071-12563d152375/1199569711397` | `{ param => body }` |
-| `InferredClosureParameterDeclaration` | `c:fd392034-7849-419d-9071-12563d152375/2524418899405758586` | `it` / named inferred param. Inherits a **required** `type` child — fill it with `UndefinedType`. |
+| `InferredClosureParameterDeclaration` | `c:fd392034-7849-419d-9071-12563d152375/2524418899405758586` | `it` / named inferred param; required `type` child — see notes below |
 | `YieldStatement` | `c:fd392034-7849-419d-9071-12563d152375/1200830824066` | `yield expr;` — emit one element from a generator-style closure (typically used inside `.translate { ... }`) |
 | `FunctionType` | `c:fd392034-7849-419d-9071-12563d152375/1199542442495` | `{T1, T2 => R}` |
 | `ClosureLiteralType` | `c:fd392034-7849-419d-9071-12563d152375/1046929382682558545` | inferred type of a `ClosureLiteral` |
@@ -125,6 +125,6 @@ Generated code using closures depends on `jetbrains.mps.baseLanguage.closures.ru
 
 - To reference the parameter from inside the body, use `jetbrains.mps.baseLanguage.structure.VariableReference` with a `variableDeclaration` reference targeting the `InferredClosureParameterDeclaration`. Do not insert a fresh declaration each time you reference it.
 
-- **Forward references by plain name within the same blueprint**: when authoring a JSON blueprint that both *declares* a parameter (e.g. `ParameterDeclaration` / `InferredClosureParameterDeclaration` with `name: "it"`) and *references* it elsewhere in the same tree, you may set the `VariableReference`'s `variableDeclaration` `target` to the plain string `"it"` — the unified-JSON-format auto-resolver matches it to the parameter declared elsewhere in the same `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`) / `mps_mcp_insert_root_node_from_json` call. Confirmed working for closure parameters used inside `where`/`select` predicates. No need to perform the insert in two stages just to capture a persistent ref for the parameter.
+- **Plain-name parameter references**: within one blueprint, a `VariableReference`'s `variableDeclaration` `target` may be the plain string `"it"` — it resolves to the parameter declared elsewhere in the same `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`) / `mps_mcp_insert_root_node_from_json` call (confirmed for closure parameters in `where`/`select` predicates), so no two-stage insert is needed. Forward-reference rules: `moai:mps-node-editing` (`references/staged-construction.md`).
 
 - The body is a `StatementList`, not a bare expression. The "last expression is the result" rule means: wrap the value in an `ExpressionStatement` and place it last (or use a `ReturnStatement` if the closure has an explicit return type).

@@ -21,6 +21,6 @@
 - A dry-run warning about an unresolved `TARGET_*` means the production write would create a dynamic reference. Resolve the placeholder first unless a temporary dynamic reference is deliberate.
 - Inspect roots shallowly first; deep-print only the needed subtree.
 - Use `mps_mcp_check_root_node_problems` on each changed root after every complex edit. Run `FIX_REFERENCES` before declaring an existing target unresolvable.
-- If a concept descriptor is `hollow`, do not trust empty features; rebuild the language module and query again.
+- A `descriptorStatus: "hollow"` entry is untrustworthy; what to do: `moai:mps-language-analysis` (`references/concept-details.md`).
 - Never copy persistent node references from an application project into this skill or into portable blueprints.
 

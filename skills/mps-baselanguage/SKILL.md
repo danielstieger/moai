@@ -1,6 +1,6 @@
 ---
 name: mps-baselanguage
-description: Author and edit MPS `jetbrains.mps.baseLanguage` (Java) nodes — choose between the Java parser and JSON AST blueprints, map Java syntax to baseLanguage concepts/roles, harvest persistent member references, and validate. Use when writing class/method bodies, fields, expressions, statements, or any Java/BaseLanguage code inside MPS models, especially when BaseLanguage extensions (smodel, closures, collections) are involved.
+description: Author and edit MPS `jetbrains.mps.baseLanguage` (Java) nodes — choose between the Java parser and JSON AST blueprints, map Java syntax to baseLanguage concepts/roles, harvest persistent member references, and validate. Use for class/method bodies, fields, expressions, statements, or any plain Java code inside MPS models; the smodel/closures extensions are `mps-model-manipulation`, collections are `baselanguage-collections-dsl`.
 ---
 
 # MPS BaseLanguage (Java) Authoring
@@ -9,14 +9,14 @@ description: Author and edit MPS `jetbrains.mps.baseLanguage` (Java) nodes — c
 
 ## Critical Directives
 
-- **Node equality**: always use `:eq:` and `:ne:` (concepts `NPEEqualsExpression` / `NPENotEqualsExpression`). Never `==` or `.equals()` between SNode references.
+- **Node equality**: `:eq:`/`:ne:` (`NPEEqualsExpression`/`NPENotEqualsExpression`), never `==`/`.equals()` — `moai:mps-model-manipulation` (`references/node-equality.md`).
 - **Constructor return type**: `ConstructorDeclaration.returnType` MUST be a `VoidType` node. Leaving it empty fails validation.
 - **`ClassCreator` wiring**: `ClassCreator.baseMethodDeclaration` points at the **constructor declaration**, not the class. `InstanceMethodCallOperation.baseMethodDeclaration` points at the **method declaration**.
 - **Inherited methods**: use the **declaring class** ref for `baseMethodDeclaration`, not the subclass that calls the method. E.g. `addActionListener` is declared on `AbstractButton`, so use the `AbstractButton` class ref.
 - **Expressions in statement lists**: any `Expression` must be wrapped in `ExpressionStatement` to be valid inside a `StatementList`.
 - **Variable declarations**: in method bodies wrap `LocalVariableDeclaration` in `LocalVariableDeclarationStatement`. In `ForStatement.variable` use `LocalVariableDeclaration` directly, no wrapper.
 - **Prefer primitives**: use `string` (`StringType`) over `String` (`ClassifierType`) where possible; same for `int`, `boolean`, etc.
-- **Compatibility**: BaseLanguage core is Java 7 (including generics). When building AST directly (JSON blueprints), there is no lambda/record syntax — use the `jetbrains.mps.baseLanguage.closures` extension for closures. The Java **parser** (`mps_mcp_parse_java_and_insert`) additionally accepts the Java 8+ syntax MPS recognizes — most notably **lambdas**, which it maps to `closures` `ClosureLiteral`s (auto-imported when `postProcess.importUsedLanguages` is on); a lambda only type-checks against a matching functional-type target. Constructs the parser does not recognize (e.g. records) still fail to parse. See `references/parse-java-tips.md`.
+- **Compatibility**: BaseLanguage core is Java 7 + generics; the parser also accepts the Java 8+ syntax MPS recognizes (lambdas → `closures` `ClosureLiteral`), nothing MPS-specific — limits and workarounds: `moai:mps-model-manipulation` (`references/java-parser-capabilities.md`).
 - **Surgical edits**: when a single child changes prefer `mps_mcp_update_node` over rewriting the whole root — a full-root rewrite keeps only the root ID and re-creates all children, breaking incoming refs (`moai:mps-node-editing`, staged construction).
 
 ## Choose Your Path
@@ -50,7 +50,7 @@ Pick the right authoring tool before you start:
 ## Reference Index
 
 - Open `references/concept-mapping.md` when you need the Java-syntax → MPS-concept lookup table and the key role names (statements, expressions, types, declarations).
-- Open `references/json-patterns.md` when you need ready-to-paste JSON blueprints for common constructs (local variable, node-equality, instance-method call, anonymous class, array creation, super-constructor call, empty class template).
+- Open `references/json-patterns.md` when you need ready-to-paste JSON blueprints for common constructs (local variable, instance-method call, anonymous class, array creation, super-constructor call, empty class template).
 - Open `references/critical-rules.md` when something fails validation and you want the rulebook on `ExpressionStatement`, `ClassCreator`, anonymous classes, mandatory bodies, `FieldReferenceOperation`, etc.
 - Open `references/parse-java-tips.md` when using `mps_mcp_parse_java_and_insert` and you need binary-expression priority handling, placeholder strategy, or post-insert verification steps.
 - Open `references/stub-references.md` when you need to point a `baseMethodDeclaration` at a JDK or library member — covers ref derivation, URL encoding, inherited-method handling, and the GET_ASSIGNABLE_REFERENCES fallback.

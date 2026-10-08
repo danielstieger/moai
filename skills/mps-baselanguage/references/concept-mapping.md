@@ -14,7 +14,6 @@ Use this lookup when constructing JSON blueprints for BaseLanguage code. Every J
 | `field` (instance/static)  | `FieldDeclaration` / `StaticFieldDeclaration` | `name`, `type`                                                       |
 | `int x = 5;`               | `LocalVariableDeclarationStatement` | `localVariableDeclaration` -> `LocalVariableDeclaration`             |
 | `x = 5;` (assignment)      | `ExpressionStatement` | `expression` -> `AssignmentExpression` (`lValue`, `rValue`)          |
-| `node1 :eq: node2`         | `NPEEqualsExpression` / `NPENotEqualsExpression` | `leftExpression`, `rightExpression`                                  |
 | `if` / `while`             | `IfStatement` / `WhileStatement` | `condition`, `ifTrue` (StatementList); `else` → `ifFalseStatement` (single Statement, see note) / `body` (StatementList) |
 | `for` / `foreach`          | `ForStatement` / `ForeachStatement` | `variable`, `condition`, `iteration` / `iterable`, `body`            |
 | `try { ... } catch`        | `TryCatchStatement` | `body` (StatementList), `catchClause`                                |

@@ -11,7 +11,7 @@ description: Use when creating, editing, validating, or inspecting jetbrains.mps
 
 - Treat the installed `jetbrains.mps.baseLanguage.collections` runtime descriptors as the authority for concepts, features, cardinalities, and assignability.
 - Use the packaged solution `org.modellwerkstatt.dataux.tests` for stable examples listed in [references/sandbox.md](references/sandbox.md).
-- Determine the target MPS project dynamically with `mps_mcp_list_open_projects`; never persist a project path or IDE-session state.
+- Never persist a project path or IDE-session state.
 - Never copy model, root, or node references from an application project. Patterns learned elsewhere must be anonymized and use explicit `TARGET_*` placeholders.
 - All links in this skill are relative and stay inside the distributed package.
 
@@ -19,21 +19,21 @@ description: Use when creating, editing, validating, or inspecting jetbrains.mps
 
 - Use MPS MCP tools; never read or edit raw `.mps` / `.mpl` XML (rule and fallback: [`MPS_AGENT_GUIDE.md`](../../MPS_AGENT_GUIDE.md#never-read-raw-mps-model-files)).
 - Query concepts with `mps_mcp_get_concept_details` and `l:83888646-71ce-4f1c-9c53-c54016f6ad4f:jetbrains.mps.baseLanguage.collections`, not the module-style reference.
-- Use fully qualified concept names in JSON blueprints.
+- Use the `qualifiedName` as `concept` in blueprints (`moai:mps-mcp-workflow`, `references/node-editing-rules.md`).
 - Collections operations are usually the `operation` child of a BaseLanguage `DotExpression`; do not insert them as standalone expressions.
-- Every `InferredClosureParameterDeclaration` needs a required `type` child. Use `jetbrains.mps.baseLanguage.structure.UndefinedType` when inference should determine the real type.
+- Closure parameters need a `type` child (`UndefinedType`) — `moai:mps-model-manipulation` (`references/closures-catalog.md`).
 - Prefer a small host skeleton followed by subtree insertion when the surrounding BaseLanguage code is large or uncertain.
 - Replace every `TARGET_*` placeholder with a resolvable destination-model reference before writing.
 - Validate the changed containing root with `mps_mcp_check_root_node_problems`; build or generate when the task requires it.
 
 ## Quick start
 
-1. Call `mps_mcp_list_open_projects` and choose the intended MPS project dynamically.
+1. Identify the target project (`moai:mps-mcp-workflow`, "Which project the tools act on"); call `mps_mcp_list_open_projects` only after a "no/multiple projects" error.
 2. Inspect the destination model with `mps_mcp_get_project_structure`; in a MoWare model the DevKit `org.modellwerkstatt.MoWareWerkbank` provides BaseLanguage, Collections and Closures (see `moai:mps-node-editing`).
 3. Load [references/concepts.md](references/concepts.md), then select a recipe from [references/workflows.md](references/workflows.md).
 4. Inspect a packaged example from [references/sandbox.md](references/sandbox.md) if a concrete AST shape is needed.
 5. Start from [references/blueprints/](references/blueprints/), and replace all placeholders.
-6. Dry-run ordinary Collections subtrees with the matching node-update operation against a host node. For the specialized `CustomContainers` root, dry-run [its root skeleton](references/blueprints/custom-containers-root-skeleton.json) with `mps_mcp_insert_root_node_from_json` (copy the skeleton to the system temp directory or pass it inline; see `moai:mps-node-editing`, File-Path Semantics); use the BaseLanguage skill for other host-language roots.
+6. Dry-run ordinary Collections subtrees with the matching node-update operation against a host node. For the specialized `CustomContainers` root, dry-run [its root skeleton](references/blueprints/custom-containers-root-skeleton.json) with `mps_mcp_insert_root_node_from_json` (file-path rules: `moai:mps-node-editing`, File-Path Semantics); use the BaseLanguage skill for other host-language roots.
 7. Insert or replace the smallest subtree possible and preserve existing node IDs.
 8. Run `mps_mcp_check_root_node_problems` on the containing root and any task-required make/generation checks.
 
@@ -48,6 +48,7 @@ description: Use when creating, editing, validating, or inspecting jetbrains.mps
 ## References
 
 - [Concepts and verified AST roles](references/concepts.md)
+- [Two `foreach` concepts, with blueprints](references/foreach-statements.md)
 - [Packaged examples](references/sandbox.md)
 - [Creation and editing workflows](references/workflows.md)
 - [Gotchas and diagnostics](references/gotchas.md)

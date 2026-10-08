@@ -42,4 +42,4 @@ Names without the `TARGET_MODEL.` prefix inside a blueprint (`ExamplePair`, `inb
 - [appui-module-skeleton.json](blueprints/appui-module-skeleton.json): complete `AppUiModule` root with configuration, minimal `isAuthenticated`, one main-menu action, one tile, `VERSION` and `OFFICIAL NAME`.
 - [batchjob-module-skeleton.json](blueprints/batchjob-module-skeleton.json): complete `BatchJobModule` root with configuration, minimal `isAuthenticated`, one producer/consumer pair, `CRON` and `CONSUMERS` for that pair, a default exception strategy (`DELAY_EXECUTION` 60 s), `VERSION` and `OFFICIAL NAME`. The producer's inbox-filling page is not included; add it with `ADD CHILD` on `runCommand.pages`.
 
-For roots and subtrees above roughly 4 KB, pass a file path instead of an inline string or construct incrementally. Root tools accept only files in the system temp directory, so copy the blueprint there first (`moai:mps-node-editing`, File-Path Semantics).
+For roots and subtrees above the inline limit, pass a file in the system temp directory or construct incrementally (file-path rules: `moai:mps-node-editing`, File-Path Semantics).

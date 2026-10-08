@@ -1,6 +1,6 @@
 ---
 name: mps-console
-description: Use for MPS Console commands and jetbrains.mps.lang.smodel.query expressions, including result printers, IDE commands, scripts, query forms and scopes, plus MCP insertion, history, recall, and execution. Also use when writing smodel queries in ordinary BaseLanguage model code.
+description: "Use for MPS Console commands and jetbrains.mps.lang.smodel.query expressions, including result printers, IDE commands, scripts, query forms and scopes, plus MCP insertion, history, recall, and execution. Also use when writing `smodel.query` scope queries (`#instances`, `#usages`, `#nodes`, `with (<scope>)`) in ordinary BaseLanguage model code; per-node smodel operations are `mps-model-manipulation`."
 ---
 
 # MPS Console and the smodel query language
@@ -66,7 +66,7 @@ The console input holds exactly **one** command (`jetbrains.mps.console.base.str
 
 ## Related Skills
 
-- `moai:mps-model-manipulation` — the `smodel` / `collections` / `closures` operations (`.where`, `.select`, `.ofConcept<C>`, `replace with new(C)`, `:eq:`) used in the bodies of console commands, `with` blocks, and `refactor` closures. The smodel query language layers on top of these.
+- `moai:mps-model-manipulation` — the `smodel` / `closures` operations (`.ofConcept<C>`, `replace with new(C)`, `:eq:`) used in the bodies of console commands, `with` blocks, and `refactor` closures; collections operations (`.where`, `.select`) are `moai:baselanguage-collections-dsl`. The smodel query language layers on top of these.
 - `moai:mps-node-editing` — the JSON blueprint format that `mps_mcp_insert_console_command_from_json` consumes (shared with `mps_mcp_insert_root_node_from_json`).
 - `moai:mps-baselanguage` — host BaseLanguage statements/expressions that fill `BLCommand` / `BLExpression`.
 - `moai:mps-run-configurations` — for running a `main`/test root node instead of console code.

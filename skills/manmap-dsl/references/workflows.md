@@ -2,7 +2,7 @@
 
 ## Create a Persistence Description
 
-Source semantics: [Persistence Description and mapping capabilities](../../../docu/manmap.md#persistence-description-und-mapping-möglichkeiten), [entity-mapping structure](../../../docu/manmap.md#aufbau-eines-entitymappings), and [fields, keys, and options](../../../docu/manmap.md#felder-schlüssel-und-optionen).
+Source semantics: [Persistence Description and mapping capabilities](../../../docu/manmap.md#persistence-description-und-mapping-möglichkeiten) and [fields, keys, and options](../../../docu/manmap.md#felder-schlüssel-und-optionen).
 
 1. Determine the target project dynamically and resolve the editable target model.
 2. Resolve ObjectFlow entity and property declaration nodes in that model.
@@ -26,7 +26,7 @@ Source semantics: [repositories and the four method kinds](../../../docu/manmap.
 6. Add query/save/delete/SQL subtrees surgically.
 7. Validate the root, then generate/build the owning solution.
 
-Repository method type states intent but does not create a transaction boundary and does not replace `QueryFromMap.readOnly` or join load modes.
+Method kind vs `QueryFromMap.readOnly` and the transaction boundary: see [Repositories und die vier Methodenarten](../../../docu/manmap.md#repositories-und-die-vier-methodenarten).
 
 ## Build a Mapped Query
 
@@ -47,13 +47,10 @@ Source semantics: [`save with`](../../../docu/manmap.md#speichern-mit-save-with)
 
 Use [save-with-map-subtree.json](blueprints/save-with-map-subtree.json) or [delete-with-map-subtree.json](blueprints/delete-with-map-subtree.json) inside a repository method body.
 
-- Save the parent with its own mapping.
-- Propagate parent keys/back-references to children explicitly.
-- Save every child with its own mapping.
-- Delete children in a relationally valid order before deleting the parent.
+- Order of saving/deleting a graph: see [Speichern von Objektgraphen](../../../docu/manmap.md#speichern-von-objektgraphen) and [Löschen mit `delete with`](../../../docu/manmap.md#löschen-mit-delete-with).
 - Register database-changing methods as ObjectFlow session operations when their effect belongs to successful command completion.
 
-Without a forced option, save decides insert versus update from key nullness. For composite keys, prefer an explicit insert/update option.
+Insert versus update without a forced option, composite keys: see [Insert oder Update](../../../docu/manmap.md#insert-oder-update).
 
 ## Direct SQL and Read Models
 
@@ -64,7 +61,6 @@ Source semantics: [Custom SQL](../../../docu/manmap.md#custom-sql-mit-sql), [par
 3. For a small scalar query, use an inline closure or `RowMapperFieldRef`.
 4. For DTO/projection/aggregate rows without a usable key, define a `NoKeyMapperField` and reference it from the SQL block.
 5. Match SQL aliases exactly to mapper field names and target properties.
-6. Treat no-key results as read-only and outside the session identity map.
 
 Use [custom-sql-statement-subtree.json](blueprints/custom-sql-statement-subtree.json) for the statement shape and [no-key-mapper-subtree.json](blueprints/no-key-mapper-subtree.json) for a portable DTO mapper. For a query mapping expression, inspect the focused shipped examples and resolve the mapper member in the target repository.
 

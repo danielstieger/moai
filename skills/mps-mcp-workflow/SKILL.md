@@ -10,10 +10,8 @@ Hub skill for working with JetBrains MPS (Meta Programming System) models and th
 ## Critical Directives
 
 - **Never read or edit raw `.mps` / `.mpl` XML; use `mps_mcp_*` tools.** Rule and fallback: [`MPS_AGENT_GUIDE.md`](../../MPS_AGENT_GUIDE.md#never-read-raw-mps-model-files).
-- **Preserve node IDs.** Prefer surgical edits (`mps_mcp_update_node`, …) over delete-and-reinsert; `mps_mcp_update_root_node_from_json` keeps only the root ID (see `moai:mps-node-editing`). Deleting destroys persistent IDs and breaks incoming references.
+- **Editing rules** (preserve node IDs, surgical `mps_mcp_update_node` over full-root rewrites, validate every changed root): `moai:mps-node-editing`.
 - **Language definitions are off-limits.** In a MoWare application project never edit language structure or aspects (`mps_mcp_alter_structure`, `mps_mcp_scaffold_editor`, aspect models of the MoWare languages) — see `MPS_AGENT_GUIDE.md`.
-- **Surgical edits over full-root rewrites.** When a single child changes, prefer `mps_mcp_update_node` over re-running `mps_mcp_update_root_node_from_json` on the whole root.
-- **Validate frequently.** A successful insertion (`"ok": true`) does not mean the AST is semantically valid — always follow with `mps_mcp_check_root_node_problems` on each changed root.
 
 > **Tool name note**: MPS MCP tools are named with a `mps_mcp_` prefix (e.g. `mps_mcp_query_nodes`, `mps_mcp_alter_nodes`, `mps_mcp_get_concept_details`). Your MCP client wraps these with a server-specific prefix (e.g. `mcp__mps-mcp__`), which varies by environment. Match tools by the stable `mps_mcp_*` suffix.
 
@@ -33,9 +31,9 @@ All skills bundled with this package are loaded as `moai:<skill-name>`. Load whi
 |-------|---------------|
 | `moai:baselanguage-collections-dsl` | Create and edit BaseLanguage collection types, creators, operations, access expressions, and collection foreach statements. |
 | `moai:mps-baselanguage` | Author and edit `jetbrains.mps.baseLanguage` nodes using the Java parser or JSON AST blueprints. |
-| `moai:mps-console` | Work with MPS Console commands and `jetbrains.mps.lang.smodel.query` queries. |
+| `moai:mps-console` | Console commands and `smodel.query` scope queries. |
 | `moai:mps-language-analysis` | Analyze MPS language definitions, concepts, metadata, aspects, and sample nodes. |
-| `moai:mps-model-manipulation` | Write BaseLanguage model code using smodel, collections, and closures. |
+| `moai:mps-model-manipulation` | smodel + closures model code. |
 | `moai:mps-node-editing` | Add, update, or delete MPS nodes using JSON blueprints. |
 | `moai:mps-run-configurations` | Create and execute MPS IDE run configurations for runnable roots and tests. |
 | `moai:dataux-dsl` | Create, edit, validate, or inspect MoWare DataUX pages, forms, tables, layouts, bindings, includes, and menus. |
@@ -75,7 +73,7 @@ Open `references/node-editing-rules.md` for the full rulebook on adding/updating
 
 Open `references/reference-formats.md` for the reference-format protocol: node refs (`r:`/`i:`), concept refs (`c:`), and the critical "never use a concept ref where a node ref is expected" rule.
 
-Open `references/bulk-creation.md` for the print-shallow-then-add-children staged construction workflow used when subtrees exceed the JSON size limit.
+Large subtrees / staged construction and the inline-size/file-path rules: `moai:mps-node-editing` (`references/staged-construction.md`, SKILL.md File-Path Semantics).
 
 Open `references/analysis-tools.md` for the inventory of analysis operations (`mps_mcp_print_node`, `mps_mcp_check_root_node_problems`, `mps_mcp_alter_nodes FIX_REFERENCES`, etc.).
 
