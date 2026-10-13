@@ -1152,6 +1152,8 @@ Wichtige Konfigurationsknoten sind:
 
 Damit lassen sich gemeinsame `section`s einbinden, einzelne Werte pro Anwendung oder Test überschreiben und unterschiedliche Konfigurationen für Entwicklung, Test und Deployment bilden.
 
+**Externe Properties-Datei.** Umgebungs- oder installationsspezifische Konfigurationswerte können optional in eine externe Properties-Datei ausgelagert werden. Die Umgebungsvariable `MOWARE_APP_PROPPATH` legt das Verzeichnis fest, in dem die Anwendung die Datei `moware_app.properties` erwartet. Die Datei eignet sich für Werte, die nicht ins Repository gehören, etwa Datenbank-Zugangsdaten oder andere sensible Parameter. Die Property-Werte einer `OFXConfig` referenzieren sie direkt über Platzhalter wie `${DB_USERNAME}` oder `${DB_PASSWORD}`. Die Verwendung ist optional; bestehende Konfigurationen funktionieren unverändert weiter.
+
 Services und Repositories werden über diese Konfiguration zu Laufzeitkomponenten. Ein Komponentenaufruf `#` löst die passende konfigurierte Instanz auf.
 
 ### User Environment und User Service
