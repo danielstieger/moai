@@ -39,6 +39,8 @@ Die folgende Tabelle ist verbindlich: Ein Modell enthält, was unter „Inhalt�
 
 ### Abhängigkeiten
 
+Ziel der folgenden Regeln ist, dass Fachlogik, Oberfläche, Bounded Contexts und Fremdsysteme sich unabhängig voneinander ändern lassen. Eng gekoppelt wird nur, was fachlich zusammengehört.
+
 - **KONVENTION:** Ein Modell importiert nie ein Modell einer höheren Ebene. Insbesondere importieren `domain` und `read` nie ein `unit` oder `app`.
 - **KONVENTION:** Innerhalb eines Bounded Context dürfen Modelle derselben Ebene einander importieren, auch gegenseitig, wenn die Fachlichkeit zyklisch ist (`domain` und `read` desselben Bereichs, die `domain`-Modelle zweier Bereiche, zwei `unit`-Modelle), soweit die Tabelle nichts anderes festlegt.
 - **KONVENTION:** Ein Aggregat-Bereich greift mit `domain` und `read` nie auf einen Use-Case-Bereich zu.

@@ -3,7 +3,7 @@
 ### Was getestet wird
 
 - **KONVENTION:** Jede Service Method für einen Zustandsübergang hat einen Test für den erfolgreichen Übergang.
-
+- **KONVENTION:** Eine Service Method ohne Komponentenaufrufe wird mit Objekten getestet, die der Test selbst aufbaut, ohne Testdaten in der Datenbank. Testdaten in der Datenbank braucht nur der Test der ladenden Service Method, der das Zusammenspiel mit Repositories und Lesemodellen prüft.
 
 ### Plausible Testdaten
 
