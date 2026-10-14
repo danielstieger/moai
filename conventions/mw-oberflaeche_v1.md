@@ -1,6 +1,7 @@
 ## Verbindliche Konventionen für Benutzeroberflächen
 
 - **KONVENTION:** Jede Page eines Commands setzt einen Page Title.
+- **KONVENTION:** Ein `Delegate Form` wird nicht direkt an ein Value Object gebunden, sondern an die Entity oder das DTO, das es enthält; die Bestandteile des Value Objects werden über den Pfad erreicht, etwa `betrag.amount`.
 - **KONVENTION:** Eine Oberfläche wird nicht in einen linken und einen rechten Bereich aufgeteilt. Jedes UI-Element verwendet die volle Breite (100 %); mehrere Elemente stehen untereinander. Das gilt für UI-Elemente wie Formulare, Tabellen und Layouts, nicht für die Spalten innerhalb eines Formulars oder einer Tabelle.
 - **KONVENTION:** Menüeinträge eines `Page Pane`s oder einer Tabelle stehen in einem `Submenu` (Overflow-Menü), auch die Hauptaktion der Tabelle mit Hotkey `ENTER`. Das `Submenu` auf oberster Ebene hat keinen Text.
 - **KONVENTION:** Ein `Delegate Form`, das in ein `Grid Layout` eingebunden ist, erhält als Zeilengewicht immer `-1` (`MinWeight`, minimale Höhe). Den verbleibenden Platz bekommen die Tabellen.

@@ -72,6 +72,8 @@ Wird einem `Page Pane` auf Root-Ebene genau eine Instanz seines Root-Typs bereit
 
 Eine Property-Bindung wird auf der aktuellen Selektion ihres Eigentümertyps ausgewertet. Bei einer selektierten `Rechnung` bezeichnet die Bindung `Rechnung.kunde` das `kunde`-Objekt genau dieser Rechnung. Ein `Delegate Form` kann so an eine Property gebunden werden, deren Typ eine Entity, ein DTO oder ein Value Object ist.
 
+Value Objects werden unveränderlich bearbeitet: Schreibt ein Delegate über einen Pfad wie `betrag.amount`, erzeugt DataUX mit der `with`-Methode des Value Objects einen neuen Wert und ersetzt das ganze Value Object am Eigentümer.
+
 Das Formular liest diesen Bindungskontext, erzeugt oder verändert aber keine Selektion. Ein an `Rechnung.kunde` gebundenes Formular hängt daher nicht an einer eventuell vorhandenen `Kunde`-Selektion, sondern zeigt ausschließlich den `kunde` der aktuell selektierten `Rechnung`.
 
 ##### Tabellenbindung und Selektion

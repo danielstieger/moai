@@ -126,8 +126,9 @@ Das Beispiel umfasst die Suche nach Rechnungen, die Bearbeitung einer Rechnung m
 | Element       | Beispiel                  | Aufgabe                                                                                                                                                       |
 | ------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Entity`      | `Rechnung`                | Enthält Rechnungs-ID, Rechnungsnummer, Rechnungsdatum und eine Liste von Rechnungspositionen.                                                                 |
-| `Entity`      | `Rechnungsposition`       | Enthält Positionsnummer, Beschreibung, Menge und Einzelpreis.                                                                                                 |
+| `Entity`      | `Rechnungsposition`       | Enthält Positionsnummer, Beschreibung, Menge, Einzelpreis und Lieferstichtag.                                                                                 |
 | `Value Object` | `Geldbetrag`              | Fasst Betrag und Währung zusammen.                                                                                                                            |
+| `Value Object` | `Lieferstichtag`          | Stichtag mit Toleranztagen davor und danach. Prüft mit `istTermingerecht(datum)`, ob ein Lieferdatum im erlaubten Fenster liegt; die Regel bleibt im Wert gekapselt. |
 | `DTO`         | `RechnungInfo`            | Read-only-Projektion für ein Suchergebnis. Enthält die Rechnungs-ID sowie die für die Ergebnisliste benötigten Rechnungsdaten.                                 |
 | `DTO`         | `RechnungFilter`          | Enthält Suchkriterien, beispielsweise Rechnungsnummer und Datumsbereich, sowie die Property `results` vom Typ `list<RechnungInfo>`.                           |
 | `DTO`         | `RechnungsSummenErgebnis` | Nimmt das Ergebnis der SQL-Aggregation zur Summe aller Rechnungen auf.                                                                                        |
@@ -215,11 +216,12 @@ Eine `OFXTestSuit` kann beispielsweise folgende Fälle abdecken:
 
 - Zwei Positionen mit `2 × 50 EUR` und `1 × 30 EUR` ergeben eine Rechnungssumme von `130 EUR`.
 - Eine Position mit Menge `0` wird fachlich abgelehnt.
+- Ein `Lieferstichtag` am 31.10. mit einem Tag Toleranz davor und zwei Tagen danach wertet den 30.10. und den 2.11. als termingerecht, den 29.10. und den 3.11. nicht.
 - Die Rechnungssuche liefert die im Test angelegten Rechnungen als `RechnungInfo`-DTOs.
 
 ### ExpensiveCode und CheapCode im Beispiel
 
-Rechnungsstruktur, Berechnungen, fachliche Prüfungen und Aggregationslogik bilden den sorgfältig abzusichernden fachlichen Kern (**ExpensiveCode**).
+Rechnungsstruktur, Berechnungen, fachliche Prüfungen und Aggregationslogik bilden den sorgfältig abzusichernden fachlichen Kern (**ExpensiveCode**). Die Regel zum Lieferstichtag ist dabei im Value Object gekapselt und lässt sich ohne Datenbank testen.
 
 Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion mit diesem Modell gehören zum **CheapCode**. Sie lassen sich beim Ausprobieren unmittelbar beurteilen und durch kurze Feedbackzyklen verbessern. Darstellungs- und Interaktionsanteile eines Commands sind typischerweise CheapCode; fachlich relevante Ablaufregeln im Command können aber auch ExpensiveCode sein.
 
