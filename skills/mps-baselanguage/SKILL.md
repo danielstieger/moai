@@ -1,6 +1,6 @@
 ---
 name: mps-baselanguage
-description: Author and edit MPS `jetbrains.mps.baseLanguage` (Java) nodes — choose between the Java parser and JSON AST blueprints, map Java syntax to baseLanguage concepts/roles, harvest persistent member references, and validate. Use for class/method bodies, fields, expressions, statements, or any plain Java code inside MPS models; the smodel/closures extensions are `mps-model-manipulation`, collections are `baselanguage-collections-dsl`.
+description: Author and edit MPS `jetbrains.mps.baseLanguage` (Java) nodes — choose between the Java parser and JSON AST blueprints, map Java syntax to baseLanguage concepts/roles, harvest persistent member references, and validate. Use for class/method bodies, fields, expressions, statements, or any plain Java code inside MPS models; collections and closures are `moai:baselanguage-collections-dsl`, the smodel extension is `moai:mps-model-manipulation`.
 ---
 
 # MPS BaseLanguage (Java) Authoring
@@ -12,12 +12,14 @@ description: Author and edit MPS `jetbrains.mps.baseLanguage` (Java) nodes — c
 - **Node equality**: `:eq:`/`:ne:` (`NPEEqualsExpression`/`NPENotEqualsExpression`), never `==`/`.equals()` — `moai:mps-model-manipulation` (`references/node-equality.md`).
 - **Constructor return type**: `ConstructorDeclaration.returnType` MUST be a `VoidType` node. Leaving it empty fails validation.
 - **`ClassCreator` wiring**: `ClassCreator.baseMethodDeclaration` points at the **constructor declaration**, not the class. `InstanceMethodCallOperation.baseMethodDeclaration` points at the **method declaration**.
+- **`new …` is always a `GenericNewExpression` plus a creator**: the `GenericNewExpression` is the `Expression`; its `creator` child is `ClassCreator`, `ArrayCreator`, `ArrayCreatorWithInitializer`, `AnonymousClassCreator`, a collections creator, or smodel `SNodeCreator` (`new node<C>()`). Creators are `AbstractCreator`s, not `Expression`s — none can stand alone in `ReturnStatement.expression`, an argument, or an initializer.
 - **Inherited methods**: use the **declaring class** ref for `baseMethodDeclaration`, not the subclass that calls the method. E.g. `addActionListener` is declared on `AbstractButton`, so use the `AbstractButton` class ref.
 - **Expressions in statement lists**: any `Expression` must be wrapped in `ExpressionStatement` to be valid inside a `StatementList`.
 - **Variable declarations**: in method bodies wrap `LocalVariableDeclaration` in `LocalVariableDeclarationStatement`. In `ForStatement.variable` use `LocalVariableDeclaration` directly, no wrapper.
 - **Prefer primitives**: use `string` (`StringType`) over `String` (`ClassifierType`) where possible; same for `int`, `boolean`, etc.
-- **Compatibility**: BaseLanguage core is Java 7 + generics; the parser also accepts the Java 8+ syntax MPS recognizes (lambdas → `closures` `ClosureLiteral`), nothing MPS-specific — limits and workarounds: `moai:mps-model-manipulation` (`references/java-parser-capabilities.md`).
+- **Compatibility**: BaseLanguage core is Java 7 + generics. JSON blueprints have no lambda syntax — use `closures` `ClosureLiteral` (blueprints: `moai:baselanguage-collections-dsl`). The parser also accepts the Java 8+ syntax MPS recognizes (lambdas → `ClosureLiteral`), nothing MPS-specific — limits and workarounds: `moai:mps-model-manipulation` (`references/java-parser-capabilities.md`).
 - **Surgical edits**: when a single child changes prefer `mps_mcp_update_node` over rewriting the whole root — a full-root rewrite keeps only the root ID and re-creates all children, breaking incoming refs (`moai:mps-node-editing`, staged construction).
+- **Ask the typesystem**: for types such as `int + long` or assignability use `mps_mcp_query_types` (`OPERATION_TYPE`, `IS_SUBTYPE`, `COERCE`) instead of working them out — `moai:mps-mcp-workflow` (`references/type-queries.md`).
 
 ## Choose Your Path
 
@@ -34,25 +36,26 @@ Pick the right authoring tool before you start:
 2. **Resolve dependencies**: in a MoWare model the DevKit `org.modellwerkstatt.MoWareWerkbank` provides BaseLanguage, closures and collections (see `moai:mps-node-editing`). Models for referenced nodes must also be imported.
 3. **Skeleton first**: for any non-trivial root, insert a placeholder skeleton (`mps_mcp_create_root_node` + `mps_mcp_update_root_node_from_json` or the parser) before filling member bodies.
 4. **Harvest references**: for own members, run `mps_mcp_print_node` on the skeleton to read persistent refs of constructors, methods, and fields. For JDK / library stubs, derive refs from the class ref using the URL-encoded signature formula (see references).
-5. **Apply bodies**: edit one subtree at a time with `mps_mcp_update_node`, or bulk-rewrite via `mps_mcp_update_root_node_from_json`.
+5. **Apply bodies**: edit one subtree at a time with `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`) or the parser (`mode: "child"`). Never re-run `mps_mcp_update_root_node_from_json` after harvesting — it re-creates all children and invalidates the harvested refs (`moai:mps-node-editing`, `references/staged-construction.md`).
 6. **Auto-resolution**: for unambiguous local refs (a parameter, a local variable, a unique method name), pass the plain name as `target` — MPS resolves it after insertion. For overloaded or stub members, use a persistent ref.
 7. **Validate in three gates**:
-   - `dryRun: true` on insert tools — catches structural / assignability errors before mutation
+   - `dryRun: true` on insert tools — catches structural / assignability errors before mutation (plain-name refs are not looked up, node factories do not run)
    - `mps_mcp_check_root_node_problems` — semantic checking
    - `mps_mcp_alter_nodes MAKE` — generation + compilation
-8. **Repair**: if a few refs are broken after insert, run `mps_mcp_alter_nodes FIX_REFERENCES` rather than re-harvesting all of them.
+8. **Repair**: every write reports `fixReferences.stillBroken`; if a few refs stay broken, run `mps_mcp_alter_nodes FIX_REFERENCES` rather than re-harvesting all of them.
 
 ## Related Skills
 
 - **`moai:mps-node-editing`** — general node mutation tools (`mps_mcp_update_node`, etc.). Load first if you have not seen them.
-- **`moai:mps-model-manipulation`** — `smodel` + `collections` + `closures` patterns layered on top of BaseLanguage; load when manipulating MPS nodes from BaseLanguage.
+- **`moai:baselanguage-collections-dsl`** — `collections` + `closures` patterns layered on top of BaseLanguage (`sequence`/`list`/`map`, `.where`/`.select`, closure literals); load for any lambda, closure or collection operation.
+- **`moai:mps-model-manipulation`** — `smodel` patterns layered on top of BaseLanguage; load when manipulating MPS nodes from BaseLanguage.
 
 ## Reference Index
 
 - Open `references/concept-mapping.md` when you need the Java-syntax → MPS-concept lookup table and the key role names (statements, expressions, types, declarations).
-- Open `references/json-patterns.md` when you need ready-to-paste JSON blueprints for common constructs (local variable, instance-method call, anonymous class, array creation, super-constructor call, empty class template).
+- Open `references/json-patterns.md` when you need ready-to-paste JSON blueprints for common constructs (local variable, instance-method call, anonymous class, array creation (sized or with initializer), super-constructor call, static method call, empty class template).
 - Open `references/critical-rules.md` when something fails validation and you want the rulebook on `ExpressionStatement`, `ClassCreator`, anonymous classes, mandatory bodies, `FieldReferenceOperation`, etc.
-- Open `references/parse-java-tips.md` when using `mps_mcp_parse_java_and_insert` and you need binary-expression priority handling, placeholder strategy, or post-insert verification steps.
+- Open `references/parse-java-tips.md` when using `mps_mcp_parse_java_and_insert` and you need binary-expression priority handling, placeholder strategy, `recovery`, `StatementList` auto-wrap, or post-insert verification steps.
 - Open `references/stub-references.md` when you need to point a `baseMethodDeclaration` at a JDK or library member — covers ref derivation, URL encoding, inherited-method handling, and the GET_ASSIGNABLE_REFERENCES fallback.
 - Open `references/json-ast-workflow.md` when authoring a non-trivial BaseLanguage root via JSON AST — covers staged skeleton → harvest → patch → validate, plus the `ClassCreator` vs `InstanceMethodCallOperation` ref distinction.
 - Open `references/troubleshooting.md` when you hit `dryRun` errors, broken-ref symptoms in generated Java (`new ()`, `???()`), stale-ref errors, or "model checks pass but MAKE fails".

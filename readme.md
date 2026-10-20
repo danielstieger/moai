@@ -23,8 +23,8 @@ The MoWare skills are:
   configuration;
 - `moai:manmap-dsl` for persistence mappings, repositories, queries and SQL;
 - `moai:dataux-dsl` for user interfaces, applications and batch jobs;
-- `moai:baselanguage-collections-dsl` for BaseLanguage collections inside
-  MoWare code.
+- `moai:baselanguage-collections-dsl` for BaseLanguage collections and
+  closures inside MoWare code.
 
 `moai:mps-mcp-workflow` is the hub skill for MPS work; its skill table lists
 the remaining MPS skills (BaseLanguage, node editing, model manipulation,
@@ -82,6 +82,6 @@ instructions and skills outside the submodule) are stated in
 
 ## Prerequisites
 
-- JetBrains MPS with the target project open;
+- JetBrains MPS 2026.2 (build 262.10968.569) with the target project open;
 - enabled MPS MCP integration for model-aware agent work;
 - the MoAI plugin installed and enabled in the agent runtime in use.

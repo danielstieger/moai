@@ -37,8 +37,9 @@ The focused references were verified to resolve. They are examples only: do not 
 
 ## Navigation Procedure
 
-1. Determine the target MPS project dynamically.
-2. Resolve the shipped module/model by the explicit reference above. If name-based discovery omits globally visible modules, call `mps_mcp_get_project_structure` with `includeStubModules=true`.
-3. Print only the root or subtree needed for the current shape.
-4. Replace every domain/mapping/member reference with a reference resolved in the actual target model.
-5. Validate the changed target root; do not edit these examples as part of an application task.
+1. Pass `projectPath` in every call (`moai:mps-mcp-workflow`, "Which project the tools act on").
+2. Resolve the shipped module/model by the explicit reference above. If name-based discovery omits globally visible modules, call `mps_mcp_get_project_structure` with `includeStubModules=true`; `nodeDetail="names"` and a small `nodeDepth` keep the listing short. An explicit model or module selector is all-or-nothing: one invalid reference fails the whole call.
+3. Count or locate shapes with `mps_mcp_query_nodes` `FIND_INSTANCES` (`conceptRefs`, `rootsOnly`, `detail:"count"`) before printing.
+4. Print only the root or subtree needed for the current shape; `format="PLAIN TEXT"` (with a space) gives the editor view.
+5. Replace every domain/mapping/member reference with a reference resolved in the actual target model.
+6. Validate the changed target root; do not edit these examples as part of an application task.

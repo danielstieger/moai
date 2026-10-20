@@ -13,22 +13,31 @@ The core workflow for mutating MPS nodes through MCP tools. JSON blueprints desc
 - **Resolve before editing** — call `mps_mcp_get_current_editor_root_node` (for the user's focus) or `mps_mcp_search_root_node_by_name` (by name) to lock onto the target. Don't guess refs.
 - **Prefer surgical edits** — `mps_mcp_update_node` (`ADD`/`CHILD` or `SET`/`CHILD`) preserves persistent IDs. `mps_mcp_update_root_node_from_json` rewrites the entire root and is wasteful when only one subtree changed.
 - **Don't delete-and-reinsert** to make a small change — deletion destroys persistent IDs and breaks incoming references.
-- **Validate frequently** — call `mps_mcp_check_root_node_problems` immediately after inserting or modifying a complex node. `"ok": true` from insert does not mean the AST is semantically valid.
+- **Cloning an existing node? Use `mps_mcp_alter_nodes` `COPY_NODE`, not a JSON blueprint.** It clones the subtree natively within the same model — a root as a new root, a node in a `0..n`/`1..n` role as the next sibling (a single-child role is an error) — then tweak the copy with `mps_mcp_update_node`. Reserve blueprints for nodes with no close match to copy from; nodes of shipped example modules cannot be copied this way.
+- **Filling a typed slot?** Ask `mps_mcp_query_nodes` `GET_EXPECTED_TYPE` on the node you are about to replace and confirm a candidate with `mps_mcp_query_types` `IS_SUBTYPE` — `moai:mps-mcp-workflow` (`references/type-queries.md`).
+- **A blueprint is not the whole node** — outside a dry run the concept's node factory runs and may add properties, children and references your JSON never mentions. See [Node factories](#node-factories).
+- **Validate frequently** — call `mps_mcp_check_root_node_problems` immediately after inserting or modifying a complex node; after work on several roots, once on the model reference with `perRoot=true`. `"ok": true` from insert does not mean the AST is semantically valid; read `warnings` and `details.uncheckedSubtrees` as well.
 
 ## `mps_mcp_update_node` — Unified Node-Mutation Tool
 
-All child, property, and reference operations on existing nodes go through `mps_mcp_update_node`. The operation is selected via `operation` (`ADD`/`SET`) × `kind` (`CHILD`/`PROPERTY`/`REFERENCE`). There is no `DELETE` operation — deletion is `SET` with a `null` value.
+All child, property, and reference operations on existing nodes go through `mps_mcp_update_node`. The operation is selected via `operation` (`ADD`/`SET`) × `kind` (`CHILD`/`PROPERTY`/`REFERENCE`). **There is no `DELETE` operation** — deletion is a `SET`:
+
+- **Delete a child:** `SET` × `CHILD` with `childNodeRef` and **no `childJson`** (omit the parameter or send an unquoted JSON `null`; the string `"null"` is rejected).
+- **Clear a property or reference:** an unquoted `null` as the **third element** of the triplet, e.g. `[nodeRef, "name", null]`. A shortened two-element row is rejected (`Invalid property triplet: expected at least 3 elements`), not read as a delete.
+- **Delete a root:** `mps_mcp_update_root_node_from_json` with `operation: "DELETE"` and the root's `nodeReference` (no blueprint).
 
 | operation × kind        | Required parameters                                           | Notes |
 |-------------------------|---------------------------------------------------------------|-------|
 | `ADD` × `CHILD`         | `nodeReference` (parent), `childRole`, `childJson`            | Optional `position` (0-based; null/-1 = append) and `dryRun`. A `position` ≥ the current child count clamps to an append; a negative value other than -1 is rejected. The response's `data.index` reports the actual landing index. |
-| `SET` × `CHILD`         | `childNodeRef`, `childJson`                                   | Replaces an existing child; preserves its position in the role. `childJson = null` **deletes** the child (returns the parent's envelope). Optional `dryRun`. |
+| `SET` × `CHILD`         | `childNodeRef` (+ `childJson` to replace)                     | Replaces an existing child; preserves its position in the role. Without `childJson` it **deletes** the child. Optional `dryRun`. The success envelope is the **parent's** (`data.reference` is the parent) for both replacement and deletion; the replaced child's reference is stale — find the new child with `mps_mcp_print_node` on the parent. |
 | `SET` × `PROPERTY`      | `properties` = `[[nodeRef, propertyName, value], …]`          | Batch operation; returns per-row results. `value = null` **deletes** the property. |
 | `SET` × `REFERENCE`     | `references` = `[[nodeRef, role, targetRefOrName], …]`        | Batch operation; `targetRefOrName` accepts an `r:...` ref or a plain name. A plain name is resolved within the reference role's search scope; if it cannot be resolved the call fails (`NOT_FOUND`), preserves the previous reference value, and stores no dangling reference. |
 
-`ADD` × `PROPERTY` and `ADD` × `REFERENCE` are not valid combinations and return an error envelope.
+`ADD` × `PROPERTY` and `ADD` × `REFERENCE` are not valid combinations and return an error envelope; so does any other `operation` value, `DELETE` included.
 
-`mps_mcp_update_node` (PROPERTY / REFERENCE / CHILD) and `mps_mcp_alter_nodes` MOVE_CHILD / MOVE_NODE_TO_PARENT also work on nodes inside the **current MPS Console input command** — pass the node's normal persistent reference; no extra parameter is needed. The node must be inside the current unexecuted console input (not history/stale). MOVE_NODE_TO_PARENT only relocates a node *within* the current console command — moving a node between the console and a project model, or making a console node a root, is refused. Edits to console nodes skip disk-persistence and refresh the console's imports instead. Nodes outside the selected project are rejected as before.
+`mps_mcp_update_node` (PROPERTY / REFERENCE / CHILD) and `mps_mcp_alter_nodes` MOVE_CHILD / MOVE_NODE_TO_PARENT / COPY_NODE also work on nodes inside the **current MPS Console input command** — pass the node's normal persistent reference; no extra parameter is needed. The node must be inside the current unexecuted console input (not history/stale). MOVE_NODE_TO_PARENT only relocates a node *within* the current console command — moving a node between the console and a project model, or making a console node a root, is refused. Edits to console nodes skip disk-persistence and refresh the console's imports instead. Nodes outside the selected project are rejected.
+
+`MOVE_NODE_TO_PARENT` has two forms: a non-null `newParentRef` plus `role` reparents the node; omitting `newParentRef` and supplying `modelReference` promotes it to a root. An explicit `"newParentRef": null` is rejected.
 
 ## Prerequisites
 
@@ -38,7 +47,7 @@ All child, property, and reference operations on existing nodes go through `mps_
     - `mps_mcp_search_root_node_by_name` for a known name.
 - Resolve required languages and concepts:
     - Check used languages of the current model via `mps_mcp_get_project_structure`.
-    - **DevKit rule for MoWare models:** every new model gets the DevKit `org.modellwerkstatt.MoWareWerkbank` right after `mps_mcp_create_model`: `mps_mcp_model_used_language(modelReference, kind="devkit", usedLanguage="org.modellwerkstatt.MoWareWerkbank")`. It provides objectflow, manmap, dataux, baseLanguage, closures, collections and javadoc; do not add these languages individually. Inserting a node whose language is missing adds that language automatically (verified), but a model without the DevKit is incomplete.
+    - **DevKit rule for MoWare models:** every new model gets the DevKit `org.modellwerkstatt.MoWareWerkbank` right after `mps_mcp_create_model`: `mps_mcp_model_used_language(modelReference, kind="devkit", usedLanguage="org.modellwerkstatt.MoWareWerkbank")`. It provides objectflow, manmap, dataux, baseLanguage, closures, collections and javadoc; do not add these languages individually. Inserting a node whose language is missing adds that language automatically (verified), even when the DevKit already provides it — harmless, but a model without the DevKit is incomplete.
     - Get concept details using `mps_mcp_get_concept_details` for specific languages.
     - Use `mps_mcp_search_concepts` for discovery.
 
@@ -47,9 +56,9 @@ All child, property, and reference operations on existing nodes go through `mps_
 1. **Identify** the target node (existing) or parent model (new root).
 2. **Choose the right tool**: `mps_mcp_create_root_node` / `mps_mcp_insert_root_node_from_json` for new roots; `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`/`PROPERTY`/`REFERENCE`) for surgical edits; `mps_mcp_update_root_node_from_json` only for full-root rewrites.
 3. **Author the JSON** following the unified blueprint format.
-4. **Insert** with `dryRun: true` first for large blueprints and read `warnings` (`references/json-format.md`).
-5. **Validate** with `mps_mcp_check_root_node_problems`.
-6. **Repair** broken refs with `mps_mcp_alter_nodes FIX_REFERENCES` if validation surfaces resolvable-but-unresolved targets.
+4. **Insert.** A `dryRun: true` call checks concepts, roles, properties and assignability; it runs no node factories and never looks up a reference target given by name — it warns "is a name, not looked up" for every one, existing names included. Do not rewrite names or dry-run again because of those warnings; fix only "names no node" and "matches no Model.Root" warnings. After the real write, `fixReferences.stillBroken` must be 0. Full rule: `moai:mps-mcp-workflow` ([`references/response-envelope.md`](../mps-mcp-workflow/references/response-envelope.md#dry-run-response)).
+5. **Check the result** with `mps_mcp_print_node` when the concepts have node factories (what the factory added is not in your blueprint), then **validate** with `mps_mcp_check_root_node_problems` — the root, or the model reference with `perRoot=true` after several roots. Read `warnings` and `details.uncheckedSubtrees` as well as `data`; apply a problem's `quickFixes` with `mps_mcp_apply_intention` or `autoApplyQuickFixes=true`.
+6. **Repair** broken refs with `mps_mcp_alter_nodes FIX_REFERENCES` if `stillBroken` or validation shows resolvable-but-unresolved targets.
 
 ## Related Skills
 
@@ -61,13 +70,28 @@ All child, property, and reference operations on existing nodes go through `mps_
 
 The tools that accept a node JSON blueprint (`mps_mcp_update_node` for `ADD`/`SET` × `CHILD`, `mps_mcp_insert_root_node_from_json`, `mps_mcp_update_root_node_from_json`, `mps_mcp_insert_console_command_from_json`) take the blueprint in `childJson` / `json`:
 
-- The parameter is **either** an inline JSON string (max 4 KB) **or** an absolute file path. `mps_mcp_update_node.childJson` accepts any absolute path; the root/console tools (`insert_root_node_from_json`, `update_root_node_from_json`, `insert_console_command_from_json`) accept only a file **inside the system temp directory**. Bundled blueprint files (`references/blueprints/*.json` of the DSL skills) must therefore be copied to the temp directory, or their content passed inline (≤ 4 KB), before use.
+- The parameter is **either** the JSON itself (max 4 KB; real JSON or that JSON written as a string) **or** an absolute file path.
+- **Every blueprint tool accepts only a file inside the JVM system temp directory** — `$TMPDIR` on Linux (`/tmp` when `TMPDIR` is unset), `%TEMP%` on Windows. A leading `$TMPDIR`, `${TMPDIR}` or `%TEMP%` in the path is expanded by the server. Any other path is rejected (`Input file path '...' is not inside the system temp directory`), so bundled blueprint files (`references/blueprints/*.json` of the DSL skills) are copied first or passed inline: `d="${TMPDIR:-/tmp}/moai-blueprints"; mkdir -p "$d"; cp <blueprint>.json "$d/"`.
+- `mps_mcp_insert_root_node_from_json` and `mps_mcp_update_root_node_from_json` also accept a **top-level array** (bulk, atomic); `mps_mcp_update_node` `childJson` takes a single object only.
 - Files may contain either a **raw node blueprint** or the **full MCP response envelope** produced by `mps_mcp_print_node`; in the latter case the `data` field is used.
 - **Ordinary input files are never deleted.** Only temporary JSON files created by this toolset may be cleaned up after reading (and only when `dryRun=false`).
 - Very large JSON inputs may be truncated by the MCP transport before the tool reads them. If that happens, insert a smaller blueprint first and add children in follow-up calls with `mps_mcp_update_node` (`ADD`/`CHILD` or `SET`/`CHILD`), or pass the JSON as a file path instead of an inline string. See `references/staged-construction.md` for the recommended pattern.
+
+## Node factories
+
+Many concepts ship a **node factory** that initializes a freshly created node; the MoWare languages use them widely (an Entity gets its key property, a DataUX form its label option, a SQL block its mapping closure). Outside a dry run, the blueprint tools run the factory for every node they **create** — each new root and every nested child of `mps_mcp_insert_root_node_from_json`, the new child of `mps_mcp_update_node` `ADD`/`SET` × `CHILD`, the staged children (not the existing root) of `mps_mcp_update_root_node_from_json`. Factories see the enclosing nodes. `COPY_NODE` and deletions run none.
+
+- **A factory fills only the roles the blueprint omits.** A property you set wins over the factory's value. A child or reference role you **name** replaces the factory's content — even an empty one, `{"role": "options", "nodes": []}`, which is the way to suppress unwanted factory children.
+- **Name a role only to override it.** Listing a role you meant to leave alone discards the factory's contribution; omitting a role keeps it.
+- **Mandatory roles are not auto-filled.** A role neither the factory nor the blueprint fills stays empty, and `mps_mcp_check_root_node_problems` reports it.
+- **A dry run runs no factories**, so it validates the blueprint, not the final node. Check the written node with `mps_mcp_print_node` and validate it; the per-DSL factory effects are in each DSL skill's `gotchas.md` ("Node factories").
+- **Factory side effects survive a failed batch.** A failed call removes only the nodes it created, not what factories wrote elsewhere (used languages, model imports). Re-read the affected state instead of assuming a failed call changed nothing.
+- **A factory that throws is reported as a `warnings` entry**, and the node is still created without its factory state; one that catches its own exception reports nothing — check the IDE log (`moai:mps-mcp-workflow`, `references/ide-log.md`) when expected factory content is missing.
+
+Whether a concept has a factory: `mps_mcp_query_structure` `LIST_CONCEPT_ASPECTS` lists the `actions` aspect for it (read `relation`: only `appliesTo` roots act on the concept).
 
 ## Reference Index
 
 - Open `references/json-format.md` when you need the unified JSON blueprint shape — concept/properties/children/references layout, optional-section rules, and reference-resolution semantics (`r:...` vs name auto-resolution).
 - Open `references/staged-construction.md` when the subtree exceeds the inline limit or its child refs are needed for later edits — the skeleton → validate → incremental-fill → targeted-update → cleanup pattern.
-- Open `references/troubleshooting.md` when an insert call fails with `JsonElement.getAsString()` errors or when the JSON shape diverges from the user's textual notation.
+- Open `references/troubleshooting.md` when an insert call fails (missing fields, unknown roles, temp-directory rejection, assignability errors, `featureId` as target, object vs. array) or a dry run lists name warnings.

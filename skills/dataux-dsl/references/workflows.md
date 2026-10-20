@@ -2,7 +2,7 @@
 
 ## Resolve context before editing
 
-1. Identify the target project (`moai:mps-mcp-workflow`, "Which project the tools act on"); call `mps_mcp_list_open_projects` only after a "no/multiple projects" error.
+1. Pass `projectPath` in every call. If it is unknown, use the current directory on the first call, take the path from the rejection, and reuse it; if the project list is empty, ask the user to open the project (`moai:mps-mcp-workflow`, "Which project the tools act on").
 2. Resolve the destination model with `mps_mcp_get_project_structure`, including dependencies and used languages.
 3. Confirm that DataUX, ObjectFlow, and any needed BaseLanguage expressions are available.
 4. Resolve every target-model classifier, property, command, conclusion, label, and reusable UI root. Do not carry references across projects.
@@ -15,8 +15,8 @@ This separation follows the [MoWare ownership map](../../../docu/moware-werkbank
 1. Identify the ObjectFlow Page's bound Entity/DTO and ensure Page Init returns the corresponding object. [Page Init and data preparation](../../../docu/objectflow.md#page-init-und-datenbereitstellung)
 2. Copy [page-pane-form-skeleton.json](blueprints/page-pane-form-skeleton.json).
 3. Replace `TARGET_MODEL.RootClassifier` and `TARGET_MODEL.textProperty` from the destination model.
-4. Adjust the delegate concept to the property's actual type and add only valid options. [Delegate type rules](../../../docu/dataux.md#formulare-tabellen-und-delegates)
-5. Dry-run, insert, then link the ObjectFlow Page to the new PagePane in the ObjectFlow model.
+4. Adjust the delegate concept to the property's actual type and add only valid options; when the type is unclear, ask the typesystem (`mps_mcp_query_nodes` `GET_TYPE` on the property, `mps_mcp_query_types` `IS_SUBTYPE`) instead of guessing. Bind each property only once per form. [Delegate type rules](../../../docu/dataux.md#formulare-tabellen-und-delegates)
+5. Dry-run, insert (`fixReferences.stillBroken` must be 0), then link the ObjectFlow Page to the new PagePane in the ObjectFlow model.
 6. Validate both the PagePane root and the owning Command root.
 
 ## Create a table over a list property
@@ -26,7 +26,7 @@ This separation follows the [MoWare ownership map](../../../docu/moware-werkbank
 3. Use [table-subtree.json](blueprints/table-subtree.json).
 4. Set `TARGET_MODEL.TableOwnerClassifier` to the classifier owning the list and `TARGET_MODEL.items` to the list property (see [gotchas](gotchas.md#owning-classifier-list-property-and-row-type-differ)).
 5. Set each delegate path to a property of the row type, such as `TARGET_MODEL.rowText`.
-6. Add `SelectFirstFOption` only when the first row should initialize the shared row-type selection.
+6. Add `SelectFirstFOption` only when the first row should initialize the shared row-type selection. Directly under a PagePane, remove `LabelFOption`: the checker reports "Label option can not be used here, since label will be set via page title." Give every delegate a `WidthDOption` (percentages add up to 100).
 7. Add the subtree under an `uxChild` role, then validate the containing root.
 
 ## Build master-detail UI
@@ -35,7 +35,7 @@ This separation follows the [MoWare ownership map](../../../docu/moware-werkbank
 2. Ensure the command loads the complete master/detail graph before showing the Page. [Explicit loading](../../../docu/manmap.md#domänenmodell-laden-bearbeiten-und-speichern)
 3. Use [grid-master-detail-subtree.json](blueprints/grid-master-detail-subtree.json).
 4. Bind the form to the page root and the table to the owner/list property. Layout weights and arrangement: conventions `oberflaeche`.
-5. Set the table's `LabelFOption` as the conventions `oberflaeche` require; keep `SelectFirstFOption` only when an initial selection is desired.
+5. Set the table's `LabelFOption` as the conventions `oberflaeche` require; keep `SelectFirstFOption` only when an initial selection is desired. Keep the form's explicit `options` role (empty or with a labelled `LabelFOption`); without it the node factory labels the form with the classifier name.
 6. Add delegates for both types; give every table delegate a `WidthDOption` (percentages add up to 100).
 7. Add the table's actions as the conventions `oberflaeche` require (shape: [menu-submenu-subtree.json](blueprints/menu-submenu-subtree.json)).
 8. Validate behavior for empty lists and cleared selection. [Empty selection](../../../docu/dataux.md#leere-selektion) and [master-detail behavior](../../../docu/dataux.md#master-detail)
@@ -46,11 +46,12 @@ This separation follows the [MoWare ownership map](../../../docu/moware-werkbank
 2. Keep at least one `Tab`; each Tab requires exactly one label expression and one `uxChild`.
 3. Use string literals for static labels or load `moai:mps-baselanguage` for dynamic expressions.
 4. Put composite content inside a GridLayout; do not add multiple `uxChild` nodes to one Tab.
-5. Validate target-device suitability. Distinct device classes may require distinct PagePanes or conditional PagePane links. [Layouts and target devices](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung) and [multiple PagePanes](../../../docu/objectflow.md#mehrere-page-panes)
+5. Name the `options` role on a form in a Tab, empty or with a labelled `LabelFOption`; otherwise the node factory adds an empty label and the checker reports "Specify some text for this the label."
+6. Validate target-device suitability. Distinct device classes may require distinct PagePanes or conditional PagePane links. [Layouts and target devices](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung) and [multiple PagePanes](../../../docu/objectflow.md#mehrere-page-panes)
 
 ## Reuse UI with Include
 
-1. Ensure the reusable target is a declared UI root; roots are typed only (`boundClassifier`, no `boundProperty`).
+1. Ensure the reusable target is a declared UI root; roots are typed only (`boundClassifier`, no `boundProperty`). A root `DelegateForm` or `Table` needs an explicit `options` role (empty or with a labelled `LabelFOption`); otherwise the node factory adds an empty label, a checker error.
 2. Use [include-subtree.json](blueprints/include-subtree.json).
 3. Resolve `TARGET_MODEL.ReusableUiRoot` in the destination model.
 4. `boundClassifier` is mandatory on an Include (the checker reports "An include needs to be bound on an object."); add `boundProperty` when the reused element works on a property of the selected object. The content type must match the reused root's type.
@@ -76,7 +77,7 @@ Place the entries as the conventions `oberflaeche` require. Checker: actions bef
 5. Keep `VERSION` (`OptVersion`) and `OFFICIAL NAME` (`OptOfficialAppName`) once each.
 6. Dry-run and insert the root. Then replace the body of `isAuthenticated` so that it stores the runtime user name in `userEnvironment` (`userEnvironment.setUserName(...)`) and sets the user id via a service or repository; the body must end with a boolean expression statement. Load `moai:mps-baselanguage` for this subtree. [isAuthenticated](../../../docu/dataux.md#anwendung-mit-appui-module)
 7. Optional: add `tileInit` (`TileInitFunction`), tile label/color expressions, or `startup command to run` (`StartupCommandCall` with `commandCall: CommandCallBasis`) with `ADD CHILD`. [Tiles](../../../docu/dataux.md#tiles-und-dynamische-darstellung)
-8. Run `mps_mcp_check_root_node_problems` on the module root; also validate the referenced Command roots.
+8. Run `mps_mcp_check_root_node_problems` on the module root and the referenced Command roots, or on each model reference with `perRoot=true`.
 
 Do not add `onStartup`/`onShutdown`; the checker rejects them.
 
@@ -86,19 +87,21 @@ Do not add `onStartup`/`onShutdown`; the checker rejects them.
 2. Place the root and resolve the `OFXConfig` per the conventions `anwendungsaufbau`; set the config as `TARGET_MODEL.OFXConfig`.
 3. Copy [batchjob-module-skeleton.json](blueprints/batchjob-module-skeleton.json). Replace `TARGET_MODEL.InboxClassifier` (inbox element type), `TARGET_MODEL.ProducerCommand`, and `TARGET_MODEL.ConsumerCommand`; rename `ExamplePair` consistently in the pair and in the `pair` references of the `CRON` and `CONSUMERS` options.
 4. Dry-run and insert the root.
-5. Add the inbox-filling page to the producer's `runCommand.pages` (`OFXRunCmdPage` with `page -> <producer page>`, `name` for the page variable, and `beforeConclude` with `inbox.addAll(<pageVar>.<list>)` built from `OFXRunCmdVarRef` nodes); load `moai:mps-baselanguage` for the statement. Add an `ifClause` precondition to the consumer call context when the item may already be processed. [Inbox rules](../../../docu/dataux.md#batchjob-mit-batchjob-module)
+5. Add the inbox-filling page to the producer's `runCommand.pages` as an `OFXRunCmdPage`. Its node factory prefills `page`, `name`, `boundObjectType = boundObject`, and `conclusion` from the producer command ([node factories](gotchas.md#node-factories)): omit them for the defaults or name them to override, and check `boundObjectType` for a list-bound page. Add `beforeConclude` by hand with `inbox.addAll(<pageVar>.<list>)` built from `OFXRunCmdVarRef` nodes; load `moai:mps-baselanguage` for the statement and `moai:baselanguage-collections-dsl` for `addAll`. Print the page afterwards to see the prefilled values. Add an `ifClause` precondition to the consumer call context when the item may already be processed. [Inbox rules](../../../docu/dataux.md#batchjob-mit-batchjob-module)
 6. Choose the timing per pair: a `CRON` with a concrete second for point-in-time runs, or `DELAY` plus optional `CRON` windows (second `*`) for continuous mode. Exactly one `CONSUMERS` per pair with a consumer; none for a producer-only pair. Use `DEPENDENT_CONSECUTIVE` only with several pairs, with timing options on the first pair only. [Batch options](../../../docu/dataux.md#kapitellandkarte-batchoptionen)
 7. Keep the exception strategy's default rule (no `exMatch`) last; put matching rules before it. [Exception strategies](../../../docu/dataux.md#exception-strategien-und-wiederanlauf)
 8. For console or one-shot runs do not add `RUN_IN_CONSOLE`; configure `org.modellwerkstatt.objectflow.job.console.ConsoleBatchJobAppFactory` in the `OFXConfig` instead (checker message, see gotchas). Use `OptIncludeBatchUi` on an `AppUiModule` to show the batch job's pages in that application.
-9. Run `mps_mcp_check_root_node_problems` on the module root and on the producer/consumer Command roots.
+9. Run `mps_mcp_check_root_node_problems` on the module root and the producer/consumer Command roots, or on each model reference with `perRoot=true`.
 
 ## Choose full-root JSON versus staged construction
 
 - Use a full root only for a small new PagePane whose complete structure is understood.
 - Use a skeleton plus `mps_mcp_update_node ADD CHILD` for grids, tab sets, large delegate lists, or menus with expressions.
 - Use `SET CHILD`, property updates, or reference updates for existing roots; do not rewrite the entire root for one change.
-- Dry-run every non-trivial blueprint. A successful insert does not prove semantic validity.
-- After real changes, run `mps_mcp_check_root_node_problems` on each changed root; then generate/build when runtime or generated-code behavior matters.
+- Clone delegates, columns, or menu entries within the same model with `mps_mcp_alter_nodes` `COPY_NODE`.
+- Delete a child with `SET CHILD` without `childJson`; clear a property or reference with an unquoted `null` as the third element of the triple; delete a root with `mps_mcp_update_root_node_from_json` and `operation:"DELETE"`. After `SET CHILD` the returned reference is the parent's.
+- Dry-run every non-trivial blueprint. A successful insert does not prove semantic validity; after each real write `fixReferences.stillBroken` must be 0.
+- After real changes, run `mps_mcp_check_root_node_problems` on the changed root, or on the model reference with `perRoot=true` after work on several roots. Read `warnings`, `details.uncheckedSubtrees`, and each problem's `rules[].statement`; apply offered `quickFixes` with `autoApplyQuickFixes=true` or `mps_mcp_list_node_intentions` / `mps_mcp_apply_intention`, then re-check. Generate/build when runtime or generated-code behavior matters.
 
 ## Diagnose a UI that shows no or wrong data
 
@@ -107,4 +110,4 @@ Do not add `onStartup`/`onShutdown`; the checker rejects them.
 3. Check the shared selection by runtime type and account for an empty selection.
 4. Check each delegate path, especially every operand/operation step of a `PathDot`.
 5. Check read-only/session provenance if editing unexpectedly fails. [ManMap read-only and session identity](../../../docu/manmap.md#read-only-checkout-und-session-identität)
-6. Run MPS validation on both UI and command roots.
+6. Run MPS validation on both UI and command roots (per root, or per model reference with `perRoot=true`).

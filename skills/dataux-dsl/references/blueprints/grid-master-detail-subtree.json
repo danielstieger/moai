@@ -37,6 +37,7 @@
                 { "concept": "org.modellwerkstatt.dataux.structure.OneWeight" }
               ]
             },
+            { "role": "options", "nodes": [] },
             {
               "role": "delegates",
               "nodes": [

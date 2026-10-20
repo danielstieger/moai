@@ -13,27 +13,29 @@ ManMap models relational persistence and read models for MoWare applications. `P
 - Never persist a project path or IDE-session state.
 - Conventions are referenced by name, e.g. conventions `anwendungsaufbau`; the project provides them (see its `AGENTS.md`). This skill does not repeat their content.
 - Database schemas: conventions `allgemein`.
-- Discover the language by its qualified name `org.modellwerkstatt.manmap`. Query concepts with `l:5aaa957f-3447-4783-b1f7-b301fa3e0394:org.modellwerkstatt.manmap`, not the module reference syntax.
+- Discover the language by its qualified name `org.modellwerkstatt.manmap`. Query concepts with `l:5aaa957f-3447-4783-b1f7-b301fa3e0394:org.modellwerkstatt.manmap` or the plain language name in `languageRefs`, not the module reference syntax; one `languageRefs` call with `detail="shape"` covers all concepts. Enum literals (`sqlType`, `repoMethodType`): `mps_mcp_query_structure` `GET_ENUMERATION_LITERALS`.
 - Use the `qualifiedName` as `concept` in blueprints (`moai:mps-mcp-workflow`, `references/node-editing-rules.md`).
-- Treat every `$TARGET_*` value in a blueprint as a required target-model placeholder. Resolve it by scope or replace it with a persistent `r:` node reference from the target model immediately before insertion.
+- Treat every `$TARGET_*` value in a blueprint as a required target-model placeholder. Resolve it by scope or replace it with a persistent `r:` node reference from the target model immediately before insertion. The dry-run does not reliably report a forgotten placeholder: search the blueprint text for `TARGET_` before every write and stop on any match.
 - Never copy persistent references from an application example into another model. The stable references in [sandbox.md](references/sandbox.md) are read-only navigation and verification anchors, not insertion values.
 - Prefer skeleton-plus-subtree construction for persistence descriptions and repositories. Preserve existing node IDs with surgical updates.
 - No lazy loading, no cascading save/delete; references and lists are loaded explicitly (separate queries or `refJoin`/`listJoin`): see [Explizites Laden](../../docu/manmap.md#explizites-laden) and [Referenzen, eingebettete Werte und Listen](../../docu/manmap.md#referenzen-eingebettete-werte-und-listen).
 - In a blueprint, set `MappingReference.mappingSource` to the name of the query's `EntityMapping`; it resolves to the enclosing query even within the same blueprint. See [mapped query workflow](references/workflows.md#build-a-mapped-query).
 - New `QueryFromMap` nodes default to `readOnly = true`. Set `readOnly = false` deliberately for queries that check out data for editing.
-- Validate changed roots with `mps_mcp_check_root_node_problems`; then run task-required generation or build checks.
+- After every real write, `fixReferences.stillBroken` must be 0. Validate with `mps_mcp_check_root_node_problems`: the single changed root, or after work on several roots the model reference with `perRoot=true`. Evaluate `warnings`, `details.uncheckedSubtrees`, `rules[].statement` and `quickFixes`; then run task-required generation or build checks.
+- Node factories run on insert and fill roles the blueprint omits; a named role, even `{"role":"…","nodes":[]}`, replaces the factory's content. See [Node factories](references/gotchas.md#node-factories).
 - Load `moai:mps-baselanguage` and `moai:mps-node-editing` before constructing repository methods or expression/statement subtrees.
 
 ## Quick Start
 
-1. Identify the target project (`moai:mps-mcp-workflow`, "Which project the tools act on"); call `mps_mcp_list_open_projects` only after a "no/multiple projects" error.
+1. Pass `projectPath` in every call (`moai:mps-mcp-workflow`, "Which project the tools act on"). If it is unknown, use the current directory on the first call, then take the path from the rejection and reuse it. If the project list is empty, ask the user to open the project.
 2. Resolve the editable target model and its ObjectFlow entity/property declarations.
-3. Start with a JSON file from [references/blueprints](references/blueprints) and replace every `$TARGET_*` placeholder.
-4. Dry-run a new root with `mps_mcp_insert_root_node_from_json`.
-5. Insert the root, then add `persistenceMapping`, `atomMpig`, or `member` subtrees incrementally with `mps_mcp_update_node`.
-6. Validate after each substantial subtree and after the finished root.
-7. Review every changed root against the applicable conventions. A shape copied from a blueprint, a packaged example, or the project itself does not prove compliance.
-8. Generate or build the owning solution when semantic or generated-code correctness matters.
+3. Start with a JSON file from [references/blueprints](references/blueprints) and replace every `$TARGET_*` placeholder. Search the result for `TARGET_`; any match stops the write.
+4. Send the blueprint inline (up to 4 KB) or copy it to `${TMPDIR:-/tmp}` and pass the copy's absolute path; the server rejects files under `skills/`.
+5. Dry-run a new root with `mps_mcp_insert_root_node_from_json`. It checks concepts, roles and assignability only: names are not looked up ("is a name, not looked up" is expected) and node factories do not run.
+6. Insert the root, then add `persistenceMapping`, `atomMpig`, or `member` subtrees incrementally with `mps_mcp_update_node`. After each real write, `fixReferences.stillBroken` must be 0.
+7. Use `mps_mcp_print_node` where a factory may have added content, and validate after each substantial subtree and after the finished root (several roots: model reference with `perRoot=true`).
+8. Review every changed root against the applicable conventions. A shape copied from a blueprint, a packaged example, or the project itself does not prove compliance.
+9. Generate or build the owning solution when semantic or generated-code correctness matters. After generation, or when a call reports `ok` but the effect is missing, check `mps_mcp_read_ide_log` (`sinceMinutes`, `minLevel="WARN"`).
 
 ## Stable Package References
 

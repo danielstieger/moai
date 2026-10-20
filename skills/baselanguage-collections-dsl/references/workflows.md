@@ -59,7 +59,7 @@ See [map-element-subtree.json](blueprints/map-element-subtree.json) and [list-el
 ## Large or mixed-language host code
 
 1. Load the BaseLanguage skill for the surrounding method, statement, or expression nodes.
-2. Load the model-manipulation skill when Collections is combined with closures, smodel, quotations, or model mutation.
+2. Load `moai:mps-model-manipulation` when Collections or closures code is combined with smodel node access or model mutation; closures themselves are in [closures-catalog.md](closures-catalog.md).
 3. Print the smallest existing host subtree that establishes the insertion role.
 4. Add the Collections subtree surgically; avoid rewriting a whole class, service, rule, or generator root.
 5. Validate the containing root and rebuild/reload when the changed host is a compiled language aspect.

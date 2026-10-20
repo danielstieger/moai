@@ -1,6 +1,6 @@
 # Blueprint index
 
-Except for the explicitly named `CustomContainers` skeleton, these are subtree templates rather than standalone roots. Replace every `$TARGET_*` reference in the destination model before a real write.
+Except for the explicitly named `CustomContainers` skeleton, these are subtree templates rather than standalone roots. Replace every `$TARGET_X$` placeholder (for example `$TARGET_SEQUENCE_VARIABLE$`) with a reference in the destination model before a real write, then search the text for `TARGET_` (any hit: stop).
 
 - [custom-containers-root-skeleton.json](blueprints/custom-containers-root-skeleton.json) — the language's specialized rootable registry, initially empty.
 - [list-string-type-subtree.json](blueprints/list-string-type-subtree.json) — `list<string>` type node.

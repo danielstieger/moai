@@ -1,6 +1,6 @@
 ---
 name: mps-mcp-workflow
-description: Complete JetBrains MPS workflow guide for MoWare application projects — modules, models, node JSON blueprints, validation, MPS MCP tool usage, and the index of companion skills. Use whenever working in an MPS project, when `MPS_AGENT_GUIDE.md` says to load it, or when you need to pick the right companion skill.
+description: Complete JetBrains MPS workflow guide for MoWare application projects — modules, models, node JSON blueprints, validation, type queries, IDE log, MPS MCP tool usage, and the index of companion skills. Use whenever working in an MPS project, when `MPS_AGENT_GUIDE.md` says to load it, or when you need to pick the right companion skill.
 ---
 
 # Projectional Agent Toolkit – JetBrains MPS for Agents
@@ -10,13 +10,24 @@ Hub skill for working with JetBrains MPS (Meta Programming System) models and th
 ## Critical Directives
 
 - **Never read or edit raw `.mps` / `.mpl` XML; use `mps_mcp_*` tools.** Rule and fallback: [`MPS_AGENT_GUIDE.md`](../../MPS_AGENT_GUIDE.md#never-read-raw-mps-model-files).
-- **Editing rules** (preserve node IDs, surgical `mps_mcp_update_node` over full-root rewrites, validate every changed root): `moai:mps-node-editing`.
+- **Pass `projectPath` on every `mps_mcp_*` call**, starting with the first one — rule below in [Which project the tools act on](#which-project-the-tools-act-on).
+- **Load each tool's schema before its first call** (`ToolSearch select:` when the host defers schemas). The keys are not guessable: `nodeReference`, `conceptRefs`/`languageRefs`, `searchTexts`, `parameters.code` / `insert.modelRef`.
+- **Editing rules** (preserve node IDs, surgical `mps_mcp_update_node` over full-root rewrites, validate after every change): `moai:mps-node-editing`.
+- **Copy-then-modify beats reconstruct-from-JSON.** To create a node that closely resembles an existing one in the same model, duplicate it with `mps_mcp_alter_nodes` `COPY_NODE` (a root becomes a new root of the same model, a node in a `0..n`/`1..n` role the next sibling) and adjust the copy with `mps_mcp_update_node`. Shipped example modules are not part of the project and cannot be copied from this way.
+- **Ask the typesystem, do not simulate it.** Whether a type fits, what a slot requires, what an operator returns (BaseLanguage, collections, DSL expressions): call `mps_mcp_query_types` or `mps_mcp_query_nodes` `GET_TYPE` / `GET_EXPECTED_TYPE` — [`references/type-queries.md`](references/type-queries.md).
+- **Validate frequently.** A successful insertion (`"ok": true`) does not mean the AST is semantically valid — follow with `mps_mcp_check_root_node_problems`: on the changed root, or after work on several roots once on the model reference with `perRoot=true`. Read `warnings` and `details.uncheckedSubtrees`, not just the `data` verdict (commented-out code is not type- or constraints-checked); a problem's `rules[0].rule` names the reporting rule, `quickFixes` can be applied with `mps_mcp_apply_intention` — [`references/analysis-tools.md`](references/analysis-tools.md).
+- **Check the IDE log when the envelope and the effect disagree.** When a tool reports success but the effect is missing, call `mps_mcp_read_ide_log` with `sinceMinutes` covering the call window and `minLevel="WARN"` — [`references/ide-log.md`](references/ide-log.md).
 - **Language definitions are off-limits.** In a MoWare application project never edit language structure or aspects (`mps_mcp_alter_structure`, `mps_mcp_scaffold_editor`, aspect models of the MoWare languages) — see `MPS_AGENT_GUIDE.md`.
 
 > **Tool name note**: MPS MCP tools are named with a `mps_mcp_` prefix (e.g. `mps_mcp_query_nodes`, `mps_mcp_alter_nodes`, `mps_mcp_get_concept_details`). Your MCP client wraps these with a server-specific prefix (e.g. `mcp__mps-mcp__`), which varies by environment. Match tools by the stable `mps_mcp_*` suffix.
 
-> **Which project the tools act on (subdirectory & multi-project checkouts).** The `mps_mcp_*` tools operate on the MPS project currently open in the running MPS instance. That project often lives in a **subdirectory** of your repository (e.g. `<repo>/<mps-project-dir>`), and one checkout may even hold **several** MPS projects. The host resolves the project from your client's workspace roots, then falls back to the single open project. If a tool call is rejected with "no project opened" or "multiple projects opened", call `mps_mcp_list_open_projects`, then supply the intended project's `mpsProjectBaseDirectory` — the folder MPS actually opened, i.e. a path *at or inside* it, **not** the repository root — via the host's project-path argument.
->
+## Which project the tools act on
+
+- **`projectPath` in every call.** The platform routes each call by resolving `projectPath` to an open project; a call without it is rejected before dispatch (`Unable to determine the target project…`), `mps_mcp_list_open_projects` included. Pass the open MPS project's base directory (`mpsProjectBaseDirectory`) — a path *at or inside* the folder MPS opened, **not** an ancestor such as the repository root.
+- **Unknown path:** on the first call pass the session's current working directory. If that is rejected, take the path from the rejection message, which lists the open projects (`Currently open projects: {...}`), and reuse that one path for every later call in the session.
+- **Empty project list** (`Currently open projects: {"projects":[]}`): MPS shows the welcome screen, and no retry can succeed. Ask the user to open the project in MPS; opening it from the command line: [`references/project-management.md`](references/project-management.md).
+- **Subdirectory & multi-project checkouts.** The MPS project often lives in a **subdirectory** of your repository (e.g. `<repo>/<mps-project-dir>`), and one checkout may even hold **several** MPS projects; `projectPath` always names the folder MPS actually opened.
+
 > **Multi-project repository rules.** All open MPS projects share the same module repository. Write targets — models, modules, root nodes, and nodes being mutated — must belong to the project selected by `projectPath`; tools refuse writes to another open project's elements. Read/reference/dependency targets may come from another open MPS project when they are explicitly named or imported: model/module dependencies, model used languages/devkits, node concepts, and reference targets can point across projects, and the foreign elements are treated like read-only library/stub elements. Returned JSON for an element from another open project includes `containingProject: { name, mpsProjectBaseDirectory }` and `editableFromCurrentProject: false`; nested references use prefixes such as `conceptContainingProject`, `targetContainingProject`, or `typeContainingProject`. These markers appear *only* for elements owned by another open project — their absence does not imply an element is editable (a read-only library/stub in the current project carries `readOnly: true` but no `containingProject`), so decide editability from `readOnly` together with these markers.
 >
 > **When in doubt, ask which project.** When several MPS projects are open under one repository / VCS root, the `mps_mcp_*` tools accept *any* valid project path and act relative to that project. Same-name resolution prefers the selected project's own elements before falling back to the shared repository, but an explicit reference may still resolve to another open project. If the intended project is not obvious from the user's request or the current editor focus (`mps_mcp_get_current_editor_root_node`), do **not** guess — show the `mps_mcp_list_open_projects` entries and ask the user which project the query or change should run against.
@@ -29,11 +40,11 @@ All skills bundled with this package are loaded as `moai:<skill-name>`. Load whi
 
 | Skill | What it covers |
 |-------|---------------|
-| `moai:baselanguage-collections-dsl` | Create and edit BaseLanguage collection types, creators, operations, access expressions, and collection foreach statements. |
+| `moai:baselanguage-collections-dsl` | Collections and closures: BaseLanguage collection types, creators, operations, access expressions, foreach statements, closure literals, `yield`, and the downcast expression. |
 | `moai:mps-baselanguage` | Author and edit `jetbrains.mps.baseLanguage` nodes using the Java parser or JSON AST blueprints. |
 | `moai:mps-console` | Console commands and `smodel.query` scope queries. |
 | `moai:mps-language-analysis` | Analyze MPS language definitions, concepts, metadata, aspects, and sample nodes. |
-| `moai:mps-model-manipulation` | smodel + closures model code. |
+| `moai:mps-model-manipulation` | smodel model code — querying, navigating, creating and mutating nodes (collections and closures: `moai:baselanguage-collections-dsl`). |
 | `moai:mps-node-editing` | Add, update, or delete MPS nodes using JSON blueprints. |
 | `moai:mps-run-configurations` | Create and execute MPS IDE run configurations for runnable roots and tests. |
 | `moai:dataux-dsl` | Create, edit, validate, or inspect MoWare DataUX pages, forms, tables, layouts, bindings, includes, and menus. |
@@ -63,21 +74,38 @@ MPS is a projectional editor and a language workbench. Unlike text-based IDEs, M
 1. **Check the bundled skills** (the `moai:` skills in the table above) before starting unfamiliar work and load the relevant MoWare or MPS skill when it exists.
 2. **Anchor on the user's focus** — call `mps_mcp_get_current_editor_root_node` so you know which root the user is looking at.
 3. **Identify the task family**: editing user code → load `moai:mps-node-editing` and often `moai:mps-baselanguage`; investigating an unfamiliar language → load `moai:mps-language-analysis`; working with a MoWare DSL → load its dedicated skill.
-4. **Validate frequently** with `mps_mcp_check_root_node_problems` on each changed root.
+4. **Validate frequently** with `mps_mcp_check_root_node_problems` — the changed root, or the model reference with `perRoot=true` after work on several roots.
 
 ## Essential Skills (Detail)
 
-Open `references/finding-things.md` for the protocol on finding models, modules, and languages (including shortened-name resolution like `j.m.l.core` → `jetbrains.mps.lang.core`).
+Hub references (`references/`):
 
-Open `references/node-editing-rules.md` for the full rulebook on adding/updating nodes (concept selection, role types, cardinality, assignability, persistent IDs, surgical edits).
-
-Open `references/reference-formats.md` for the reference-format protocol: node refs (`r:`/`i:`), concept refs (`c:`), and the critical "never use a concept ref where a node ref is expected" rule.
+| Reference | Open it for |
+|---|---|
+| [`finding-things.md`](references/finding-things.md) | Finding models, modules, languages, nodes and concepts (shortened names like `j.m.l.core`, smallest projection, caret/selection, packaged modules outside the project). |
+| [`node-editing-rules.md`](references/node-editing-rules.md) | The rulebook on adding/updating nodes: concept selection, role types, cardinality, assignability, persistent IDs, surgical edits, temp-directory rule. |
+| [`reference-formats.md`](references/reference-formats.md) | Node refs (`r:`/`i:`), concept refs (`c:`), model refs, list parameters, key spellings, rejected keys, node info envelope. |
+| [`response-envelope.md`](references/response-envelope.md) | The `{ok, data, warnings, details}` envelope and the "Dry-run response" rule. |
+| [`analysis-tools.md`](references/analysis-tools.md) | `mps_mcp_print_node`, `mps_mcp_check_root_node_problems` (model/module scope, `perRoot`, `rules`, `uncheckedSubtrees`, `quickFixes`), intentions, `FIX_REFERENCES`. |
+| [`type-queries.md`](references/type-queries.md) | `mps_mcp_query_types` and `GET_TYPE` / `GET_EXPECTED_TYPE`. |
+| [`ide-log.md`](references/ide-log.md) | Reading `idea.log` with `mps_mcp_read_ide_log`, verifying a write call. |
+| [`module-dependencies.md`](references/module-dependencies.md) | Module and model dependencies, used languages and devkits, creating and renaming modules, "Cannot resolve concept" / `ClassNotFoundException`. |
+| [`project-management.md`](references/project-management.md) | Opening a project when MCP only sees the welcome screen (standalone MPS, Linux/Windows), closing it with `mps_mcp_close_project`. |
+| [`mcp-tools-index.md`](references/mcp-tools-index.md) | The complete inventory of MPS MCP tools. |
 
 Large subtrees / staged construction and the inline-size/file-path rules: `moai:mps-node-editing` (`references/staged-construction.md`, SKILL.md File-Path Semantics).
 
-Open `references/analysis-tools.md` for the inventory of analysis operations (`mps_mcp_print_node`, `mps_mcp_check_root_node_problems`, `mps_mcp_alter_nodes FIX_REFERENCES`, etc.).
+## Scripts
 
-Open `references/mcp-tools-index.md` for the complete inventory of MPS MCP tools grouped by Project/Structure, Modules and Models, Root Nodes and Nodes, Console, and Language Definition.
+`scripts/mps_dump.py` (Python standard library, offline) projects a large MCP result file (`mps_mcp_get_project_structure`, `mps_mcp_print_node`, `mps_mcp_get_concept_details`) down to the lines you need instead of reading the whole 10–40 KB file: `roots`, `models`, `node`, `tree`, `shape`, `count`.
+
+```
+python3 scripts/mps_dump.py roots "$TMPDIR/mps-node-123.json" --concept Entity
+python3 scripts/mps_dump.py models "$TMPDIR/mps-node-789.json"          # modules, models, root counts
+python3 scripts/mps_dump.py tree "$TMPDIR/mps-node-321.json" --depth 3  # indented subtree
+```
+
+`roots`, `count`, `node` and `tree` need a dump made with `includeRootNodes` (or `includeNodes`, or a `print_node` result); on a structure-only dump they exit 3 and name `models`. Run `--help` for every subcommand; `scripts/examples/` holds dumps to try it on. Stdout is the table plus a one-line JSON summary; the full table is written to a file under the system temp directory. Without `python3`, ask the server for the reduction instead: `mps_mcp_get_project_structure` with `nodeDetail: "names"` returns name / concept / reference of each root inline.
 
 ## Boundaries
 

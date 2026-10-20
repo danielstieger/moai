@@ -98,6 +98,20 @@ attach or replace; assign `null` to remove.
 }
 ```
 
+## `multiple` attributes — `.@` is a list
+
+The read/assign semantics above describe an attribute whose `AttributeInfo` has `multiple = false`
+(at most one instance per node). When the attribute is declared **`multiple`**, `node.@<...>`
+yields the **sequence** of attached instances instead of a single node:
+
+- append with `.add(...)` (collections `AddElementOperation`), e.g. `node.@unorderedChildren.add(m);`;
+- remove one instance with `.detach` / `.delete` on the specific attribute node (assigning `null`
+  replaces/removes a *single* attribute — it is not how you drop one element of a multiple);
+- iterate/filter with the usual collection operations (`moai:baselanguage-collections-dsl`).
+
+The JSON shape of the access is unchanged (`AttributeAccess` + qualifier) — only the result type
+and the operations you chain on it differ.
+
 ## Property / child / reference attribute access
 
 Same shape, but the qualifier also pins the feature. For a `PropertyAttribute` on property `p`, use
@@ -147,4 +161,3 @@ for generic traversal:
   see the attribute's own language to resolve `attributeConcept`.
 - **null when absent** — reading a node attribute that is not attached returns null; guard with
   `.isNotNull` or `node.isAttribute` before chaining into grafted features.
-</content>

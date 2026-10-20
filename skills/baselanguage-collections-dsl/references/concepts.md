@@ -26,7 +26,7 @@ All concept refs start with `c:83888646-71ce-4f1c-9c53-c54016f6ad4f/...`. When y
 | `ForEachVariable` | `c:83888646-71ce-4f1c-9c53-c54016f6ad4f/1153944193378` | Loop variable of the collections `ForEachStatement`. **Not** a `LocalVariableDeclaration`. |
 | `ForEachVariableReference` | `c:83888646-71ce-4f1c-9c53-c54016f6ad4f/1153944233411` | Reference to a `ForEachVariable` inside the loop body. **Not** a `VariableReference`. |
 
-`DowncastExpression` (`downcast expr`, collection type → Java interface): `moai:mps-model-manipulation` (`references/dot-expression-basics.md`).
+`DowncastExpression` (`downcast expr`, collection type → Java interface): [downcast-expression.md](downcast-expression.md).
 
 ## Collection types
 
@@ -89,7 +89,7 @@ DotExpression
 └─ operation: <collections operation>
 ```
 
-Operations with a predicate/selector hold a `ClosureLiteral` in role `closure`; closure shape, `UndefinedType` and plain-name parameter references: `moai:mps-model-manipulation` (`references/closures-catalog.md`, Closure literal blueprint).
+Operations with a predicate/selector hold a `ClosureLiteral` in role `closure`; closure shape, `UndefinedType` and plain-name parameter references: [closures-catalog.md](closures-catalog.md#closure-literal-blueprint-reusable-building-block).
 
 Important operation families (verified direct children):
 
@@ -213,7 +213,7 @@ Inside a closure passed to `selectMany`/`translate`/`forEach`/sequence initializ
 
 - `skip;` — abort this element, go to next input element (concept: `SkipStatement`).
 - `stop;` — terminate the outer sequence construction entirely, discarding the rest of the input (concept: `StopStatement`).
-- `yield expr;` — emit into the output sequence (from the closures language; `moai:mps-model-manipulation`, `references/closures-catalog.md`).
+- `yield expr;` — emit into the output sequence (from the closures language; [closures-catalog.md](closures-catalog.md#yield-vs-return-mutual-exclusion)).
 
 `skip`/`stop` only make sense in the enumerated contexts; using them elsewhere yields a typesystem error.
 

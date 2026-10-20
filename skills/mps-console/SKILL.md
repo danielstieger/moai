@@ -13,11 +13,11 @@ The **smodel query language** (`jetbrains.mps.lang.smodel.query`) exposes the *s
 
 1. **Type code in the Console tool window** (Tools ▸ Console, or the Console tool window). One command per input. See `references/console-languages.md`.
 2. **Write `smodel.query` queries inside ordinary BaseLanguage model code**. Import `jetbrains.mps.lang.smodel.query` and wrap queries in `with (<scope>) { … }`. See `references/smodel-query.md`.
-3. **Insert code into the Console from an agent** via `mps_mcp_insert_console_command_from_json` — builds a command from a JSON blueprint and drops it into the console input **without executing it** (the user reviews and runs it with Ctrl+Enter). See `references/mcp-insertion.md`.
+3. **Insert code into the Console from an agent** via `mps_mcp_insert_console_command_from_json` — builds a command from a JSON blueprint and drops it into the console input **without executing it** (the user reviews and runs it with Ctrl+Enter). See `references/mcp-insertion.md`, which also has a generator script for a query with `.where(…)` / `.select(…)` closures.
 4. **Read the current Console command from an agent** via `mps_mcp_get_current_editor_root_node` with `source = "console"` — returns the node-info envelope of the command currently in the console input (one an agent inserted, or the user typed). Feed its `reference` to `mps_mcp_print_node` for the JSON blueprint (`format = "JSON"`) or the notational printout (`format = "PLAIN TEXT"` / `"HTML"`), or to `mps_mcp_check_root_node_problems` to see the problems MPS's model checker reports for it (way #8). The reference is only valid until the next console interaction (execute / clear / history navigation), so print it promptly and do not cache it.
-5. **Browse the Console history from an agent** via `mps_mcp_get_console_history` — lists previously executed commands in order, each with a one-line `preview`, a history-entry `reference`, and an `effectiveCommandReference`. Pass the entry `reference` to recall; pass `effectiveCommandReference` to `mps_mcp_print_node`. Use `includeResponses = true` to also see the printed output. Same reference-validity caveat as #4.
+5. **Browse the Console history from an agent** via `mps_mcp_get_console_history` — lists previously executed commands in order, each with a one-line `preview`, a history-entry `reference`, and an `effectiveCommandReference`. Pass the entry `reference` to recall; pass `effectiveCommandReference` to `mps_mcp_print_node`. Use `includeResponses = true` to also list each command's printed output as a `kind:response` entry right after it, with a one-line `preview`; see "Reading a command's output" below for the full text and for the node references inside it. Same reference-validity caveat as #4.
 6. **Recall a history command into the input** via `mps_mcp_recall_console_command(historyNodeReference)` — deep-copies a history entry (from #5) back into the input slot **without executing it**. Pass the history entry's `reference`, not its `effectiveCommandReference`. There is no MPS "recall" API to call directly; this mirrors what the Console's own up/down history navigation does (`copy` + insert).
-7. **Run the current Console command from an agent** via `mps_mcp_run_console_command` — executes whatever command is currently in the input (placed there by #3 or #6, or typed by the user), exactly as Ctrl+Enter, and only when a command is present. **It executes code with side effects.** The response is not returned by the tool; read it afterwards via #5 (`mps_mcp_get_console_history` with `includeResponses = true`) or from the Console tool window, and note that long-running commands (make/generate) complete asynchronously.
+7. **Run the current Console command from an agent** via `mps_mcp_run_console_command` — executes whatever command is currently in the input (placed there by #3 or #6, or typed by the user), exactly as Ctrl+Enter, and only when a command is present. **It executes code with side effects.** The response is not returned by the tool; read it afterwards as "Reading a command's output" below describes, and note that long-running commands (make/generate) complete asynchronously.
 8. **Check a Console command for problems from an agent** via `mps_mcp_check_root_node_problems` — pass the `reference` from way #4 (or an `effectiveCommandReference` from way #5) and it runs MPS's full checker set (structure, constraints, reference scopes, typesystem, and checking rules), surfacing the same errors/warnings the Console editor underlines and the Model Checker reports. Two caveats: **(a) root-scoped** — the tool checks the command's `containingRoot`, which for console code is the single `ConsoleRoot` holding the current input *and the entire history*, so results can include problems from earlier commands; with the default `onlyNodesWithProblems = true` you get a flat list of problem nodes, so match each one's `rootName`/subtree to the command you mean. **(b)** Same reference-validity window as #4 — resolve and check before the next console interaction.
 
 ## A command is one of three shapes
@@ -45,6 +45,31 @@ The console input holds exactly **one** command (`jetbrains.mps.console.base.str
 - **Insertion and recall do not execute.** `mps_mcp_insert_console_command_from_json` and `mps_mcp_recall_console_command` only place a command in the input; by default leave it for the user to run and tell them it is waiting. To execute it yourself, call `mps_mcp_run_console_command` (way #7) — it runs code with side effects, so do it deliberately and report what it did.
 - **Bulk node mutation: `refactor` (modal confirm, for the user to run) vs `forEach` (immediate, for `mps_mcp_run_console_command`).** Rule and trap: `references/console-languages.md`, section Scripts.
 
+## Reading a command's output
+
+`mps_mcp_run_console_command` does not return the output, and execution is asynchronous. To read it:
+
+1. Before running, note the `index` of the last history entry (`limit = 1`); `index` counts the whole history, so your command is the `kind:command` with a higher `index`, even when it repeats an earlier command. After running, call `mps_mcp_get_console_history(includeResponses = true, limit = 2)`. The command is finished when the last entry is a `kind:response` and the entry before it is your `kind:command`. If your `kind:command` is the last entry, it is still running, or it printed nothing: a command that prints nothing gets no response entry. If your command is not listed yet, it has not started. Call again a few times, then stop waiting.
+2. The response entry's `preview` is the printed text with whitespace and line breaks collapsed to single spaces, cut at 200 characters. It is omitted when the text is empty or cannot be rendered, and for long responses (over 100 items, where each printed value and each line break counts). Read `previewComplete` next to it:
+   - `true`: the preview **is** the exact printed text, with only the Console's leading and trailing padding removed. This is the usual case for a count (`3 nodes`) or a short one-line value list. Report it as it is; do not print the node again.
+   - `false` (the preview was cut and ends in `…`, or it was collapsed from several lines), or no `preview` at all: call `mps_mcp_print_node(nodeReference = <the response entry's reference>, format = "PLAIN TEXT")` for the exact full text.
+3. For node references in the output, print the same `reference` with `format = "JSON"` and `deep = true`. Each printed node is an `item` child holding a `NodeReferencePresentation`. The `targetReference` of its `target` reference is the real node, which you can pass to any other tool.
+
+The console prints a value according to its type, and an agent can only get back what was printed:
+
+| Value | Printed text | `Response` node children (`item`) |
+|---|---|---|
+| a non-empty sequence or list of nodes, references, models, or modules (`#instances(C)`, `.where(…)`, `.toList`, `#models`) | only a count, e.g. `3 nodes` or `12 models`. In the IDE the count links to the usages view. | one `NodeResponseItem` → `NodeWithClosure`, whose `text` is the count. **The items cannot be recovered.** |
+| an empty sequence of any of these | `empty sequence` | one `TextResponseItem` |
+| a single node (`.first`, `#print node`) | the node's presentation, usually its name | `NodeResponseItem` → `NodeReferencePresentation`, `target` = the node |
+| anything else: a string, a number, a sequence of strings | the value's `toString()`, e.g. `[Flour, Sugar, Egg]` | one `TextResponseItem`, whose `text` is that string |
+
+So shape the query for what you need back:
+
+- **Values:** select them before printing: `#instances(Ingredient).select({~it => it.name; })` prints one list of the names, such as `[Flour, Sugar, Egg]`.
+- **Node references:** print each node: `#instances(Ingredient).forEach({~it => #print it; })` gives one `NodeReferencePresentation` per node, read with step 3.
+- **Not** `.forEach({~it => #print it.name; })` for values. The items print separated only by spaces, so a name containing a space cannot be told apart from two names.
+
 ## Examples (surface syntax)
 
 ```
@@ -66,7 +91,8 @@ The console input holds exactly **one** command (`jetbrains.mps.console.base.str
 
 ## Related Skills
 
-- `moai:mps-model-manipulation` — the `smodel` / `closures` operations (`.ofConcept<C>`, `replace with new(C)`, `:eq:`) used in the bodies of console commands, `with` blocks, and `refactor` closures; collections operations (`.where`, `.select`) are `moai:baselanguage-collections-dsl`. The smodel query language layers on top of these.
+- `moai:mps-model-manipulation` — the `smodel` operations (`.ofConcept<C>`, `replace with new(C)`, `:eq:`) used in the bodies of console commands, `with` blocks, and `refactor` closures. The smodel query language layers on top of these.
+- `moai:baselanguage-collections-dsl` — the `collections` / `closures` operations (`.where`, `.select`, `.translate`, closure literals; `references/closures-catalog.md`) that filter and transform query results.
 - `moai:mps-node-editing` — the JSON blueprint format that `mps_mcp_insert_console_command_from_json` consumes (shared with `mps_mcp_insert_root_node_from_json`).
 - `moai:mps-baselanguage` — host BaseLanguage statements/expressions that fill `BLCommand` / `BLExpression`.
 - `moai:mps-run-configurations` — for running a `main`/test root node instead of console code.
@@ -75,4 +101,4 @@ The console input holds exactly **one** command (`jetbrains.mps.console.base.str
 
 - Open `references/console-languages.md` for the full console command-language reference — every `#` command grouped by language (`base`, `ideCommands`, `internalCommands`, `scripts`), aliases, what each prints, scopes, paste-as-nodeRef, and `#exec` scripts.
 - Open `references/smodel-query.md` for the `jetbrains.mps.lang.smodel.query` language used in model code — the `with` statement, the six query expressions, scope parameters, the `scope` / `exact` / `r/o+` query parameters, default-scope rules, and intention/behavior usage examples.
-- Open `references/mcp-insertion.md` for `mps_mcp_insert_console_command_from_json` — the two accepted JSON shapes, validated working blueprints (`BLExpression` + query, statement arrays, interpreted commands), concept FQNs and language UUIDs, the "wrap expressions in `BLExpression`" gotcha, and `dryRun` validation.
+- Open `references/mcp-insertion.md` for `mps_mcp_insert_console_command_from_json` — the two accepted JSON shapes, validated working blueprints (`BLExpression` + query, statement arrays, interpreted commands), a generator script for `.where(…)` / `.select(…)` queries, concept FQNs and language UUIDs, the "wrap expressions in `BLExpression`" gotcha, and `dryRun` validation.

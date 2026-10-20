@@ -36,8 +36,9 @@ Do not cite or persist references from non-package application models. If a task
 ## Verification protocol
 
 1. Determine the target MPS project dynamically.
-2. Resolve the packaged solution or model explicitly; use `includeStubModules=true` if needed.
-3. Shallow-print the chosen root first.
-4. Deep-print only the subtree needed for the task.
-5. Re-query concept details for required roles/cardinalities.
-6. Never use a packaged example's domain references as insertion values in another model.
+2. Resolve the packaged solution or model explicitly; use `includeStubModules=true` if needed. Explicit model and module selectors are all-or-nothing: one invalid selector fails the whole call.
+3. List roots with `mps_mcp_get_project_structure` (`includeRootNodes=true`, `nodeDetail="names"`; bound inlined ASTs with `nodeDepth`). Count instances with `mps_mcp_query_nodes` `FIND_INSTANCES` (`conceptRefs`, `detail:"count"`, `rootsOnly:true` for roots).
+4. Shallow-print the chosen root first; use `format="PLAIN TEXT"` (with a space) to read the editor projection.
+5. Deep-print only the subtree needed for the task.
+6. Re-query concept details for required roles/cardinalities.
+7. Never use a packaged example's domain references as insertion values in another model.

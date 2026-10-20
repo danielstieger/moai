@@ -6,6 +6,18 @@
   ],
   "children": [
     {
+      "role": "shortDesc",
+      "nodes": [
+        { "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral", "properties": [{ "name": "value", "value": "Number" }] }
+      ]
+    },
+    {
+      "role": "longDesc",
+      "nodes": [
+        { "concept": "jetbrains.mps.baseLanguage.structure.StringLiteral", "properties": [{ "name": "value", "value": "Sample number" }] }
+      ]
+    },
+    {
       "role": "type",
       "nodes": [
         { "concept": "jetbrains.mps.baseLanguage.structure.IntegerType" }

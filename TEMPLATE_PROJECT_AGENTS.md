@@ -20,8 +20,9 @@ Use the skills supplied by the installed MoAI plugin:
   and direct SQL;
 - `moai:dataux-dsl` for pages, forms, tables, layouts, bindings, includes, menus,
   applications, and batch jobs;
-- `moai:baselanguage-collections-dsl` for BaseLanguage collection types,
-  creators, operations, and foreach statements;
+- `moai:baselanguage-collections-dsl` for BaseLanguage collections and
+  closures: collection types, creators, operations, closure literals, and
+  foreach statements;
 - `moai:mps-mcp-workflow` for MPS tooling and workflow; its skill table names
   the matching MPS support skill (node editing, BaseLanguage, console work,
   model manipulation, language analysis, run configurations).

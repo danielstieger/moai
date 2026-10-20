@@ -62,7 +62,7 @@ All typed delegates below are non-rootable and implement `IDelegate`. Except for
 | upload | `UploadDelegate` | Form-only according to the documentation. |
 | spacer | `DummyDelegate` | Layout placeholder; it has no `boundTo` role. |
 
-Delegate kind must match the ObjectFlow property type. [Forms, tables, and delegates](../../../docu/dataux.md#formulare-tabellen-und-delegates)
+Delegate kind must match the ObjectFlow property type. When the property type is unclear, ask the typesystem with `mps_mcp_query_nodes` `GET_TYPE` on the property or `mps_mcp_query_types` `IS_SUBTYPE` (`moai:mps-mcp-workflow`, `references/type-queries.md`) instead of inferring it. [Forms, tables, and delegates](../../../docu/dataux.md#formulare-tabellen-und-delegates)
 
 ### Delegate options
 
@@ -168,4 +168,4 @@ Semantics of the batch options: [Batch options](../../../docu/dataux.md#kapitell
 
 Strategy behaviours (`IOFXStratBehaviour`, editor alias in parentheses): `OFXReAddInboxStratBehaviour` (`READD_TO_INBOX`), `OFXDelayStratBehaviour` (`DELAY_EXECUTION`, property `supendSeconds: integer`, sic), `OFXClearInboxStratBehaviour` (`CLEAR_INBOX`), `OFXConsRestartStratBehaviour` (`CONSUMER_RESTART`), `OFXSilentNoLogStratBehaviour` (`SILENT_NO_LOG`). `JOB_*`/`VM_*` reactions listed in the documentation have no concept in the live language. [Exception strategies](../../../docu/dataux.md#exception-strategien-und-wiederanlauf)
 
-The producer fills its inbox inside `OFXRunCmdPage.beforeConclude`, typically `inbox.addAll(<page var>.<list property>)`; the consumer passes the inbox element to its command as `actualArgument`. Load `moai:objectflow-dsl` for the command side and `moai:mps-baselanguage` for these expressions.
+The producer fills its inbox inside `OFXRunCmdPage.beforeConclude`, typically `inbox.addAll(<page var>.<list property>)`; the consumer passes the inbox element to its command as `actualArgument`. Load `moai:objectflow-dsl` for the command side, `moai:mps-baselanguage` for these expressions, and `moai:baselanguage-collections-dsl` for `addAll` and other collection operations.

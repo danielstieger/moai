@@ -37,12 +37,12 @@ Use MPS MCP tools for everything model-related:
 
 Do not change the MoWare language definitions (structure, editor, constraints, typesystem, behavior, generator) from an application project.
 
-File-based tools (Read, Grep, Glob) are acceptable for:
+File-based tools (Read, Grep, Glob, or their shell equivalents such as `cat` and `grep` when your runtime has no such tools) are acceptable for:
 - inspecting generated output to understand runtime behavior or diagnose a problem
 - reading project configuration files that are not driven by MPS models
 - reading plain text documentation
 
-Which open MPS project the tools act on, how to pass `mpsProjectBaseDirectory` as `projectPath`, and when to ask the user: see "Which project the tools act on" in `moai:mps-mcp-workflow`.
+Pass `projectPath` — the open MPS project's base directory, never an ancestor such as the repository root — on **every** `mps_mcp_*` call, starting with the first one; a call without it is rejected. If you do not know the path yet, pass the session's current working directory on the first call; if that is rejected, take the path from the rejection message, which lists the open projects, and reuse it for the session. An empty project list means MPS shows the welcome screen: ask the user to open the project. Details, multi-project checkouts and when to ask the user: ["Which project the tools act on"](skills/mps-mcp-workflow/SKILL.md#which-project-the-tools-act-on) in `moai:mps-mcp-workflow`.
 
 ## Generated Code Is Read-Only
 
@@ -63,6 +63,8 @@ Inspection of generated code is allowed when:
 ## Rules for MPS Work
 
 - Resolve nodes, concepts, models, and modules precisely before editing.
-- Validate after structural changes using `mps_mcp_check_root_node_problems` on each changed root, never on a model reference (why and how to validate a whole model: `references/analysis-tools.md` in `moai:mps-mcp-workflow`).
+- Validate after structural changes using `mps_mcp_check_root_node_problems`: on the single changed root, or after work on several roots once on the model reference with `perRoot=true` (one row per root). Read `warnings` and `details.uncheckedSubtrees` too (`references/analysis-tools.md` in `moai:mps-mcp-workflow`).
 - Errors must be fixed. Warnings and infos can come from the MoWare Werkbank or BaseLanguage itself and are to be ignored; do not change a model to silence them.
 - Rebuild or regenerate after significant changes to keep generated artifacts consistent.
+
+Some failures (swallowed node-factory exceptions, generator or make problems, tool-side regressions) reach only the IDE log, not the tool response. When a tool reports success but the effect is missing, call `mps_mcp_read_ide_log` with `sinceMinutes` covering the call window and `minLevel="WARN"`: it reads `idea.log` and its rotated files without a path, also for a standalone MPS. `mps_mcp_list_open_projects` reports the log location as `logDirectory` / `logFile`; reading the log by hand: [`references/ide-log.md`](skills/mps-mcp-workflow/references/ide-log.md) in `moai:mps-mcp-workflow`.

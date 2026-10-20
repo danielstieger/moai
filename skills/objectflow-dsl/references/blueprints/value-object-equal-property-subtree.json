@@ -1,0 +1,6 @@
+{
+  "concept": "org.modellwerkstatt.objectflow.structure.EqualPropertyReference",
+  "references": [
+    { "role": "property", "target": "TARGET_BUSINESS_PROPERTY" }
+  ]
+}

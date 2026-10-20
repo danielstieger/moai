@@ -65,15 +65,25 @@ Menu and tile actions of a module run outside any PagePane. Arguments that use s
 ## Reference and blueprint safety
 
 - Use the `qualifiedName` as `concept` in blueprints (`moai:mps-mcp-workflow`, `references/node-editing-rules.md`).
-- Use `r:` node references or deliberately resolvable names for reference targets; never put a `c:` concept reference into a node-reference role.
-- Replace every `TARGET_MODEL.*` placeholder before insertion.
+- Use `r:` node references or deliberately resolvable names for reference targets; never put a `c:` concept reference into a node-reference role. The insert accepts it silently and leaves the reference unresolved; only the checker reports it.
+- Replace every `TARGET_MODEL.*` placeholder before insertion, then search the blueprint text for `TARGET_`; every hit stops the write. A dotted `TARGET_MODEL.*` value still draws the dry-run warning "matches no Model.Root", but a placeholder left in a plain-name position does not stand out.
 - Never copy persistent references from an application model.
-- Expect dry-run warnings for unresolved names; do not treat them as harmless without a resolution plan.
+- The dry-run does not look up names: every plain name draws "is a name, not looked up", whether the target exists or not. Resolution is proven only after the real write by `fixReferences {fixed, repointed, stillBroken}` with `stillBroken = 0`; `mps_mcp_alter_nodes FIX_REFERENCES` is the fallback when it stays above 0.
 - Validate the finished root even when insertion returned `ok: true`.
 
 ## Inner UI elements must stay unnamed
 
-`DelegateForm`, `Table`, `GridLayout`, `TabLayout`, and `CustomElement` inside a PagePane must have `isNamed = false` and `name = "#"`. JSON insertion leaves `isNamed = true` even though the concept constructor sets `false`, so always set both explicitly; the blueprints do. The checker error "optionally named component is not used anywhere … remove name" means: set `isNamed = false`. Do not clear the name; an empty name crashes the generator. Name an element only when it is reused with `Include`. [Include](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung)
+`DelegateForm`, `Table`, `GridLayout`, `TabLayout`, and `CustomElement` inside a PagePane must have `isNamed = false` and `name = "#"`. Inner elements inserted from JSON without these properties get exactly that (verified for `DelegateForm`, `Table`, and `GridLayout`); only roots are named, because the DataUX root factory sets `isNamed = true` when there is no enclosing node. Explicit values in a blueprint are kept; the blueprints set both, which does no harm. The checker error "optionally named component is not used anywhere … remove name" means: set `isNamed = false`. Do not clear the name; an empty name crashes the generator. Name an element only when it is reused with `Include`. [Include](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung)
+
+## Node factories
+
+Node factories run on every real insert with the actual enclosing node; the dry-run does not run them. A factory fills only the roles the blueprint omits. A named role replaces the factory content, even an empty one (`{"role":"options","nodes":[]}`), which suppresses factory children deliberately. `mps_mcp_query_structure` `LIST_CONCEPT_ASPECTS` shows whether a concept has a factory; `mps_mcp_print_node` after the write shows what it added.
+
+- `DelegateForm` without a named `options` role inside a layout or tab, and a root `DelegateForm` or `Table` (the target of an `Include`, no PagePane parent), get a `LabelFOption`. In a `GridLayout` it carries the bound classifier's name, an unasked label; in a `Tab` and on a root the text is empty and the checker reports "Specify some text for this the label." Name `options` on such forms and tables, empty or with a `LabelFOption` with text. The tab and master-detail blueprints do; a form directly under a PagePane gets no label.
+- Roots are named (`isNamed = true`); inner elements are not, see [above](#inner-ui-elements-must-stay-unnamed).
+- `OFXRunCmdPage` in `runCommand.pages` (or a successor handler) is prefilled: `page` (the command's next page, else its last), `name` (instance name of the first page's bound type), `boundObjectType = boundObject`, and `conclusion` (the last conclusion of that page). Omit these roles for the defaults or name them to override; for a page bound to a list set `boundObjectType = boundList` explicitly and check the result (not verified). `beforeConclude` is never filled.
+- `OFXProducerContext.name` defaults to `inbox`, `OFXConsumerContext.name` to `inboxElement`, and `OFXProducerConsumerPair.name` to `A Pair`; set the pair name explicitly, the `pair` references of the options use it.
+- `OFXRunCmdSuccessorHandler` references the next unique successor command and adds an `OFXRunCmdPage` when that command has pages.
 
 ## Partially documented concepts
 

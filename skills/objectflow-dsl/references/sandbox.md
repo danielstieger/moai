@@ -53,9 +53,9 @@ Inspect these for the child shapes of component wiring and platform resources in
 
 ## Verification protocol
 
-1. Resolve the solution/module/model by persistent reference with `mps_mcp_get_project_structure`.
-2. Use `mps_mcp_print_node` with `deep=false` first.
+1. Resolve the solution/module/model by persistent reference with `mps_mcp_get_project_structure`; list roots with `includeRootNodes=true, nodeDetail="names"` and bound inlined ASTs with `nodeDepth`. Explicit module/model selectors are all-or-nothing: one invalid selector fails the whole call.
+2. Use `mps_mcp_print_node` with `deep=false` first; `format="PLAIN TEXT"` (with a space) gives the readable editor projection.
 3. Deep-print only the subtree needed for the task.
-4. Re-query concept details for required roles/cardinalities.
+4. Re-query concept details for required roles/cardinalities. To count or locate shapes, use `mps_mcp_query_nodes` `FIND_INSTANCES` with `conceptRefs`, `rootsOnly`, and `detail:"count"`.
 5. Never persist a reference discovered outside this packaged solution.
 

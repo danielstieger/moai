@@ -34,12 +34,14 @@ Used in `type` role of a `LocalVariableDeclaration`, `returnType`, parameter `ty
 
 ## Creators (node factories)
 
+`SNodeCreator` and `SNodeCreatorAndInitializer` are `AbstractCreator`s: each is the `creator` child of a `GenericNewExpression`.
+
 | Concept | ID | MPS notation / usage |
 |---|---|---|
 | `SNodeCreator` | `1180636770613` | `new node<C>()` — concept literal / prototype-based creator (child `createdType`: `SNodeType` card 1; optional `prototypeNode`) |
 | `Model_CreateNewNodeOperation` | `1143235216708` | `model.createNode<C>()` |
 | `Model_CreateNewRootNodeOperation` | `1166648550386` | `new root node<C>` in `model` |
-| `SNodeCreatorAndInitializer` | actions-lang `5979988948250981289` | `new node<C>() { … init block … }` (from `jetbrains.mps.lang.actions`) |
+| `SNodeCreatorAndInitializer` | actions-lang `5979988948250981289` | `new initialized node<C>()` — runs the node factory (from `jetbrains.mps.lang.actions`) |
 
 ## Modification operations
 
@@ -110,7 +112,7 @@ All in `operation` role of a `DotExpression`.
 | `OfConceptOperation` | `4693937538533521280` | `.ofConcept<C>` — sequence filter by concept |
 | `Node_IsNotNullOperation` | `1172008320231` | `.isNotNull` |
 | `Node_IsNullOperation` | `1171999116870` | `.isNull` |
-| `Node_ConceptMethodCall` | `1179409122411` | `.behaviorMethod(args)` |
+| `Node_ConceptMethodCall` | `1179409122411` | **OBSOLETE** — the check reports "ConceptMethodCall moved from lang.smodel to lang.behavior". Write `.behaviorMethod(args)` as `jetbrains.mps.lang.behavior.structure.Node_ConceptMethodCall` (`3235159848334022093`; the model uses `jetbrains.mps.lang.behavior`) |
 | `Node_GetSConceptOperation` | `7453996997717780434` | `.concept` — the node's concept (`concept<>` value) |
 | `Node_GetConceptOperation` | `1172323065820` | `.conceptNode` — **DEPRECATED since MPS 2018.3**; use `.concept` (`Node_GetSConceptOperation`) |
 

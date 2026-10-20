@@ -54,7 +54,7 @@
                 {
                   "concept": "org.modellwerkstatt.dataux.structure.WidthDOption",
                   "properties": [
-                    { "name": "percent", "value": "40" }
+                    { "name": "percent", "value": "100" }
                   ]
                 }
               ]

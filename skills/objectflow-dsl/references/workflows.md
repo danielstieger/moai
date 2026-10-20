@@ -3,12 +3,12 @@
 ## Create a domain structure
 
 1. Decide Entity vs Value Object vs DTO from identity, immutability, and use-case scope. [Decision semantics](../../../docu/objectflow.md#entity-value-object-und-dto)
-2. Insert the matching root skeleton from [blueprints.md](blueprints.md).
-3. Add Business Properties with `mps_mcp_update_node` (`ADD CHILD`, role `businessProperties`). Use the verified property subtree as a starting point.
+2. Insert the matching root skeleton from [blueprints.md](blueprints.md) without properties, then `print_node` it: the factory adds `id` (Entity, rename it and `S_` per conventions), `myVal` (Value Object), or `name` (DTO). [Node factories](gotchas.md#node-factories)
+3. Add Business Properties with `mps_mcp_update_node` (`ADD CHILD`, role `businessProperties`); replace or delete the factory property. Use the verified property subtree as a starting point; to clone an existing property of the same model use `mps_mcp_alter_nodes` `COPY_NODE`.
 4. Choose only supported property types and add ObjectFlow/ManMap options deliberately. [Property types and options](../../../docu/objectflow.md#business-properties)
-5. For Value Objects, add `equalProperties` only for components that define value equality. Treat instances immutably. [Value Object equality](../../../docu/objectflow.md#value-object-gleichheit)
+5. For Value Objects, add `equalProperties` only for components that define value equality, a constructor taking all properties, and one `with<Prop>(..)` per property ([blueprints](blueprints.md#incremental-subtrees)). Treat instances immutably. [Value Object equality](../../../docu/objectflow.md#value-object-gleichheit)
 6. Add status declarations under the structure's `status` role, not as roots. Ensure every element has technical value plus short/long descriptions. [Status](../../../docu/objectflow.md#status)
-7. Validate the root and generate/build if the target project workflow requires it.
+7. Validate the root (`fixReferences.stillBroken` = 0, `mps_mcp_check_root_node_problems`) and generate/build if the target project workflow requires it.
 
 `#Key` versus the loaded reference: see [Beziehungen und Objektgraphen](../../../docu/objectflow.md#beziehungen-und-objektgraphen).
 
@@ -48,6 +48,8 @@ Use Successors for one atomic Unit of Work; use `session queue next command` for
 
 Apply the conventions `tests`.
 
+Test-model facts: a `tests` model is discovered only with the stereotype `@tests` (`<name>@tests`), and its solution needs the `tests` facet (check `facets` in `mps_mcp_get_project_structure`; set with `mps_mcp_update_module_facet`). Run it with `mps_mcp_create_run_configuration(modelReference=…)`, then `mps_mcp_execute_run_configuration`; a single model gives a live JUnit configuration (`moai:mps-run-configurations`). Never edit `test_gen/`.
+
 1. Insert [test-suite-skeleton.json](blueprints/test-suite-skeleton.json).
 2. Replace `TARGET_OFX_CONFIG` with the test `OFXConfig` from the model that holds the `OFXConfig`s (conventions `anwendungsaufbau`); add that model as a dependency of the `tests` model if it is missing.
 3. Add configured components and test content incrementally.
@@ -77,6 +79,8 @@ Apply the conventions `tests`.
 1. Insert only the root skeleton.
 2. Validate it immediately.
 3. Add Business Properties, Pages, methods, conclusions, test content, or config elements with surgical `ADD CHILD` calls.
-4. Use `SET CHILD` for one subtree; avoid a full-root rewrite unless the complete root is intentionally replaced.
-5. Run `FIX_REFERENCES` only after the expected targets exist, then validate again.
+4. Use `SET CHILD` for one subtree; avoid a full-root rewrite unless the complete root is intentionally replaced. After `SET CHILD` the returned reference is the parent's.
+5. Delete without `DELETE`: a child with `SET CHILD` and no `childJson`; a property or reference with an unquoted `null` as third element of the triplet; a root with `mps_mcp_update_root_node_from_json` `operation:"DELETE"`.
+6. Clone a node within the same model with `mps_mcp_alter_nodes` `COPY_NODE`; packaged examples cannot be copied in this way. Use `responseDetail="summary"` for large inserts.
+7. Each write reports `fixReferences`; run `FIX_REFERENCES` only for references still broken after the expected targets exist, then validate again (several roots: model reference with `perRoot=true`).
 

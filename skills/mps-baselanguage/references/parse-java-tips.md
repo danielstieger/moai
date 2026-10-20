@@ -4,7 +4,7 @@ The Java parser is the fastest path when the code is plain Java with no BaseLang
 
 ## `parameters` JSON Schema
 
-The tool takes a single JSON-encoded `parameters` argument. Shape:
+The tool takes a single `parameters` argument holding a JSON object — sent either as real JSON or as that object written as a string; both decode identically. Shape:
 
 ```
 {
@@ -14,10 +14,21 @@ The tool takes a single JSON-encoded `parameters` argument. Shape:
                                              //   STATEMENTS, CLASS_CONTENT, EXPRESSION
                                              //   FIELD/METHOD/NESTED_CLASS are parsed as
                                              //   class members; the kind is advisory (see Rules)
-  "recovery": boolean,                       // optional, default true
+  "recovery": boolean,                       // optional. Omitted: code with a Java syntax
+                                             //   error (Java 8 level) is rejected with the
+                                             //   parser's messages, because the parser would
+                                             //   repair it into different code (`a != null && b;`
+                                             //   becomes `a = (null && b)`). true: insert the
+                                             //   repaired result, with a warning. false: parse
+                                             //   without statement recovery (no effect for CLASS);
+                                             //   syntax errors are still rejected.
   "contextNodeRef": string,                  // optional SNodeReference (r:...) used as parser
                                              //   context. REQUIRED for FIELD, METHOD,
-                                             //   NESTED_CLASS, CLASS_CONTENT.
+                                             //   NESTED_CLASS, CLASS_CONTENT. Must resolve to a
+                                             //   Classifier (class/interface), or — for METHOD /
+                                             //   CLASS_CONTENT only — a ConceptBehavior; parsed
+                                             //   methods then become ConceptMethodDeclarations
+                                             //   in the behavior's `method` role.
   "insert": {                                // required
     "mode": "root" | "child" | "replace" | "console",
                                              // required. "console" replaces the current MPS
@@ -53,10 +64,14 @@ The tool takes a single JSON-encoded `parameters` argument. Shape:
 - For `mode: "child"` or `mode: "replace"`, if the `parentRef`/`targetRef` resolves to a node inside the current MPS Console input command, the node is edited in place without saving the model to disk. The target node must be inside the current unexecuted console input command (`mps_mcp_get_current_editor_root_node(source:"console")` + `mps_mcp_print_node` is the usual way to get fresh nested references). Console history entries and stale references from previous console interactions are rejected. Nodes outside the selected project are also rejected.
 - For child insertion, the `role` name must exist on the parent concept; otherwise the call fails.
 - For `child` insertion into a **single-cardinality** role (`0..1` / `1`), an existing occupant is **overwritten** (the new node replaces it) rather than appended — appending would otherwise create two children and break validation with *"Only one child is allowed in the role …"*. This matches `mps_mcp_update_node`. A multi-node input cannot fill one slot, so that case is still rejected; for single-cardinality roles `position` must be `-1`/absent or `0`.
-- For `child` insertion into a **multi-cardinality** role, `position` is 0-based. A value at or beyond the current child count is **clamped to an append** — it is *not* rejected — matching common list-insert semantics (e.g. Python `list.insert(big, x)`). A negative value other than `-1` is rejected. The response's `inserted[]` entries each carry the node's **actual `index`** within the parent role, so when a `position` overshoots you can see the resulting append position. This clamp-and-report behavior is consistent across the MCP tool family — `mps_mcp_update_node` (`ADD` × `CHILD`) and `mps_mcp_alter_nodes` (`MOVE_CHILD` / `MOVE_NODE_TO_PARENT`) clamp the same way.
-- For `replace` mode, the input must parse to exactly one top-level node; multi-node input is rejected.
+- For `child` insertion into a **multi-cardinality** role, `position` is 0-based. A value at or beyond the current child count is **clamped to an append** — it is *not* rejected — matching common list-insert semantics (e.g. Python `list.insert(big, x)`). A negative value other than `-1` is rejected. The response's `inserted[]` entries each carry the node's **actual `index`** within the parent role, so when a `position` overshoots you can see the resulting append position. This clamp-and-report behavior is consistent across the MCP tool family — `mps_mcp_update_node` (`ADD` × `CHILD`) and `mps_mcp_alter_nodes` (`MOVE_CHILD` / `MOVE_NODE_TO_PARENT` / `COPY_NODE`) clamp the same way.
+- **Statements into a `StatementList` role are auto-wrapped.** Body-like roles (`BaseMethodDeclaration.body`, `IfStatement.ifTrue`, `BlockStatement.statements`, …) declare `StatementList`, not `Statement`. Pass `featureKind: "STATEMENTS"` with the body role directly — no need to insert a `StatementList` yourself and target its `statement` role; the tool redirects the statements into that list and reports it in the envelope's `warnings`.
+  - `mode: "child"` is **non-destructive**: an existing `StatementList` in the role (a method's `body` always holds one, even when empty) is reused and **appended to**; one is created only when the role is empty. `position` and the reported `index` then refer to the position **inside the statement list**.
+  - `mode: "replace"` on a `StatementList` target wraps the statements into a **new** `StatementList` that **replaces** the old one — the previous body content is gone. Use `child` to add to a body.
+  - The wrap depends on the parsed nodes being statements, not on `featureKind`: an `EXPRESSION` into a body role is still rejected — wrap it in an `ExpressionStatement` yourself, or pass the code as `STATEMENTS` with a trailing `;`.
+- For `replace` mode, the input must parse to exactly one top-level node; multi-node input is rejected. Exception: the auto-wrap above collapses several statements into one `StatementList`, so a multi-statement `replace` on a body is accepted.
 - `FIELD`, `METHOD`, and `NESTED_CLASS` are all parsed as **class members** (internally as `CLASS_CONTENT`). The `featureKind` here is **advisory**: the parser accepts any class-body content for these kinds, and what may be placed where is validated against the **target containment role**, not the kind. For example `featureKind:METHOD` with a nested-class body succeeds when the target role accepts a nested class. Constrain placement via the insert target / `role`, not `featureKind`.
-- Unrecognized keys in `parameters` (and in `insert` / `postProcess`) are **rejected** with an error naming the offending key. In particular **`dryRun` is not supported** by this tool (unlike `mps_mcp_update_node`); passing it fails rather than silently mutating.
+- Unrecognized keys in `parameters` (and in `insert` / `postProcess`) are **rejected** with an error naming the offending key, the nearest accepted spelling and the whole accepted set. In particular **`dryRun` is not supported** by this tool (unlike `mps_mcp_update_node`); passing it fails rather than silently mutating. `projectPath` is tolerated inside `parameters`, but it is a top-level tool parameter and must still be passed there.
 
 ## Editing Strategy
 

@@ -1,0 +1,87 @@
+{
+  "concept": "jetbrains.mps.baseLanguage.structure.InstanceMethodDeclaration",
+  "properties": [
+    { "name": "name", "value": "withSampleNumber" },
+    { "name": "resolveInfo", "value": "withSampleNumber" }
+  ],
+  "children": [
+    {
+      "role": "returnType",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.ClassifierType",
+          "references": [{ "role": "classifier", "target": "TARGET_VALUE_OBJECT" }]
+        }
+      ]
+    },
+    {
+      "role": "parameter",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.ParameterDeclaration",
+          "properties": [
+            { "name": "name", "value": "val" },
+            { "name": "resolveInfo", "value": "val" }
+          ],
+          "children": [
+            { "role": "type", "nodes": [{ "concept": "jetbrains.mps.baseLanguage.structure.IntegerType" }] }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "body",
+      "nodes": [
+        {
+          "concept": "jetbrains.mps.baseLanguage.structure.StatementList",
+          "children": [
+            {
+              "role": "statement",
+              "nodes": [
+                {
+                  "concept": "jetbrains.mps.baseLanguage.structure.ReturnStatement",
+                  "children": [
+                    {
+                      "role": "expression",
+                      "nodes": [
+                        {
+                          "concept": "jetbrains.mps.baseLanguage.structure.GenericNewExpression",
+                          "children": [
+                            {
+                              "role": "creator",
+                              "nodes": [
+                                {
+                                  "concept": "jetbrains.mps.baseLanguage.structure.ClassCreator",
+                                  "references": [{ "role": "baseMethodDeclaration", "target": "TARGET_VALUE_OBJECT_CONSTRUCTOR" }],
+                                  "children": [
+                                    {
+                                      "role": "actualArgument",
+                                      "nodes": [
+                                        {
+                                          "concept": "jetbrains.mps.baseLanguage.structure.VariableReference",
+                                          "references": [{ "role": "variableDeclaration", "target": "val" }]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "visibility",
+      "nodes": [{ "concept": "jetbrains.mps.baseLanguage.structure.PublicVisibility" }]
+    }
+  ]
+}

@@ -24,6 +24,8 @@ Both Java Application paths additionally require the owning module's descriptor 
 Module '<moduleName>' (owner of node '<nodeName>') has compileInMPS=false; the standard MPS Java producer skips such modules because their classes_gen is empty at launch. Either flip the module's JavaModuleFacet compile setting to MPS, or launch via the JPS-built classpath using the IDEA MCP execute_run_configuration tool on the generated .java file.
 ```
 
+The message names an IDEA MCP route; MoAI does not use it. Report the gate to the user (`references/classconcept-and-fallbacks.md`).
+
 ## Refusal: no shape matched
 
 If the node matches none of the three shapes, the tool **refuses with an error**:
