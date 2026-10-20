@@ -13,7 +13,8 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 - Use the packaged solution `org.modellwerkstatt.dataux.tests` for stable examples. Its verified model and node references are in [references/sandbox.md](references/sandbox.md).
 - Use the package documentation for semantics and runtime behavior; start with the [ObjectFlow scope](../../docu/objectflow.md#modellierungsumfang-und-ausdrucksmöglichkeiten) and the [MoWare responsibility map](../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin).
 - Never persist a project path, editor-session state, or references from an application project.
-- For targets outside the packaged solution, use explicit placeholders such as `TARGET_OFX_CONFIG`, then resolve them before writing. `OFXConfig`s live in `<firma>.<app>.base`; the destination model imports that model and references the config, it never holds its own copy. [Model layering](../../conventions/mw-anwendungsaufbau_v1.md#solutions-und-modelle)
+- Conventions are referenced by name, e.g. conventions `commands`; the project provides them (see its `AGENTS.md`). This skill does not repeat their content.
+- For targets outside the packaged solution, use explicit placeholders such as `TARGET_OFX_CONFIG`, then resolve them before writing. The destination model imports the model that holds the `OFXConfig`s (conventions `anwendungsaufbau`) and references the config; it never holds its own copy.
 
 ## Critical rules
 
@@ -38,7 +39,8 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 5. Start from [references/blueprints/](references/blueprints/). Replace names and every `TARGET_*` placeholder.
 6. Dry-run a root with `mps_mcp_insert_root_node_from_json`; dry-run a subtree with `mps_mcp_update_node` using `ADD CHILD`.
 7. Insert the skeleton, add large subtrees incrementally, and preserve existing node IDs with surgical updates.
-8. Run `mps_mcp_check_root_node_problems` on each changed root, repair resolvable references if needed, and run the task-required make/generation checks.
+8. Review every changed root against the applicable conventions. A shape copied from a blueprint, a packaged example, or the project itself does not prove compliance.
+9. Run `mps_mcp_check_root_node_problems` on each changed root, repair resolvable references if needed, and run the task-required make/generation checks.
 
 ## Stable project references
 

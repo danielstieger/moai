@@ -11,6 +11,8 @@ ManMap models relational persistence and read models for MoWare applications. `P
 
 - Use MPS MCP tools; never read or edit raw `.mps` / `.mpl` XML (rule and fallback: [`MPS_AGENT_GUIDE.md`](../../MPS_AGENT_GUIDE.md#never-read-raw-mps-model-files)).
 - Never persist a project path or IDE-session state.
+- Conventions are referenced by name, e.g. conventions `anwendungsaufbau`; the project provides them (see its `AGENTS.md`). This skill does not repeat their content.
+- Database schemas: conventions `allgemein`.
 - Discover the language by its qualified name `org.modellwerkstatt.manmap`. Query concepts with `l:5aaa957f-3447-4783-b1f7-b301fa3e0394:org.modellwerkstatt.manmap`, not the module reference syntax.
 - Use the `qualifiedName` as `concept` in blueprints (`moai:mps-mcp-workflow`, `references/node-editing-rules.md`).
 - Treat every `$TARGET_*` value in a blueprint as a required target-model placeholder. Resolve it by scope or replace it with a persistent `r:` node reference from the target model immediately before insertion.
@@ -30,7 +32,8 @@ ManMap models relational persistence and read models for MoWare applications. `P
 4. Dry-run a new root with `mps_mcp_insert_root_node_from_json`.
 5. Insert the root, then add `persistenceMapping`, `atomMpig`, or `member` subtrees incrementally with `mps_mcp_update_node`.
 6. Validate after each substantial subtree and after the finished root.
-7. Generate or build the owning solution when semantic or generated-code correctness matters.
+7. Review every changed root against the applicable conventions. A shape copied from a blueprint, a packaged example, or the project itself does not prove compliance.
+8. Generate or build the owning solution when semantic or generated-code correctness matters.
 
 ## Stable Package References
 

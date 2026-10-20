@@ -20,5 +20,5 @@ All blueprints use fully qualified concept names and contain no persistent appli
 
 The Entity, Value Object, and DTO skeletons contain an empty public default constructor, as the packaged examples do; the Service skeleton and the other root skeletons contain no constructor. All root skeletons intentionally omit further constructors, methods, Pages, config elements, and other large/semantic content. Insert them first, validate, then add those parts surgically. For Pages and Config elements, inspect a packaged reference from [sandbox.md](sandbox.md) because required references and task-specific child concepts cannot be made universally portable.
 
-The test-suite skeleton contains `TARGET_OFX_CONFIG`; replace it with the `OFXConfig` root in `<firma>.<app>.base` (imported by the `tests` model) before a production write. [Test configuration semantics](../../../docu/objectflow.md#ofxtestsuit)
+The test-suite skeleton contains `TARGET_OFX_CONFIG`; replace it with the test `OFXConfig` root (location: conventions `anwendungsaufbau`; imported by the `tests` model) before a production write. [Test configuration semantics](../../../docu/objectflow.md#ofxtestsuit)
 

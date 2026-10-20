@@ -4,7 +4,7 @@
 
 Source semantics: [Persistence Description and mapping capabilities](../../../docu/manmap.md#persistence-description-und-mapping-möglichkeiten) and [fields, keys, and options](../../../docu/manmap.md#felder-schlüssel-und-optionen).
 
-1. Determine the target project dynamically and resolve the editable target model.
+1. Determine the target project dynamically and resolve the editable target model; placement and name: conventions `anwendungsaufbau`.
 2. Resolve ObjectFlow entity and property declaration nodes in that model.
 3. Dry-run and insert [persistence-description-skeleton.json](blueprints/persistence-description-skeleton.json).
 4. Add one [entity-mapping-subtree.json](blueprints/entity-mapping-subtree.json) under `persistenceMapping` at a time.
@@ -19,7 +19,7 @@ Use [field-mapping-subtree.json](blueprints/field-mapping-subtree.json), [refere
 Source semantics: [repositories and the four method kinds](../../../docu/manmap.md#repositories-und-die-vier-methodenarten) and [ObjectFlow explicit session operations](../../../docu/objectflow.md#explizite-session-operationen).
 
 1. Load `moai:mps-baselanguage` and `moai:mps-node-editing`.
-2. Insert [repository-skeleton.json](blueprints/repository-skeleton.json), or identify the existing root and preserve its ID.
+2. Insert [repository-skeleton.json](blueprints/repository-skeleton.json), or identify the existing root and preserve its ID. Which repository holds which method, placement and name: conventions `anwendungsaufbau`.
 3. Add one `RepositoryInstanceMethodDeclaration` under inherited role `member`; [repository-method-skeleton.json](blueprints/repository-method-skeleton.json) is a minimal void-body starting point.
 4. Build the BaseLanguage return type, parameters, body, and visibility before adding ManMap operations.
 5. Resolve mapping references against the persistence root used by the target model.

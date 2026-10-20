@@ -696,8 +696,8 @@ Ein `SEARCH_CMD` kann ein erfolgreich vom Child gepushtes Objekt beispielsweise 
 ```objectflow
 cmd terminated handler for page:
 
-  child cmd term with Rechnung
-  func(terminatedInFinalOk, pushed)->void {
+  any cmd term with Rechnung
+  func(terminatedInFinalOk, wasChild, pushed)->void {
     if (terminatedInFinalOk) {
       Rechnung integriert = session merge entity pushed
         into list<> filter.results (in session as readonly);
@@ -705,7 +705,7 @@ cmd terminated handler for page:
   }
 ```
 
-Das Beispiel ist Pseudocode. Entscheidend ist, mit dem von `session merge` gelieferten Objekt weiterzuarbeiten: Es ist die in den Parent-Kontext integrierte Instanz, während `pushed` aus dem beendeten Command stammt.
+Das Beispiel ist Pseudocode. Der Classifier `with Rechnung` beschränkt den Handler auf gepushte Objekte vom Typ `Rechnung`; `any cmd term` setzt `NEWSTYLE_CMD_TERM_HANDLING` voraus. Entscheidend ist, mit dem von `session merge` gelieferten Objekt weiterzuarbeiten: Es ist die in den Parent-Kontext integrierte Instanz, während `pushed` aus dem beendeten Command stammt.
 
 #### Page Conclusions
 

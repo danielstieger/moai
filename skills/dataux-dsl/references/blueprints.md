@@ -19,7 +19,7 @@ Every JSON string beginning with `TARGET_MODEL.` is intentionally unresolved and
 | `TARGET_MODEL.targetTypeProperty` | Property of the referenced type shown as the choice text |
 | `TARGET_MODEL.ReusableUiRoot` | Bindable DataUX root referenced by Include |
 | `TARGET_MODEL.Command` | ObjectFlow Command referenced by a menu action |
-| `TARGET_MODEL.OFXConfig` | `OFXConfig` root in the application's `<firma>.<app>.base` model, referenced by a module's `configuration` |
+| `TARGET_MODEL.OFXConfig` | `OFXConfig` root (location: conventions `anwendungsaufbau`), referenced by a module's `configuration` |
 | `TARGET_MODEL.InboxClassifier` | Entity/DTO (or key type) of the producer inbox (`OFXProducerContext.keytype`) |
 | `TARGET_MODEL.ProducerCommand` | ObjectFlow Command that searches or computes the work items of a pair |
 | `TARGET_MODEL.ConsumerCommand` | ObjectFlow Command that processes one inbox element (usually `GRAPH_OWNER_CMD`) |
@@ -31,8 +31,8 @@ Property values beginning with `Example` (`ExampleFormPage`, `ExampleApp`, `Exam
 ## Files
 
 - [page-pane-form-skeleton.json](blueprints/page-pane-form-skeleton.json): small complete PagePane root with a single form.
-- [table-subtree.json](blueprints/table-subtree.json): table over an owner list property with one column, `LABEL` and `SELECT FIRST`. Remove the `LabelFOption` when the table is the Page Pane's top element (its label is the Page Title). [UI conventions](../../../conventions/mw-oberflaeche_v1.md)
-- [grid-master-detail-subtree.json](blueprints/grid-master-detail-subtree.json): compact form (row `-1`) above the list table (row `1*`), one column `1*`, table with `LABEL` and `SELECT FIRST`.
+- [table-subtree.json](blueprints/table-subtree.json): table over an owner list property with one column, `LABEL` and `SELECT FIRST`. Whether `LABEL` stays: conventions `oberflaeche`.
+- [grid-master-detail-subtree.json](blueprints/grid-master-detail-subtree.json): compact form (row `-1`) above the list table (row `1*`), one column `1*`, table with `LABEL` and `SELECT FIRST`. The form is editable; whether it stays editable depends on the command type: conventions `commands`.
 - [tab-layout-subtree.json](blueprints/tab-layout-subtree.json): two tabs, one reusable include and one form.
 - [include-subtree.json](blueprints/include-subtree.json): minimal reusable UI reference.
 - [menu-submenu-subtree.json](blueprints/menu-submenu-subtree.json): overflow submenu with one command using its ObjectFlow defaults.

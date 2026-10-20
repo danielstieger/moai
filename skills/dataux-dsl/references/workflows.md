@@ -34,10 +34,10 @@ This separation follows the [MoWare ownership map](../../../docu/moware-werkbank
 1. Decide the page root type, master list property, and row/detail type.
 2. Ensure the command loads the complete master/detail graph before showing the Page. [Explicit loading](../../../docu/manmap.md#domänenmodell-laden-bearbeiten-und-speichern)
 3. Use [grid-master-detail-subtree.json](blueprints/grid-master-detail-subtree.json).
-4. Bind the form to the page root and the table to the owner/list property; one column `1*`, the form row `-1`, the table row `1*`, no left/right split.
-5. Keep the table's `LabelFOption` (set the text) unless the table is the Page Pane's top element; keep `SelectFirstFOption` only when an initial selection is desired.
+4. Bind the form to the page root and the table to the owner/list property. Layout weights and arrangement: conventions `oberflaeche`.
+5. Set the table's `LabelFOption` as the conventions `oberflaeche` require; keep `SelectFirstFOption` only when an initial selection is desired.
 6. Add delegates for both types; give every table delegate a `WidthDOption` (percentages add up to 100).
-7. Put the table's actions, including the `ENTER` main action, into one text-less `MenuSub` (see [menu-submenu-subtree.json](blueprints/menu-submenu-subtree.json)). [UI conventions](../../../conventions/mw-oberflaeche_v1.md)
+7. Add the table's actions as the conventions `oberflaeche` require (shape: [menu-submenu-subtree.json](blueprints/menu-submenu-subtree.json)).
 8. Validate behavior for empty lists and cleared selection. [Empty selection](../../../docu/dataux.md#leere-selektion) and [master-detail behavior](../../../docu/dataux.md#master-detail)
 
 ## Add tabs
@@ -65,12 +65,12 @@ This separation follows the [MoWare ownership map](../../../docu/moware-werkbank
 5. Use `MenuCompoundAction` only after confirming Graph Owner/Edit and conclusion semantics. [Compound action behavior](../../../docu/dataux.md#menüs-und-command-aktionen)
 6. Validate the DataUX root and the referenced Command root.
 
-Put the entries in the text-less `Submenu`, including the `ENTER` main action; actions before submenus, one overflow, top level only (checker). [UI conventions](../../../conventions/mw-oberflaeche_v1.md), [menu rules](../../../docu/dataux.md#menüs-und-command-aktionen)
+Place the entries as the conventions `oberflaeche` require. Checker: actions before submenus, one overflow, top level only. [Menu rules](../../../docu/dataux.md#menüs-und-command-aktionen)
 
 ## Create an AppUI Module
 
-1. Place the root in the application's `app` model (`<firma>.<app>.app`), the only model that holds `AppUI Module` and `BatchJob Module`. [Model layering](../../../conventions/mw-anwendungsaufbau_v1.md#solutions-und-modelle)
-2. Resolve the `OFXConfig` root in `<firma>.<app>.base` and set it as `TARGET_MODEL.OFXConfig`. `configuration` is always required although only start-ups from MPS, FX8, or standalone use it. [Configuration note](../../../docu/dataux.md#teil-ii--anwendung-und-batchjob)
+1. Place the root in the model the conventions `anwendungsaufbau` assign to `AppUI Module`s.
+2. Resolve the `OFXConfig` root (location: conventions `anwendungsaufbau`) and set it as `TARGET_MODEL.OFXConfig`. `configuration` is always required although only start-ups from MPS, FX8, or standalone use it. [Configuration note](../../../docu/dataux.md#teil-ii--anwendung-und-batchjob)
 3. Copy [appui-module-skeleton.json](blueprints/appui-module-skeleton.json); give the module a name without spaces.
 4. Replace `TARGET_MODEL.Command` in `mainMenu` and in the tile with the commands the user starts; add one `MenuAction` per entry command to `mainMenu` (business entries), `extrasMenu` (rare functions), or `helpMenu`. Use `MenuSub` for grouping. Module actions have no selection, so give them no `getSelected()` arguments. [Navigation](../../../docu/dataux.md#anwendung-mit-appui-module)
 5. Keep `VERSION` (`OptVersion`) and `OFFICIAL NAME` (`OptOfficialAppName`) once each.
@@ -83,7 +83,7 @@ Do not add `onStartup`/`onShutdown`; the checker rejects them.
 ## Create a BatchJob Module
 
 1. Model the command side first with `moai:objectflow-dsl`: a producer command that finds the work items (usually with a page whose bound list carries the result) and a consumer command that processes one item, typically a `GRAPH_OWNER_CMD`. [Batch concept](../../../docu/dataux.md#batchjob-mit-batchjob-module)
-2. Place the root in `<firma>.<app>.app`; reference the `OFXConfig` from `<firma>.<app>.base` as `TARGET_MODEL.OFXConfig`.
+2. Place the root and resolve the `OFXConfig` per the conventions `anwendungsaufbau`; set the config as `TARGET_MODEL.OFXConfig`.
 3. Copy [batchjob-module-skeleton.json](blueprints/batchjob-module-skeleton.json). Replace `TARGET_MODEL.InboxClassifier` (inbox element type), `TARGET_MODEL.ProducerCommand`, and `TARGET_MODEL.ConsumerCommand`; rename `ExamplePair` consistently in the pair and in the `pair` references of the `CRON` and `CONSUMERS` options.
 4. Dry-run and insert the root.
 5. Add the inbox-filling page to the producer's `runCommand.pages` (`OFXRunCmdPage` with `page -> <producer page>`, `name` for the page variable, and `beforeConclude` with `inbox.addAll(<pageVar>.<list>)` built from `OFXRunCmdVarRef` nodes); load `moai:mps-baselanguage` for the statement. Add an `ifClause` precondition to the consumer call context when the item may already be processed. [Inbox rules](../../../docu/dataux.md#batchjob-mit-batchjob-module)

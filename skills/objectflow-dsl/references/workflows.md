@@ -14,10 +14,10 @@
 
 ## Add or change domain logic
 
-Apply the domain conventions (invariants, state transitions as Service Methods, values). [Domain conventions](../../../conventions/mw-domaenenmodell_v1.md)
+Apply the conventions `domaenenmodell`.
 
-1. Keep calculations and invariant-preserving behavior on the domain structure when they need no infrastructure.
-2. Use a stateless Service for cross-object coordination or repository/service access. [Service placement](../../../docu/objectflow.md#service-komponenten)
+1. Place logic on the domain structure or in a Service as the conventions `domaenenmodell` require.
+2. A Service is stateless; repository and service access happens there. [Service placement](../../../docu/objectflow.md#service-komponenten)
 3. Invoke configured components through `OperationCall` (`#`). [Operation calls](../../../docu/objectflow.md#komponenten-mit--aufrufen)
 4. Load required facts first, collect expected failures in `validation`, then mutate. [Validation pattern](../../../docu/objectflow.md#preconditions-validation-guards-und-exceptions)
 5. Use server date/time literals and `BigDecimal` literals for business time and exact decimals; do not use `double`/`float` for exact values. [Date/time/decimal literals](../../../docu/objectflow.md#literale-für-datum-zeitpunkt-und-dezimalzahl)
@@ -27,10 +27,10 @@ Load `moai:mps-baselanguage` whenever writing method bodies or expressions.
 
 ## Create a command
 
-Apply the command conventions (naming, owner/edit split, returning results to a search). [Command conventions](../../../conventions/mw-commands_v1.md)
+Apply the conventions `commands`.
 
 1. Pick the command type from its ownership and commit semantics, not its visual appearance. [Command types](../../../docu/objectflow.md#die-vier-command-typen)
-2. Insert [command-skeleton.json](blueprints/command-skeleton.json) and set a space-containing user-facing name.
+2. Insert [command-skeleton.json](blueprints/command-skeleton.json) and set the name (conventions `commands`).
 3. Add parameters/default selections and `generally enabled` conditions. Defaults do not replace business validation. [Parameters and selection](../../../docu/objectflow.md#parameter-defaults-und-selektion)
 4. In `command init`, load/checkout the graph and reject startup with Preconditions before mutation. [Command init](../../../docu/objectflow.md#command-init-und-hintergrundinitialisierung)
 5. Add Pages incrementally. Each normal Page requires a Page Init and at least one Page Pane link; keep an unconditional link last. [Pages](../../../docu/objectflow.md#pages-und-page-conclusions)
@@ -40,21 +40,21 @@ Apply the command conventions (naming, owner/edit split, returning results to a 
 9. Add the aggregate root to `revert` when a child edit must be undone on cancel. [Revert](../../../docu/objectflow.md#revert-beim-abbruch)
 10. Validate the command, then test it with `run command`.
 
-Prefer `NEWSTYLE_CMD_TERM_HANDLING`: consume pushed values in a termination handler, merge explicitly, and continue with the merge result. [Explicit termination and merge](../../../docu/objectflow.md#explizites-command-termination-handling-und-session-merge)
+Prefer an `any cmd term` handler (`any cmd term with <Classifier>`, function `(terminatedInFinalOk, wasChild, pushed)`): merge the pushed value explicitly and continue with the merge result. For search pages apply the conventions `commands`. [Explicit termination and merge](../../../docu/objectflow.md#explizites-command-termination-handling-und-session-merge)
 
 Use Successors for one atomic Unit of Work; use `session queue next command` for a post-commit UI flow. [Successors](../../../docu/objectflow.md#successor-commands) and [post-commit queue](../../../docu/objectflow.md#command-nach-dem-commit-einplanen)
 
 ## Create an ObjectFlow test
 
-Apply the test conventions (test data through `CS` and `TestDaten`, one test per state transition and per blocking Precondition). [Test conventions](../../../conventions/mw-tests_v1.md)
+Apply the conventions `tests`.
 
 1. Insert [test-suite-skeleton.json](blueprints/test-suite-skeleton.json).
-2. Replace `TARGET_OFX_CONFIG` with the test `OFXConfig` from `<firma>.<app>.base`; add that model as a dependency of the `tests` model if it is missing. [Model layering](../../../conventions/mw-anwendungsaufbau_v1.md#solutions-und-modelle)
+2. Replace `TARGET_OFX_CONFIG` with the test `OFXConfig` from the model that holds the `OFXConfig`s (conventions `anwendungsaufbau`); add that model as a dependency of the `tests` model if it is missing.
 3. Add configured components and test content incrementally.
 4. Use `Simple Test` for session-aware domain/service/repository tests. [OFXTestSuit](../../../docu/objectflow.md#ofxtestsuit)
 5. Use `run command` to model expected Pages, forced Conclusions, child Commands, Successors, cancellation, and passed-forward values. [Commands without UI](../../../docu/objectflow.md#commands-ohne-ui-ausführen)
 6. Use `FAIL IN` for expected failures and `DEFAULT_DATETIME` for deterministic business time. [Test options](../../../docu/objectflow.md#testoptionen)
-7. Verify persisted effects by reading them back, in a fresh Custom Session where needed. [Typical test levels](../../../docu/objectflow.md#typische-testebenen)
+7. Verify persisted effects by reading them back (conventions `tests`). [Typical test levels](../../../docu/objectflow.md#typische-testebenen)
 
 ## Integrate persistence with ManMap
 

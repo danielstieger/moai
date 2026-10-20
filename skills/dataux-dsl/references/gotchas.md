@@ -20,7 +20,7 @@ An Include is always bound: `boundClassifier` mandatory (checker: "An include ne
 
 ## Modules need a configuration and a version
 
-`configuration` is `0..1` in the descriptor, but the checker reports "AppUi Module needs a configuration." / "BatchJob Module needs a configuration." Likewise one `VERSION` option is required: "Sepcify a version option for this app module." (sic, both modules). The `OFXConfig` lives in `<firma>.<app>.base`. [Executable modules](../../../docu/dataux.md#teil-ii--anwendung-und-batchjob)
+`configuration` is `0..1` in the descriptor, but the checker reports "AppUi Module needs a configuration." / "BatchJob Module needs a configuration." Likewise one `VERSION` option is required: "Sepcify a version option for this app module." (sic, both modules). Location of the `OFXConfig`: conventions `anwendungsaufbau`. [Executable modules](../../../docu/dataux.md#teil-ii--anwendung-und-batchjob)
 
 ## Module options are single-use
 
