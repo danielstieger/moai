@@ -12,6 +12,16 @@
 
 `#Key` versus the loaded reference: see [Beziehungen und Objektgraphen](../../../docu/objectflow.md#beziehungen-und-objektgraphen).
 
+## Write method bodies and command functions
+
+Bodies of Services, Repositories, data-structure methods and command functions (command init, page init, scopes, conclusions, final conclusions) are written as Java text with markers and converted with `moai/tools/text2of.py`; the markers are listed by `python3 -I moai/tools/text2of.py --help`. Do not build such bodies as JSON.
+
+1. Insert the root skeleton first (`blueprint.py build`). In a command, every function to fill must exist, empty.
+2. Insert the Java text with `mps_mcp_parse_java_and_insert`: methods as `CLASS_CONTENT` into the root's `member` role, all methods of a root in one call; statements of a command function as `STATEMENTS` into the function's `body`. The parser reports the markers as unresolved; that is expected.
+3. `mps_mcp_print_node` (`deep=true`) of the root, then `python3 -I moai/tools/text2of.py PRINTOUT [--repo-type method=CHECKOUT|CHECKIN|DELETE]`. It prints `name | node to replace | file` per member or function body and stops with the location on anything it cannot convert.
+4. `mps_mcp_update_node` `SET CHILD` per row (`childNodeRef` = the node, `childJson` = the file), then `FIX_REFERENCES` on the root and the model check. A call to another replaced member binds by name to the old node until that member is replaced too; `FIX_REFERENCES` rebinds it.
+5. To change a body later, write it again as text: delete the member or clear the function body, then steps 2 to 4.
+
 ## Add or change domain logic
 
 Apply the conventions `domaenenmodell`.
@@ -23,7 +33,7 @@ Apply the conventions `domaenenmodell`.
 5. Use server date/time literals and `BigDecimal` literals for business time and exact decimals; do not use `double`/`float` for exact values. [Date/time/decimal literals](../../../docu/objectflow.md#literale-für-datum-zeitpunkt-und-dezimalzahl)
 6. Use `status switch` without a default when exhaustive handling should be checked. [Status switch](../../../docu/objectflow.md#statuswerte-mit-status-switch-behandeln)
 
-Load `moai:mps-baselanguage` whenever writing method bodies or expressions.
+Write the bodies as described in [Write method bodies and command functions](#write-method-bodies-and-command-functions).
 
 ## Create a command
 
@@ -32,7 +42,7 @@ Apply the conventions `commands`.
 1. Pick the command type from its ownership and commit semantics, not its visual appearance. [Command types](../../../docu/objectflow.md#die-vier-command-typen)
 2. Insert [command-skeleton.json](blueprints/command-skeleton.json) and set the name (conventions `commands`).
 3. Add parameters/default selections and `generally enabled` conditions. Defaults do not replace business validation. [Parameters and selection](../../../docu/objectflow.md#parameter-defaults-und-selektion)
-4. In `command init`, load/checkout the graph and reject startup with Preconditions before mutation. [Command init](../../../docu/objectflow.md#command-init-und-hintergrundinitialisierung)
+4. In `command init`, load/checkout the graph and reject startup with Preconditions before mutation. [Command init](../../../docu/objectflow.md#command-init-und-hintergrundinitialisierung) Write the function bodies as in [Write method bodies and command functions](#write-method-bodies-and-command-functions).
 5. Add Pages incrementally. Each normal Page requires a Page Init and at least one Page Pane link; keep an unconditional link last. [Pages](../../../docu/objectflow.md#pages-und-page-conclusions)
 6. Put Page-specific `#Meta` changes in scopes; keep server-side validation as well. [Property metadata](../../../docu/objectflow.md#ui-metadaten-einer-property-mit-meta-steuern)
 7. Use `save` conclusions normally; use `no_save` only to discard editor state intentionally. [Page Conclusions](../../../docu/objectflow.md#page-conclusions)

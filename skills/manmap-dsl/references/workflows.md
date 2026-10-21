@@ -21,7 +21,7 @@ Source semantics: [repositories and the four method kinds](../../../docu/manmap.
 1. Load `moai:mps-baselanguage` and `moai:mps-node-editing`.
 2. Insert [repository-skeleton.json](blueprints/repository-skeleton.json), or identify the existing root and preserve its ID. Which repository holds which method, placement and name: conventions `anwendungsaufbau`.
 3. Add one `RepositoryInstanceMethodDeclaration` under inherited role `member`; [repository-method-skeleton.json](blueprints/repository-method-skeleton.json) is a minimal void-body starting point.
-4. Build the BaseLanguage return type, parameters, body, and visibility before adding ManMap operations.
+4. Write the methods as Java with markers (`GET`, `WHERE`, `SAVE`, `DELETE`, `SQL`) and convert them with `moai/tools/text2of.py`, setting the method kind with `--repo-type` (`moai:objectflow-dsl`, `references/workflows.md`, "Write method bodies and command functions").
 5. Resolve mapping references against the persistence root used by the target model.
 6. Add query/save/delete/SQL subtrees surgically.
 7. Validate the root (several changed roots: the model reference with `perRoot=true`), then generate/build the owning solution.

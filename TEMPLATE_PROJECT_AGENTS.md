@@ -56,7 +56,9 @@ with `python3 -I`):
   blueprints (`build`, `check`) against the structure of the MoWare languages;
 - `verify.py` – compare an inserted node with its blueprint;
 - `dump.py` – condense check reports, show blueprints, search dumps;
-- `copyroot.py` – copy roots from another model, e.g. configuration templates.
+- `copyroot.py` – copy roots from another model, e.g. configuration templates;
+- `text2of.py` – convert method and command bodies written as Java with markers
+  into ObjectFlow and ManMap nodes.
 
 Use them instead of writing your own scripts for the same purpose. Their input
 and output files live in the system temp directory; they write nothing into the

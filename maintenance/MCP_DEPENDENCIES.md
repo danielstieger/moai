@@ -20,5 +20,5 @@ Check this list against each new MPS / MCP version.
 
 ## Stays in any case
 
-The generic builder (composing and checking offline), the pattern layer (patterns spanning several levels) and
+The generic builder (composing and checking offline), the example export (multi-level shapes from real instances) and
 the scaffolds (conventions as a generator). Their value lies above the server.

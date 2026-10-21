@@ -50,10 +50,11 @@ project.
 
 1. Add the submodule manually in the root of the application project:
 
-   ```bash
+```bash
    git submodule add https://github.com/danielstieger/moai.git moai
+   git -C moai sparse-checkout set --no-cone '/*' '!/maintenance/'
    git submodule update --init --recursive
-   ```
+```
 
 2. Hand the rest of the installation to a coding agent;
    [INSTALL_INSTRUCTIONS.md](INSTALL_INSTRUCTIONS.md) is written as a prompt

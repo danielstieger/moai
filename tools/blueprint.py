@@ -19,6 +19,7 @@ Short spec (build):
    "children": {"type": "IntegerType",        a node, a list of nodes, or [] for a named empty role
                 "propertyOption": []}}        (an empty role suppresses node-factory content)
   A plain string stands for a node without properties, references and children.
+  A node in full blueprint form (lists of properties/references/children) is taken as it is and checked.
 
 Errors stop the build (exit code 1). Warnings (missing mandatory roles that a node factory may fill,
 deprecated concepts or roles) are printed; check the inserted node afterwards.
@@ -213,6 +214,8 @@ def expand(st, spec, path="$"):
         spec = {"concept": spec}
     if not isinstance(spec, dict) or "concept" not in spec:
         raise ValueError(f"{path}: node needs a 'concept'")
+    if any(isinstance(spec.get(k), list) for k in ("properties", "references", "children")):
+        return spec  # already a full blueprint node (e.g. from copyroot.py); check() validates it
     try:
         fq = st.resolve(spec["concept"])
     except ValueError as e:
