@@ -54,7 +54,7 @@ Insert versus update without a forced option, composite keys: see [Insert oder U
 
 ## Direct SQL and Read Models
 
-Source semantics: [Custom SQL](../../../docu/manmap.md#custom-sql-mit-sql), [parameter binding](../../../docu/manmap.md#parameter-in-sql-text), [row/no-key mappers](../../../docu/manmap.md#row-mapper-und-no-key-mapper), and [the read-model workflow](../../../docu/manmap.md#lesemodell-mit-custom-sql-verwenden).
+Source semantics: [Custom SQL](../../../docu/manmap.md#custom-sql-mit-sql), [parameter binding](../../../docu/manmap.md#parameter-in-sql-text), [row/no-key mappers](../../../docu/manmap.md#row-mapper-und-nokeystoreread-only-map), and [the read-model workflow](../../../docu/manmap.md#lesemodell-mit-custom-sql-verwenden).
 
 1. Choose `C2SqlBlock.sqlType=QUERY` for rows or `STATEMENT` for an update count. A `STATEMENT` needs an explicit empty `mapping` role; otherwise the node factory adds a `row` mapping closure and the checker rejects it.
 2. Compose SQL from reached `C2SqlText` statements. Use bound variables/property/status references, not text concatenation of values.

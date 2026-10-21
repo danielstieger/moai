@@ -11,7 +11,7 @@ ManMap models relational persistence and read models for MoWare applications. `P
 
 - Use MPS MCP tools; never read or edit raw `.mps` / `.mpl` XML (rule and fallback: [`MPS_AGENT_GUIDE.md`](../../MPS_AGENT_GUIDE.md#never-read-raw-mps-model-files)).
 - Never persist a project path or IDE-session state.
-- Conventions are referenced by name, e.g. conventions `anwendungsaufbau`; the project provides them (see its `AGENTS.md`). This skill does not repeat their content.
+- Conventions are referenced by name, e.g. conventions `anwendungsaufbau` (file `mw-anwendungsaufbau_v1.md`); the project's `AGENTS.md` states where they are and which ones it changes. This skill does not repeat their content.
 - Database schemas: conventions `allgemein`.
 - Discover the language by its qualified name `org.modellwerkstatt.manmap`. Query concepts with `l:5aaa957f-3447-4783-b1f7-b301fa3e0394:org.modellwerkstatt.manmap` or the plain language name in `languageRefs`, not the module reference syntax; one `languageRefs` call with `detail="shape"` covers all concepts. Enum literals (`sqlType`, `repoMethodType`): `mps_mcp_query_structure` `GET_ENUMERATION_LITERALS`.
 - Use the `qualifiedName` as `concept` in blueprints (`moai:mps-mcp-workflow`, `references/node-editing-rules.md`).

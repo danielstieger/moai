@@ -77,7 +77,7 @@ Options with additional structure:
 - `OverwriteFormatDOption.expression: Expression [1]`
 - `DynColorDOption.func: DynColorConceptFunction [1]`
 
-Apply an option only where its delegate/property context permits it; several constraints are semantic rather than expressible by the raw role type. [Documented delegate options](../../../docu/dataux.md#delegate-optionen)
+Apply an option only where its delegate/property context permits it; several constraints are semantic rather than expressible by the raw role type. [Documented delegate options](../../../docu/dataux.md#kapitellandkarte-delegate-optionen)
 
 ## Form, table, grid, and page options
 
@@ -91,7 +91,7 @@ Apply an option only where its delegate/property context permits it; several con
 - `SkipFocusOption.element -> IUxElement [1]`: move initial focus forward to a later element.
 - `ColorPpOption.color: Expression [1]` and `StatusColorPpFOption.path: IPath [1]` are structurally available PagePane options; their complete runtime semantics are not documented, so verify them against a focused package example before use.
 
-See [form and table options](../../../docu/dataux.md#optionen-für-formulare-und-tabellen) and [layout options](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung).
+See [form and table options](../../../docu/dataux.md#kapitellandkarte-optionen-für-formulare-und-tabellen) and [layout options](../../../docu/dataux.md#layouts-tabs-und-wiederverwendung).
 
 ## Layout weights
 
@@ -166,6 +166,6 @@ Semantics of the batch options: [Batch options](../../../docu/dataux.md#kapitell
 | `OFXStrategyForException` | optional `exMatch`, `messagePartMatch: StringLiteral [0..1]`; `properties: IOFXStratBehaviour [0..n]`; a member without `exMatch` is the default rule and must be last |
 | `OFXExceptionStrategyInclude` | `strategy -> OFXExceptionStrategy [1]` |
 
-Strategy behaviours (`IOFXStratBehaviour`, editor alias in parentheses): `OFXReAddInboxStratBehaviour` (`READD_TO_INBOX`), `OFXDelayStratBehaviour` (`DELAY_EXECUTION`, property `supendSeconds: integer`, sic), `OFXClearInboxStratBehaviour` (`CLEAR_INBOX`), `OFXConsRestartStratBehaviour` (`CONSUMER_RESTART`), `OFXSilentNoLogStratBehaviour` (`SILENT_NO_LOG`). `JOB_*`/`VM_*` reactions listed in the documentation have no concept in the live language. [Exception strategies](../../../docu/dataux.md#exception-strategien-und-wiederanlauf)
+Strategy behaviours (`IOFXStratBehaviour`, editor alias in parentheses): `OFXReAddInboxStratBehaviour` (`READD_TO_INBOX`), `OFXDelayStratBehaviour` (`DELAY_EXECUTION`, property `supendSeconds: integer`, sic), `OFXClearInboxStratBehaviour` (`CLEAR_INBOX`), `OFXConsRestartStratBehaviour` (`CONSUMER_RESTART`), `OFXSilentNoLogStratBehaviour` (`SILENT_NO_LOG`). [Exception strategies](../../../docu/dataux.md#exception-strategien-und-wiederanlauf)
 
 The producer fills its inbox inside `OFXRunCmdPage.beforeConclude`, typically `inbox.addAll(<page var>.<list property>)`; the consumer passes the inbox element to its command as `actualArgument`. Load `moai:objectflow-dsl` for the command side, `moai:mps-baselanguage` for these expressions, and `moai:baselanguage-collections-dsl` for `addAll` and other collection operations.

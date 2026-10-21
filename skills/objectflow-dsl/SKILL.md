@@ -13,7 +13,7 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 - Use the packaged solution `org.modellwerkstatt.dataux.tests` for stable examples. Its verified model and node references are in [references/sandbox.md](references/sandbox.md).
 - Use the package documentation for semantics and runtime behavior; start with the [ObjectFlow scope](../../docu/objectflow.md#modellierungsumfang-und-ausdrucksmöglichkeiten) and the [MoWare responsibility map](../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin).
 - Never persist a project path, editor-session state, or references from an application project.
-- Conventions are referenced by name, e.g. conventions `commands`; the project provides them (see its `AGENTS.md`). This skill does not repeat their content.
+- Conventions are referenced by name, e.g. conventions `commands` (file `mw-commands_v1.md`); the project's `AGENTS.md` states where they are and which ones it changes. This skill does not repeat their content.
 - For targets outside the packaged solution, use explicit placeholders such as `TARGET_OFX_CONFIG`, then resolve them before writing. The destination model imports the model that holds the `OFXConfig`s (conventions `anwendungsaufbau`) and references the config; it never holds its own copy.
 
 ## Critical rules

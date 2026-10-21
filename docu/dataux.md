@@ -6,7 +6,7 @@
 
 DataUX verbindet zwei Aufgabenbereiche:
 
-1. **UI-Modellierung:** Eine Oberfläche wird aus einem fachlich gebundenen `Page Pane` sowie Formularen, Tabellen, Layouts und Aktionen aufgebaut.
+1. **UI-Modellierung:** Eine Oberfläche wird aus einem fachlich gebundenen `Page Pane` sowie `Delegate Form`s, `Table`s, Layouts und Aktionen aufgebaut.
 2. **Anwendung und Batchjob:** Ausführbare Module konfigurieren Authentifizierung, Navigation beziehungsweise Batch-Verarbeitung und die zugehörige Laufzeitkonfiguration.
 
 Die Sprache beschreibt vor allem, **welche fachlichen Daten wie visualisiert werden**. Generator und Laufzeit übernehmen die technische Umsetzung. An dafür vorgesehenen Stellen können BaseLanguage-Ausdrücke eingebettet werden, etwa für Beschriftungen, Farben, Bedingungen oder Command-Argumente.
@@ -17,7 +17,7 @@ Name, Konzeptname und FQ-Name folgen der [Bezeichnung der Konzepte](moware-werkb
 
 ## Teil I – UI-Modellierung
 
-### Page Panes
+### `Page Pane`s
 
 Eine ObjectFlow-`Page` (`org.modellwerkstatt.objectflow.structure.PageCrtl`) gehört zu einem ObjectFlow-`Command` (`org.modellwerkstatt.objectflow.structure.Command`) und beschreibt eine Seite seines Interaktionsablaufs. Ein `Page Pane` ist das Gegenstück auf der UI-Seite: Es beschreibt den sichtbaren Inhalt dieser Page.
 
@@ -45,60 +45,56 @@ Die Page stellt die Daten bereit; das `Page Pane` stellt sie dar. Eine UI-Bindun
 | `5*` | `FiveWeight` | `org.modellwerkstatt.dataux.structure.FiveWeight` | Gewicht 5 für Zeile/Spalte im `Grid Layout` und Spaltengewicht im `Delegate Form`. |
 | `FLEXIBLE` | `FlexibleOption` | `org.modellwerkstatt.dataux.structure.FlexibleOption` | Erlaubt eine flexible Größenanpassung des `Grid Layout`s. |
 | `FOCUS FORWARD 2` | `SkipFocusOption` | `org.modellwerkstatt.dataux.structure.SkipFocusOption` | Verschiebt den initialen Fokus im `Grid Layout` auf ein späteres Element. |
-| `DISABLED` | `DisabledFOption` | `org.modellwerkstatt.dataux.structure.DisabledFOption` | Formular ist nicht editierbar. |
-| `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` | Beschriftung von Formular oder Tabelle; nicht am obersten Element eines `Page Pane`s. |
-| `SELECT FIRST` | `SelectFirstFOption` | `org.modellwerkstatt.dataux.structure.SelectFirstFOption` | Selektiert das erste Tabellenelement bei der Initialisierung. |
-| `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.SelectionSummaryLineFOption` | Berechnet eine Zusammenfassung für ausgewählte Tabellenobjekte. |
-| `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.TableSummaryLineFOption` | Berechnet eine Zusammenfassung über alle Tabellenobjekte. |
-| `CUSTOM CSV EXPORT` | `TableCustomCsvExportFOption` | `org.modellwerkstatt.dataux.structure.TableCustomCsvExportFOption` | Passt den CSV-Export der Tabelle an. |
+| `COLOR` | `ColorPpOption` | `org.modellwerkstatt.dataux.structure.ColorPpOption` | Thematische Farbe des `Page Pane`s als konstanter Farbausdruck. |
+| `SCOLOR` | `StatusColorPpFOption` | `org.modellwerkstatt.dataux.structure.StatusColorPpFOption` | Thematische Farbe des `Page Pane`s aus dem Status unter einem Pfad; strukturell auch an `Delegate Form` und `Table` zulässig. |
 
 `Delegate Form`, `Table`, `Grid Layout`, `Tab Layout` und `Custom UI Element` können sowohl innerhalb eines `Page Pane`s als auch als eigenständige, wiederverwendbare Root Nodes deklariert werden.
 
 #### Datenbindung und Selektion
 
-DataUX bindet UI-Komponenten an fachliche Typen und deren Properties. Ein bindbares Element spezifiziert einen Entity- oder DTO-Typ (`boundClassifier`) und optional eine Property dieses Typs (`boundProperty`). Formulare, Tabellen, `Custom UI Element`s und `Include`s sind immer gebunden; nur Layouts innerhalb einer Hierarchie tragen keine Bindung und reichen den Kontext durch.
+DataUX bindet UI-Komponenten an fachliche Typen und deren Properties. Ein bindbares Element spezifiziert einen Entity- oder DTO-Typ (`boundClassifier`) und optional eine Property dieses Typs (`boundProperty`). `Delegate Form`s, `Table`s, `Custom UI Element`s und `Include`s sind immer gebunden; nur Layouts innerhalb einer Hierarchie tragen keine Bindung und reichen den Kontext durch.
 
-Jedes `Page Pane` besitzt einen gemeinsamen **Selektionskontext**. Für jeden darin verwendeten Entity- oder DTO-Typ kann eine aktuell selektierte Instanz existieren. Diese Selektion gehört nicht einer einzelnen Tabelle oder einem einzelnen Formular, sondern steht allen Komponenten des `Page Pane`s zur Verfügung.
+Jedes `Page Pane` besitzt einen gemeinsamen **Selektionskontext**. Für jeden darin verwendeten Entity- oder DTO-Typ kann eine aktuell selektierte Instanz existieren. Diese Selektion gehört nicht einer einzelnen `Table` oder einem einzelnen `Delegate Form`, sondern steht allen Komponenten des `Page Pane`s zur Verfügung.
 
-Im Modell kann ein Element als `boundClassifier` jedoch nur Typen wählen, die vor ihm in der UI-Hierarchie bereitgestellt werden: die Inhaltstypen vorheriger Geschwister einschließlich ihrer Kindelemente sowie die Inhaltstypen umgebender Layouts, Formulare und Tabellen und deren vorheriger Geschwister. Nachfolgende Elemente zählen nicht. Ein einzelner Tab begrenzt diese Suche: Ein Element in einem Tab sieht nur, was im selben Tab vor ihm steht oder dem `Tab Layout` vorausgeht, nicht aber Elemente anderer Tabs. Soll ein Detail in einem Tab die Selektion eines Masters verwenden, steht der Master deshalb vor dem `Tab Layout` oder im selben Tab vor dem Detail.
+Im Modell kann ein Element als `boundClassifier` jedoch nur Typen wählen, die vor ihm in der UI-Hierarchie bereitgestellt werden: die Inhaltstypen vorheriger Geschwister einschließlich ihrer Kindelemente sowie die Inhaltstypen umgebender Layouts, `Delegate Form`s und `Table`s und deren vorheriger Geschwister. Nachfolgende Elemente zählen nicht. Ein einzelner Tab begrenzt diese Suche: Ein Element in einem Tab sieht nur, was im selben Tab vor ihm steht oder dem `Tab Layout` vorausgeht, nicht aber Elemente anderer Tabs. Soll ein Detail in einem Tab die Selektion eines Masters verwenden, steht der Master deshalb vor dem `Tab Layout` oder im selben Tab vor dem Detail.
 
 ##### Typbindung
 
-Eine Bindung nur an einen Entity- oder DTO-Typ verwendet grundsätzlich die aktuelle Selektion dieses Typs. Ein an `Rechnung` gebundenes `Delegate Form` zeigt beispielsweise die aktuell selektierte `Rechnung`. Für eine `Table` ist diese reine Typbindung nur zulässig, wenn sie das oberste Element des `Page Pane`s ist oder in einem Layout der ersten Ebene liegt und an den Root-Typ des `Page Pane`s gebunden ist; jede andere Tabelle in der Hierarchie wird an eine Listen-Property eines selektierten Objekts gebunden.
+Eine Bindung nur an einen Entity- oder DTO-Typ verwendet grundsätzlich die aktuelle Selektion dieses Typs. Ein an `Rechnung` gebundenes `Delegate Form` zeigt beispielsweise die aktuell selektierte `Rechnung`.
 
-Wird einem `Page Pane` auf Root-Ebene genau eine Instanz seines Root-Typs bereitgestellt – unmittelbar oder als Liste mit genau einem Element –, ist diese Instanz automatisch selektiert. Ein direkt an den Root-Typ gebundenes Formular kann sie deshalb ohne eine Tabelle mit `SELECT FIRST` unmittelbar anzeigen. Diese automatische Selektion gilt für das Root-Objekt; eine untergeordnete Liste wird nicht allein deshalb selektiert, weil sie nur ein Element enthält.
+Wird einem `Page Pane` auf Root-Ebene genau eine Instanz seines Root-Typs bereitgestellt – unmittelbar oder als Liste mit genau einem Element –, ist diese Instanz automatisch selektiert. Ein direkt an den Root-Typ gebundenes `Delegate Form` kann sie deshalb ohne eine `Table` mit `SELECT FIRST` unmittelbar anzeigen. Diese automatische Selektion gilt für das Root-Objekt; eine untergeordnete Liste wird nicht allein deshalb selektiert, weil sie nur ein Element enthält.
 
 ##### Property-Bindung
 
-Eine Property-Bindung wird auf der aktuellen Selektion ihres Eigentümertyps ausgewertet. Bei einer selektierten `Rechnung` bezeichnet die Bindung `Rechnung.kunde` das `kunde`-Objekt genau dieser Rechnung. Ein `Delegate Form` kann so an eine Property gebunden werden, deren Typ eine Entity, ein DTO oder ein Value Object ist.
+Eine Property-Bindung wird auf der aktuellen Selektion ihres Eigentümertyps ausgewertet. Bei einer selektierten `Rechnung` bezeichnet die Bindung `Rechnung.kunde` das `kunde`-Objekt genau dieser Rechnung. Ein `Delegate Form` kann so an eine Property gebunden werden, deren Typ eine Entity, ein DTO oder ein Value Object ist. Die Bestandteile eines Value Objects lassen sich auch über den Pfad von der Entity oder dem DTO aus binden, etwa `betrag.amount`.
 
 Value Objects werden unveränderlich bearbeitet: Schreibt ein Delegate über einen Pfad wie `betrag.amount`, erzeugt DataUX mit der `with`-Methode des Value Objects einen neuen Wert und ersetzt das ganze Value Object am Eigentümer.
 
-Das Formular liest diesen Bindungskontext, erzeugt oder verändert aber keine Selektion. Ein an `Rechnung.kunde` gebundenes Formular hängt daher nicht an einer eventuell vorhandenen `Kunde`-Selektion, sondern zeigt ausschließlich den `kunde` der aktuell selektierten `Rechnung`.
+Das `Delegate Form` liest diesen Bindungskontext, erzeugt oder verändert aber keine Selektion. Ein an `Rechnung.kunde` gebundenes `Delegate Form` hängt daher nicht an einer eventuell vorhandenen `Kunde`-Selektion, sondern zeigt ausschließlich den `kunde` der aktuell selektierten `Rechnung`.
 
 ##### Tabellenbindung und Selektion
 
 Eine `Table` benötigt eine Liste von Entities oder DTOs. Listen von Value Objects sind kein Tabellen-Bindungsmodell in DataUX.
 
-Ist der Zeilentyp mit dem Root-Typ des `Page Pane`s identisch, kann die Tabelle direkt an diesen Typ gebunden werden und verwendet den Root-Datenbestand; das gilt nur für eine Tabelle als oberstes Element des `Page Pane`s oder innerhalb eines Layouts der ersten Ebene, etwa die Rechnungstabelle oben in einem `Grid Layout` mit darunterliegendem Rechnungsformular. Soll die Tabelle Objekte eines anderen Typs anzeigen, wird sie an eine Listen-Property eines selektierten Objekts gebunden. Eine Tabelle für `Rechnung.positionen` zeigt somit die Positionen der aktuell selektierten Rechnung; ihr Zeilentyp ist `Rechnungsposition`, nicht `Rechnung`.
+Ist der Zeilentyp mit dem Root-Typ des `Page Pane`s identisch, kann die `Table` direkt an diesen Typ gebunden werden und verwendet den Root-Datenbestand; das gilt nur für eine `Table` als oberstes Element des `Page Pane`s oder innerhalb eines Layouts der ersten Ebene, etwa die Rechnungstabelle oben in einem `Grid Layout` mit darunterliegendem Rechnungsformular. Soll die `Table` Objekte eines anderen Typs anzeigen, wird sie an eine Listen-Property eines selektierten Objekts gebunden. Eine `Table` für `Rechnung.positionen` zeigt somit die Positionen der aktuell selektierten Rechnung; ihr Zeilentyp ist `Rechnungsposition`, nicht `Rechnung`.
 
-Die Auswahl einer Tabellenzeile bestimmt die gemeinsame Selektion des Zeilentyps. Mit `SELECT FIRST` kann eine Tabelle beim initialen Anzeigen das erste Element selektieren und so eine abhängige Detaildarstellung initialisieren.
+Die Auswahl einer Tabellenzeile bestimmt die gemeinsame Selektion des Zeilentyps. Mit `SELECT FIRST` kann eine `Table` beim initialen Anzeigen das erste Element selektieren und so eine abhängige Detaildarstellung initialisieren.
 
-Mehrere Tabellen mit demselben Zeilentyp teilen dieselbe Selektion. Enthält eine andere Tabelle dieselbe Laufzeitinstanz, markiert sie diese ebenfalls. Enthält sie die Instanz nicht, zeigt sie keine ausgewählte Zeile; die gemeinsame Selektion bleibt erhalten. Maßgeblich ist dieselbe Laufzeitinstanz, nicht nur eine gleiche fachliche ID oder fachliche Gleichheit. Für in die Session integrierte Entities ist diese Instanz je Identität eindeutig, für DTOs und andere No-Key-Ergebnisse nicht; siehe [Read-only, Checkout und Session-Identität](manmap.md#read-only-checkout-und-session-identität).
+Mehrere `Table`s mit demselben Zeilentyp teilen dieselbe Selektion. Enthält eine andere `Table` dieselbe Laufzeitinstanz, markiert sie diese ebenfalls. Enthält sie die Instanz nicht, zeigt sie keine ausgewählte Zeile; die gemeinsame Selektion bleibt erhalten. Maßgeblich ist dieselbe Laufzeitinstanz, nicht nur eine gleiche fachliche ID oder fachliche Gleichheit. Für in die Session integrierte Entities ist diese Instanz je Identität eindeutig, für DTOs und andere No-Key-Ergebnisse nicht; siehe [Read-only, Checkout und Session-Identität](manmap.md#read-only-checkout-und-session-identität).
 
 ##### Leere Selektion
 
-Für einen Entity- oder DTO-Typ kann keine Instanz selektiert sein. Ein ausschließlich an diesen Typ gebundenes Formular zeigt dann keine Daten. Tabellen können ihre Zeilen weiterhin darstellen, obwohl keine Zeile ausgewählt ist. Aktionen und Ausdrücke müssen diesen Zustand vertragen oder deaktiviert sein.
+Für einen Entity- oder DTO-Typ kann keine Instanz selektiert sein. Ein ausschließlich an diesen Typ gebundenes `Delegate Form` zeigt dann keine Daten. `Table`s können ihre Zeilen weiterhin darstellen, obwohl keine Zeile ausgewählt ist. Aktionen und Ausdrücke müssen diesen Zustand vertragen oder deaktiviert sein.
 
 ##### Master-Detail
 
-Der gemeinsame Selektionskontext ermöglicht Master-Detail-Oberflächen ohne explizite Synchronisationslogik zwischen den Komponenten. Eine Rechnungsseite kann beispielsweise aus einer Tabelle der `Rechnung`-Objekte, einer Tabelle für `Rechnung.positionen` und einem Formular für die ausgewählte `Rechnungsposition` bestehen.
+Der gemeinsame Selektionskontext ermöglicht Master-Detail-Oberflächen ohne explizite Synchronisationslogik zwischen den Komponenten. Eine Rechnungsseite kann beispielsweise aus einer `Table` der `Rechnung`-Objekte, einer `Table` für `Rechnung.positionen` und einem `Delegate Form` für die ausgewählte `Rechnungsposition` bestehen.
 
 Die Bindungskette lautet sinngemäß:
 
 `selektierte Rechnung -> positionen -> ausgewählte Rechnungsposition -> Detailformular`
 
-Das Detailformular muss nicht wissen, aus welcher Tabelle die Selektion stammt. Auch beim Wechsel des Masters ist keine zusätzliche Synchronisationslogik erforderlich; die Laufzeit wertet abhängige Bindungen und Selektionen im gemeinsamen Kontext aus.
+Das Detailformular muss nicht wissen, aus welcher `Table` die Selektion stammt. Auch beim Wechsel des Masters ist keine zusätzliche Synchronisationslogik erforderlich; die Laufzeit wertet abhängige Bindungen und Selektionen im gemeinsamen Kontext aus.
 
 ### Formulare, Tabellen und Delegates
 
@@ -117,55 +113,39 @@ Der Delegate-Typ folgt dem fachlichen Property-Typ. Ein Delegate ersetzt keine f
 | `DateTime (Date Only)` | `DateTimeDateOnlyDelegate` | `org.modellwerkstatt.dataux.structure.DateTimeDateOnlyDelegate` | Nur Datumskomponente eines DateTime-Werts |
 | `LocalDate` | `LocalDateDelegate` | `org.modellwerkstatt.dataux.structure.LocalDateDelegate` | Lokales Datum |
 | `Status` | `StatusDelegate` | `org.modellwerkstatt.dataux.structure.StatusDelegate` | ObjectFlow-Statuswert |
-| `Reference` | `ReferenceDelegate` | `org.modellwerkstatt.dataux.structure.ReferenceDelegate` | Referenz auf ein fachliches Objekt; nur im Formular |
-| `Image` | `ImageDelegate` | `org.modellwerkstatt.dataux.structure.ImageDelegate` | Bilddarstellung, nur im Formular |
-| `Upload` | `UploadDelegate` | `org.modellwerkstatt.dataux.structure.UploadDelegate` | Datei-Upload, nur im Formular |
+| `Reference` | `ReferenceDelegate` | `org.modellwerkstatt.dataux.structure.ReferenceDelegate` | Referenz auf ein fachliches Objekt; nur im `Delegate Form` |
+| `Image` | `ImageDelegate` | `org.modellwerkstatt.dataux.structure.ImageDelegate` | Bilddarstellung, nur im `Delegate Form` |
+| `Upload` | `UploadDelegate` | `org.modellwerkstatt.dataux.structure.UploadDelegate` | Datei-Upload, nur im `Delegate Form` |
 | `Dummy` | `DummyDelegate` | `org.modellwerkstatt.dataux.structure.DummyDelegate` | Platzhalter zur Anordnung von Formularfeldern |
-| `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` | Delegate im Formular nicht editierbar. |
-| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | Hebt die Pflichteingabe auf. |
-| `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` | Datumsauswahl für Datums-Delegates; bei `DateTime` nicht mit `OVERWRITE FORMAT`. |
-| `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` | Löst bei Scan oder Inhaltsänderung eine verfügbare Conclusion mit Hotkey [`SCAN/UPDATE`](objectflow.md#conclusions-mit-scanupdate-oder-gook) aus. |
-| `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` | Numerischer Editor für einen `String`-Delegate. |
-| `ALTER` | `AlternativeDOption` | `org.modellwerkstatt.dataux.structure.AlternativeDOption` | Alternativer Editor für `Reference` und `Status`, sofern die Laufzeit ihn unterstützt. |
-| `WIDE` | `WideDOption` | `org.modellwerkstatt.dataux.structure.WideDOption` | Blendet das Label aus und gibt dem Editor die gesamte Breite. |
-| `NUM OF LINES` | `NumOfLinesDOption` | `org.modellwerkstatt.dataux.structure.NumOfLinesDOption` | Mehrzeiliger Text mit angegebener Zeilenzahl. |
-| `TIME PICKER ONLY` | `TimeOnlyDOption` | `org.modellwerkstatt.dataux.structure.TimeOnlyDOption` | Erfasst nur die Uhrzeit; als Datum gilt immer das aktuelle. |
-| `OVERWRITE LABEL` | `OverwriteLabelDOption` | `org.modellwerkstatt.dataux.structure.OverwriteLabelDOption` | Überschreibt die von der Datenstruktur vorgegebene Beschriftung. |
-| `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `org.modellwerkstatt.dataux.structure.OverwriteFormatDOption` | Überschreibt das von der Datenstruktur vorgegebene Format. |
-| `WIDTH` | `WidthDOption` | `org.modellwerkstatt.dataux.structure.WidthDOption` | Spaltenbreite in Prozent; Pflicht je Tabellenspalte, Summe höchstens 100 %. |
-| `EDITABLE` | `EditableDOption` | `org.modellwerkstatt.dataux.structure.EditableDOption` | Tabellenspalte (`Status`, `BigDecimal`) editierbar; höchstens eine je Tabelle, nicht mit `FOLD`. |
-| `IMPORTANT` | `ImportantDOption` | `org.modellwerkstatt.dataux.structure.ImportantDOption` | Hebt ein wichtiges Tabellenfeld hervor; höchstens einmal je Tabelle. |
-| `COLOR` | `DynColorDOption` | `org.modellwerkstatt.dataux.structure.DynColorDOption` | Berechnet die Farbe einer `BigDecimal`-Tabellenspalte dynamisch aus dem Wert. |
-| `LONG DESC` | `StatusLongDescDOption` | `org.modellwerkstatt.dataux.structure.StatusLongDescDOption` | Verwendet in der Tabelle die Langbeschreibung eines Status. |
-| `RIGHT ALIGN` | `RightAlignDOption` | `org.modellwerkstatt.dataux.structure.RightAlignDOption` | Richtet den Zelleninhalt einer `String`-Spalte rechtsbündig aus. |
-| `FOLD` | `FoldDOption` | `org.modellwerkstatt.dataux.structure.FoldDOption` | Tabelle: Spalte zunächst ausgeblendet (Doppelklick auf Spaltenkopf); Formular unter h2forms: verstecktes, per Scan befüllbares Feld. |
 
-Ein `Reference`-Delegate bietet die zulässigen Objekte zur Auswahl an. `reference description` (`scopeText`) legt mit einem oder mehreren Pfaden fest, welche Properties des referenzierten Typs den angezeigten Text bilden: Für einen an `Rechnung.kunde` gebundenen Delegate verweist `name` auf `Kunde.name`. Die Auswahlmenge setzt die Scope-Funktion der Page mit `#Meta.setScope(…)`; siehe [ObjectFlow: Scopes](objectflow.md#scopes). Fehlt sie, führt eine Auswahl zu einer Exception. Ist der Delegate oder das Formular mit `DISABLED` gekennzeichnet, wird der Wert nur angezeigt und kein Scope benötigt.
+Ein `Reference`-Delegate bietet die zulässigen Objekte zur Auswahl an. `reference description` (`scopeText`) legt mit einem oder mehreren Pfaden fest, welche Properties des referenzierten Typs den angezeigten Text bilden: Für einen an `Rechnung.kunde` gebundenen Delegate verweist `name` auf `Kunde.name`. Die Auswahlmenge setzt `pageSetScopesFunc` der Page mit `#Meta.setScope(…)`; siehe [ObjectFlow: Scopes](objectflow.md#scopes). Fehlt sie, führt eine Auswahl zu einer Exception. Ist der Delegate oder das `Delegate Form` mit `DISABLED` gekennzeichnet, wird der Wert nur angezeigt und kein Scope benötigt.
 
-#### Delegate-Optionen
+#### Kapitellandkarte: Delegate-Optionen
+
+Die FQ-Namen lauten `org.modellwerkstatt.dataux.structure.<Konzeptname>`.
 
 | Name | Konzeptname | Kontext | Delegate-Typen | Wirkung |
 | --- | --- | --- | --- | --- |
-| `DISABLED` | `DisabledDOption` | Formular | alle | Delegate ist nicht editierbar |
-| `OPTIONAL` | `OptionalDOption` | Formular | alle | Hebt die Pflichteingabe auf; siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
-| `PICKER` | `PickerDOption` | Formular | `LocalDate`, `DateTime (Date Only)`, `DateTime` | Verwendet nach Möglichkeit eine Datumsauswahl; bei `DateTime` nicht zusammen mit `OVERWRITE FORMAT` |
-| `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | Formular | alle | Löst eine verfügbare Conclusion mit Hotkey `SCAN/UPDATE` aus |
-| `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | Formular | `String` | Verwendet für einen `String`-Delegate einen numerischen Editor |
-| `ALTER` | `AlternativeDOption` | Formular und Tabelle | `Reference`, `Status` | Verwendet einen alternativen Editor, sofern die Laufzeitumgebung diesen unterstützt |
-| `WIDE` | `WideDOption` | Formular | alle | Blendet nach Möglichkeit das Label links vom Editor aus und gibt dem Editor die gesamte Breite |
-| `NUM OF LINES` | `NumOfLinesDOption` | Formular | `String` | Stellt den Text mehrzeilig mit der angegebenen Zeilenzahl dar |
-| `TIME PICKER ONLY` | `TimeOnlyDOption` | Formular | `DateTime` | Erfasst nur die Uhrzeit; als Datum wird immer das aktuelle verwendet |
-| `OVERWRITE LABEL` | `OverwriteLabelDOption` | Formular und Tabelle | alle | Überschreibt die von der Datenstruktur vorgegebene Beschriftung |
-| `OVERWRITE FORMAT` | `OverwriteFormatDOption` | Formular, Tabelle und `Custom UI Element` | `String`, `Integer`, `BigDecimal`, `DateTime`, `DateTime (Date Only)`, `LocalDate`, `Image` | Überschreibt das von der Datenstruktur vorgegebene Format |
-| `WIDTH` | `WidthDOption` | Tabelle | alle | Legt die Breite der Spalte in Prozent fest; Pflicht für jede Spalte, die Summe darf 100 % nicht überschreiten |
-| `EDITABLE` | `EditableDOption` | Tabelle | `Status`, `BigDecimal` | Property wird editierbar dargestellt; höchstens eine Spalte pro Tabelle, nicht zusammen mit `FOLD` |
-| `IMPORTANT` | `ImportantDOption` | Tabelle | alle | Hebt ein wichtiges Tabellenfeld hervor; höchstens einmal pro Tabelle |
-| `COLOR` | `DynColorDOption` | Tabelle | `BigDecimal` | Berechnet die Farbe dynamisch aus dem Wert |
-| `LONG DESC` | `StatusLongDescDOption` | Tabelle | `Status` | Verwendet die Langbeschreibung eines Status |
-| `RIGHT ALIGN` | `RightAlignDOption` | Tabelle | `String` | Richtet den Zelleninhalt rechtsbündig aus |
-| `FOLD` | `FoldDOption` | Formular und Tabelle | alle | Tabelle: Blendet die Spalte zunächst aus; der Benutzer kann sie per Doppelklick auf den Spaltenkopf einblenden (in h2forms ohne Wirkung). Formular unter h2forms: Das Feld wird nicht angezeigt, bleibt aber als verstecktes Feld erhalten und kann etwa mit `ISSUE UPDATE/SCANABLE` per Scan befüllt werden |
+| `DISABLED` | `DisabledDOption` | `Delegate Form` | alle | Delegate ist nicht editierbar |
+| `OPTIONAL` | `OptionalDOption` | `Delegate Form` | alle | Hebt die Pflichteingabe auf; siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
+| `PICKER` | `PickerDOption` | `Delegate Form` | `LocalDate`, `DateTime (Date Only)`, `DateTime` | Verwendet nach Möglichkeit eine Datumsauswahl; bei `DateTime` nicht zusammen mit `OVERWRITE FORMAT` |
+| `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `Delegate Form` | alle | Löst bei Scan oder Inhaltsänderung eine verfügbare Conclusion mit Hotkey [`SCAN/UPDATE`](objectflow.md#conclusions-mit-scanupdate-oder-gook) aus |
+| `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `Delegate Form` | `String` | Verwendet für einen `String`-Delegate einen numerischen Editor |
+| `ALTER` | `AlternativeDOption` | `Delegate Form` und `Table` | `Reference`, `Status` | Verwendet einen alternativen Editor, sofern die Laufzeitumgebung diesen unterstützt |
+| `WIDE` | `WideDOption` | `Delegate Form` | alle | Blendet nach Möglichkeit das Label links vom Editor aus und gibt dem Editor die gesamte Breite |
+| `NUM OF LINES` | `NumOfLinesDOption` | `Delegate Form` | `String` | Stellt den Text mehrzeilig mit der angegebenen Zeilenzahl dar |
+| `TIME PICKER ONLY` | `TimeOnlyDOption` | `Delegate Form` | `DateTime` | Erfasst nur die Uhrzeit; als Datum wird immer das aktuelle verwendet |
+| `OVERWRITE LABEL` | `OverwriteLabelDOption` | `Delegate Form` und `Table` | alle | Überschreibt die von der Datenstruktur vorgegebene Beschriftung |
+| `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `Delegate Form`, `Table` und `Custom UI Element` | `String`, `Integer`, `BigDecimal`, `DateTime`, `DateTime (Date Only)`, `LocalDate`, `Image` | Überschreibt das von der Datenstruktur vorgegebene Format |
+| `WIDTH` | `WidthDOption` | `Table` | alle | Legt die Breite der Spalte in Prozent fest; Pflicht für jede Spalte, die Summe darf 100 % nicht überschreiten |
+| `EDITABLE` | `EditableDOption` | `Table` | `Status`, `BigDecimal` | Property wird editierbar dargestellt; höchstens eine Spalte pro `Table`, nicht zusammen mit `FOLD` |
+| `IMPORTANT` | `ImportantDOption` | `Table` | alle | Hebt ein wichtiges Tabellenfeld hervor; höchstens einmal pro `Table` |
+| `COLOR` | `DynColorDOption` | `Table` | `BigDecimal` | Berechnet die Farbe dynamisch aus dem Wert |
+| `LONG DESC` | `StatusLongDescDOption` | `Table` | `Status` | Verwendet die Langbeschreibung eines Status |
+| `RIGHT ALIGN` | `RightAlignDOption` | `Table` | `String` | Richtet den Zelleninhalt rechtsbündig aus |
+| `FOLD` | `FoldDOption` | `Delegate Form` und `Table` | alle | `Table`: Blendet die Spalte zunächst aus; der Benutzer kann sie per Doppelklick auf den Spaltenkopf einblenden (in h2forms ohne Wirkung). `Delegate Form` unter h2forms: Das Feld wird nicht angezeigt, bleibt aber als verstecktes Feld erhalten und kann etwa mit `ISSUE UPDATE/SCANABLE` per Scan befüllt werden |
 
-Jede Option darf pro Delegate höchstens einmal verwendet werden. `Reference`-Delegates sind in Tabellen nicht zulässig.
+Jede Option darf pro Delegate höchstens einmal verwendet werden. `Reference`-Delegates sind in `Table`s nicht zulässig.
 
 #### Pflichtwerte, leere Eingaben und `null`
 
@@ -182,44 +162,41 @@ Bei Strings steuert `LENGTH[min-max]` an der Business Property die Pflichteingab
 
 Die Grenzen aus `LENGTH` und `RANGE` werden nicht zusätzlich als `validation` modelliert, außer die Regel ist fachlich zwingend oder die Eingabe kommt ohne Oberfläche, etwa aus einem Batch oder über eine Schnittstelle.
 
-#### Optionen für Formulare und Tabellen
+#### Kapitellandkarte: Optionen für Formulare und Tabellen
+
+Die FQ-Namen lauten `org.modellwerkstatt.dataux.structure.<Konzeptname>`.
 
 | Name | Konzeptname | Element | Wirkung |
 | --- | --- | --- | --- |
-| `DISABLED` | `DisabledFOption` | Formular | Formular ist nicht editierbar |
-| `LABEL` | `LabelFOption` | Formular und Tabelle | Setzt die Beschriftung des Elements. Nicht zulässig am obersten Element eines `Page Pane`s; dort kommt die Beschriftung aus dem [Page Title](objectflow.md#command-title-page-title-und-subtitle) der Page |
-| `SELECT FIRST` | `SelectFirstFOption` | Tabelle | Selektiert das erste Tabellenelement bei der Initialisierung |
-| `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung für ausgewählte Tabellenobjekte |
-| `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | Tabelle | Berechnet eine Zusammenfassung über alle Tabellenobjekte |
-| `CUSTOM CSV EXPORT` | `TableCustomCsvExportFOption` | Tabelle | Passt den CSV-Export an |
+| `DISABLED` | `DisabledFOption` | `Delegate Form` | `Delegate Form` ist nicht editierbar |
+| `LABEL` | `LabelFOption` | `Delegate Form` und `Table` | Setzt die Beschriftung des Elements. Nicht zulässig am obersten Element eines `Page Pane`s; dort kommt die Beschriftung aus dem [Page Title](objectflow.md#command-title-page-title-und-subtitle) der Page |
+| `SELECT FIRST` | `SelectFirstFOption` | `Table` | Selektiert das erste Tabellenelement bei der Initialisierung |
+| `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `Table` | Berechnet eine Zusammenfassung für ausgewählte Tabellenobjekte |
+| `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `Table` | Berechnet eine Zusammenfassung über alle Tabellenobjekte |
+| `CUSTOM CSV EXPORT` | `TableCustomCsvExportFOption` | `Table` | Passt den CSV-Export an |
 
 ### Layouts, Tabs und Wiederverwendung
 
-Ein `Grid Layout` ordnet UI-Elemente in Zeilen und Spalten an. Zeilen- und Spaltengewichte bestimmen die Größenverteilung. Verfügbar sind die Gewichte `-1`, `1*`, `2*`, `3*`, `4*` und `5*`. So steht beispielsweise ein kompaktes Rechnungsformular (Zeilengewicht `-1`) über der Tabelle der `Rechnung.positionen` (Zeilengewicht `1*`); beide nutzen in einer Spalte `1*` die volle Breite. Dieselben Gewichte werden auch im `Delegate Form` als Spaltengewichte verwendet, dort jedoch ohne `-1`.
+Ein `Grid Layout` ordnet UI-Elemente in Zeilen und Spalten an. Zeilen- und Spaltengewichte bestimmen die Größenverteilung. Verfügbar sind die Gewichte `-1`, `1*`, `2*`, `3*`, `4*` und `5*`. So steht beispielsweise ein kompaktes Rechnungsformular (Zeilengewicht `-1`) über der `Table` der `Rechnung.positionen` (Zeilengewicht `1*`); beide nutzen in einer Spalte `1*` die volle Breite. Dieselben Gewichte werden auch im `Delegate Form` als Spaltengewichte verwendet, dort jedoch ohne `-1`.
 
-Für ein `Grid Layout` stehen insbesondere folgende Optionen zur Verfügung:
-
-| Name | Konzeptname | Wirkung |
-| --- | --- | --- |
-| `FLEXIBLE` | `FlexibleOption` | Erlaubt eine flexible Größenanpassung |
-| `FOCUS FORWARD 2` | `SkipFocusOption` | Verschiebt den initialen Fokus auf ein späteres Element |
+Für ein `Grid Layout` stehen die Optionen `FLEXIBLE` und `FOCUS FORWARD 2` der [Kapitellandkarte](#kapitellandkarte-ui-komposition) zur Verfügung.
 
 Ein `Tab Layout` enthält mindestens einen `Tab`. Jeder Tab besitzt eine als Ausdruck modellierte Beschriftung und genau ein UI-Element.
 
 Mit `Include` wird ein bereits deklariertes bindbares UI-Element wiederverwendet. Die Bindung ist dabei nach Elementart festgelegt: Ein als Root Node deklariertes Element wird nur typisiert, d. h. es gibt lediglich seinen Entity- oder DTO-Typ an und keine Property. Das `Include` ist immer gebunden: Es gibt den Typ und gegebenenfalls die Property an, auf der das eingebundene Element am Verwendungsort arbeitet, etwa `Rechnung.positionen` für eine wiederverwendbare Positionstabelle; sein Inhaltstyp muss dem Typ des eingebundenen Elements entsprechen. Ein `Grid Layout` oder `Tab Layout` innerhalb einer UI-Hierarchie wird nicht gebunden; nur als Root Node ist es typisiert. Die Einbindung erzeugt weder zusätzliche Daten noch einen unabhängigen Selektionsraum. Ein UI-Element wird nur benannt, wenn es mit `Include` wiederverwendet wird.
 
-Ein `Custom UI Element` bindet eine projektspezifische UI-Implementierung ein. Es ist für Darstellungsfälle gedacht, die Form, Tabelle und Layouts nicht ausdrücken. Die fachliche Datenbindung, Delegates und Menüaktionen bleiben Teil des DataUX-Modells; nur die konkrete Darstellung wird projektspezifisch implementiert.
+Ein `Custom UI Element` bindet eine projektspezifische UI-Implementierung ein. Es ist für Darstellungsfälle gedacht, die `Delegate Form`, `Table` und Layouts nicht ausdrücken. Die fachliche Datenbindung, Delegates und `Action`s bleiben Teil des DataUX-Modells; nur die konkrete Darstellung wird projektspezifisch implementiert.
 
-Die Zielgeräte sind bei der Layoutwahl ausdrücklich mitzudenken. Eine breite Desktop-Aufteilung ist nicht automatisch für mobile Datenerfassungsgeräte oder Smartphones geeignet. Für unterschiedliche Geräteklassen können eigene `Page Pane`s erforderlich sein.
+Die Zielgeräte sind bei der Layoutwahl ausdrücklich mitzudenken. Eine für Desktop-PCs gestaltete Oberfläche ist nicht automatisch für mobile Datenerfassungsgeräte oder Smartphones geeignet. Für unterschiedliche Geräteklassen können eigene `Page Pane`s erforderlich sein.
 
 ### Menüs und Command-Aktionen
 
 Ein `Page Pane` und eine `Table` besitzen Menüs, deren fachlicher Bezug unterschiedlich ist:
 
-- Das Menü einer Tabelle richtet sich vor allem an die gebundenen Tabellenobjekte. Seine Aktionen arbeiten typischerweise mit der aktuell ausgewählten Zeile oder mit mehreren ausgewählten Zeilen.
+- Das Menü einer `Table` richtet sich vor allem an die gebundenen Tabellenobjekte. Seine Aktionen arbeiten typischerweise mit der aktuell ausgewählten Zeile oder mit mehreren ausgewählten Zeilen.
 - Das Menü eines `Page Pane`s gehört zum gesamten Seitenkontext. Seine Aktionen betreffen daher eher das gebundene Wurzelobjekt, den vollständigen Aggregatgraphen oder den übergreifenden Ablauf der Page.
 
-Auch für ein `Custom UI Element` kann ein Menü modelliert werden. Ob und wie es sichtbar und bedienbar ist, hängt jedoch davon ab, ob die konkrete UI-Laufzeitkomponente diese Menüintegration unterstützt. Ein `Include` kann eigene Menüeinträge nur angeben, wenn es eine `Table` einbindet; damit wird das Tabellenmenü am jeweiligen Verwendungsort überschrieben. Beim Einbinden eines `Custom UI Element`s, Formulars oder Layouts sind Menüeinträge am `Include` nicht zulässig.
+Auch für ein `Custom UI Element` kann ein Menü modelliert werden. Ob und wie es sichtbar und bedienbar ist, hängt jedoch davon ab, ob die konkrete UI-Laufzeitkomponente diese Menüintegration unterstützt. Ein `Include` kann eigene Menüeinträge nur angeben, wenn es eine `Table` einbindet; damit wird das Tabellenmenü am jeweiligen Verwendungsort überschrieben. Beim Einbinden eines `Custom UI Element`s, `Delegate Form`s oder Layouts sind Menüeinträge am `Include` nicht zulässig.
 
 #### Kapitellandkarte: Menüs
 
@@ -234,7 +211,7 @@ Auch für ein `Custom UI Element` kann ein Menü modelliert werden. Ob und wie e
 | `getSelected` | `SelectedObject` | `org.modellwerkstatt.objectflow.structure.SelectedObject` | Action-Argument: das aktuell selektierte Objekt eines im `Page Pane` verwendeten Typs. |
 | `getSelectedObjects` | `SelectedList` | `org.modellwerkstatt.objectflow.structure.SelectedList` | Action-Argument: die ausgewählten Objekte einer Mehrfachselektion. |
 
-Ein `Submenu` ohne Text ist das Overflow-Menü eines `Page Pane`s oder einer Tabelle. Die Sprache prüft dafür drei Regeln: Auf der obersten Menüebene stehen `Action`s vor einem `Submenu`, nach einem `Submenu` folgen nur weitere `Submenu`s oder Trennstriche („Actions should be placed left before overflows/sub menus (on lowest menu level at least).“); das textlose `Submenu` ist nur auf der obersten Ebene erlaubt („Action overflow (submenu) is only valid as top level menu in ux elements.“) und nur einmal („Only one overflow (submenu) can be used.“).
+Ein `Submenu` ohne Text ist das Overflow-Menü eines `Page Pane`s oder einer `Table`. Die Sprache prüft dafür drei Regeln: Auf der obersten Menüebene stehen `Action`s vor einem `Submenu`, nach einem `Submenu` folgen nur weitere `Submenu`s oder Trennstriche („Actions should be placed left before overflows/sub menus (on lowest menu level at least).“); das textlose `Submenu` ist nur auf der obersten Ebene erlaubt („Action overflow (submenu) is only valid as top level menu in ux elements.“) und nur einmal („Only one overflow (submenu) can be used.“).
 
 Eine `Action` referenziert einen ObjectFlow-`Command`. Die im Command definierte Standardparametrisierung gilt auch für eine Action, sodass sie ohne explizite Argumente modelliert werden kann. Nur wenn der Aufrufkontext andere Werte verlangt, überschreibt die Action einzelne beziehungsweise alle Argumente mit Ausdrücken. Typische Quellen dafür sind:
 
@@ -242,32 +219,32 @@ Eine `Action` referenziert einen ObjectFlow-`Command`. Die im Command definierte
 - `getSelectedObjects()` für die ausgewählten Objekte einer Mehrfachselektion,
 - Konstanten für fest vorgegebene Aufrufvarianten.
 
-Beschriftung, Icon und Hotkey einer Action kommen aus dem Command. Mit einem eigenen Label aus den statischen Ressourcen (`customLabel`) überschreibt die Action diese Vorgaben für diesen Menüeintrag.
+Beschriftung, Icon und Hotkey einer Action kommen aus dem Command. Mit einem eigenen Label aus den `Static Ressources` (`customLabel`) überschreibt die Action diese Vorgaben für diesen Menüeintrag.
 
-Ein Doppelklick auf eine Tabellenzeile oder die Enter-Taste auf einer ausgewählten Zeile führt die erste Action im Menü der Tabelle aus, deren Hotkey `ENTER` ist; Actions in Submenüs zählen der Reihe nach mit. Die Hauptaktion einer Tabelle, etwa Öffnen oder Bearbeiten, erhält deshalb den Hotkey `ENTER`, als `defaultHotkey` am Command oder über das Label der Action.
+Ein Doppelklick auf eine Tabellenzeile oder die Enter-Taste auf einer ausgewählten Zeile führt die erste Action im Menü der `Table` aus, deren Hotkey `ENTER` ist; Actions in `Submenu`s zählen der Reihe nach mit. Die Hauptaktion einer `Table`, etwa Öffnen oder Bearbeiten, erhält deshalb den Hotkey `ENTER`, als `defaultHotkey` am Command oder über das Label der Action.
 
-Menüaktionen arbeiten immer im aktuellen UI-Kontext. Bei Tabellenaktionen ist deshalb typischerweise die Selektion des Zeilentyps maßgeblich; bei Page-Pane-Aktionen steht meist das gebundene Wurzelobjekt oder der gesamte Seitenablauf im Vordergrund. Das schränkt den Zugriff aber nicht auf diese Typen ein: An jeder Aktionsstelle kann mit einem typisierten `getSelected(...)` die gemeinsame Selektion eines beliebigen im `Page Pane` verwendeten Typs abgefragt werden, beispielsweise `getSelected(Rechnungsposition)` direkt in einer Page-Pane-Aktion.
+`Action`s arbeiten immer im aktuellen UI-Kontext. Bei einer `Action` im Menü einer `Table` ist deshalb typischerweise die Selektion des Zeilentyps maßgeblich; bei einer `Action` im Menü eines `Page Pane`s steht meist das gebundene Wurzelobjekt oder der gesamte Seitenablauf im Vordergrund. Das schränkt den Zugriff aber nicht auf diese Typen ein: An jeder Aktionsstelle kann mit einem typisierten `getSelected(...)` die gemeinsame Selektion eines beliebigen im `Page Pane` verwendeten Typs abgefragt werden, beispielsweise `getSelected(Rechnungsposition)` direkt in einer Page-Pane-Aktion.
 
 Vor dem Modellieren einer Aktion ist deshalb zu klären:
 
 - Welcher Typ ist an der Aufrufstelle selektiert?
 - Welche Command-Parameter müssen befüllt werden?
-- Soll die Aktion global, in einem Submenü oder nur an der fokussierten Komponente angeboten werden?
+- An welchem Element wird die Aktion angeboten: im Menü des `Page Pane`s, einer `Table` oder im Hauptmenü des `AppUI Module`s?
 
 Eine `Compound Action` ruft einen `GRAPH_OWNER_CMD` oder `GRAPH_OWNER_CMD(modal)` auf und verbindet ihn optional mit einem anschließenden `GRAPH_EDIT_CMD`. Sie benötigt immer ein eigenes Label (`customLabel`) und immer eine automatische Conclusion für den Owner; ohne sie ist eine einfache `Action` zu verwenden. Der Owner wird damit ohne sichtbare UI bis zu diesem Abschluss ausgeführt. Folgt ein `GRAPH_EDIT_CMD`, läuft er in derselben Session mit den vom Owner bereitgestellten Daten; der Owner muss dann genau eine Page besitzen, und `getSelected(...)` im Edit-Aufruf darf nur den Typ dieser Page verwenden. Für den `GRAPH_EDIT_CMD` ist eine automatische Conclusion optional und nur möglich, wenn er Pages hat. Successor-Commands des Owners werden nicht unterstützt, mit Ausnahme genau eines unbedingten Successors.
 
 Damit kann beispielsweise aus einem Suchergebnis heraus eine Aktion auf einem vollständigen Aggregat ausgeführt werden: Der `GRAPH_OWNER_CMD` öffnet das ausgewählte Objekt, lädt den Aggregatgraphen vollständig und stellt die Session bereit. Anschließend führt der `GRAPH_EDIT_CMD` die fachliche Änderung aus. Dessen Conclusion bestätigt die Änderung; die Conclusion des Owners speichert und schließt den Aggregatgraphen. Ohne nachgelagerten `GRAPH_EDIT_CMD` eignet sich dasselbe Muster auch dazu, einen `GRAPH_OWNER_CMD` vollständig ohne UI auszuführen.
 
-`PageConclusionReference` verweist dabei auf eine Abschlussart, d. h., der `Command` muss diese Conclusion deklarieren. `USER_CANCEL` modelliert einen Abbruch des Commands mit `cancel`, analog zu einem Benutzerabbruch.
+`PageConclusionReference` verweist dabei auf eine Abschlussart, d. h., der `Command` muss diese Conclusion deklarieren.
 
 ### Typischer UI-Modellierungsablauf
 
 1. Der ObjectFlow-Command und seine Pages legen fest, welche Daten und Aktionen der Ablauf benötigt.
 2. Für jede Page wird der Root-Typ der UI bestimmt.
 3. Das `Page Pane` erhält diesen Entity- oder DTO-Typ als Bindungskontext.
-4. Das oberste UI-Element wird gewählt: Formular, Tabelle oder Layout.
-5. Formulare und Tabellen werden an Typen beziehungsweise geeignete Properties gebunden.
-6. Tabellen können über die Auswahl ihrer Zeilen Selektionen für weitere UI-Komponenten bestimmen.
+4. Das oberste UI-Element wird gewählt: `Delegate Form`, `Table` oder Layout.
+5. `Delegate Form`s und `Table`s werden an Typen beziehungsweise geeignete Properties gebunden.
+6. `Table`s können über die Auswahl ihrer Zeilen Selektionen für weitere UI-Komponenten bestimmen.
 7. Typgerechte Delegates beschreiben Felder und Tabellenspalten.
 8. Menüs rufen Commands mit Argumenten aus dem aktuellen Bindungs- und Selektionskontext auf.
 
@@ -279,7 +256,7 @@ Die Referenz `configuration` ist immer anzugeben, wird aber nur beim Start mit F
 
 ### Anwendung mit `AppUI Module`
 
-Ein `AppUI Module` beschreibt eine interaktive Anwendung. Neben Benutzerkontext und Modulmetadaten besitzt es Navigation und Einstiegspunkte:
+Ein `AppUI Module` beschreibt eine interaktive Anwendung. Neben Benutzerkontext und Modulmetadaten besitzt es Navigation und Einstiegspunkte.
 
 #### Kapitellandkarte: Anwendung
 
@@ -361,15 +338,19 @@ Auch ein Batchjob benötigt einen konsistenten technischen Benutzerkontext. Die 
 
 #### Exception-Strategien und Wiederanlauf
 
-Ein Batchjob besitzt eine verpflichtende `exception strategy`. Ihre Regeln werden der Reihe nach geprüft; die letzte Regel muss eine Default-Strategie sein. Eine Regel kann mehrere Laufzeitreaktionen kombinieren:
+Ein Batchjob besitzt eine verpflichtende `exception strategy`. Ihre Regeln werden der Reihe nach geprüft; die letzte Regel muss eine Default-Strategie sein. Eine Regel kann mehrere Laufzeitreaktionen kombinieren.
 
-| Reaktion | Wirkung |
-| --- | --- |
-| `READD_TO_INBOX` | Stellt das fehlgeschlagene Element erneut in die Inbox ein |
-| `DELAY_EXECUTION` | Wartet vor der weiteren Verarbeitung beziehungsweise Neuplanung |
-| `CLEAR_INBOX` | Verwirft alle noch wartenden Inbox-Elemente und veranlasst eine Neuplanung |
-| `CONSUMER_RESTART` | Beendet den betroffenen Consumer und startet einen Ersatz-Consumer |
-| `SILENT_NO_LOG` | Unterdrückt die übliche Problemprotokollierung; der Vorgang bleibt als nicht protokollierte Exception gezählt |
+#### Kapitellandkarte: Exception-Strategien
+
+| Name | Konzeptname | FQ-Name | Aufgabe |
+| --- | --- | --- | --- |
+| `strategy` | `OFXStrategyForException` | `org.modellwerkstatt.objectflow.structure.OFXStrategyForException` | Regel einer `exception strategy` mit optionaler Exception-Klasse und optionalem Meldungsteil als Bedingung; eine Regel ohne Bedingung ist die Default-Regel und steht zuletzt. |
+| `OFXExceptionStrategyInclude` | `OFXExceptionStrategyInclude` | `org.modellwerkstatt.objectflow.structure.OFXExceptionStrategyInclude` | Bindet eine andere `exception strategy` ein. |
+| `READD_TO_INBOX` | `OFXReAddInboxStratBehaviour` | `org.modellwerkstatt.objectflow.structure.OFXReAddInboxStratBehaviour` | Stellt das fehlgeschlagene Element erneut in die Inbox ein |
+| `DELAY_EXECUTION` | `OFXDelayStratBehaviour` | `org.modellwerkstatt.objectflow.structure.OFXDelayStratBehaviour` | Wartet vor der weiteren Verarbeitung beziehungsweise Neuplanung |
+| `CLEAR_INBOX` | `OFXClearInboxStratBehaviour` | `org.modellwerkstatt.objectflow.structure.OFXClearInboxStratBehaviour` | Verwirft alle noch wartenden Inbox-Elemente und veranlasst eine Neuplanung |
+| `CONSUMER_RESTART` | `OFXConsRestartStratBehaviour` | `org.modellwerkstatt.objectflow.structure.OFXConsRestartStratBehaviour` | Beendet den betroffenen Consumer und startet einen Ersatz-Consumer |
+| `SILENT_NO_LOG` | `OFXSilentNoLogStratBehaviour` | `org.modellwerkstatt.objectflow.structure.OFXSilentNoLogStratBehaviour` | Unterdrückt die übliche Problemprotokollierung; der Vorgang bleibt als nicht protokollierte Exception gezählt |
 
 Bei mehreren gleichzeitig fehlschlagenden Consumern wartet die Laufzeit, bis kein Consumer mehr arbeitet, und verwendet dann die längste angeforderte Verzögerung. Ein fachlicher Abbruch wird separat als *canceled* gezählt: Er ist kein technischer Fehler und stellt das betroffene Element nicht automatisch erneut in die Inbox.
 
@@ -398,7 +379,7 @@ Aus diesen Optionen ergeben sich drei typische Betriebsweisen:
 
 Bei der Zeitpunktausführung muss der `CRON`-Ausdruck mit einem konkreten Sekundenwert beginnen. Für Zeitfenster beginnen die Ausdrücke dagegen mit einer Sekunden-Wildcard. Wird `DELAY` ohne `CRON` verwendet, läuft das `consumer/producer pair` grundsätzlich ohne tägliche Zeitfensterbegrenzung. Die Auswertung verwendet die Standardzeitzone der JVM.
 
-`CONSUMERS` legt die Anzahl der Consumer je `consumer/producer pair` fest und steuert damit dessen Parallelität. Eine Erhöhung beschleunigt die Abarbeitung nur, wenn die verwendeten externen Systeme sowie Sperrstrategien dies vertragen. Ob ein Batchjob mit oder ohne UI läuft, legt nicht das Modul, sondern die `OFXConfig` fest: Für den Konsolenbetrieb ohne instanziierte UI wird dort als Anwendungsfabrik eine `new instance` der Klasse `org.modellwerkstatt.objectflow.job.console.ConsoleBatchJobAppFactory` konfiguriert. Die frühere Modul-Option `RUN_IN_CONSOLE` wird nicht mehr unterstützt und vom Checker als Fehler gemeldet. `OptIncludeBatchUi` bindet umgekehrt einen Batchjob in den UI-Kontext eines Moduls ein.
+`CONSUMERS` legt die Anzahl der Consumer je `consumer/producer pair` fest und steuert damit dessen Parallelität. Eine Erhöhung beschleunigt die Abarbeitung nur, wenn die verwendeten externen Systeme sowie Sperrstrategien dies vertragen. Ob ein Batchjob mit oder ohne UI läuft, legt nicht das Modul, sondern die `OFXConfig` fest: Für den Konsolenbetrieb ohne instanziierte UI wird dort als Anwendungsfabrik eine `new instance` der Klasse `org.modellwerkstatt.objectflow.job.console.ConsoleBatchJobAppFactory` konfiguriert. `OptIncludeBatchUi` bindet umgekehrt einen Batchjob in den UI-Kontext eines Moduls ein.
 
 #### Manuelle Ausführung und Konsolenbetrieb
 
@@ -437,12 +418,12 @@ Beide Modulformen können dieselben fachlichen Services und Repositories verwend
 
 ### Interaktive Suche und Bearbeitung
 
-1. Eine Menüaktion des `AppUI Module`s startet einen Such-Command.
-2. Dessen erste Page stellt ein Filterobjekt bereit; ein `Page Pane` zeigt es in einem `Delegate Form`.
-3. Nach der Suche stellt eine weitere Page eine Ergebnisliste bereit; eine `Table` zeigt die Ergebnisse.
+1. Eine `Action` im Hauptmenü des `AppUI Module`s startet einen Such-Command.
+2. Bei wenigen Suchkriterien zeigt eine einzige Page oben ein `Delegate Form` mit dem Filterobjekt und darunter eine `Table` mit den Ergebnissen; `ISSUE UPDATE/SCANABLE` an den Kriterien kann die Suche bei jeder Änderung auslösen.
+3. Bei vielen Suchkriterien stellt die erste Page das Filterobjekt in einem `Delegate Form` bereit, eine weitere Page die Ergebnisliste in einer `Table`.
 4. Die ausgewählte Tabellenzeile wird zur gemeinsamen Selektion des Ergebnis- beziehungsweise Entity-Typs.
-5. Eine Tabellenaktion startet den Bearbeitungs-Command mit der selektierten ID oder Instanz.
-6. Der Bearbeitungs-Command ist ein `GRAPH_OWNER_CMD`; seine Page zeigt die geladene Rechnung in einem `DISABLED` `Delegate Form` über der Tabelle der Positionen. Die Änderungen führen `GRAPH_EDIT_CMD`s mit editierbaren Formularen aus, die über das `Submenu` der Tabelle beziehungsweise des `Page Pane`s gestartet werden.
+5. Eine `Action` im Menü der `Table` startet den Bearbeitungs-Command mit der selektierten ID oder Instanz.
+6. Der Bearbeitungs-Command ist ein `GRAPH_OWNER_CMD`; seine Page zeigt die geladene Rechnung in einem `DISABLED` `Delegate Form` über der `Table` der Positionen. Die Änderungen führen `GRAPH_EDIT_CMD`s mit editierbaren `Delegate Form`s aus, die über das `Submenu` der `Table` beziehungsweise des `Page Pane`s gestartet werden.
 
 ### Batchverarbeitung mit optionaler UI
 
@@ -460,4 +441,4 @@ Beide Modulformen können dieselben fachlichen Services und Repositories verwend
 
 ## Dokumentstand
 
-Diese Dokumentation beschreibt DataUX, Stand Oktober 2026, auf Basis von JetBrains MPS 2026.1.
+Diese Dokumentation beschreibt DataUX, Stand Oktober 2026, auf Basis von JetBrains MPS 2026.2.

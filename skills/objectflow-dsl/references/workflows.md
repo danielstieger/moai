@@ -36,7 +36,7 @@ Apply the conventions `commands`.
 5. Add Pages incrementally. Each normal Page requires a Page Init and at least one Page Pane link; keep an unconditional link last. [Pages](../../../docu/objectflow.md#pages-und-page-conclusions)
 6. Put Page-specific `#Meta` changes in scopes; keep server-side validation as well. [Property metadata](../../../docu/objectflow.md#ui-metadaten-einer-property-mit-meta-steuern)
 7. Use `save` conclusions normally; use `no_save` only to discard editor state intentionally. [Page Conclusions](../../../docu/objectflow.md#page-conclusions)
-8. Register check-in/delete operations in the session owner. Do not register normal session operations in a Graph Edit. [Session and Unit of Work](../../../docu/objectflow.md#session-und-unit-of-work)
+8. Register check-in/delete operations in the session owner. Do not register normal session operations in a Graph Edit. [Die vier Command-Typen](../../../docu/objectflow.md#die-vier-command-typen)
 9. Add the aggregate root to `revert` when a child edit must be undone on cancel. [Revert](../../../docu/objectflow.md#revert-beim-abbruch)
 10. Validate the command, then test it with `run command`.
 

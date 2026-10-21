@@ -16,7 +16,7 @@ Die **modellwerkstatt MoWare-Werkbank** basiert auf JetBrains MPS und umfasst dr
 
 **ObjectFlow** (`org.modellwerkstatt.objectflow`) dient der Modellierung von Service-Komponenten und Geschäftslogik. Die Sprache umfasst fachliche Datenstrukturen wie Entities und Value Objects sowie Commands zur Beschreibung von Aktionen und Anwendungsabläufen. Darüber hinaus unterstützt ObjectFlow die Modellierung von Testabläufen in Testsuiten sowie die Definition von Rollen und Berechtigungen.
 
-**DataUX** (`org.modellwerkstatt.dataux`) dient der Modellierung von Benutzeroberflächen, Anwendungen und Batchjobs. Tabellen und Formulare werden durch ihre Spalten, Felder, Formatierungen und Datenbindungen beschrieben; Layouts strukturieren die Darstellung und ermöglichen die Zusammenstellung komplexerer Oberflächen. Anwendungen dienen Endanwendern als Einstiegspunkt und verfügen über das Hauptmenü. Für die automatisierte Verarbeitung lassen sich Batchjobs modellieren.
+**DataUX** (`org.modellwerkstatt.dataux`) dient der Modellierung von Benutzeroberflächen, Anwendungen und Batchjobs. `Table`s und `Delegate Form`s werden durch ihre Spalten, Felder, Formatierungen und Datenbindungen beschrieben; Layouts strukturieren die Darstellung und ermöglichen die Zusammenstellung komplexerer Oberflächen. Anwendungen dienen Endanwendern als Einstiegspunkt und verfügen über das Hauptmenü. Für die automatisierte Verarbeitung lassen sich Batchjobs modellieren.
 
 Aus den in MPS modellierten Anwendungen wird Java-Code generiert; die drei Laufzeitumgebungen sind unter [Laufzeitumgebungen](#laufzeitumgebungen) beschrieben.
 
@@ -81,7 +81,7 @@ Entity / Value Object / DTO / Service / Command
 
 - **ObjectFlow** definiert die fachlichen Daten, Regeln und Anwendungsfälle.
 - **ManMap** verbindet Entities und DTOs mit der relationalen Persistenz und stellt den Datenzugriff über Repositories bereit.
-- **DataUX** projiziert Commands und deren Daten in `Page Pane`s, Formulare, Tabellen und ausführbare Module.
+- **DataUX** projiziert Commands und deren Daten in `Page Pane`s, `Delegate Form`s, `Table`s und ausführbare Module.
 
 ### Wo gehört eine Änderung hin?
 
@@ -92,7 +92,7 @@ Entity / Value Object / DTO / Service / Command
 | Neues Persistenzmapping                                 | `org.modellwerkstatt.manmap`                                                    | `EntityMapping` innerhalb einer `Persistence Description`                                          |
 | Neue Datenbankabfrage oder Speicheroperation            | `org.modellwerkstatt.manmap`                                                    | Methode und gegebenenfalls Mapper innerhalb eines `Repository`                                    |
 | Neuer Anwendungsfall oder geänderter Interaktionsablauf | `org.modellwerkstatt.objectflow`                                                | `Command` und dessen Pages                                                                        |
-| Neue Darstellung oder Bedienelemente                    | `org.modellwerkstatt.dataux`                                                    | `Page Pane` und darin eingebundene Formulare, Tabellen, Layouts oder andere UI-Komponenten        |
+| Neue Darstellung oder Bedienelemente                    | `org.modellwerkstatt.dataux`                                                    | `Page Pane` und darin eingebundene `Delegate Form`s, `Table`s, Layouts oder andere UI-Komponenten        |
 | Neue Anwendung oder geändertes Hauptmenü                | `org.modellwerkstatt.dataux`                                                    | `AppUI Module`                                                                                   |
 
 Fachliche Prüfungen und Berechnungen gehören in das fachliche Modell beziehungsweise in Services. Datenbankabfragen und Speicheroperationen werden in Repositories implementiert. Commands koordinieren den Anwendungsfall, die Session und die zugehörigen Pages. Deren Darstellung wird durch `Page Pane`s und die darin eingebundenen UI-Komponenten beschrieben. Eine Änderung kann daher mehrere Modellierungsorte und DSLs betreffen.
@@ -130,9 +130,9 @@ Das Beispiel umfasst die Suche nach Rechnungen, die Bearbeitung einer Rechnung m
 | `Value Object` | `Geldbetrag`              | Fasst Betrag und Währung zusammen.                                                                                                                            |
 | `Value Object` | `Lieferstichtag`          | Stichtag mit Toleranztagen davor und danach. Prüft mit `istTermingerecht(datum)`, ob ein Lieferdatum im erlaubten Fenster liegt; die Regel bleibt im Wert gekapselt. |
 | `DTO`         | `RechnungInfo`            | Read-only-Projektion für ein Suchergebnis. Enthält die Rechnungs-ID sowie die für die Ergebnisliste benötigten Rechnungsdaten.                                 |
-| `DTO`         | `RechnungFilter`          | Enthält Suchkriterien, beispielsweise Rechnungsnummer und Datumsbereich, sowie die Property `results` vom Typ `list<RechnungInfo>`.                           |
+| `DTO`         | `RechnungFilter`          | Enthält die Suchkriterien Rechnungsnummer, Datumsbereich, Positionsbeschreibung und Mindestsumme sowie die Property `results` vom Typ `list<RechnungInfo>`.                           |
 | `DTO`         | `RechnungsSummenErgebnis` | Nimmt das Ergebnis der SQL-Aggregation zur Summe aller Rechnungen auf.                                                                                        |
-| `Service`     | `RechnungsService`        | Berechnet Positionswerte und Rechnungssumme und prüft fachliche Regeln bei der Bearbeitung.                                                                   |
+| `Service`     | `RechnungService`         | Berechnet Positionswerte und Rechnungssumme und prüft fachliche Regeln bei der Bearbeitung.                                                                   |
 
 Für das vereinfachte Beispiel müssen Mengen positiv und Einzelpreise nicht negativ sein. Alle Rechnungen verwenden dieselbe Währung. Die Summe einer Rechnung ergibt sich aus ihren Positionswerten. Steuern und Rundungsregeln werden in diesem Beispiel nicht behandelt.
 
@@ -171,8 +171,8 @@ Der ebenfalls verfügbare Typ `GRAPH_OWNER_CMD(modal)` wird in diesem Beispiel n
 
 Der Command `Rechnungen suchen` startet eine eigene Read-only-Session und besteht aus zwei Pages:
 
-1. **Suchfilter eingeben:** Ein `Delegate Form` im `Page Pane` dieser Page ist an das DTO `RechnungFilter` gebunden. Der Benutzer legt die Suchkriterien fest.
-2. **Suchergebnisse anzeigen:** Mit den Kriterien aus dem DTO wird die Methode `sucheRechnungen(filter)` des `RechnungsLeseRepo` aufgerufen. Sie führt benutzerdefiniertes SQL aus und legt die erzeugten `RechnungInfo`-DTOs in der Property `results` des Filter-DTOs ab. Eine `Table` im `Page Pane` der zweiten Page zeigt diese Liste an.
+1. **Suchfilter eingeben:** Ein `Delegate Form` im `Page Pane` dieser Page ist an das DTO `RechnungFilter` gebunden. Der Benutzer legt die Suchkriterien fest; die Conclusion „Weiter“ führt die Suche aus und wechselt zur Ergebnis-Page.
+2. **Suchergebnisse anzeigen:** Mit den Kriterien aus dem DTO wird die Methode `sucheRechnungen(filter)` des `RechnungsLeseRepo` aufgerufen. Sie führt benutzerdefiniertes SQL aus und legt die erzeugten `RechnungInfo`-DTOs in der Property `results` des Filter-DTOs ab. Eine `Table` im `Page Pane` der zweiten Page zeigt diese Liste an. „Zurück“ kehrt zu den Suchkriterien zurück, „Aktualisieren“ führt die Suche erneut aus.
 
 Bei der Suche werden weder `Rechnung`-Entities noch deren Positionen geladen. Die Session des `SEARCH_CMD` kann nicht committed werden. Die Eingabe von Suchkriterien und das Befüllen von `results` im DTO sind davon unabhängig: Diese Daten dienen dem Suchablauf und werden nicht in die Datenbank geschrieben.
 
@@ -182,9 +182,9 @@ Ein Doppelklick auf eine Tabellenzeile startet `Rechnung bearbeiten`. Als Parame
 
 Der Command `Rechnung bearbeiten` hat den Typ `GRAPH_OWNER_CMD` und startet eine eigene Session. Er ist dafür verantwortlich, die Daten zur Bearbeitung zu laden (**Checkout**). Dazu ruft er `checkout(id)` des `RechnungsRepo` mit der übergebenen Rechnungs-ID auf. Die Repository-Methode lädt den Rechnungskopf und die zugehörigen Positionen.
 
-Der `GRAPH_OWNER_CMD` zeigt Rechnungskopf und Positionen an, bearbeitet sie aber nicht selbst; sein `Delegate Form` ist `DISABLED`. Zum Bearbeiten öffnet er `Rechnungskopf bearbeiten` und `Rechnungsposition bearbeiten` vom Typ `GRAPH_EDIT_CMD`. Diese Commands arbeiten innerhalb der bestehenden Session des `GRAPH_OWNER_CMD` und eröffnen keine eigene Session. In diesem Beispiel werden Änderungen direkt an den Entities durchgeführt. In größeren Anwendungen liegt typischerweise ein DTO zwischen Oberfläche und Aggregat: Das `Delegate Form` ist an das DTO gebunden, und der Command übergibt die Werte an einen Service, der das Aggregat verändert. Damit ist auch die Oberfläche vom Aggregat entkoppelt. Dann sind Eingabeprüfungen am DTO von fachlichen Prüfungen zu unterscheiden: Pflichteingaben und Wertegrenzen regeln die DataUX-Delegates mit `LENGTH` und `RANGE` an den Properties des DTOs, die fachlichen Prüfungen bleiben im Service. Schlägt eine Precondition des Service fehl, bleibt die Page sichtbar, und der Benutzer kann seine Eingaben korrigieren.
+Der `GRAPH_OWNER_CMD` zeigt Rechnungskopf und Positionen an, bearbeitet sie aber nicht selbst; sein `Delegate Form` ist `DISABLED`. Zum Bearbeiten öffnet er `Rechnungskopf bearbeiten` und `Rechnungsposition bearbeiten` vom Typ `GRAPH_EDIT_CMD`. Diese Commands arbeiten innerhalb der bestehenden Session des `GRAPH_OWNER_CMD` und eröffnen keine eigene Session. In diesem Beispiel sind die `Delegate Form`s der `GRAPH_EDIT_CMD`s direkt an die Entities gebunden; ihre Conclusions übergeben die Änderung dem `RechnungService`, der Mengen und Preise prüft. In größeren Anwendungen liegt typischerweise ein DTO zwischen Oberfläche und Aggregat: Das `Delegate Form` ist an das DTO gebunden, und der Command übergibt die Werte an einen Service, der das Aggregat verändert. Damit ist auch die Oberfläche vom Aggregat entkoppelt. Dann sind Eingabeprüfungen am DTO von fachlichen Prüfungen zu unterscheiden: Pflichteingaben und Wertegrenzen regeln die DataUX-Delegates mit `LENGTH` und `RANGE` an den Properties des DTOs, die fachlichen Prüfungen bleiben im Service. Schlägt eine Precondition des Service fehl, bleibt die Page sichtbar, und der Benutzer kann seine Eingaben korrigieren.
 
-Der `RechnungsService` übernimmt fachliche Prüfungen und Berechnungen. Der `GRAPH_OWNER_CMD` registriert die zum Speichern benötigten Repository-Methoden (**Check-in**) als **Session-Operationen**. Im Beispiel dient dazu `checkin(rechnung)`.
+Der `RechnungService` übernimmt fachliche Prüfungen und Berechnungen. Der `GRAPH_OWNER_CMD` registriert die zum Speichern benötigten Repository-Methoden (**Check-in**) als **Session-Operationen**. Im Beispiel dient dazu `checkin(rechnung)`.
 
 Beim vorgesehenen Abschluss des `GRAPH_OWNER_CMD` wird eine Datenbanktransaktion gestartet. Die registrierten Session-Operationen werden ausgeführt und die Transaktion wird committed. Die Session begleitet damit die Bearbeitung; die Transaktion zum Speichern wird erst beim Abschluss ausgeführt.
 
@@ -196,7 +196,7 @@ Die Repository-Methode führt eine aggregierende SQL-Abfrage direkt auf der Date
 
 ### Benutzeroberfläche mit DataUX
 
-Eine **Page** beschreibt eine Seite im Ablauf eines Commands. Das zugehörige **`Page Pane`** bildet ihr Gegenstück in der Benutzeroberfläche und nimmt deren UI-Inhalte auf. Formulare, Tabellen, Layouts und andere UI-Komponenten müssen jeweils innerhalb eines `Page Pane`s eingebunden sein, gegebenenfalls über darin enthaltene Layouts. `Page Pane`s können wiederverwendet werden.
+Eine **Page** beschreibt eine Seite im Ablauf eines Commands. Das zugehörige **`Page Pane`** bildet ihr Gegenstück in der Benutzeroberfläche und nimmt deren UI-Inhalte auf. `Delegate Form`s, `Table`s, Layouts und andere UI-Komponenten müssen jeweils innerhalb eines `Page Pane`s eingebunden sein, gegebenenfalls über darin enthaltene Layouts. `Page Pane`s können wiederverwendet werden.
 
 | Element                                 | Inhalt                                                                                                                                                                     |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -292,4 +292,4 @@ Die Dokumentation beschreibt, was die Sprachen können. Wie eine Anwendung das v
 
 ## Stand der Dokumentation
 
-Diese Dokumentation beschreibt die **modellwerkstatt MoWare-Werkbank, Stand Oktober 2026**, auf Basis von **JetBrains MPS 2026.1**.
+Diese Dokumentation beschreibt die **modellwerkstatt MoWare-Werkbank, Stand Oktober 2026**, auf Basis von **JetBrains MPS 2026.2**.

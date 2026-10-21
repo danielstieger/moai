@@ -25,5 +25,7 @@ Entities modellieren die Datenstruktur, Services das Verhalten; beides sind Sich
 - **KONVENTION:** Ein Value Object wird nach dem Erzeugen nicht über Setter verändert. Eine Änderung erzeugt mit einer `with`-Methode oder einem Konstruktor ein neues Value Object, das der Property zugewiesen wird. Nur so wird die besitzende Entity dirty und die Änderung gespeichert.
 - **KONVENTION:** Statische Methoden an einem Value Object sind erwünscht, wenn sie zum Wert gehören und ohne Infrastruktur auskommen: Fabrikmethoden wie `Geldbetrag.von(betrag, waehrung)`, benannte Konstanten wie `Geldbetrag.NULL()`, Prädikate und Prüfungen wie `Zeitraum.istGueltig(von, bis)` sowie Operationen über mehrere Werte wie `Geldbetrag.summe(betraege)`, `min` und `max`. Sie liefern neue Werte oder Antworten und werfen keine fachlichen Fehler; die fachliche Prüfung bleibt im Service. Konstanten werden als Methode modelliert, nicht als statisches Feld.
 
+### Fehlende Werte
+
 - **KONVENTION:** Ein `string` ist nie `null`; „kein Wert“ ist der leere String. Fachlicher Code prüft Strings (falls notwendig) auf Leere und nicht auf `null` und setzt einen String nicht auf `null`. Ausgenommen ist ein String, der bewusst optional geführt wird, etwa als Kriterium eines `optional`-Filters, das mit `null` entfällt.
 - **KONVENTION:** `java.util.Optional` wird nicht verwendet. Ein fehlender Wert ist `null` beziehungsweise der leere String.

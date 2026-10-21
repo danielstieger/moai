@@ -89,7 +89,7 @@ The operational semantics are documented under [`save with`](../../../docu/manma
 
 ## Direct SQL (C2)
 
-Use [Custom SQL](../../../docu/manmap.md#custom-sql-mit-sql), [SQL query versus statement](../../../docu/manmap.md#sql-query-und-sql-statement), [SQL parameter binding](../../../docu/manmap.md#parameter-in-sql-text), and [row/no-key mappers](../../../docu/manmap.md#row-mapper-und-no-key-mapper) for semantics and runtime behavior.
+Use [Custom SQL](../../../docu/manmap.md#custom-sql-mit-sql), [SQL query versus statement](../../../docu/manmap.md#sql-query-und-sql-statement), [SQL parameter binding](../../../docu/manmap.md#parameter-in-sql-text), and [row/no-key mappers](../../../docu/manmap.md#row-mapper-und-nokeystoreread-only-map) for semantics and runtime behavior.
 
 `C2SqlBlock` is an expression. `sqlType` is exactly `QUERY` or `STATEMENT`; `statements: StatementList[1]` contains reached `C2SqlText` statements, while optional `mapping: Expression[0..1]` maps query rows.
 

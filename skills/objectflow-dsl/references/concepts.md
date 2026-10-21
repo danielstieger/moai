@@ -73,7 +73,7 @@ Important verified roles:
 - A value passed forward from `FINAL OK_CONCLUSION` is declared by `CommandCreationInfo` (projected as `user toast message`; `msg` [1], optional `keyReference`, name in `refName`). In the test, reference it with `OFXRunCmdCreateInfoRef` (reference role `reference` → that `CommandCreationInfo`), not with a `VariableReference`. [Commands without UI](../../../docu/objectflow.md#commands-ohne-ui-ausführen)
 - `OFXConfig` models component wiring, reusable sections, overrides, scanning, and primary implementations. [OFXConfig](../../../docu/objectflow.md#konfiguration-mit-ofxconfig)
 - `RolesAndPermissions` separates roles, object-returning scopes, and cached identities. [Roles, scopes, and identities](../../../docu/objectflow.md#rollen-scopes-und-identities)
-- `StaticRessources` requires `platforms` (`1..n`). [Static resources](../../../docu/objectflow.md#statische-ressourcen)
+- `StaticRessources` requires `platforms` (`1..n`). [Static resources](../../../docu/objectflow.md#static-ressources)
 
 ## DSL responsibility boundaries
 

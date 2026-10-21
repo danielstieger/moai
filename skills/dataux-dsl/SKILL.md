@@ -13,7 +13,7 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 - Use the package documentation for semantics and runtime behavior; start with [DataUX UI modeling](../../docu/dataux.md#teil-i--ui-modellierung) and the [MoWare responsibility map](../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin).
 - The shipped solution `org.modellwerkstatt.dataux.tests` supplies the stable examples recorded in [references/sandbox.md](references/sandbox.md). It is useful but does not cover every UI shape.
 - Never persist a project path, editor-session state, or references from an application project.
-- Conventions are referenced by name, e.g. conventions `oberflaeche`; the project provides them (see its `AGENTS.md`). This skill does not repeat their content.
+- Conventions are referenced by name, e.g. conventions `oberflaeche` (file `mw-oberflaeche_v1.md`); the project's `AGENTS.md` states where they are and which ones it changes. This skill does not repeat their content.
 - For target-model classifiers, properties, commands, the `OFXConfig`, and reusable UI roots, replace the explicit `TARGET_MODEL.*` placeholders immediately before insertion.
 
 ## Critical rules
