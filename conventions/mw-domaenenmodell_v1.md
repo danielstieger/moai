@@ -19,6 +19,10 @@ Entities modellieren die Datenstruktur, Services das Verhalten; beides sind Sich
 - **KONVENTION:** Eingabeprüfungen an einem DTO, das zwischen Oberfläche und Aggregat liegt, sind CheapCode und ersetzen nie die fachliche Prüfung. Jede Geschäftsregel steht im Service oder am Aggregat, und der Service prüft sie auch dann, wenn das DTO sie bereits geprüft hat.
 - **KONVENTION:** Pflichteingaben und Wertegrenzen der Eingabe regeln die DataUX-Delegates zusammen mit `LENGTH` und `RANGE` an den Properties des DTOs. Eine Precondition am DTO wird nur für Eingabeprüfungen modelliert, die sich damit nicht ausdrücken lassen, etwa Abhängigkeiten zwischen Feldern.
 
+### Löschen
+
+- **KONVENTION:** Fachliche Objekte werden nicht physisch gelöscht. Muss ein Objekt fachlich entfallen, auch ein Teil eines Aggregats wie eine Position, erhält es einen Status, etwa „storniert“ oder „gelöscht“. Abfragen und Lesemodelle schließen diesen Status aus. `delete with` ist technischen Daten vorbehalten.
+
 ### Werte
 
 - **KONVENTION:** Value Objects sind erwünscht. Ein zusammengesetzter fachlicher Wert (Compound Value), etwa Geldbetrag, Zeitraum, Anschrift oder ein Stichtag mit Toleranz, wird als Value Object modelliert und nicht als einzelne Properties der Entity. Einzelne Properties bleiben nur, wenn ihre Bestandteile auch einzeln einen fachlichen Sinn ergeben.

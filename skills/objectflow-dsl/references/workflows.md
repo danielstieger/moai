@@ -48,7 +48,7 @@ Use Successors for one atomic Unit of Work; use `session queue next command` for
 
 Apply the conventions `tests`.
 
-Test-model facts: a `tests` model is discovered only with the stereotype `@tests` (`<name>@tests`), and its solution needs the `tests` facet (check `facets` in `mps_mcp_get_project_structure`; set with `mps_mcp_update_module_facet`). Run it with `mps_mcp_create_run_configuration(modelReference=…)`, then `mps_mcp_execute_run_configuration`; a single model gives a live JUnit configuration (`moai:mps-run-configurations`). Never edit `test_gen/`.
+Test-model facts: test models are ordinary models named `<…>.tests` (no `@tests` stereotype, no `tests` facet). Run an `OFXTestSuit` with `mps_mcp_create_run_configuration(nodeReference=<suite root>)`, which creates a Java Application config, then `mps_mcp_execute_run_configuration`; a model reference gives a JUnit config that finds no `OFXTestSuit` (`moai:mps-run-configurations`).
 
 1. Insert [test-suite-skeleton.json](blueprints/test-suite-skeleton.json).
 2. Replace `TARGET_OFX_CONFIG` with the test `OFXConfig` from the model that holds the `OFXConfig`s (conventions `anwendungsaufbau`); add that model as a dependency of the `tests` model if it is missing.
@@ -57,6 +57,10 @@ Test-model facts: a `tests` model is discovered only with the stereotype `@tests
 5. Use `run command` to model expected Pages, forced Conclusions, child Commands, Successors, cancellation, and passed-forward values. [Commands without UI](../../../docu/objectflow.md#commands-ohne-ui-ausführen)
 6. Use `FAIL IN` for expected failures and `DEFAULT_DATETIME` for deterministic business time. [Test options](../../../docu/objectflow.md#testoptionen)
 7. Verify persisted effects by reading them back (conventions `tests`). [Typical test levels](../../../docu/objectflow.md#typische-testebenen)
+
+## Create an OFXConfig
+
+Look up templates in model `org.modellwerkstatt.wbkit.shared.configuration` (solution `org.modellwerkstatt.wbkit`); the explanations are there as well.
 
 ## Integrate persistence with ManMap
 

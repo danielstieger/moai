@@ -5,6 +5,7 @@
 - Business Properties require both `type` and `propertyImplementation`; an inserted node can be structurally accepted yet incomplete. Start from the verified subtree blueprint. [Business Properties](../../../docu/objectflow.md#business-properties)
 - `StatusDeclaration` is nested under Entity/Value Object/DTO and is not rootable. Every element requires the `shortDescNew` and `longDescNew` children in the AST. [Status](../../../docu/objectflow.md#status)
 - Checker: comparing a Value-Object key with `null` (`rechnung.kunde#Key == null`) is an error; use `isNullKey`. `#Key` versus the loaded object: see [Beziehungen und Objektgraphen](../../../docu/objectflow.md#beziehungen-und-objektgraphen).
+- In services and repositories, never call an own method with `this.method(..)` (it fails in javac); call `method(..)` instead.
 
 ## Runtime semantics (documentation pointers)
 
@@ -34,4 +35,5 @@ Factories run on every real insert (not in the dry-run) and fill only the roles 
 - Value Object: adds `int myVal`. The skeleton alone leaves checker errors (missing `equalProperties`, missing `withMyVal(..)`); without `myVal` the `equalProperties` error stays. After the insert: replace the property, add `equalProperties`, a constructor taking all properties, and one `with<Prop>(val)` per property that returns `new <ValueObject>(..)` with `val` in its position and the other properties unchanged (packaged `SimpleValue`) ([blueprints](blueprints.md#incremental-subtrees)).
 - DTO: adds `string name`; rename or delete it.
 - Command: sets `newWindowTitleType=ADDON` and `defaultHotkey="_"`.
+- `DateLiteral` and `DateTimeLiteral`: the factory sets `fromServer=true`, so a literal with date/time values but without `fromServer` evaluates to the server date/time and ignores the given values; the checker does not report it. For fixed values set `fromServer=false` explicitly.
 - Check factory effects with `print_node` after the insert.

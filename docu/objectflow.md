@@ -269,7 +269,7 @@ Eine Methode mit `TO_SESSION_OPS` darf keine Preconditions besitzen. Eine solche
 
 ### Komponenten mit `#` aufrufen
 
-Service- und Repository-Methoden werden ausschließlich mit dem Komponentenaufruf `#` aufgerufen; ein direkter Java-Aufruf ist nicht vorgesehen, er würde die Komponenten-, Session- und Transaktionssemantik umgehen. Das Sprachkonzept referenziert die konfigurierte Komponente und ihre Methode und kann optional einen expliziten Session-Ausdruck enthalten. Entscheidend ist außerdem, ob der Aufruf im `FINAL OK_CONCLUSION`-Kontext eines Commands verwendet wird.
+Service- und Repository-Methoden werden mit dem Komponentenaufruf `#` aufgerufen; ein direkter Java-Aufruf ist nicht vorgesehen, er würde die Komponenten-, Session- und Transaktionssemantik umgehen. Innerhalb desselben Service kann eine Service Method eine andere auch direkt mit ihrem Namen aufrufen, etwa `pruefen(rechnung)`. Das Sprachkonzept referenziert die konfigurierte Komponente und ihre Methode und kann optional einen expliziten Session-Ausdruck enthalten. Entscheidend ist außerdem, ob der Aufruf im `FINAL OK_CONCLUSION`-Kontext eines Commands verwendet wird.
 
 | Ziel des Komponentenaufrufs `#` | Typisches Verhalten |
 | --- | --- |
@@ -1072,7 +1072,8 @@ Dieser Teil beschreibt Konfiguration, Benutzerkontext, Berechtigungen, gemeinsam
 | `userEnvironment` | `UserEnvironmentParameter` | `org.modellwerkstatt.objectflow.structure.UserEnvironmentParameter` | Repräsentiert den `userEnvironment`-Parameter innerhalb von `isAuthenticated` zum Setzen von Benutzername, Benutzer-ID, Compact Mode und Branding. |
 | `static role` | `StaticRole` | `org.modellwerkstatt.objectflow.structure.StaticRole` | Prüft anhand der User Environment, ob ein Benutzer eine Rolle (oder ein Feature) besitzt; Rollen können weitere Rollen einschließen. |
 | `is` | `StaticRoleFunc` | `org.modellwerkstatt.objectflow.structure.StaticRoleFunc` | Funktion `is(userEnvironment) -> boolean` einer `static role`; darf über `#` Services und Repositories befragen. |
-| `StaticRoleReference` | `StaticRoleReference` | `org.modellwerkstatt.objectflow.structure.StaticRoleReference` | Referenziert eine `static role`, etwa unter `is also / can also`, in `CAN_OPEN_RO`/`CAN_OPEN_RW` oder in Ausdrücken; kapselt den gecachten Zugriff. |
+| `StaticRoleReference` | `StaticRoleReference` | `org.modellwerkstatt.objectflow.structure.StaticRoleReference` | Referenziert unter `is also / can also` eine eingeschlossene `static role`. |
+| `role` | `PermissionHasReference` | `org.modellwerkstatt.objectflow.structure.PermissionHasReference` | Ausdruck, der eine Rolle auswertet (Referenz `evaluatePermission`), etwa in `CAN_OPEN_RW role Sachbearbeiter()` oder in anderen Ausdrücken; kapselt den gecachten Zugriff. |
 | `Scope` | `Scope` | `org.modellwerkstatt.objectflow.structure.Scope` | Liefert die für einen Benutzer beziehungsweise Kontext zugänglichen Objekte eines Typs; kann Parameter, Variablen und Komponentenaufrufe `#` verwenden. |
 | `scope` | `ScopeFunc` | `org.modellwerkstatt.objectflow.structure.ScopeFunc` | Funktion eines `Scope`, die die zugängliche Objektmenge berechnet. |
 | `scope` | `ScopeReference` | `org.modellwerkstatt.objectflow.structure.ScopeReference` | Verwendet einen Scope in Ausdrücken und kapselt den generierten Zugriff samt Cache-Semantik. |
@@ -1117,7 +1118,7 @@ Bei einer interaktiven Anwendung ist [`isAuthenticated`](dataux.md#anwendung-mit
 
 Außerhalb von `isAuthenticated` liefert `session` die aktuelle ObjectFlow-Session (siehe [Session und Unit of Work](#session-und-unit-of-work)); innerhalb von `isAuthenticated` sind `session` und `userEnvironment` die Parameter der Funktion. Anwendungslogik soll den Kontext über diese Zugriffe lesen und keine eigene globale Benutzerinstanz führen.
 
-Für Rollen, Scopes und Identities stehen eigene DSL-Ausdrücke zur Verfügung: `StaticRoleReference`, `scope` und `identity`. Sie kapseln die generierten Zugriffe und deren Cache-Semantik. Anwendungscode soll diese Konzepte verwenden und keine eigenen String-Schlüssel für `getValue(...)` oder `getIdentity(...)` erfinden.
+Für Rollen, Scopes und Identities stehen eigene DSL-Ausdrücke zur Verfügung: `role`, `scope` und `identity`. Sie kapseln die generierten Zugriffe und deren Cache-Semantik. Anwendungscode soll diese Konzepte verwenden und keine eigenen String-Schlüssel für `getValue(...)` oder `getIdentity(...)` erfinden.
 
 Bei einem headless Batchjob wird `isAuthenticated` nicht ausgeführt; beim `BatchJob Module` ist diese Funktion nur für eine gegebenenfalls gestartete UI relevant. Die verwendete `OFXConfig` muss deshalb je eine Implementierung von `IOFXUserEnvironment` und `IOFXUserServices` als Instanz bereitstellen (siehe Tabelle); die Job-Laufzeit übernimmt beide Komponenten in die Sessions der Producer- und Consumer-Abläufe.
 
@@ -1134,7 +1135,7 @@ Der User Service bündelt benutzer- beziehungsweise laufzeitabhängige Infrastru
 
 `Roles and Permissions` bündelt drei Arten von Zugriffskonzepten: `static role`, `Scope` und `identity` (siehe [Kapitellandkarte](#kapitellandkarte-querschnittsthemen)).
 
-Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN_OPEN_RW role ...`. Fehlt beides, ist der Command uneingeschränkt zugänglich. Die Art der Berechtigung beschreibt nicht den Datenzugriff, sondern die Bedienbarkeit des Commands: Öffnet ein Benutzer den Command über `CAN_OPEN_RO`, läuft dieser mit einer Read-only-Session (siehe [Session-weites Read-only und Dirty](#session-weites-read-only-und-dirty)) und ist damit eine reine Ansicht. Erfüllt ein Benutzer sowohl einen `CAN_OPEN_RO`- als auch einen `CAN_OPEN_RW`-Eintrag, gilt `CAN_OPEN_RW`. Ein `GRAPH_EDIT_CMD` darf kein `CAN_OPEN_RO` deklarieren, weil Read-only an der Session seines Session Owners hängt; der Checker meldet einen Fehler. Ein `SEARCH_CMD` mit Filterformular braucht `CAN_OPEN_RW` oder gar keine Berechtigung; weil seine Session nie committed wird (siehe [Die vier Command-Typen](#die-vier-command-typen)), ist damit kein Schreibrecht verbunden.
+Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN_OPEN_RW role ...`; der Ausdruck hinter `CAN_OPEN_RO`/`CAN_OPEN_RW` ist üblicherweise ein `role`-Ausdruck. Fehlt beides, ist der Command uneingeschränkt zugänglich. Die Art der Berechtigung beschreibt nicht den Datenzugriff, sondern die Bedienbarkeit des Commands: Öffnet ein Benutzer den Command über `CAN_OPEN_RO`, läuft dieser mit einer Read-only-Session (siehe [Session-weites Read-only und Dirty](#session-weites-read-only-und-dirty)) und ist damit eine reine Ansicht. Erfüllt ein Benutzer sowohl einen `CAN_OPEN_RO`- als auch einen `CAN_OPEN_RW`-Eintrag, gilt `CAN_OPEN_RW`. Ein `GRAPH_EDIT_CMD` darf kein `CAN_OPEN_RO` deklarieren, weil Read-only an der Session seines Session Owners hängt; der Checker meldet einen Fehler. Ein `SEARCH_CMD` mit Filterformular braucht `CAN_OPEN_RW` oder gar keine Berechtigung; weil seine Session nie committed wird (siehe [Die vier Command-Typen](#die-vier-command-typen)), ist damit kein Schreibrecht verbunden.
 
 Scopes sind nicht nur Berechtigungsflags, sondern liefern eine eingeschränkte Objektmenge. Sie können Parameter und lokale Variablen besitzen und Services beziehungsweise Repositories über `#` verwenden.
 

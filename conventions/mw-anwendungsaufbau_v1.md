@@ -18,7 +18,7 @@ Eine Anwendung umfasst einen oder mehrere **Bounded Contexts**. Ein Bounded Cont
 - **KONVENTION:** Die Anwendung hat die Solution `<firma>.<app>` mit den Modellen `base`, `rollen` und `app`. Bei einem Bounded Context enthält sie alle Modelle; bei mehreren liegt jeder Bounded Context in einer eigenen Solution `<firma>.<app>.<boundedcontext>`.
 - **KONVENTION:** Modellnamen folgen dem Muster `<firma>.<app>.<boundedcontext>.<bereich>.<modell>`. `base`, `rollen` und `app` gehören zur Anwendung (`<firma>.<app>.base`), `sharedvalues` und `gate.<fremdsystem>.<modell>` zum Bounded Context, `domain`, `read`, `unit` und `tests` zum Bereich. Bei einem Bounded Context entfällt das Segment `<boundedcontext>`: `<firma>.<app>.rechnung.domain`.
 - **KONVENTION:** Modelle werden erst angelegt, wenn sie gebraucht werden. Ein Bereich muss nicht alle vier Modelle `domain`, `read`, `unit` und `tests` besitzen.
-- **KONVENTION:** `tests`-Modelle liegen in derselben Solution wie die Modelle, die sie testen, es sei denn, der Bounded Context hat eine eigene Test-Solution.
+- **KONVENTION:** `tests`-Modelle (normale Modelle, nicht MPS-Stereotyp `@tests`) liegen in derselben Solution wie die Modelle, die sie testen, es sei denn, der Bounded Context hat eine eigene Test-Solution.
 
 Die folgende Tabelle ist verbindlich: Ein Modell enthält, was unter „Inhalt“ steht, importiert höchstens, was unter „darf importieren“ steht, und nie, was unter „gehört nicht hinein“ steht.
 

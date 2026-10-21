@@ -18,6 +18,7 @@ Committete Testdaten bleiben in der Datenbank und sammeln sich über mehrere Tes
 Die Session eines `Simple Test` wird am Testende nicht committet. Testdaten, die für einen Test in der Datenbank stehen müssen, werden deshalb über eine eigene Custom Session angelegt und dort committet.
 
 - **KONVENTION:** Der Service `CS` aus der Solution `org.modellwerkstatt.wbkit` liefert mit `CREATE()` eine neue Custom Session und committet mit `COMMIT()` die Session des aktuellen Kontexts samt der registrierten Session-Operationen. Die Anwendung legt `CS` nicht selbst an.
+- **KONVENTION:** Die `OFXConfig` einer Testsuite muss `CS` als Komponente finden: Mit `Component Scanning` nimmt sie `org.modellwerkstatt.wbkit.shared` als zusätzlichen Basisnamen auf, mit `Generation Time Resolution` setzt sie `includingImported`.
 - **KONVENTION:** Alle Methoden zum Anlegen von Testdaten liegen im Service `TestDaten` des jeweiligen `tests`-Modells. Eine solche Methode baut den Objektgraphen auf, registriert das Speichern mit `session operation add` und schließt mit `#CS.COMMIT()` ab.
 - **KONVENTION:** Der Test ruft Methoden zum Anlegen von Testdaten mit `#+ with #CS.CREATE()` auf. Innerhalb der Methode ist `session` damit die Custom Session; die Session des Tests bleibt unberührt.
 - **KONVENTION:** Persistierte Ergebnisse werden in einer frischen Custom Session zurückgelesen, etwa `#+ with #CS.CREATE() RechnungsRepo.get(id)`.
