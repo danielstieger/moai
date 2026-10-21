@@ -60,7 +60,7 @@ Test-model facts: test models are ordinary models named `<…>.tests` (no `@test
 
 ## Create an OFXConfig
 
-Look up templates in model `org.modellwerkstatt.wbkit.shared.configuration` (solution `org.modellwerkstatt.wbkit`); the explanations are there as well.
+Templates with explanations are in model `org.modellwerkstatt.wbkit.shared.configuration` (solution `org.modellwerkstatt.wbkit`); `baseconfig` holds the sections the other templates include. Copy the templates you need together with `baseconfig` into the target model with `moai/tools/copyroot.py` (conventions `anwendungsaufbau`: no wbkit import there), then adapt names and values.
 
 ## Integrate persistence with ManMap
 

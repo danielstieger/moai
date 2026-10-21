@@ -1,0 +1,29 @@
+{
+ "concepts": [
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.execution.util.structure.IMainClass",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  }
+ ],
+ "language": "jetbrains.mps.execution.util"
+}

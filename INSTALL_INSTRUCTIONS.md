@@ -66,6 +66,8 @@
 - If not, do not configure anything speculatively; instead point out that
   JetBrains MPS must be running with the target project open and the MPS MCP
   integration enabled.
+- Check that `python3` (3.8 or later) is available; the MoAI tools in
+  `moai/tools/` need it. If it is missing, report it.
 
 ### 4. Verify
 

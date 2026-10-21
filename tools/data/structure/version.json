@@ -1,0 +1,15 @@
+{
+ "languages": {
+  "jetbrains.mps.baseLanguage": 324,
+  "jetbrains.mps.baseLanguage.closures": 20,
+  "jetbrains.mps.baseLanguage.collections": 172,
+  "jetbrains.mps.execution.util": 1,
+  "jetbrains.mps.lang.core": 42,
+  "jetbrains.mps.lang.text": 25,
+  "jetbrains.mps.lang.traceable": 3,
+  "org.modellwerkstatt.dataux": 122,
+  "org.modellwerkstatt.manmap": 92,
+  "org.modellwerkstatt.objectflow": 210
+ },
+ "mpsBuild": "262.10968.569"
+}

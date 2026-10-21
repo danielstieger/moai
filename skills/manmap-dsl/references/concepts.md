@@ -1,6 +1,6 @@
 # ManMap Concept and Role Map
 
-The live MPS descriptor exposes 94 concepts. Exactly two are rootable: `PersistenceDescription` and `Repository`. No hollow runtime descriptors were observed when this inventory was recorded.
+The live MPS descriptor exposes 92 concepts. Exactly two are rootable: `PersistenceDescription` and `Repository`. No hollow runtime descriptors were observed when this inventory was recorded.
 
 Use `mps_mcp_get_concept_details` again before relying on this inventory after a language upgrade. The language reference is recorded in the parent [SKILL.md](../SKILL.md). Use the FQ names from the Kapitellandkarten in JSON blueprints; resolve references, child roles and cardinalities via MPS MCP in the current project before changing a model.
 
@@ -96,8 +96,6 @@ Use [Custom SQL](../../../docu/manmap.md#custom-sql-mit-sql), [SQL query versus 
 Key concepts are `C2SqlText`, `C2SqlWordVarReference`, `C2Dot`, `C2PropertyReference`, `C2EntityKeyPropReference`, `C2MethodReference`, `C2SqlStatusReference`, `C2SqlIntegration`, and `SqlNamedParameter`.
 
 `C2SqlIntegration` has an optional `sqlString` expression, ordered `arguments`, and `SqlNamedParameter` children; when to use it: see [Custom SQL](../../../docu/manmap.md#custom-sql-mit-sql).
-
-`QueryFromSql` and `UpdateFormSql` are marked deprecated in the live descriptor. Do not use them for new models.
 
 ## Concept Families
 

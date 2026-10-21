@@ -29,21 +29,21 @@ ManMap models relational persistence and read models for MoWare applications. `P
 
 Do not infer a shape from dumps, and do not write your own tools for it. Follow this order:
 
-1. Find the projection in the documentation's [chapter map (Kapitellandkarte)](../../docu/manmap.md); it names the concept and its FQ name.
-2. Read roles, cardinalities and enum values with `mps_mcp_get_concept_details` (`detail="shape"`). Its `sampleNode` is a one-level placeholder, not a pattern.
+1. Find the projection in the documentation's [chapter map (Kapitellandkarte)](../../docu/manmap.md), or search name and alias offline with `python3 -I moai/tools/blueprint.py find <text>`; both give the concept and its FQ name.
+2. Read roles, cardinalities, enum values and the concrete concepts that fit each child role offline with `blueprint.py concept <Name>`. Use `mps_mcp_get_concept_details` only for a concept the tool does not know.
 3. Find a real instance in the packaged examples ([sandbox.md](references/sandbox.md)): `mps_mcp_query_nodes` `FIND_INSTANCES` with `scope:"models"` and `sampleOnly:true`.
-4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file.
-5. Dry-run your blueprint (`dryRun:true`); it checks roles, cardinality and assignability.
+4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file; search a dump by concept, name or unresolved reference with `python3 -I moai/tools/dump.py grep`.
+5. Write the blueprint as a short spec and expand it with `blueprint.py build`; it checks roles, cardinality, assignability, enum values and placeholders. Then dry-run it (`dryRun:true`).
 
 ## Quick Start
 
 1. Pass `projectPath` in every call (`moai:mps-mcp-workflow`, "Which project the tools act on"). If it is unknown, use the current directory on the first call, then take the path from the rejection and reuse it. If the project list is empty, ask the user to open the project.
 2. Resolve the editable target model and its ObjectFlow entity/property declarations.
-3. Start with a JSON file from [references/blueprints](references/blueprints) and replace every `$TARGET_*` placeholder. Search the result for `TARGET_`; any match stops the write.
+3. Start with a JSON file from [references/blueprints](references/blueprints) and replace every `$TARGET_*` placeholder. Search the result for `TARGET_`; any match stops the write. Or write a short spec and expand it with `python3 -I moai/tools/blueprint.py build SPEC` (format: `blueprint.py --help`); check a filled template with `blueprint.py check`.
 4. Send the blueprint inline (up to 4 KB) or copy it to `${TMPDIR:-/tmp}` and pass the copy's absolute path; the server rejects files under `skills/`.
 5. Dry-run a new root with `mps_mcp_insert_root_node_from_json`. It checks concepts, roles and assignability only: names are not looked up ("is a name, not looked up" is expected) and node factories do not run.
 6. Insert the root, then add `persistenceMapping`, `atomMpig`, or `member` subtrees incrementally with `mps_mcp_update_node`. After each real write, `fixReferences.stillBroken` must be 0.
-7. Use `mps_mcp_print_node` where a factory may have added content, and validate after each substantial subtree and after the finished root (several roots: model reference with `perRoot=true`).
+7. Compare the inserted node with its blueprint: `mps_mcp_print_node` (`deep=true`) of the new node, then `python3 -I moai/tools/verify.py node BLUEPRINT PRINTOUT`. Fix every deviation; read what it lists as "added" (node-factory effects). Validate after each substantial subtree and after the finished root (several roots: model reference with `perRoot=true`). Read a large report with `python3 -I moai/tools/dump.py problems FILE` (one line per problem).
 8. Review every changed root against the applicable conventions. A shape copied from a blueprint, a packaged example, or the project itself does not prove compliance.
 9. Generate or build the owning solution when semantic or generated-code correctness matters. After generation, or when a call reports `ok` but the effect is missing, check `mps_mcp_read_ide_log` (`sinceMinutes`, `minLevel="WARN"`).
 

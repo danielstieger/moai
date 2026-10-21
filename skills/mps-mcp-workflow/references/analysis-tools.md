@@ -86,6 +86,8 @@ A saved file contains the full MCP response envelope; its `data` field contains 
 
 Validates the specified node (and its descendants), model, or module. Pass any of them in `nodeReference` — a node reference, a model reference or qualified model name, a module reference or module name. If no problems are found, returns `data: "no problems found"`; when unchecked subtrees exist, `data` reads `no problems found in checked nodes (N subtree(s) unchecked: …)`. Otherwise the report is inline up to `maxInlineBytes` and a temp-file path above that. It reports *problems*, not content: to verify what a root contains, print it.
 
+A large report (a temp-file path in `data`) is read with `python3 -I moai/tools/dump.py problems FILE`: one line per problem with root, node, feature, message, reporting rule and quick-fix ids, then a count per message.
+
 - **Model reference:** checks the model itself (imports, used languages, devkits) and every root in one exhaustive call — `details.scope: "model"`, `details.rootsChecked`. Problems come as the model object plus a `roots` array, one entry per offending root. `perRoot=true` returns `[{root, name, concept, errors, warnings}]` for every root, clean ones included. Do **not** re-check the roots individually after a clean model-level result.
 - **Module reference or name:** the module (dependencies, used languages) and every model it owns; `details.modelsChecked`, `rootsChecked`; `perRoot=true` gives one row per model. Module-level warnings in `details.moduleProblems` do not make the answer unclean.
 - **When to use which:** the changed root after a single edit; the model reference with `perRoot=true` after work on several roots.

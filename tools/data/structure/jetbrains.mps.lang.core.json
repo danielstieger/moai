@@ -1,0 +1,1202 @@
+{
+ "concepts": [
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.core.structure.Attribute",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "1",
+     "name": "commentedNode",
+     "target": "jetbrains.mps.lang.core.structure.BaseConcept"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.ICommentedOutFromScope",
+    "jetbrains.mps.lang.core.structure.IDontApplyTypesystemRules",
+    "jetbrains.mps.lang.core.structure.ISkipConstraintsChecking",
+    "jetbrains.mps.lang.core.structure.ISuppressErrors"
+   ],
+   "name": "jetbrains.mps.lang.core.structure.BaseCommentAttribute",
+   "properties": [
+    {
+     "name": "linkId",
+     "type": "string"
+    },
+    {
+     "name": "role_DebugInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.ChildAttribute"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.core.structure.BaseConcept",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..1",
+     "name": "content",
+     "target": "jetbrains.mps.lang.core.structure.IPlaceholderContent"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.core.structure.BasePlaceholder",
+   "properties": [
+    {
+     "name": "linkId",
+     "type": "string"
+    },
+    {
+     "name": "role_DebugInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.ChildAttribute"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.core.structure.ChildAttribute",
+   "properties": [
+    {
+     "name": "linkId",
+     "type": "string"
+    },
+    {
+     "name": "role_DebugInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.Attribute"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.IPlaceholderContent"
+   ],
+   "name": "jetbrains.mps.lang.core.structure.DocumentationContent",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "deprecated": true,
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.IAntisuppressErrors",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.ICanSuppressErrors",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.ICommentedOutFromScope",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.IContainer",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.IDeprecatable",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.IDontApplyTypesystemRules",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "deprecated": true,
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.IDontSubstituteByDefault",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.IGenericComment",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "deprecated": true,
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.IMetaLevelChanger",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.INamedConcept",
+   "properties": [
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.IOldCommentContainer",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.IPlaceholderContent",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.IResolveInfo",
+   "properties": [
+    {
+     "name": "resolveInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.ISkipConstraintsChecking",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.ISmartReferent",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.InterfacePart"
+   ],
+   "name": "jetbrains.mps.lang.core.structure.IStubForAnotherConcept",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.ISuppressErrors",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.IType",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.IWrapper",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.ImplementationContainer",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.ScopeFacade"
+   ],
+   "name": "jetbrains.mps.lang.core.structure.ImplementationPart",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.ImplementationPart"
+   ],
+   "name": "jetbrains.mps.lang.core.structure.ImplementationWithStubPart",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.InterfacePart",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.core.structure.LinkAttribute",
+   "properties": [
+    {
+     "name": "linkId",
+     "type": "string"
+    },
+    {
+     "name": "role_DebugInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.Attribute"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.MigrationAnnotation_old"
+   ],
+   "name": "jetbrains.mps.lang.core.structure.MigrationAnnotation",
+   "properties": [
+    {
+     "name": "createdByScript",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.MigrationAnnotation_old",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "1",
+     "name": "dataNode",
+     "target": "jetbrains.mps.lang.core.structure.BaseConcept"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.MigrationAnnotation"
+   ],
+   "name": "jetbrains.mps.lang.core.structure.MigrationDataAnnotation",
+   "properties": [
+    {
+     "name": "createdByScript",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": true,
+   "super": "jetbrains.mps.lang.core.structure.NodeAttribute"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.core.structure.NodeAttribute",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.Attribute"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.core.structure.PropertyAttribute",
+   "properties": [
+    {
+     "name": "enumUsageMigrated",
+     "type": "boolean"
+    },
+    {
+     "name": "name_DebugInfo",
+     "type": "string"
+    },
+    {
+     "name": "propertyId",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.Attribute"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.MigrationAnnotation"
+   ],
+   "name": "jetbrains.mps.lang.core.structure.ReviewMigration",
+   "properties": [
+    {
+     "name": "createdByScript",
+     "type": "string"
+    },
+    {
+     "name": "readableId",
+     "type": "string"
+    },
+    {
+     "name": "reasonShort",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "todo",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.NodeAttribute"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "deprecated": true,
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.MigrationAnnotation_old"
+   ],
+   "name": "jetbrains.mps.lang.core.structure.ReviewMigration_old",
+   "properties": [
+    {
+     "name": "readableId",
+     "type": "string"
+    },
+    {
+     "name": "reasonShort",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "todo",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.NodeAttribute"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.ScopeFacade",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.core.structure.ScopeProvider",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.core.structure.SideTransformInfo",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "anchorTag",
+     "type": "string"
+    },
+    {
+     "name": "cellId",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "default": "right",
+     "enum": [
+      "right",
+      "left"
+     ],
+     "name": "side",
+     "type": "SideTransformSide"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.NodeAttribute"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.ISuppressErrors"
+   ],
+   "name": "jetbrains.mps.lang.core.structure.SuppressErrorsAnnotation",
+   "properties": [
+    {
+     "name": "comment",
+     "type": "string"
+    },
+    {
+     "name": "filter",
+     "type": "string"
+    },
+    {
+     "name": "message",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.NodeAttribute"
+  },
+  {
+   "abstract": false,
+   "alias": "_:",
+   "children": [
+    {
+     "card": "0..1",
+     "name": "annotation",
+     "target": "jetbrains.mps.lang.core.structure.BaseConcept"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.core.structure.TypeAnnotated",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  }
+ ],
+ "language": "jetbrains.mps.lang.core"
+}

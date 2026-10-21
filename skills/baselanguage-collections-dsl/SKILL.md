@@ -34,11 +34,11 @@ description: Collections and closures. Use when creating, editing, validating, o
 
 Do not infer a shape from dumps, and do not write your own tools for it. Follow this order:
 
-1. Find the construct in [references/concepts.md](references/concepts.md); it names the concept and its FQ name.
-2. Read roles, cardinalities and enum values with `mps_mcp_get_concept_details` (`detail="shape"`). Its `sampleNode` is a one-level placeholder, not a pattern.
+1. Find the construct in [references/concepts.md](references/concepts.md), or search name and alias offline with `python3 -I moai/tools/blueprint.py find <text>`; both give the concept and its FQ name.
+2. Read roles, cardinalities, enum values and the concrete concepts that fit each child role offline with `blueprint.py concept <Name>`. Use `mps_mcp_get_concept_details` only for a concept the tool does not know.
 3. Find a real instance in the packaged examples ([sandbox.md](references/sandbox.md)): `mps_mcp_query_nodes` `FIND_INSTANCES` with `scope:"models"` and `sampleOnly:true`.
-4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file.
-5. Dry-run your blueprint (`dryRun:true`); it checks roles, cardinality and assignability.
+4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file; search a dump by concept, name or unresolved reference with `python3 -I moai/tools/dump.py grep`.
+5. Write the blueprint as a short spec and expand it with `blueprint.py build`; it checks roles, cardinality, assignability, enum values and placeholders. Then dry-run it (`dryRun:true`).
 
 ## Quick start
 
@@ -46,10 +46,10 @@ Do not infer a shape from dumps, and do not write your own tools for it. Follow 
 2. Inspect the destination model with `mps_mcp_get_project_structure`; in a MoWare model the DevKit `org.modellwerkstatt.MoWareWerkbank` provides BaseLanguage, Collections and Closures (see `moai:mps-node-editing`).
 3. Load [references/concepts.md](references/concepts.md), then select a recipe from [references/workflows.md](references/workflows.md).
 4. Inspect a packaged example from [references/sandbox.md](references/sandbox.md) if a concrete AST shape is needed.
-5. Start from [references/blueprints/](references/blueprints/). Replace every `$TARGET_X$` placeholder, then search the text for `TARGET_` (any hit: stop). Send the JSON inline (≤ 4 KB, true for every blueprint here) or copy it to `${TMPDIR:-/tmp}` and pass the copy's absolute path; files under `skills/` are rejected (`moai:mps-node-editing`, File-Path Semantics).
+5. Start from [references/blueprints/](references/blueprints/). Replace every `$TARGET_X$` placeholder, then search the text for `TARGET_` (any hit: stop). Send the JSON inline (≤ 4 KB, true for every blueprint here) or copy it to `${TMPDIR:-/tmp}` and pass the copy's absolute path; files under `skills/` are rejected (`moai:mps-node-editing`, File-Path Semantics). Or write a short spec and expand it with `python3 -I moai/tools/blueprint.py build SPEC` (format: `blueprint.py --help`); check a filled template with `blueprint.py check`.
 6. Dry-run ordinary Collections subtrees with `mps_mcp_update_node` (`ADD CHILD`) against a host node. For the specialized `CustomContainers` root, dry-run [its root skeleton](references/blueprints/custom-containers-root-skeleton.json) with `mps_mcp_insert_root_node_from_json`; use the BaseLanguage skill for other host-language roots. The dry-run checks concepts, roles and assignability only; name warnings ("is a name, not looked up") are expected.
-7. Insert or replace the smallest subtree possible, check `fixReferences.stillBroken` = 0, and preserve existing node IDs.
-8. Run `mps_mcp_check_root_node_problems` on the containing root (several roots: the model reference with `perRoot=true`) and any task-required make/generation checks.
+7. Insert or replace the smallest subtree possible, check `fixReferences.stillBroken` = 0, and preserve existing node IDs. Compare the inserted node with its blueprint: `mps_mcp_print_node` (`deep=true`) of the new node, then `python3 -I moai/tools/verify.py node BLUEPRINT PRINTOUT`. Fix every deviation; read what it lists as "added" (node-factory effects).
+8. Run `mps_mcp_check_root_node_problems` on the containing root (several roots: the model reference with `perRoot=true`) and any task-required make/generation checks. Read a large report with `python3 -I moai/tools/dump.py problems FILE` (one line per problem).
 
 ## Stable references
 

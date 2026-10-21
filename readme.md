@@ -15,6 +15,7 @@ moai/
 ├── MPS_AGENT_GUIDE.md          General MPS working rules
 ├── INSTALL_INSTRUCTIONS.md     Installation instructions for agents
 ├── TEMPLATE_PROJECT_AGENTS.md  Template for the application project
+├── tools/                      Tools for agents (Python), with the language structure export
 └── maintenance/                For MoAI maintainers only, not for agents in a project
 ```
 

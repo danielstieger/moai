@@ -1,0 +1,827 @@
+{
+ "concepts": [
+  {
+   "abstract": false,
+   "alias": "bullet line",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "elements",
+     "target": "jetbrains.mps.lang.text.structure.TextElement"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.text.structure.IndentedPoint"
+   ],
+   "name": "jetbrains.mps.lang.text.structure.BulletLine",
+   "properties": [
+    {
+     "name": "indentation",
+     "type": "integer"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.Line"
+  },
+  {
+   "abstract": false,
+   "alias": "bullet point",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "letters",
+     "target": "jetbrains.mps.lang.text.structure.TextualElement"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.text.structure.IndentedPoint"
+   ],
+   "name": "jetbrains.mps.lang.text.structure.BulletPoint",
+   "properties": [
+    {
+     "name": "indentation",
+     "type": "integer"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.Paragraph"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.text.structure.EmptyParagraphLetter",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.TextualElement"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "elements",
+     "target": "jetbrains.mps.lang.text.structure.TextElement"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.text.structure.Header",
+   "properties": [
+    {
+     "default": "Header1",
+     "enum": [
+      "Header1",
+      "Header2",
+      "Header3",
+      "Header4",
+      "Header5",
+      "Header6"
+     ],
+     "name": "level",
+     "type": "HeaderEnum"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.Line"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.text.structure.IHoldComment",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.text.structure.IHoldDocumentation",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.text.structure.IHoldLines",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.text.structure.IHoldParagraphs",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.text.structure.IParagraph",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.lang.text.structure.IndentedPoint",
+   "properties": [
+    {
+     "name": "indentation",
+     "type": "integer"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": false,
+   "alias": "letter",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.text.structure.Letter",
+   "properties": [
+    {
+     "name": "bold",
+     "type": "boolean"
+    },
+    {
+     "name": "italic",
+     "type": "boolean"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "underlined",
+     "type": "boolean"
+    },
+    {
+     "name": "value",
+     "type": "CharacterValueType"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.TextualElement"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "elements",
+     "target": "jetbrains.mps.lang.text.structure.TextElement"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.text.structure.Line",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "node",
+   "children": [
+    {
+     "card": "0..1",
+     "name": "node",
+     "target": "jetbrains.mps.lang.core.structure.BaseConcept"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.ICommentedOutFromScope",
+    "jetbrains.mps.lang.core.structure.IDontApplyTypesystemRules",
+    "jetbrains.mps.lang.core.structure.ISkipConstraintsChecking"
+   ],
+   "name": "jetbrains.mps.lang.text.structure.NodeWrapperElement",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.TextElement"
+  },
+  {
+   "abstract": false,
+   "alias": "wrapped node",
+   "children": [
+    {
+     "card": "0..1",
+     "name": "node",
+     "target": "jetbrains.mps.lang.core.structure.BaseConcept"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.ICommentedOutFromScope",
+    "jetbrains.mps.lang.core.structure.IDontApplyTypesystemRules",
+    "jetbrains.mps.lang.core.structure.ISkipConstraintsChecking"
+   ],
+   "name": "jetbrains.mps.lang.text.structure.NodeWrapperTextualElement",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.TextualElement"
+  },
+  {
+   "abstract": false,
+   "alias": "numbered line",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "elements",
+     "target": "jetbrains.mps.lang.text.structure.TextElement"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.text.structure.IndentedPoint"
+   ],
+   "name": "jetbrains.mps.lang.text.structure.NumberedLine",
+   "properties": [
+    {
+     "name": "indentation",
+     "type": "integer"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.Line"
+  },
+  {
+   "abstract": false,
+   "alias": "numbered point",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "letters",
+     "target": "jetbrains.mps.lang.text.structure.TextualElement"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.text.structure.IndentedPoint"
+   ],
+   "name": "jetbrains.mps.lang.text.structure.NumberedPoint",
+   "properties": [
+    {
+     "name": "indentation",
+     "type": "integer"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.Paragraph"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "letters",
+     "target": "jetbrains.mps.lang.text.structure.TextualElement"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.text.structure.IParagraph"
+   ],
+   "name": "jetbrains.mps.lang.text.structure.Paragraph",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "tag",
+   "children": [
+    {
+     "card": "1",
+     "name": "content",
+     "target": "jetbrains.mps.lang.text.structure.Line"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "deprecated": true,
+   "interface": false,
+   "name": "jetbrains.mps.lang.text.structure.SingleLineHtmlTag",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "tagName",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.TextElement"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "lines",
+     "target": "jetbrains.mps.lang.text.structure.Line"
+    },
+    {
+     "card": "0..n",
+     "name": "paragraphs",
+     "target": "jetbrains.mps.lang.text.structure.Paragraph"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.IPlaceholderContent",
+    "jetbrains.mps.lang.text.structure.IHoldLines",
+    "jetbrains.mps.lang.text.structure.IHoldParagraphs"
+   ],
+   "name": "jetbrains.mps.lang.text.structure.Text",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.text.structure.TextElement",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "reference",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.text.structure.TextNodeReference",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "reference",
+     "target": "jetbrains.mps.lang.core.structure.INamedConcept"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.TextElement"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.text.structure.TextualElement",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "</>",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "body",
+     "target": "jetbrains.mps.lang.text.structure.Line"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.text.structure.UniversalHtmlTag",
+   "properties": [
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.TextElement"
+  },
+  {
+   "abstract": false,
+   "alias": "url",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "1",
+     "name": "text",
+     "target": "jetbrains.mps.lang.text.structure.Paragraph"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.text.structure.IHoldParagraphs"
+   ],
+   "name": "jetbrains.mps.lang.text.structure.UrlTextualElement",
+   "properties": [
+    {
+     "name": "address",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.TextualElement"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.lang.text.structure.Word",
+   "properties": [
+    {
+     "name": "bold",
+     "type": "boolean"
+    },
+    {
+     "name": "italic",
+     "type": "boolean"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "underlined",
+     "type": "boolean"
+    },
+    {
+     "name": "url",
+     "type": "Url"
+    },
+    {
+     "name": "value",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.TextElement"
+  }
+ ],
+ "language": "jetbrains.mps.lang.text"
+}

@@ -1,0 +1,898 @@
+{
+ "concepts": [
+  {
+   "abstract": false,
+   "alias": "{ ~~> }",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "parameterType",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    },
+    {
+     "card": "1",
+     "name": "resultType",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "deprecated": true,
+   "interface": false,
+   "name": "jetbrains.mps.baseLanguage.closures.structure.AbstractFunctionType",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Type"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "1",
+     "name": "original",
+     "target": "jetbrains.mps.baseLanguage.structure.VariableReference"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.baseLanguage.closures.structure.ClosureArgReference",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "alias": "{ => <body> }",
+   "children": [
+    {
+     "card": "1",
+     "name": "body",
+     "target": "jetbrains.mps.baseLanguage.structure.StatementList"
+    },
+    {
+     "card": "0..n",
+     "name": "parameter",
+     "target": "jetbrains.mps.baseLanguage.structure.ParameterDeclaration"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.baseLanguage.structure.IContainsStatementList",
+    "jetbrains.mps.baseLanguage.structure.IControlFlowInterrupter",
+    "jetbrains.mps.baseLanguage.structure.IFinalWrapper",
+    "jetbrains.mps.baseLanguage.structure.IMethodLike",
+    "jetbrains.mps.baseLanguage.structure.IStatementListContainer",
+    "jetbrains.mps.lang.core.structure.ScopeProvider"
+   ],
+   "name": "jetbrains.mps.baseLanguage.closures.structure.ClosureLiteral",
+   "properties": [
+    {
+     "name": "forceMultiLine",
+     "type": "boolean"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "parameterType",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    },
+    {
+     "card": "1",
+     "name": "resultType",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "0..n",
+     "name": "throwsType",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.baseLanguage.structure.IInferredType",
+    "jetbrains.mps.baseLanguage.structure.IInternalType"
+   ],
+   "name": "jetbrains.mps.baseLanguage.closures.structure.ClosureLiteralType",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "0..1",
+     "name": "runtimeIface",
+     "target": "jetbrains.mps.baseLanguage.structure.Interface"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.closures.structure.FunctionType"
+  },
+  {
+   "abstract": false,
+   "alias": "var",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.baseLanguage.closures.structure.ClosureVarType",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.UndefinedType"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "1",
+     "name": "function",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "parameter",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.baseLanguage.closures.structure.CompactInvokeFunctionExpression",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "annotation",
+     "target": "jetbrains.mps.baseLanguage.structure.AnnotationInstance"
+    },
+    {
+     "card": "0..n",
+     "name": "controlAbstraction",
+     "target": "jetbrains.mps.baseLanguage.closures.structure.ControlAbstractionDeclaration"
+    },
+    {
+     "card": "0..n",
+     "name": "member",
+     "target": "jetbrains.mps.baseLanguage.structure.ClassifierMember"
+    },
+    {
+     "card": "0..n",
+     "deprecated": true,
+     "name": "method",
+     "target": "jetbrains.mps.baseLanguage.structure.InstanceMethodDeclaration"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "0..n",
+     "deprecated": true,
+     "name": "staticField",
+     "target": "jetbrains.mps.baseLanguage.structure.StaticFieldDeclaration"
+    },
+    {
+     "card": "0..n",
+     "deprecated": true,
+     "name": "staticInnerClassifiers",
+     "target": "jetbrains.mps.baseLanguage.structure.Classifier"
+    },
+    {
+     "card": "0..n",
+     "name": "typeVariableDeclaration",
+     "target": "jetbrains.mps.baseLanguage.structure.TypeVariableDeclaration"
+    },
+    {
+     "card": "0..1",
+     "name": "visibility",
+     "target": "jetbrains.mps.baseLanguage.structure.Visibility"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.baseLanguage.closures.structure.ControlAbstractionContainer",
+   "properties": [
+    {
+     "name": "isDeprecated",
+     "type": "boolean"
+    },
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "name": "nestedName",
+     "type": "string"
+    },
+    {
+     "name": "nonStatic",
+     "type": "boolean"
+    },
+    {
+     "name": "packageName",
+     "type": "string"
+    },
+    {
+     "name": "resolveInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": true,
+   "super": "jetbrains.mps.baseLanguage.structure.Classifier"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "annotation",
+     "target": "jetbrains.mps.baseLanguage.structure.AnnotationInstance"
+    },
+    {
+     "card": "1",
+     "name": "body",
+     "target": "jetbrains.mps.baseLanguage.structure.StatementList"
+    },
+    {
+     "card": "0..n",
+     "name": "parameter",
+     "target": "jetbrains.mps.baseLanguage.structure.ParameterDeclaration"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "0..n",
+     "name": "typeVariableDeclaration",
+     "target": "jetbrains.mps.baseLanguage.structure.TypeVariableDeclaration"
+    },
+    {
+     "card": "0..1",
+     "name": "visibility",
+     "target": "jetbrains.mps.baseLanguage.structure.Visibility"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.baseLanguage.structure.ClassifierMember",
+    "jetbrains.mps.baseLanguage.structure.HasAnnotation",
+    "jetbrains.mps.lang.core.structure.IResolveInfo"
+   ],
+   "name": "jetbrains.mps.baseLanguage.closures.structure.ControlAbstractionDeclaration",
+   "properties": [
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "name": "resolveInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.GenericDeclaration"
+  },
+  {
+   "abstract": false,
+   "alias": "function",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "annotation",
+     "target": "jetbrains.mps.baseLanguage.structure.AnnotationInstance"
+    },
+    {
+     "card": "1",
+     "name": "body",
+     "target": "jetbrains.mps.baseLanguage.structure.StatementList"
+    },
+    {
+     "card": "0..n",
+     "name": "modifiers",
+     "target": "jetbrains.mps.baseLanguage.structure.Modifier"
+    },
+    {
+     "card": "0..n",
+     "name": "parameter",
+     "target": "jetbrains.mps.baseLanguage.structure.ParameterDeclaration"
+    },
+    {
+     "card": "1",
+     "name": "returnType",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "0..n",
+     "name": "throwsItem",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    },
+    {
+     "card": "0..n",
+     "name": "typeVariableDeclaration",
+     "target": "jetbrains.mps.baseLanguage.structure.TypeVariableDeclaration"
+    },
+    {
+     "card": "0..1",
+     "name": "visibility",
+     "target": "jetbrains.mps.baseLanguage.structure.Visibility"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.baseLanguage.closures.structure.FunctionMethodDeclaration",
+   "properties": [
+    {
+     "name": "isAbstract",
+     "type": "boolean"
+    },
+    {
+     "deprecated": true,
+     "name": "isDeprecated",
+     "type": "boolean"
+    },
+    {
+     "name": "isFinal",
+     "type": "boolean"
+    },
+    {
+     "name": "isNative",
+     "type": "boolean"
+    },
+    {
+     "name": "isSynchronized",
+     "type": "boolean"
+    },
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "name": "resolveInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.InstanceMethodDeclaration"
+  },
+  {
+   "abstract": false,
+   "alias": "{ => }",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "parameterType",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    },
+    {
+     "card": "1",
+     "name": "resultType",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "0..n",
+     "name": "throwsType",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.baseLanguage.structure.IGenericType"
+   ],
+   "name": "jetbrains.mps.baseLanguage.closures.structure.FunctionType",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "0..1",
+     "name": "runtimeIface",
+     "target": "jetbrains.mps.baseLanguage.structure.Interface"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Type"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "jetbrains.mps.baseLanguage.closures.structure.IIncompatibleWithJavaLambda",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": false,
+   "alias": "var <name>",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "annotation",
+     "target": "jetbrains.mps.baseLanguage.structure.AnnotationInstance"
+    },
+    {
+     "card": "0..1",
+     "name": "initializer",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "1",
+     "name": "type",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.baseLanguage.structure.IInferredExpression"
+   ],
+   "name": "jetbrains.mps.baseLanguage.closures.structure.InferredClosureParameterDeclaration",
+   "properties": [
+    {
+     "name": "isFinal",
+     "type": "boolean"
+    },
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "name": "resolveInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.closures.structure.UnboundClosureParameterDeclaration"
+  },
+  {
+   "abstract": false,
+   "alias": "invoke",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "parameter",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.baseLanguage.closures.structure.IIncompatibleWithJavaLambda"
+   ],
+   "name": "jetbrains.mps.baseLanguage.closures.structure.InvokeExpression",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "alias": "invoke",
+   "children": [
+    {
+     "card": "1",
+     "name": "function",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "parameter",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "deprecated": true,
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.IDeprecatable"
+   ],
+   "name": "jetbrains.mps.baseLanguage.closures.structure.InvokeFunctionExpression",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "alias": "invoke",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "parameter",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.baseLanguage.structure.IOperation"
+   ],
+   "name": "jetbrains.mps.baseLanguage.closures.structure.InvokeFunctionOperation",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.baseLanguage.closures.structure.PairOfInts",
+   "properties": [
+    {
+     "name": "first",
+     "type": "integer"
+    },
+    {
+     "name": "second",
+     "type": "integer"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.baseLanguage.closures.structure.StringPropertyHolder",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "value",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": true,
+   "alias": "? <name>",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "annotation",
+     "target": "jetbrains.mps.baseLanguage.structure.AnnotationInstance"
+    },
+    {
+     "card": "0..1",
+     "name": "initializer",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "1",
+     "name": "type",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.baseLanguage.closures.structure.UnboundClosureParameterDeclaration",
+   "properties": [
+    {
+     "name": "isFinal",
+     "type": "boolean"
+    },
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "name": "resolveInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.ParameterDeclaration"
+  },
+  {
+   "abstract": false,
+   "alias": "yieldAll",
+   "children": [
+    {
+     "card": "1",
+     "name": "expression",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.baseLanguage.closures.structure.YieldAllStatement",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Statement"
+  },
+  {
+   "abstract": false,
+   "alias": "yield",
+   "children": [
+    {
+     "card": "1",
+     "name": "expression",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "jetbrains.mps.baseLanguage.closures.structure.YieldStatement",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Statement"
+  }
+ ],
+ "language": "jetbrains.mps.baseLanguage.closures"
+}

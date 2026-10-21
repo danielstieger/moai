@@ -1,0 +1,3296 @@
+{
+ "concepts": [
+  {
+   "abstract": false,
+   "alias": "ADDITIONAL_TABLE_NAME",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "1",
+     "name": "tablename",
+     "target": "jetbrains.mps.baseLanguage.structure.StringLiteral"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.baseLanguage.structure.IValidIdentifier",
+    "org.modellwerkstatt.manmap.structure.ITableOption"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.AdditionalTableName",
+   "properties": [
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "WHEN",
+   "children": [
+    {
+     "card": "1",
+     "name": "condition",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IQueryOption"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.AdditionalTableReference",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "alternativeAccess",
+     "target": "org.modellwerkstatt.manmap.structure.AdditionalTableName"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.SaveOption"
+  },
+  {
+   "abstract": false,
+   "alias": "AUTOID",
+   "children": [
+    {
+     "card": "1",
+     "name": "sequenceName",
+     "target": "jetbrains.mps.baseLanguage.structure.StringLiteral"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.AutoidOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.FieldOption"
+  },
+  {
+   "abstract": false,
+   "alias": "BATCH",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.BatchSaveOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.SaveOption"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "1",
+     "name": "operand",
+     "target": "org.modellwerkstatt.manmap.structure.C2Path"
+    },
+    {
+     "card": "1",
+     "name": "operation",
+     "target": "org.modellwerkstatt.manmap.structure.C2Operation"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.C2Path"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.C2Dot",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.TextElement"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.C2Operation"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.C2EntityKeyPropReference",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "property",
+     "target": "jetbrains.mps.baseLanguage.structure.Property"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.C2Operation"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.C2MethodReference",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "method",
+     "target": "jetbrains.mps.baseLanguage.structure.InstanceMethodDeclaration"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.C2Operation",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.C2Path",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.C2Operation"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.C2PropertyReference",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "property",
+     "target": "jetbrains.mps.baseLanguage.structure.Property"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "SQL",
+   "children": [
+    {
+     "card": "0..1",
+     "name": "mapping",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "1",
+     "name": "statements",
+     "target": "jetbrains.mps.baseLanguage.structure.StatementList"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.C2SqlBlock",
+   "properties": [
+    {
+     "name": "debugMe",
+     "type": "boolean"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "default": "QUERY",
+     "enum": [
+      "QUERY",
+      "STATEMENT"
+     ],
+     "name": "sqlType",
+     "type": "C2SqlType"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "alias": "+",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "arguments",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "namedParams",
+     "target": "org.modellwerkstatt.manmap.structure.SqlNamedParameter"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "0..1",
+     "name": "sqlString",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.C2SqlIntegration",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Statement"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "1",
+     "name": "primConstant",
+     "target": "org.modellwerkstatt.manmap.structure.IPrimitiveConstant"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.C2SqlStatusReference",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.TextElement"
+  },
+  {
+   "abstract": false,
+   "alias": "[",
+   "children": [
+    {
+     "card": "1..n",
+     "name": "lines",
+     "target": "jetbrains.mps.lang.text.structure.Line"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.C2SqlText",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Statement"
+  },
+  {
+   "abstract": false,
+   "alias": ":",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.C2Path"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.C2SqlWordVarReference",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "varDecl",
+     "target": "jetbrains.mps.baseLanguage.structure.VariableDeclaration"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.text.structure.TextElement"
+  },
+  {
+   "abstract": false,
+   "alias": "CREATEDAT",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IAtOption"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.CreatedAtFieldOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.FieldOption"
+  },
+  {
+   "abstract": false,
+   "alias": "CREATEDBY",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IByOption"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.CreatedByFieldOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.FieldOption"
+  },
+  {
+   "abstract": false,
+   "alias": "delete",
+   "children": [
+    {
+     "card": "1",
+     "name": "expression",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "options",
+     "target": "org.modellwerkstatt.manmap.structure.SaveOption"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IDataBaseOperation",
+    "org.modellwerkstatt.manmap.structure.INeedsClassMapper"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.DeleteWithMap",
+   "properties": [
+    {
+     "name": "debugMe",
+     "type": "boolean"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "entityMapping",
+     "target": "org.modellwerkstatt.manmap.structure.EntityMapping"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Statement"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "atomMpig",
+     "target": "org.modellwerkstatt.manmap.structure.IAtomMapping"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IAtomMapping",
+    "org.modellwerkstatt.manmap.structure.IKeyMapping",
+    "org.modellwerkstatt.manmap.structure.IMapsClassConcept"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.EmbeddedMapping",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "0..1",
+     "name": "property",
+     "target": "jetbrains.mps.baseLanguage.structure.Property"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "atomMpig",
+     "target": "org.modellwerkstatt.manmap.structure.IAtomMapping"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "1",
+     "name": "tableName",
+     "target": "jetbrains.mps.baseLanguage.structure.StringLiteral"
+    },
+    {
+     "card": "0..n",
+     "name": "tableOption",
+     "target": "org.modellwerkstatt.manmap.structure.ITableOption"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IIncludeAbleMapsClassConcept"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.EntityMapping",
+   "properties": [
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "classConcept",
+     "target": "jetbrains.mps.baseLanguage.structure.ClassConcept"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "1",
+     "name": "fieldName",
+     "target": "jetbrains.mps.baseLanguage.structure.StringLiteral"
+    },
+    {
+     "card": "0..n",
+     "name": "mappingOption",
+     "target": "org.modellwerkstatt.manmap.structure.FieldOption"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IAtomMapping",
+    "org.modellwerkstatt.manmap.structure.IAutoIdProvider",
+    "org.modellwerkstatt.manmap.structure.IKeyMapping"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.FieldMapping",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "property",
+     "target": "jetbrains.mps.baseLanguage.structure.Property"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.FieldOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "FORCE AUDIT",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.ForceAuditSaveOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.SaveOption"
+  },
+  {
+   "abstract": false,
+   "alias": "get",
+   "children": [
+    {
+     "card": "1",
+     "name": "argument",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IQueryOperation"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.GetQuery",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IAtOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IAtomMapping",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IAutoIdProvider",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IByOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.ICustomSqlStringContentProvider",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IDataBaseOperation",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "atomMpig",
+     "target": "org.modellwerkstatt.manmap.structure.IAtomMapping"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.INamedConcept",
+    "org.modellwerkstatt.manmap.structure.IMapsClassConcept"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.IIncludeAbleMapsClassConcept",
+   "properties": [
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "options",
+     "target": "org.modellwerkstatt.manmap.structure.AdditionalTableReference"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IMappingInstance",
+    "org.modellwerkstatt.manmap.structure.IQueryOption"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.IJoinOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IKeyMapping",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IMappingInstance",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "atomMpig",
+     "target": "org.modellwerkstatt.manmap.structure.IAtomMapping"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IMapsClassConcept",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.INeedsClassMapper",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "entityMapping",
+     "target": "org.modellwerkstatt.manmap.structure.EntityMapping"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IOptionsProvider",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IPrimitiveConstant",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IQueryOperation",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IQueryOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.IReferenceMapping",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "0..1",
+     "name": "visibility",
+     "target": "jetbrains.mps.baseLanguage.structure.Visibility"
+    }
+   ],
+   "interface": true,
+   "interfaces": [
+    "jetbrains.mps.baseLanguage.structure.ClassifierMember",
+    "jetbrains.mps.baseLanguage.structure.IValidIdentifier"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.IRepositoryContent",
+   "properties": [
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.ISizeSpecified",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.IType"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.IStatus",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.ITableOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": false,
+   "alias": "in",
+   "children": [
+    {
+     "card": "1",
+     "name": "operand",
+     "target": "org.modellwerkstatt.manmap.structure.MappingReference"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "1",
+     "name": "targetList",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.InOperation",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IAtomMapping"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.IncludeMapping",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "0..1",
+     "name": "mapping",
+     "target": "org.modellwerkstatt.manmap.structure.IIncludeAbleMapsClassConcept"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "INDEX",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.IndexOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.FieldOption"
+  },
+  {
+   "abstract": false,
+   "alias": "INSERT",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.InsertSaveOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.SaveOption"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IReferenceMapping"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.KeyOnlyReferenceMapping",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "0..1",
+     "name": "entityMapping",
+     "target": "org.modellwerkstatt.manmap.structure.EntityMapping"
+    },
+    {
+     "card": "0..1",
+     "name": "keyOnlyRef",
+     "target": "org.modellwerkstatt.manmap.structure.IKeyMapping"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "KEY",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.KeyOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.FieldOption"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.L2Comment",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.L2RTHasSession"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.L2RTComponent",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.L2RTComponentCall",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": true,
+   "name": "org.modellwerkstatt.manmap.structure.L2RTHasSession",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false
+  },
+  {
+   "abstract": false,
+   "alias": "like",
+   "children": [
+    {
+     "card": "1",
+     "name": "operand",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "1",
+     "name": "target",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.LikeOperator",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "alias": "limit",
+   "children": [
+    {
+     "card": "1",
+     "name": "count",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IQueryOperation"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.LimitQuery",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "options",
+     "target": "org.modellwerkstatt.manmap.structure.AdditionalTableReference"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IJoinOption"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.ListJoinOption",
+   "properties": [
+    {
+     "default": "ReadOnly",
+     "enum": [
+      "ReadOnly",
+      "Checkout"
+     ],
+     "name": "readOnly",
+     "type": "LoadType"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "listMapping",
+     "target": "org.modellwerkstatt.manmap.structure.ListMapping"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "1",
+     "name": "mappedfieldRef",
+     "target": "org.modellwerkstatt.manmap.structure.IReferenceMapping"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IAtomMapping"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.ListMapping",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "property",
+     "target": "jetbrains.mps.baseLanguage.structure.Property"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IReferenceMapping"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.MappedFieldRef",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "0..1",
+     "name": "entityMapping",
+     "target": "org.modellwerkstatt.manmap.structure.EntityMapping"
+    },
+    {
+     "card": "0..1",
+     "name": "refMapping",
+     "target": "org.modellwerkstatt.manmap.structure.ReferenceMapping"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "mappingReference",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.MappingReference",
+   "properties": [
+    {
+     "name": "onNewLine",
+     "type": "boolean"
+    },
+    {
+     "default": "NOP",
+     "enum": [
+      "NOP",
+      "TO_LOCALDATE",
+      "TO_LOWERCASE",
+      "TO_UPPERCASE"
+     ],
+     "name": "option",
+     "type": "MappingReferenceOption"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "fieldMapping",
+     "target": "org.modellwerkstatt.manmap.structure.FieldMapping"
+    },
+    {
+     "card": "1",
+     "name": "mappingSource",
+     "target": "org.modellwerkstatt.manmap.structure.IMappingInstance"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "alias": "MODIFIEDAT",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IAtOption"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.ModifiedAtFieldOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.FieldOption"
+  },
+  {
+   "abstract": false,
+   "alias": "MODIFIEDBY",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IByOption"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.ModifiedByFieldOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.FieldOption"
+  },
+  {
+   "abstract": false,
+   "alias": "nokeystore/read-only map",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "atomMpig",
+     "target": "org.modellwerkstatt.manmap.structure.IAtomMapping"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "0..1",
+     "name": "visibility",
+     "target": "jetbrains.mps.baseLanguage.structure.Visibility"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IIncludeAbleMapsClassConcept",
+    "org.modellwerkstatt.manmap.structure.IRepositoryContent"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.NoKeyMapperField",
+   "properties": [
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "classConcept",
+     "target": "jetbrains.mps.baseLanguage.structure.ClassConcept"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.NoKeyMapperFieldRef",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "noKeyMapperField",
+     "target": "org.modellwerkstatt.manmap.structure.NoKeyMapperField"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "alias": "NOTNULL",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.NotnullOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.FieldOption"
+  },
+  {
+   "abstract": false,
+   "alias": "OPTIMISTIC_LOCK",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.ITableOption"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.OptimisticOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "optional",
+   "children": [
+    {
+     "card": "1",
+     "name": "expression",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.OptionalOperator",
+   "properties": [
+    {
+     "name": "onNewLine",
+     "type": "boolean"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "alias": "OVERWRITE_AUTOID",
+   "children": [
+    {
+     "card": "1",
+     "name": "sequenceName",
+     "target": "jetbrains.mps.baseLanguage.structure.StringLiteral"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IAutoIdProvider",
+    "org.modellwerkstatt.manmap.structure.ITableOption"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.OverWriteAutoIdOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "fieldMapping",
+     "target": "org.modellwerkstatt.manmap.structure.FieldMapping"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "Persistence Description",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "persistenceMapping",
+     "target": "org.modellwerkstatt.manmap.structure.EntityMapping"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.INamedConcept"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.PersistenceDescription",
+   "properties": [
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": true,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "joinOption",
+     "target": "org.modellwerkstatt.manmap.structure.IQueryOption"
+    },
+    {
+     "card": "0..n",
+     "name": "queryOperation",
+     "target": "org.modellwerkstatt.manmap.structure.IQueryOperation"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IDataBaseOperation",
+    "org.modellwerkstatt.manmap.structure.IMappingInstance",
+    "org.modellwerkstatt.manmap.structure.INeedsClassMapper"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.QueryFromMap",
+   "properties": [
+    {
+     "name": "debugMe",
+     "type": "boolean"
+    },
+    {
+     "name": "readOnly",
+     "type": "boolean"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "entityMapping",
+     "target": "org.modellwerkstatt.manmap.structure.EntityMapping"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "annotation",
+     "target": "jetbrains.mps.baseLanguage.structure.AnnotationInstance"
+    },
+    {
+     "card": "0..1",
+     "name": "initializer",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "1",
+     "name": "type",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.QuerySmartClosureParamDeclaration",
+   "properties": [
+    {
+     "name": "isFinal",
+     "type": "boolean"
+    },
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "name": "resolveInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.collections.structure.SmartClosureParameterDeclaration"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "options",
+     "target": "org.modellwerkstatt.manmap.structure.AdditionalTableReference"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IJoinOption"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.RefJoinOption",
+   "properties": [
+    {
+     "default": "ReadOnly",
+     "enum": [
+      "ReadOnly",
+      "Checkout"
+     ],
+     "name": "readOnly",
+     "type": "LoadType"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "entityMapping",
+     "target": "org.modellwerkstatt.manmap.structure.EntityMapping"
+    },
+    {
+     "card": "1",
+     "name": "refMapping",
+     "target": "org.modellwerkstatt.manmap.structure.ReferenceMapping"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "atomMpig",
+     "target": "org.modellwerkstatt.manmap.structure.IAtomMapping"
+    },
+    {
+     "card": "1",
+     "name": "keyMapping",
+     "target": "org.modellwerkstatt.manmap.structure.IKeyMapping"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IAtomMapping",
+    "org.modellwerkstatt.manmap.structure.IMapsClassConcept"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.ReferenceMapping",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "property",
+     "target": "jetbrains.mps.baseLanguage.structure.Property"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "reload",
+   "children": [
+    {
+     "card": "1",
+     "name": "argument",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IQueryOperation"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.ReloadQuery",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "Repository",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "annotation",
+     "target": "jetbrains.mps.baseLanguage.structure.AnnotationInstance"
+    },
+    {
+     "card": "0..1",
+     "deprecated": true,
+     "name": "classInitializer",
+     "target": "jetbrains.mps.baseLanguage.structure.StaticInitializer"
+    },
+    {
+     "card": "0..n",
+     "deprecated": true,
+     "name": "constructor",
+     "target": "jetbrains.mps.baseLanguage.structure.ConstructorDeclaration"
+    },
+    {
+     "card": "0..1",
+     "name": "documentation2",
+     "target": "org.modellwerkstatt.manmap.structure.L2Comment"
+    },
+    {
+     "card": "0..n",
+     "deprecated": true,
+     "name": "field",
+     "target": "jetbrains.mps.baseLanguage.structure.FieldDeclaration"
+    },
+    {
+     "card": "0..n",
+     "name": "implementedInterface",
+     "target": "jetbrains.mps.baseLanguage.structure.ClassifierType"
+    },
+    {
+     "card": "0..1",
+     "deprecated": true,
+     "name": "instanceInitializer",
+     "target": "jetbrains.mps.baseLanguage.structure.InstanceInitializer"
+    },
+    {
+     "card": "0..n",
+     "name": "member",
+     "target": "jetbrains.mps.baseLanguage.structure.ClassifierMember"
+    },
+    {
+     "card": "0..n",
+     "deprecated": true,
+     "name": "method",
+     "target": "jetbrains.mps.baseLanguage.structure.InstanceMethodDeclaration"
+    },
+    {
+     "card": "0..n",
+     "deprecated": true,
+     "name": "property",
+     "target": "jetbrains.mps.baseLanguage.structure.Property"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "0..n",
+     "deprecated": true,
+     "name": "staticField",
+     "target": "jetbrains.mps.baseLanguage.structure.StaticFieldDeclaration"
+    },
+    {
+     "card": "0..1",
+     "deprecated": true,
+     "name": "staticInitializer",
+     "target": "jetbrains.mps.baseLanguage.structure.StatementList"
+    },
+    {
+     "card": "0..n",
+     "deprecated": true,
+     "name": "staticInnerClassifiers",
+     "target": "jetbrains.mps.baseLanguage.structure.Classifier"
+    },
+    {
+     "card": "0..n",
+     "deprecated": true,
+     "name": "staticMethod",
+     "target": "jetbrains.mps.baseLanguage.structure.StaticMethodDeclaration"
+    },
+    {
+     "card": "0..1",
+     "name": "superclass",
+     "target": "jetbrains.mps.baseLanguage.structure.ClassifierType"
+    },
+    {
+     "card": "0..n",
+     "name": "typeVariableDeclaration",
+     "target": "jetbrains.mps.baseLanguage.structure.TypeVariableDeclaration"
+    },
+    {
+     "card": "0..1",
+     "name": "visibility",
+     "target": "jetbrains.mps.baseLanguage.structure.Visibility"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.lang.core.structure.ScopeProvider",
+    "org.modellwerkstatt.manmap.structure.L2RTComponent"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.Repository",
+   "properties": [
+    {
+     "name": "abstractClass",
+     "type": "boolean"
+    },
+    {
+     "name": "isDeprecated",
+     "type": "boolean"
+    },
+    {
+     "deprecated": true,
+     "name": "isDeprecated",
+     "type": "boolean"
+    },
+    {
+     "name": "isFinal",
+     "type": "boolean"
+    },
+    {
+     "name": "isStatic",
+     "type": "boolean"
+    },
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "name": "nestedName",
+     "type": "string"
+    },
+    {
+     "name": "nonStatic",
+     "type": "boolean"
+    },
+    {
+     "name": "packageName",
+     "type": "string"
+    },
+    {
+     "name": "resolveInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": true,
+   "super": "jetbrains.mps.baseLanguage.structure.ClassConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "repo method",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "annotation",
+     "target": "jetbrains.mps.baseLanguage.structure.AnnotationInstance"
+    },
+    {
+     "card": "1",
+     "name": "body",
+     "target": "jetbrains.mps.baseLanguage.structure.StatementList"
+    },
+    {
+     "card": "0..n",
+     "name": "modifiers",
+     "target": "jetbrains.mps.baseLanguage.structure.Modifier"
+    },
+    {
+     "card": "0..n",
+     "name": "parameter",
+     "target": "jetbrains.mps.baseLanguage.structure.ParameterDeclaration"
+    },
+    {
+     "card": "1",
+     "name": "returnType",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "0..n",
+     "name": "throwsItem",
+     "target": "jetbrains.mps.baseLanguage.structure.Type"
+    },
+    {
+     "card": "0..n",
+     "name": "typeVariableDeclaration",
+     "target": "jetbrains.mps.baseLanguage.structure.TypeVariableDeclaration"
+    },
+    {
+     "card": "0..1",
+     "name": "visibility",
+     "target": "jetbrains.mps.baseLanguage.structure.Visibility"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IRepositoryContent"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.RepositoryInstanceMethodDeclaration",
+   "properties": [
+    {
+     "name": "isAbstract",
+     "type": "boolean"
+    },
+    {
+     "deprecated": true,
+     "name": "isDeprecated",
+     "type": "boolean"
+    },
+    {
+     "name": "isFinal",
+     "type": "boolean"
+    },
+    {
+     "name": "isNative",
+     "type": "boolean"
+    },
+    {
+     "name": "isSynchronized",
+     "type": "boolean"
+    },
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "default": "READONLY",
+     "enum": [
+      "READONLY",
+      "CHECKOUT",
+      "CHECKIN",
+      "DELETE"
+     ],
+     "name": "repoMethodType",
+     "type": "RepositoryInstanceMethodType"
+    },
+    {
+     "name": "resolveInfo",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.InstanceMethodDeclaration"
+  },
+  {
+   "abstract": false,
+   "alias": "row mapper",
+   "children": [
+    {
+     "card": "1",
+     "name": "rowMapper",
+     "target": "jetbrains.mps.baseLanguage.closures.structure.ClosureLiteral"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "0..1",
+     "name": "visibility",
+     "target": "jetbrains.mps.baseLanguage.structure.Visibility"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IRepositoryContent"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.RowMapperField",
+   "properties": [
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.RowMapperFieldRef",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "rowMapperField",
+     "target": "org.modellwerkstatt.manmap.structure.RowMapperField"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": true,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.SaveOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "save",
+   "children": [
+    {
+     "card": "1",
+     "name": "expression",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "options",
+     "target": "org.modellwerkstatt.manmap.structure.SaveOption"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IDataBaseOperation",
+    "org.modellwerkstatt.manmap.structure.INeedsClassMapper"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.SaveWithMap",
+   "properties": [
+    {
+     "name": "debugMe",
+     "type": "boolean"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "entityMapping",
+     "target": "org.modellwerkstatt.manmap.structure.EntityMapping"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Statement"
+  },
+  {
+   "abstract": false,
+   "alias": "SIZE",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.ISizeSpecified"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.SizeOption",
+   "properties": [
+    {
+     "name": "decvalue",
+     "type": "integer"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "value",
+     "type": "integer"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.FieldOption"
+  },
+  {
+   "abstract": false,
+   "alias": "size",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IQueryOperation"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.SizeQuery",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "SKIP AUDIT",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.SkipAuditSaveOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.SaveOption"
+  },
+  {
+   "abstract": false,
+   "alias": "sortBy",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "1",
+     "name": "toComparable",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IQueryOperation"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.SortByQuery",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "default": "ASC",
+     "enum": [
+      "ASC",
+      "DESC"
+     ],
+     "name": "sortDirection",
+     "type": "SortByDirection"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "1",
+     "name": "argument",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "jetbrains.mps.baseLanguage.structure.IValidIdentifier"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.SqlNamedParameter",
+   "properties": [
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "alias": "SqlString",
+   "children": [
+    {
+     "card": "1..n",
+     "name": "newText",
+     "target": "jetbrains.mps.lang.text.structure.Line"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.ICustomSqlStringContentProvider"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.SqlString",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "alias": "sql string",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    },
+    {
+     "card": "1",
+     "name": "sqlString",
+     "target": "org.modellwerkstatt.manmap.structure.SqlString"
+    },
+    {
+     "card": "0..1",
+     "name": "visibility",
+     "target": "jetbrains.mps.baseLanguage.structure.Visibility"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IRepositoryContent"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.SqlStringField",
+   "properties": [
+    {
+     "name": "name",
+     "type": "string"
+    },
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  },
+  {
+   "abstract": false,
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.SqlStringFieldRef",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "references": [
+    {
+     "card": "1",
+     "name": "sqlstringField",
+     "target": "org.modellwerkstatt.manmap.structure.SqlStringField"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.baseLanguage.structure.Expression"
+  },
+  {
+   "abstract": false,
+   "alias": "UNIQUE",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.UniqueOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.FieldOption"
+  },
+  {
+   "abstract": false,
+   "alias": "UPDATE",
+   "children": [
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "name": "org.modellwerkstatt.manmap.structure.UpdateSaveOption",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "org.modellwerkstatt.manmap.structure.SaveOption"
+  },
+  {
+   "abstract": false,
+   "alias": "where",
+   "children": [
+    {
+     "card": "1",
+     "name": "filter",
+     "target": "jetbrains.mps.baseLanguage.structure.Expression"
+    },
+    {
+     "card": "0..n",
+     "name": "smodelAttribute",
+     "target": "jetbrains.mps.lang.core.structure.Attribute"
+    }
+   ],
+   "interface": false,
+   "interfaces": [
+    "org.modellwerkstatt.manmap.structure.IQueryOperation"
+   ],
+   "name": "org.modellwerkstatt.manmap.structure.WhereQuery",
+   "properties": [
+    {
+     "deprecated": true,
+     "name": "shortDescription",
+     "type": "string"
+    },
+    {
+     "name": "virtualPackage",
+     "type": "string"
+    }
+   ],
+   "rootable": false,
+   "super": "jetbrains.mps.lang.core.structure.BaseConcept"
+  }
+ ],
+ "language": "org.modellwerkstatt.manmap"
+}

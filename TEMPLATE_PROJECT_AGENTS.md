@@ -47,6 +47,21 @@ name. Read the full part of a DSL document only when modeling that layer,
 following the section links in the skills. Reading all four documents up front
 costs about 140,000 tokens and is rarely needed.
 
+## Tools
+
+MoAI ships command-line tools in `moai/tools/` (Python standard library, call
+with `python3 -I`):
+
+- `blueprint.py` – look up concepts (`find`, `concept`) and build or check
+  blueprints (`build`, `check`) against the structure of the MoWare languages;
+- `verify.py` – compare an inserted node with its blueprint;
+- `dump.py` – condense check reports, show blueprints, search dumps;
+- `copyroot.py` – copy roots from another model, e.g. configuration templates.
+
+Use them instead of writing your own scripts for the same purpose. Their input
+and output files live in the system temp directory; they write nothing into the
+project. The skills say where each tool fits into a workflow.
+
 ## Conventions
 
 Before planning or modeling, read all files in `./moai/conventions/`. They are the MoWare
