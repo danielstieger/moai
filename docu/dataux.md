@@ -122,28 +122,26 @@ Ein `Reference`-Delegate bietet die zulässigen Objekte zur Auswahl an. `referen
 
 #### Kapitellandkarte: Delegate-Optionen
 
-Die FQ-Namen lauten `org.modellwerkstatt.dataux.structure.<Konzeptname>`.
-
-| Name | Konzeptname | Kontext | Delegate-Typen | Wirkung |
-| --- | --- | --- | --- | --- |
-| `DISABLED` | `DisabledDOption` | `Delegate Form` | alle | Delegate ist nicht editierbar |
-| `OPTIONAL` | `OptionalDOption` | `Delegate Form` | alle | Hebt die Pflichteingabe auf; siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
-| `PICKER` | `PickerDOption` | `Delegate Form` | `LocalDate`, `DateTime (Date Only)`, `DateTime` | Verwendet nach Möglichkeit eine Datumsauswahl; bei `DateTime` nicht zusammen mit `OVERWRITE FORMAT` |
-| `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `Delegate Form` | alle | Löst bei Scan oder Inhaltsänderung eine verfügbare Conclusion mit Hotkey [`SCAN/UPDATE`](objectflow.md#conclusions-mit-scanupdate-oder-gook) aus |
-| `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `Delegate Form` | `String` | Verwendet für einen `String`-Delegate einen numerischen Editor |
-| `ALTER` | `AlternativeDOption` | `Delegate Form` und `Table` | `Reference`, `Status` | Verwendet einen alternativen Editor, sofern die Laufzeitumgebung diesen unterstützt |
-| `WIDE` | `WideDOption` | `Delegate Form` | alle | Blendet nach Möglichkeit das Label links vom Editor aus und gibt dem Editor die gesamte Breite |
-| `NUM OF LINES` | `NumOfLinesDOption` | `Delegate Form` | `String` | Stellt den Text mehrzeilig mit der angegebenen Zeilenzahl dar |
-| `TIME PICKER ONLY` | `TimeOnlyDOption` | `Delegate Form` | `DateTime` | Erfasst nur die Uhrzeit; als Datum wird immer das aktuelle verwendet |
-| `OVERWRITE LABEL` | `OverwriteLabelDOption` | `Delegate Form` und `Table` | alle | Überschreibt die von der Datenstruktur vorgegebene Beschriftung |
-| `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `Delegate Form`, `Table` und `Custom UI Element` | `String`, `Integer`, `BigDecimal`, `DateTime`, `DateTime (Date Only)`, `LocalDate`, `Image` | Überschreibt das von der Datenstruktur vorgegebene Format |
-| `WIDTH` | `WidthDOption` | `Table` | alle | Legt die Breite der Spalte in Prozent fest; Pflicht für jede Spalte, die Summe darf 100 % nicht überschreiten |
-| `EDITABLE` | `EditableDOption` | `Table` | `Status`, `BigDecimal` | Property wird editierbar dargestellt; höchstens eine Spalte pro `Table`, nicht zusammen mit `FOLD` |
-| `IMPORTANT` | `ImportantDOption` | `Table` | alle | Hebt ein wichtiges Tabellenfeld hervor; höchstens einmal pro `Table` |
-| `COLOR` | `DynColorDOption` | `Table` | `BigDecimal` | Berechnet die Farbe dynamisch aus dem Wert |
-| `LONG DESC` | `StatusLongDescDOption` | `Table` | `Status` | Verwendet die Langbeschreibung eines Status |
-| `RIGHT ALIGN` | `RightAlignDOption` | `Table` | `String` | Richtet den Zelleninhalt rechtsbündig aus |
-| `FOLD` | `FoldDOption` | `Delegate Form` und `Table` | alle | `Table`: Blendet die Spalte zunächst aus; der Benutzer kann sie per Doppelklick auf den Spaltenkopf einblenden (in h2forms ohne Wirkung). `Delegate Form` unter h2forms: Das Feld wird nicht angezeigt, bleibt aber als verstecktes Feld erhalten und kann etwa mit `ISSUE UPDATE/SCANABLE` per Scan befüllt werden |
+| Name | Konzeptname | FQ-Name | Kontext | Delegate-Typen | Wirkung |
+| --- | --- | --- | --- | --- | --- |
+| `DISABLED` | `DisabledDOption` | `org.modellwerkstatt.dataux.structure.DisabledDOption` | `Delegate Form` | alle | Delegate ist nicht editierbar |
+| `OPTIONAL` | `OptionalDOption` | `org.modellwerkstatt.dataux.structure.OptionalDOption` | `Delegate Form` | alle | Hebt die Pflichteingabe auf; siehe [Pflichtwerte, leere Eingaben und `null`](#pflichtwerte-leere-eingaben-und-null) |
+| `PICKER` | `PickerDOption` | `org.modellwerkstatt.dataux.structure.PickerDOption` | `Delegate Form` | `LocalDate`, `DateTime (Date Only)`, `DateTime` | Verwendet nach Möglichkeit eine Datumsauswahl; bei `DateTime` nicht zusammen mit `OVERWRITE FORMAT` |
+| `ISSUE UPDATE/SCANABLE` | `IssueUpdateDOption` | `org.modellwerkstatt.dataux.structure.IssueUpdateDOption` | `Delegate Form` | alle | Löst bei Scan oder Inhaltsänderung eine verfügbare Conclusion mit Hotkey [`SCAN/UPDATE`](objectflow.md#conclusions-mit-scanupdate-oder-gook) aus |
+| `FORCE NUMERIC EDITOR` | `ForceNumericEditor` | `org.modellwerkstatt.dataux.structure.ForceNumericEditor` | `Delegate Form` | `String` | Verwendet für einen `String`-Delegate einen numerischen Editor |
+| `ALTER` | `AlternativeDOption` | `org.modellwerkstatt.dataux.structure.AlternativeDOption` | `Delegate Form` und `Table` | `Reference`, `Status` | Verwendet einen alternativen Editor, sofern die Laufzeitumgebung diesen unterstützt |
+| `WIDE` | `WideDOption` | `org.modellwerkstatt.dataux.structure.WideDOption` | `Delegate Form` | alle | Blendet nach Möglichkeit das Label links vom Editor aus und gibt dem Editor die gesamte Breite |
+| `NUM OF LINES` | `NumOfLinesDOption` | `org.modellwerkstatt.dataux.structure.NumOfLinesDOption` | `Delegate Form` | `String` | Stellt den Text mehrzeilig mit der angegebenen Zeilenzahl dar |
+| `TIME PICKER ONLY` | `TimeOnlyDOption` | `org.modellwerkstatt.dataux.structure.TimeOnlyDOption` | `Delegate Form` | `DateTime` | Erfasst nur die Uhrzeit; als Datum wird immer das aktuelle verwendet |
+| `OVERWRITE LABEL` | `OverwriteLabelDOption` | `org.modellwerkstatt.dataux.structure.OverwriteLabelDOption` | `Delegate Form` und `Table` | alle | Überschreibt die von der Datenstruktur vorgegebene Beschriftung |
+| `OVERWRITE FORMAT` | `OverwriteFormatDOption` | `org.modellwerkstatt.dataux.structure.OverwriteFormatDOption` | `Delegate Form`, `Table` und `Custom UI Element` | `String`, `Integer`, `BigDecimal`, `DateTime`, `DateTime (Date Only)`, `LocalDate`, `Image` | Überschreibt das von der Datenstruktur vorgegebene Format |
+| `WIDTH` | `WidthDOption` | `org.modellwerkstatt.dataux.structure.WidthDOption` | `Table` | alle | Legt die Breite der Spalte in Prozent fest; Pflicht für jede Spalte, die Summe darf 100 % nicht überschreiten |
+| `EDITABLE` | `EditableDOption` | `org.modellwerkstatt.dataux.structure.EditableDOption` | `Table` | `Status`, `BigDecimal` | Property wird editierbar dargestellt; höchstens eine Spalte pro `Table`, nicht zusammen mit `FOLD` |
+| `IMPORTANT` | `ImportantDOption` | `org.modellwerkstatt.dataux.structure.ImportantDOption` | `Table` | alle | Hebt ein wichtiges Tabellenfeld hervor; höchstens einmal pro `Table` |
+| `COLOR` | `DynColorDOption` | `org.modellwerkstatt.dataux.structure.DynColorDOption` | `Table` | `BigDecimal` | Berechnet die Farbe dynamisch aus dem Wert |
+| `LONG DESC` | `StatusLongDescDOption` | `org.modellwerkstatt.dataux.structure.StatusLongDescDOption` | `Table` | `Status` | Verwendet die Langbeschreibung eines Status |
+| `RIGHT ALIGN` | `RightAlignDOption` | `org.modellwerkstatt.dataux.structure.RightAlignDOption` | `Table` | `String` | Richtet den Zelleninhalt rechtsbündig aus |
+| `FOLD` | `FoldDOption` | `org.modellwerkstatt.dataux.structure.FoldDOption` | `Delegate Form` und `Table` | alle | `Table`: Blendet die Spalte zunächst aus; der Benutzer kann sie per Doppelklick auf den Spaltenkopf einblenden (in h2forms ohne Wirkung). `Delegate Form` unter h2forms: Das Feld wird nicht angezeigt, bleibt aber als verstecktes Feld erhalten und kann etwa mit `ISSUE UPDATE/SCANABLE` per Scan befüllt werden |
 
 Jede Option darf pro Delegate höchstens einmal verwendet werden. `Reference`-Delegates sind in `Table`s nicht zulässig.
 
@@ -164,16 +162,14 @@ Die Grenzen aus `LENGTH` und `RANGE` werden nicht zusätzlich als `validation` m
 
 #### Kapitellandkarte: Optionen für Formulare und Tabellen
 
-Die FQ-Namen lauten `org.modellwerkstatt.dataux.structure.<Konzeptname>`.
-
-| Name | Konzeptname | Element | Wirkung |
-| --- | --- | --- | --- |
-| `DISABLED` | `DisabledFOption` | `Delegate Form` | `Delegate Form` ist nicht editierbar |
-| `LABEL` | `LabelFOption` | `Delegate Form` und `Table` | Setzt die Beschriftung des Elements. Nicht zulässig am obersten Element eines `Page Pane`s; dort kommt die Beschriftung aus dem [Page Title](objectflow.md#command-title-page-title-und-subtitle) der Page |
-| `SELECT FIRST` | `SelectFirstFOption` | `Table` | Selektiert das erste Tabellenelement bei der Initialisierung |
-| `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `Table` | Berechnet eine Zusammenfassung für ausgewählte Tabellenobjekte |
-| `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `Table` | Berechnet eine Zusammenfassung über alle Tabellenobjekte |
-| `CUSTOM CSV EXPORT` | `TableCustomCsvExportFOption` | `Table` | Passt den CSV-Export an |
+| Name | Konzeptname | FQ-Name | Element | Wirkung |
+| --- | --- | --- | --- | --- |
+| `DISABLED` | `DisabledFOption` | `org.modellwerkstatt.dataux.structure.DisabledFOption` | `Delegate Form` | `Delegate Form` ist nicht editierbar |
+| `LABEL` | `LabelFOption` | `org.modellwerkstatt.dataux.structure.LabelFOption` | `Delegate Form` und `Table` | Setzt die Beschriftung des Elements. Nicht zulässig am obersten Element eines `Page Pane`s; dort kommt die Beschriftung aus dem [Page Title](objectflow.md#command-title-page-title-und-subtitle) der Page |
+| `SELECT FIRST` | `SelectFirstFOption` | `org.modellwerkstatt.dataux.structure.SelectFirstFOption` | `Table` | Selektiert das erste Tabellenelement bei der Initialisierung |
+| `SELECTION SUMMARY LINE` | `SelectionSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.SelectionSummaryLineFOption` | `Table` | Berechnet eine Zusammenfassung für ausgewählte Tabellenobjekte |
+| `TABLE SUMMARY LINE` | `TableSummaryLineFOption` | `org.modellwerkstatt.dataux.structure.TableSummaryLineFOption` | `Table` | Berechnet eine Zusammenfassung über alle Tabellenobjekte |
+| `CUSTOM CSV EXPORT` | `TableCustomCsvExportFOption` | `org.modellwerkstatt.dataux.structure.TableCustomCsvExportFOption` | `Table` | Passt den CSV-Export an |
 
 ### Layouts, Tabs und Wiederverwendung
 
