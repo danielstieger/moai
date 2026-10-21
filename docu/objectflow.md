@@ -777,7 +777,15 @@ Die ObjectFlow-Session begleitet den Command-Ablauf und hält die geladenen bezi
 
 Das Konzept `session` gibt bei Bedarf direkten Zugriff auf Interna der aktuellen Session. Es ist für Fälle gedacht, die durch die höherwertigen Sprachkonzepte nicht abgedeckt werden. Direkter Session-Zugriff erhöht die Kopplung an die Laufzeit und sollte deshalb gezielt bleiben.
 
-Entities, die nicht über `QueryFromMap` (`org.modellwerkstatt.manmap.structure.QueryFromMap`) in die Session gelangt sind, müssen Teil der Session werden, bevor Session- und UI-Mechanismen sie als bearbeiteten Graphen behandeln können. Das betrifft neu erzeugte Entities ebenso wie Entities aus einem Lesemodell, die etwa mit Custom SQL über ein `nokeystore/read-only map` geladen wurden. Dafür stellt die Session `session.ensureInSession(…)` für eine Entity oder eine Liste von Entities bereit. Eine Entity mit vergebenem Schlüssel wird unter diesem Schlüssel in die Identity-Map aufgenommen, eine Entity ohne Schlüssel als neue Entity geführt. Enthält die Session zu dem Schlüssel bereits eine Entity, bleibt der Aufruf ohne Wirkung. Der Read-only-Zustand der Entity bleibt dabei unverändert.
+Die Identity-Map der Session kennt nur Entities, die mit `QueryFromMap` (`org.modellwerkstatt.manmap.structure.QueryFromMap`) geladen, über `refJoin`/`listJoin` oder als Referenz in einem `nokeystore/read-only map` mitgeladen, per Insert gespeichert oder mit `session merge` übernommen wurden. Nicht darin liegen neu erzeugte Entities sowie die Ergebnisobjekte eines `nokeystore/read-only map` oder `row mapper`. `session.ensureInSession(…)` nimmt eine Entity oder eine Liste von Entities nachträglich auf: eine Entity mit vergebenem Schlüssel unter diesem Schlüssel, eine Entity ohne Schlüssel als neue, beim Check-in einzufügende Entity. Ihr Read-only-Zustand bleibt unverändert. Enthält die Session zum Schlüssel bereits eine Entity, bleibt der Aufruf ohne Wirkung; weitergearbeitet wird dann mit der Instanz aus der Session.
+
+Die Aufnahme wirkt sich aus auf:
+
+- `QueryFromMap` und `session merge`: Sie liefern zum selben Schlüssel die Instanz aus der Session beziehungsweise übernehmen Werte in sie und prüfen, ob read-only und ausgecheckt zueinander passen.
+- `session entities`: Es liefert nur Entities der Session.
+- `session.isDirty()` und damit die Abbruchrückfrage: Eine neue Entity zählt erst nach der Aufnahme als ungespeicherte Änderung.
+
+So lassen sich etwa Entities aus Effizienzgründen über ein Lesemodell oder einen `row mapper` laden und anschließend in die Session integrieren, als wären sie mit `QueryFromMap` geladen worden. Ausgecheckt werden sie dadurch nicht: Ob eine Entity read-only ist, bestimmt die Art, wie sie erzeugt oder geladen wurde.
 
 #### Session-weites Read-only und Dirty
 
