@@ -49,7 +49,7 @@ costs about 140,000 tokens and is rarely needed.
 
 ## Conventions
 
-Before modeling, read all files in `./moai/conventions/`. They are the MoWare
+Before planning or modeling, read all files in `./moai/conventions/`. They are the MoWare
 standard modeling conventions (e.g. structure, naming) and apply in full unless
 this project states otherwise in the section below.
 

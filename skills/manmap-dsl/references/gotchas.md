@@ -9,7 +9,6 @@
 
 ## Modeling and tooling
 
-- In services and repositories, never call an own method with `this.method(..)` (it fails in javac); call `method(..)` instead.
 - JSON uses fully qualified concepts even when shallow MPS prints display short names.
 - The role spelling `atomMpig` is intentional.
 - Never put concept references (`c:`) into roles that expect declaration nodes (`r:`). The insert accepts them silently and leaves them unresolved; only `mps_mcp_check_root_node_problems` reports them.

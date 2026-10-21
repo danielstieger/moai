@@ -6,7 +6,7 @@ Dieses Dokument ist die architektonische Einstiegsseite zur **modellwerkstatt Mo
 
 Die Beispiele sind fachliche Skizzen und keine ausführbare DSL-Syntax. Konkrete Konzepte, Eigenschaften, Einschränkungen und Modellierungsmuster werden in den jeweiligen DSL-Dokumentationen beschrieben. Bei Abweichungen zwischen Dokumentation und den geladenen MPS-Sprachen sind die Sprachdefinitionen und ihre Prüfregeln die technische Quelle der Wahrheit.
 
-Die Dokumentation beschreibt beobachtete und technisch bestätigte Praxis. Sie legt keine zusätzliche, von der Sprache nicht erzwungene Architektur fest; das tun die [verbindlichen Konventionen](#verbindliche-konventionen). Wo sich aus bestehenden Anwendungen wiederkehrende Empfehlungen ergeben, werden diese als solche benannt.
+Die Dokumentation beschreibt beobachtete und technisch bestätigte Praxis. Sie legt keine zusätzliche, von der Sprache nicht erzwungene Architektur fest; das tun verbindliche Konventionen. Wo sich aus bestehenden Anwendungen wiederkehrende Empfehlungen ergeben, werden diese als solche benannt.
 
 ## Modellierungssprachen und Laufzeitumgebungen
 
@@ -285,10 +285,6 @@ Die Detaildokumentationen beschreiben Konzepte, Möglichkeiten, Einschränkungen
 | `org.modellwerkstatt.manmap` | [manmap.md](manmap.md) |
 | `org.modellwerkstatt.objectflow` | [objectflow.md](objectflow.md) |
 | `org.modellwerkstatt.dataux` | [dataux.md](dataux.md) |
-
-### Verbindliche Konventionen
-
-Die Dokumentation beschreibt, was die Sprachen können. Wie eine Anwendung das verwenden muss, legen die verbindlichen Konventionen im Verzeichnis `conventions/` fest. 
 
 ## Stand der Dokumentation
 

@@ -5,7 +5,6 @@
 - Business Properties require both `type` and `propertyImplementation`; an inserted node can be structurally accepted yet incomplete. Start from the verified subtree blueprint. [Business Properties](../../../docu/objectflow.md#business-properties)
 - `StatusDeclaration` is nested under Entity/Value Object/DTO and is not rootable. Every element requires the `shortDescNew` and `longDescNew` children in the AST. [Status](../../../docu/objectflow.md#status)
 - Checker: comparing a Value-Object key with `null` (`rechnung.kunde#Key == null`) is an error; use `isNullKey`. `#Key` versus the loaded object: see [Beziehungen und Objektgraphen](../../../docu/objectflow.md#beziehungen-und-objektgraphen).
-- In services and repositories, never call an own method with `this.method(..)` (it fails in javac); call `method(..)` instead.
 
 ## Runtime semantics (documentation pointers)
 
