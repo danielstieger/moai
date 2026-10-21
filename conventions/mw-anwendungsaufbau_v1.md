@@ -11,13 +11,13 @@ Eine Anwendung umfasst einen oder mehrere **Bounded Contexts**. Ein Bounded Cont
 | **Aggregat-Bereich** | Domain Layer | Fachobjekt | Substantiv | `rechnung`, `kunde` |
 | **Use-Case-Bereich** | Application Layer | fachlicher Ablauf | Tätigkeit | `rechnungsexport`, `mahnlauf` |
 
-- **KONVENTION:** Namen von Bounded Contexts und Bereichen sind deutsche Fachbegriffe, Aggregat-Bereiche als Substantiv, Use-Case-Bereiche als Tätigkeit. Technische Namen sind `base`, `rollen`, `sharedvalues`, `gate`, `domain`, `read`, `unit`, `tests` und `app`.
+- **KONVENTION:** Namen von Bounded Contexts und Bereichen sind deutsche Fachbegriffe, Aggregat-Bereiche als Substantiv, Use-Case-Bereiche als Tätigkeit. Technische Namen sind `base`, `rollen`, `sharedvalues`, `gate`, `domain`, `read`, `unit`, `unit.read`, `tests` und `app`.
 
 ### Solutions und Modelle
 
 - **KONVENTION:** Die Anwendung hat die Solution `<firma>.<app>` mit den Modellen `base`, `rollen` und `app`. Bei einem Bounded Context enthält sie alle Modelle; bei mehreren liegt jeder Bounded Context in einer eigenen Solution `<firma>.<app>.<boundedcontext>`.
-- **KONVENTION:** Modellnamen folgen dem Muster `<firma>.<app>.<boundedcontext>.<bereich>.<modell>`. `base`, `rollen` und `app` gehören zur Anwendung (`<firma>.<app>.base`), `sharedvalues` und `gate.<fremdsystem>.<modell>` zum Bounded Context, `domain`, `read`, `unit` und `tests` zum Bereich. Bei einem Bounded Context entfällt das Segment `<boundedcontext>`: `<firma>.<app>.rechnung.domain`.
-- **KONVENTION:** Modelle werden erst angelegt, wenn sie gebraucht werden. Ein Bereich muss nicht alle vier Modelle `domain`, `read`, `unit` und `tests` besitzen.
+- **KONVENTION:** Modellnamen folgen dem Muster `<firma>.<app>.<boundedcontext>.<bereich>.<modell>`. `base`, `rollen` und `app` gehören zur Anwendung (`<firma>.<app>.base`), `sharedvalues` und `gate.<fremdsystem>.<modell>` zum Bounded Context, `domain`, `read`, `unit`, `unit.read` und `tests` zum Bereich. Bei einem Bounded Context entfällt das Segment `<boundedcontext>`: `<firma>.<app>.rechnung.domain`.
+- **KONVENTION:** Modelle werden erst angelegt, wenn sie gebraucht werden. Ein Bereich muss nicht alle Modelle `domain`, `read`, `unit`, `unit.read` und `tests` besitzen.
 - **KONVENTION:** `tests`-Modelle (normale Modelle, nicht MPS-Stereotyp `@tests`) liegen in derselben Solution wie die Modelle, die sie testen, es sei denn, der Bounded Context hat eine eigene Test-Solution.
 
 Die folgende Tabelle ist verbindlich: Ein Modell enthält, was unter „Inhalt“ steht, importiert höchstens, was unter „darf importieren“ steht, und nie, was unter „gehört nicht hinein“ steht.
@@ -31,8 +31,9 @@ Die folgende Tabelle ist verbindlich: Ein Modell enthält, was unter „Inhalt�
 | `…gate.<fremdsystem>.read` | 2 | Lesende Anbindung eines Fremdsystems: read-only Entities, gemappt mit `EntityMapping` oder `nokeystore/read-only map`; Abfragen; bei Bedarf Lese-Services | nur `base`, `sharedvalues`, `rollen` | – |
 | `…gate.<fremdsystem>.domain` | 2 | Schreibende Anbindung eines Fremdsystems: `EntityMapping`s und Repository | wie `gate.<fremdsystem>.read` | – |
 | `…<bereich>.domain` | 2 | Die Aggregate: Entities, die verändert werden, Value Objects und ihre `EntityMapping`s; das Aggregat-Repository mit Laden, Checkout, Speichern und Löschen; Regeln und Services, die ein Aggregat prüfen oder verändern | Ebenen 1 und 2 | weitere Abfragen im Aggregat-Repository |
-| `…<bereich>.read` | 2 | Alles, was nur liest: Abfragen und lesende Repositories; Lesemodelle als DTO mit Custom SQL oder als gemappte Abfrage; read-only Entities, gemappt mit `EntityMapping` oder `nokeystore/read-only map`, bei Bedarf mit eigener, lesender Persistence Description; Such- und Filter-DTOs; Regeln, Berechnungen und Services, die nur lesen | Ebenen 1 und 2 | Code, der Entities verändert |
-| `…<bereich>.unit` | 3 | Commands mit oder ohne Page samt Pages, Page Panes und Menüs; DTOs, die nur einem Command und seinen Page Panes dienen | Ebenen 1 und 2; von anderen `unit` nur deren Commands | fachliche Logik (gehört ins `domain` oder `read`) |
+| `…<bereich>.read` | 2 | Alles, was nur liest: Abfragen und lesende Repositories; Lesemodelle als DTO mit Custom SQL oder als gemappte Abfrage; read-only Entities, gemappt mit `EntityMapping` oder `nokeystore/read-only map`, bei Bedarf mit eigener, lesender Persistence Description; Such- und Filter-DTOs, die ein Service verwendet; Regeln, Berechnungen und Services, die nur lesen | Ebenen 1 und 2 | Code, der Entities verändert |
+| `…<bereich>.unit` | 3 | Commands mit oder ohne Page samt Pages, Page Panes und Menüs; DTOs, die nur einem Command und seinen Page Panes dienen | Ebenen 1 und 2; das eigene `unit.read`; von anderen `unit` nur deren Commands | fachliche Logik (gehört ins `domain` oder `read`) |
+| `…<bereich>.unit.read` | 3 | Such- und Listenabfragen, die nur filtern, sortieren und projizieren und ausschließlich der Anzeige in Commands des `unit` dienen, etwa die Suche eines `SEARCH_CMD`, samt Filter- und Ergebnis-DTOs, lesendem Repository und Mappings | Ebenen 1 und 2 | Code, der Entities verändert; fachliche Berechnungen wie Summen oder Kennzahlen; was ein Service verwendet |
 | `<firma>.<app>.app` | 4 | `AppUI Module`, `BatchJob Module` | Ebenen 1 bis 3 | – |
 | `…<bereich>.tests` | – | Tests der Regeln, der Persistenz, der Lesemodelle und der Commands; Testdaten nach den [Konventionen für Tests](mw-tests_v1.md) | alle Modelle der Anwendung, andere `tests`, Modelle der Solution `org.modellwerkstatt.wbkit` | – |
 | `…gate.<fremdsystem>.tests` | – | Tests des Gates; schreibende Mappings auf das Fremdsystem, die nur Tests brauchen | wie `tests` | – |
@@ -50,17 +51,17 @@ Ziel der folgenden Regeln ist, dass Fachlogik, Oberfläche, Bounded Contexts und
 
 ### `domain`, `read` und `unit`
 
-- **KONVENTION:** `domain` und `read` sind gleichrangiger ExpensiveCode und werden gleich sorgfältig getestet.
-- **KONVENTION:** Alle Abfragen außer dem Laden des Aggregats liegen im `read`, gleich ob sie der Anzeige oder einer Entscheidung dienen. Ein Service im `domain` darf sie verwenden.
-- **KONVENTION:** Das `read` verwendet das `domain`, wo es passt: Ein Lesemodell darf Entities read-only laden, und eine `nokeystore/read-only map` darf die Mappings der Entities einbinden. Verändert wird eine Entity nur über Checkout und Check-in des Aggregat-Repositories im `domain`.
-- **KONVENTION:** Ein DTO, das nur einem Command und seinen Page Panes dient, ist CheapCode und liegt im `unit` bei seinem Command. Ein Service nimmt ein solches DTO nie entgegen; der Command übergibt die Werte einzeln. Ein DTO, das ein Service entgegennimmt oder ein Repository füllt, liegt im `read`; das gilt für alle Such- und Filter-DTOs.
+- **KONVENTION:** `domain` und `read` sind gleichrangiger ExpensiveCode und werden gleich sorgfältig getestet. `unit.read` ist CheapCode.
+- **KONVENTION:** Abfragen, die einer Entscheidung oder einem Service dienen oder fachliche Werte berechnen, etwa Summen oder Kennzahlen, liegen im `read`, auch wenn sie nur angezeigt werden; ein Service im `domain` darf sie verwenden. Eine Such- oder Listenabfrage, die nur filtert, sortiert und projiziert und ausschließlich der Anzeige in Commands des `unit` dient, etwa die Suche eines `SEARCH_CMD`, liegt mit ihren Filter- und Ergebnis-DTOs im `unit.read`. Braucht später ein Service sie, wandert sie ins `read`.
+- **KONVENTION:** `read` und `unit.read` verwenden das `domain`, wo es passt: Ein Lesemodell darf Entities read-only laden, und eine `nokeystore/read-only map` darf die Mappings der Entities einbinden. Verändert wird eine Entity nur über Checkout und Check-in des Aggregat-Repositories im `domain`.
+- **KONVENTION:** Ein DTO, das nur einem Command und seinen Page Panes dient, ist CheapCode und liegt im `unit` bei seinem Command. Ein Service nimmt ein solches DTO nie entgegen; der Command übergibt die Werte einzeln. Ein DTO, das ein Service entgegennimmt oder eine Abfrage im `read` füllt, liegt im `read`.
 
 ### Bereiche schneiden
 
 - **KONVENTION:** Ein Aggregat-Bereich enthält in der Regel ein Aggregat. Mehrere Aggregate liegen in einem Bereich, wenn keines ohne die anderen verwendet wird. Der Bereich heißt nach dem führenden Aggregat, wenn die anderen ihm nur zuarbeiten, sonst nach dem Fachbegriff für das Ganze; findet sich keiner, gehören die Aggregate in getrennte Bereiche. Jedes Aggregat bleibt eine eigene Konsistenzgrenze mit eigenem Repository.
 - **KONVENTION:** Ein Use Case liegt in dem Bereich, zu dem er gehört, auch mit eigenen DTOs, Commands oder Lese-Services. Betrifft er zwei Bereiche und führt einer davon, liegt er im führenden Bereich; dessen Service liest die Fakten aus dem anderen.
 - **KONVENTION:** Ein Use-Case-Bereich entsteht nur, wenn ein Ablauf mehrere eigenständige Bereiche gleichrangig verändert oder eigene Daten führt, die nur diesem Ablauf dienen.
-- **KONVENTION:** Eine Übersicht liegt im `read` und `unit` des Bereichs, den sie zeigt und unter dem ein Benutzer sie suchen würde. Nur eine Auswertung, die mehrere eigenständige Bereiche gleichrangig zusammenführt, bekommt einen Use-Case-Bereich aus `read` und `unit`.
+- **KONVENTION:** Eine Übersicht liegt im Bereich, den sie zeigt und unter dem ein Benutzer sie suchen würde. Nur eine Auswertung, die mehrere eigenständige Bereiche gleichrangig zusammenführt, bekommt einen eigenen Use-Case-Bereich.
 - **KONVENTION:** Ein Use-Case-Bereich darf eigene Aggregate besitzen, wenn sie nur diesem Ablauf dienen, etwa ein Exportlauf mit seinen Positionen samt Mapping und Repository. Werden sie auch von anderen Bereichen benötigt, erhalten sie einen eigenen Aggregat-Bereich.
 - **KONVENTION:** Ein Use-Case-Bereich verändert ein Aggregat nur über dessen Wurzel und Services.
 
