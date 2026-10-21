@@ -12,6 +12,8 @@ This separation follows the [MoWare ownership map](../../../docu/moware-werkbank
 
 ## Create a PagePane with a form
 
+Page panes of search, owner and edit commands: `scaffold.py suche` and `commands` (`moai:objectflow-dsl`, `references/workflows.md`, "Scaffold a new area").
+
 1. Identify the ObjectFlow Page's bound Entity/DTO and ensure Page Init returns the corresponding object. [Page Init and data preparation](../../../docu/objectflow.md#page-init-und-datenbereitstellung)
 2. Copy [page-pane-form-skeleton.json](blueprints/page-pane-form-skeleton.json).
 3. Replace `TARGET_MODEL.RootClassifier` and `TARGET_MODEL.textProperty` from the destination model.

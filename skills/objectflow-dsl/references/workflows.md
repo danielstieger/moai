@@ -1,6 +1,20 @@
 # ObjectFlow workflows
 
+## Scaffold a new area
+
+For a new aggregate area, generate the convention-compliant skeleton with `moai/tools/scaffold.py` instead of building it root by root; the specification and its options are listed by `python3 -I moai/tools/scaffold.py --help`. One JSON specification serves all steps, in this order (conventions: inside out):
+
+1. `domain` – entities, status, persistence description, aggregate repository, `<Aggregat>Service` with the transitions
+2. `tests` – `TestDaten` and `<Bereich>Tests`
+3. `configs` – test and FX8 `OFXConfig` and `AppRessourcen`, from `print_node` dumps of the wbkit templates
+4. `suche` – filter, search repository, `SEARCH_CMD` with page panes
+5. `commands` – owner, edit and transition commands, menu entries
+
+Each step prints a plan: insert the roots, write the bodies as in [Write method bodies and command functions](#write-method-bodies-and-command-functions), check the model. Then add the business logic. The workflows below cover extending and changing an existing area.
+
 ## Create a domain structure
+
+For a new aggregate, start with `scaffold.py domain` ([Scaffold a new area](#scaffold-a-new-area)).
 
 1. Decide Entity vs Value Object vs DTO from identity, immutability, and use-case scope. [Decision semantics](../../../docu/objectflow.md#entity-value-object-und-dto)
 2. Insert the matching root skeleton from [blueprints.md](blueprints.md) without properties, then `print_node` it: the factory adds `id` (Entity, rename it and `S_` per conventions), `myVal` (Value Object), or `name` (DTO). [Node factories](gotchas.md#node-factories)
@@ -37,6 +51,8 @@ Write the bodies as described in [Write method bodies and command functions](#wr
 
 ## Create a command
 
+Search, owner, edit and transition commands of an aggregate: `scaffold.py suche` and `commands` ([Scaffold a new area](#scaffold-a-new-area)).
+
 Apply the conventions `commands`.
 
 1. Pick the command type from its ownership and commit semantics, not its visual appearance. [Command types](../../../docu/objectflow.md#die-vier-command-typen)
@@ -56,6 +72,8 @@ Use Successors for one atomic Unit of Work; use `session queue next command` for
 
 ## Create an ObjectFlow test
 
+The tests of the transitions and of the persistence: `scaffold.py tests` ([Scaffold a new area](#scaffold-a-new-area)).
+
 Apply the conventions `tests`.
 
 Test-model facts: test models are ordinary models named `<…>.tests` (no `@tests` stereotype, no `tests` facet). Run an `OFXTestSuit` with `mps_mcp_create_run_configuration(nodeReference=<suite root>)`, which creates a Java Application config, then `mps_mcp_execute_run_configuration`; a model reference gives a JUnit config that finds no `OFXTestSuit` (`moai:mps-run-configurations`).
@@ -70,7 +88,7 @@ Test-model facts: test models are ordinary models named `<…>.tests` (no `@test
 
 ## Create an OFXConfig
 
-Templates with explanations are in model `org.modellwerkstatt.wbkit.shared.configuration` (solution `org.modellwerkstatt.wbkit`); `baseconfig` holds the sections the other templates include. Copy the templates you need together with `baseconfig` into the target model with `moai/tools/copyroot.py` (conventions `anwendungsaufbau`: no wbkit import there), then adapt names and values.
+Templates with explanations are in model `org.modellwerkstatt.wbkit.shared.configuration` (solution `org.modellwerkstatt.wbkit`); `baseconfig` holds the sections the other templates include. `scaffold.py configs` ([Scaffold a new area](#scaffold-a-new-area)) copies and adapts the test and FX8 templates; copy further templates together with `baseconfig` with `moai/tools/copyroot.py` (conventions `anwendungsaufbau`: no wbkit import there), then adapt names and values.
 
 ## Integrate persistence with ManMap
 

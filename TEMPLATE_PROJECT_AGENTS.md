@@ -58,7 +58,9 @@ with `python3 -I`):
 - `dump.py` – condense check reports, show blueprints, search dumps;
 - `copyroot.py` – copy roots from another model, e.g. configuration templates;
 - `text2of.py` – convert method and command bodies written as Java with markers
-  into ObjectFlow and ManMap nodes.
+  into ObjectFlow and ManMap nodes;
+- `scaffold.py` – generate the convention-compliant skeleton of a new aggregate
+  area (domain, tests, configs, search, commands) from a JSON specification.
 
 Use them instead of writing your own scripts for the same purpose. Their input
 and output files live in the system temp directory; they write nothing into the

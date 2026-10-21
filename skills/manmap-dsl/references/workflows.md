@@ -2,6 +2,8 @@
 
 ## Create a Persistence Description
 
+For a new aggregate: `scaffold.py domain` (`moai:objectflow-dsl`, `references/workflows.md`, "Scaffold a new area").
+
 Source semantics: [Persistence Description and mapping capabilities](../../../docu/manmap.md#persistence-description-und-mapping-möglichkeiten) and [fields, keys, and options](../../../docu/manmap.md#felder-schlüssel-und-optionen).
 
 1. Pass `projectPath` in every call (`moai:mps-mcp-workflow`, "Which project the tools act on") and resolve the editable target model; placement and name: conventions `anwendungsaufbau`.
@@ -15,6 +17,8 @@ Source semantics: [Persistence Description and mapping capabilities](../../../do
 Use [field-mapping-subtree.json](blueprints/field-mapping-subtree.json), [reference-mapping-subtree.json](blueprints/reference-mapping-subtree.json), [embedded-mapping-subtree.json](blueprints/embedded-mapping-subtree.json), and one of the two list templates. Table/column/sequence values are `StringLiteral` children.
 
 ## Create or Extend a Repository
+
+For a new aggregate: `scaffold.py domain` (`moai:objectflow-dsl`, `references/workflows.md`, "Scaffold a new area").
 
 Source semantics: [repositories and the four method kinds](../../../docu/manmap.md#repositories-und-die-vier-methodenarten) and [ObjectFlow explicit session operations](../../../docu/objectflow.md#explizite-session-operationen).
 
