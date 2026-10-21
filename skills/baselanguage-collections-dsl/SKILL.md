@@ -30,6 +30,16 @@ description: Collections and closures. Use when creating, editing, validating, o
 - Replace every `$TARGET_X$` placeholder with a resolvable destination-model reference before writing; the dry-run does not look names up, so search the text for `TARGET_` first.
 - Validate the changed containing root with `mps_mcp_check_root_node_problems` (several roots: the model reference with `perRoot=true`); build or generate when the task requires it.
 
+## Unknown construct
+
+Do not infer a shape from dumps, and do not write your own tools for it. Follow this order:
+
+1. Find the construct in [references/concepts.md](references/concepts.md); it names the concept and its FQ name.
+2. Read roles, cardinalities and enum values with `mps_mcp_get_concept_details` (`detail="shape"`). Its `sampleNode` is a one-level placeholder, not a pattern.
+3. Find a real instance in the packaged examples ([sandbox.md](references/sandbox.md)): `mps_mcp_query_nodes` `FIND_INSTANCES` with `scope:"models"` and `sampleOnly:true`.
+4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file.
+5. Dry-run your blueprint (`dryRun:true`); it checks roles, cardinality and assignability.
+
 ## Quick start
 
 1. Pass `projectPath` in every call (`moai:mps-mcp-workflow`, "Which project the tools act on"). If it is unknown, use the current directory on the first call, take the path from the rejection, and reuse it; if the project list is empty, ask the user to open the project.

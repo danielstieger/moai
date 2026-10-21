@@ -9,7 +9,7 @@ Use this workflow when authoring non-trivial BaseLanguage code via JSON blueprin
 ## Core Principles
 
 * **Stage large roots** (skeleton → fill): `moai:mps-node-editing` (`references/staged-construction.md`).
-* **Reference stability**: references (especially `baseMethodDeclaration`) are fragile. Use persistent refs (`r:...`) instead of names for stable wiring.
+* **References**: by name; exceptions (stubs, overloads, …) and repair order in `moai:mps-node-editing` (Critical Directives).
 * **Validation gates**: always use `dryRun` (structure), `mps_mcp_check_root_node_problems` (semantics), and `MAKE` (generation/compilation).
 * **Generated Java as signal**: if `MAKE` fails, check the generated Java for hints (`new ()` or `???()`).
 
@@ -19,33 +19,31 @@ Use this workflow when authoring non-trivial BaseLanguage code via JSON blueprin
 2. **Setup**: resolve/create the target module/model and verify dependencies.
 3. **Skeleton**:
     * Insert the root with signatures, fields and empty bodies (`mps_mcp_insert_root_node_from_json`, or `mps_mcp_create_root_node` + `mps_mcp_update_root_node_from_json` once).
-4. **Harvest References**:
-    * **Own members**: use `mps_mcp_print_node` on the skeleton to get persistent refs for constructors and methods.
+4. **Set References**:
+    * **Own members**: by name.
     * **External members**: derive refs from the class ref using URL-encoded signatures (`stub-references.md`).
     * **Inherited methods**: use the declaring class ref for `baseMethodDeclaration`.
-    * **Ambiguity**: use `GET_ASSIGNABLE_REFERENCES` (mode: `completion`) for overloaded/inherited members if name auto-resolution fails.
-5. **Patch & Apply**:
-    * Replace placeholder targets in your member blueprints with the harvested/derived persistent refs (especially for `ClassCreator` and `InstanceMethodCallOperation`).
-    * Apply member by member with `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`). Never re-run `mps_mcp_update_root_node_from_json` after harvesting — it re-creates all children and invalidates the harvested refs (`moai:mps-node-editing`, `references/staged-construction.md`).
+    * **Overloads**: persistent ref; use `GET_ASSIGNABLE_REFERENCES` (mode: `completion`) to find it.
+5. **Apply**:
+    * Apply member by member with `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`); replace constructors and test methods only through their `body` (`moai:mps-node-editing`, Critical Directives). Never re-run `mps_mcp_update_root_node_from_json` on a filled root — it re-creates all children with new IDs (`moai:mps-node-editing`, `references/staged-construction.md`).
 6. **Final Validation**: `dryRun` → `mps_mcp_check_root_node_problems` → `MAKE`.
 
 ## Reference Rules
 
 * `ClassCreator.baseMethodDeclaration`: points to a **constructor**, not the class.
 * `InstanceMethodCallOperation.baseMethodDeclaration`: points to the **method declaration**.
-* **Stale refs**: a full-root rewrite (`mps_mcp_update_root_node_from_json`) re-creates all children; re-harvest afterwards.
+* **Stale refs**: a full-root rewrite (`mps_mcp_update_root_node_from_json`) or a `SET CHILD` re-creates the replaced nodes with new IDs; by-name refs resolve again, persistent refs to them break.
 
 ## Practical Authoring Tips
 
 * Keep helper JSON-generation scripts outside the model.
 * If only one subtree changes, prefer `mps_mcp_update_node` over a full root rewrite to reduce reference churn.
-* Harvest refs from live AST with `mps_mcp_print_node` for own-class members; member identities do not survive a full-root rewrite.
-* For library stubs, derive persistent refs from the class ref using the URL-encoded signature formula; do not print stubs to harvest refs that can be computed.
+* For library stubs, derive persistent refs from the class ref using the URL-encoded signature formula; do not print stubs to find refs that can be computed.
 
 ## Checklist
 
 * [ ] Model and placeholder roots exist.
 * [ ] Skeleton applies and validates.
-* [ ] Member references are harvested (own) or derived (external).
-* [ ] Final JSON is patched with persistent refs.
+* [ ] Own member references set by name; stub refs derived; overloads persistent.
+* [ ] `fixReferences.stillBroken` is 0.
 * [ ] `MAKE` succeeds and generated Java looks correct.

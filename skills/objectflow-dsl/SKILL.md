@@ -32,6 +32,16 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 - Comparison operators depend on the ObjectFlow type (`==` vs `:eq:`/`:ne:`, `of` / `status switch` for Status, no object comparison for DTOs): see [Null-Werte in Datenstrukturen](../../docu/objectflow.md#null-werte-in-datenstrukturen). Entity references: `#Key` and `isNullKey`, see [Beziehungen und Objektgraphen](../../docu/objectflow.md#beziehungen-und-objektgraphen). When the type of an operand is unclear, ask `mps_mcp_query_types` or `mps_mcp_query_nodes` `GET_TYPE` (`moai:mps-mcp-workflow`, `references/type-queries.md`) instead of guessing. ManMap `where` filters follow their own rules (`==`/`!=`, `<` … `>=`, `in`, `like`, `optional`; no `:eq:`), see [Filterausdrücke](../../docu/manmap.md#spezifikum---filterausdrücke-und-gemappte-felder). The "always `:eq:`" rule of `moai:mps-baselanguage` applies to SNode comparisons in MPS code only, not to ObjectFlow expressions.
 - No lazy loading, no cascading save/delete: see [Grundprinzipien für die Anwendungsentwicklung](../../docu/moware-werkbank.md#grundprinzipien-für-die-anwendungsentwicklung) and [Explizites Laden](../../docu/manmap.md#explizites-laden).
 
+## Unknown construct
+
+Do not infer a shape from dumps, and do not write your own tools for it. Follow this order:
+
+1. Find the projection in the documentation's [chapter map (Kapitellandkarte)](../../docu/objectflow.md); it names the concept and its FQ name.
+2. Read roles, cardinalities and enum values with `mps_mcp_get_concept_details` (`detail="shape"`). Its `sampleNode` is a one-level placeholder, not a pattern.
+3. Find a real instance in the packaged examples ([sandbox.md](references/sandbox.md)): `mps_mcp_query_nodes` `FIND_INSTANCES` with `scope:"models"` and `sampleOnly:true`.
+4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file.
+5. Dry-run your blueprint (`dryRun:true`); it checks roles, cardinality and assignability.
+
 ## Quick start
 
 1. Pass `projectPath` in every call (`moai:mps-mcp-workflow`, "Which project the tools act on"). If it is unknown, use the current directory on the first call, take the path from the rejection, and reuse it; if the project list is empty, ask the user to open the project. For a new application module, follow [From modeling to execution](../../docu/moware-werkbank.md#von-der-modellierung-zur-ausführung) and wire it with `mps_mcp_module_dependency` and `mps_mcp_model_used_language`.

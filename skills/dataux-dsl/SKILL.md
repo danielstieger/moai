@@ -33,6 +33,16 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 - Module placement and the location of the referenced `OFXConfig`: conventions `anwendungsaufbau`. Both module kinds require `configuration`, `isAuthenticated`, and one `VERSION`; a `BatchJob Module` additionally requires an exception strategy ending with a default rule and exactly one `CONSUMERS` per pair with a consumer. Never create `onStartup`/`onShutdown`. See [module gotchas](references/gotchas.md#modules-need-a-configuration-and-a-version) and [executable modules](../../docu/dataux.md#teil-ii--anwendung-und-batchjob).
 - Keep business rules out of UI expressions. DataUX should remain presentation-oriented “CheapCode”; see the [MoWare development principles](../../docu/moware-werkbank.md#grundprinzipien-für-die-anwendungsentwicklung).
 
+## Unknown construct
+
+Do not infer a shape from dumps, and do not write your own tools for it. Follow this order:
+
+1. Find the projection in the documentation's [chapter map (Kapitellandkarte)](../../docu/dataux.md); it names the concept and its FQ name.
+2. Read roles, cardinalities and enum values with `mps_mcp_get_concept_details` (`detail="shape"`). Its `sampleNode` is a one-level placeholder, not a pattern.
+3. Find a real instance in the packaged examples ([sandbox.md](references/sandbox.md)): `mps_mcp_query_nodes` `FIND_INSTANCES` with `scope:"models"` and `sampleOnly:true`.
+4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file.
+5. Dry-run your blueprint (`dryRun:true`); it checks roles, cardinality and assignability.
+
 ## Quick start
 
 1. Pass `projectPath` in every call. If it is unknown, use the current directory on the first call, take the path from the rejection, and reuse it; if the project list is empty, ask the user to open the project (`moai:mps-mcp-workflow`, "Which project the tools act on").

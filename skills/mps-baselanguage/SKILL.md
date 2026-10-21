@@ -1,6 +1,6 @@
 ---
 name: mps-baselanguage
-description: Author and edit MPS `jetbrains.mps.baseLanguage` (Java) nodes — choose between the Java parser and JSON AST blueprints, map Java syntax to baseLanguage concepts/roles, harvest persistent member references, and validate. Use for class/method bodies, fields, expressions, statements, or any plain Java code inside MPS models; collections and closures are `moai:baselanguage-collections-dsl`, the smodel extension is `moai:mps-model-manipulation`.
+description: Author and edit MPS `jetbrains.mps.baseLanguage` (Java) nodes — choose between the Java parser and JSON AST blueprints, map Java syntax to baseLanguage concepts/roles, set member references, and validate. Use for class/method bodies, fields, expressions, statements, or any plain Java code inside MPS models; collections and closures are `moai:baselanguage-collections-dsl`, the smodel extension is `moai:mps-model-manipulation`.
 ---
 
 # MPS BaseLanguage (Java) Authoring
@@ -35,14 +35,12 @@ Pick the right authoring tool before you start:
 1. **Scope**: call `mps_mcp_get_current_editor_root_node` to know where you are inserting (method body, field initializer, root, …).
 2. **Resolve dependencies**: in a MoWare model the DevKit `org.modellwerkstatt.MoWareWerkbank` provides BaseLanguage, closures and collections (see `moai:mps-node-editing`). Models for referenced nodes must also be imported.
 3. **Skeleton first**: for any non-trivial root, insert a placeholder skeleton (`mps_mcp_create_root_node` + `mps_mcp_update_root_node_from_json` or the parser) before filling member bodies.
-4. **Harvest references**: for own members, run `mps_mcp_print_node` on the skeleton to read persistent refs of constructors, methods, and fields. For JDK / library stubs, derive refs from the class ref using the URL-encoded signature formula (see references).
-5. **Apply bodies**: edit one subtree at a time with `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`) or the parser (`mode: "child"`). Never re-run `mps_mcp_update_root_node_from_json` after harvesting — it re-creates all children and invalidates the harvested refs (`moai:mps-node-editing`, `references/staged-construction.md`).
-6. **Auto-resolution**: for unambiguous local refs (a parameter, a local variable, a unique method name), pass the plain name as `target` — MPS resolves it after insertion. For overloaded or stub members, use a persistent ref.
-7. **Validate in three gates**:
+4. **References**: by name; exceptions and repair order in `moai:mps-node-editing` (Critical Directives). Derive JDK / library stub refs from the class ref (`references/stub-references.md`).
+5. **Apply bodies**: edit one subtree at a time with `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`) or the parser (`mode: "child"`). Never re-run `mps_mcp_update_root_node_from_json` on a filled root — it re-creates all children with new IDs (`moai:mps-node-editing`, `references/staged-construction.md`).
+6. **Validate in three gates**:
    - `dryRun: true` on insert tools — catches structural / assignability errors before mutation (plain-name refs are not looked up, node factories do not run)
    - `mps_mcp_check_root_node_problems` — semantic checking
    - `mps_mcp_alter_nodes MAKE` — generation + compilation
-8. **Repair**: every write reports `fixReferences.stillBroken`; if a few refs stay broken, run `mps_mcp_alter_nodes FIX_REFERENCES` rather than re-harvesting all of them.
 
 ## Related Skills
 
@@ -57,5 +55,5 @@ Pick the right authoring tool before you start:
 - Open `references/critical-rules.md` when something fails validation and you want the rulebook on `ExpressionStatement`, `ClassCreator`, anonymous classes, mandatory bodies, `FieldReferenceOperation`, etc.
 - Open `references/parse-java-tips.md` when using `mps_mcp_parse_java_and_insert` and you need binary-expression priority handling, placeholder strategy, `recovery`, `StatementList` auto-wrap, or post-insert verification steps.
 - Open `references/stub-references.md` when you need to point a `baseMethodDeclaration` at a JDK or library member — covers ref derivation, URL encoding, inherited-method handling, and the GET_ASSIGNABLE_REFERENCES fallback.
-- Open `references/json-ast-workflow.md` when authoring a non-trivial BaseLanguage root via JSON AST — covers staged skeleton → harvest → patch → validate, plus the `ClassCreator` vs `InstanceMethodCallOperation` ref distinction.
+- Open `references/json-ast-workflow.md` when authoring a non-trivial BaseLanguage root via JSON AST — covers staged skeleton → references → apply → validate, plus the `ClassCreator` vs `InstanceMethodCallOperation` ref distinction.
 - Open `references/troubleshooting.md` when you hit `dryRun` errors, broken-ref symptoms in generated Java (`new ()`, `???()`), stale-ref errors, or "model checks pass but MAKE fails".

@@ -25,6 +25,16 @@ ManMap models relational persistence and read models for MoWare applications. `P
 - Node factories run on insert and fill roles the blueprint omits; a named role, even `{"role":"…","nodes":[]}`, replaces the factory's content. See [Node factories](references/gotchas.md#node-factories).
 - Load `moai:mps-baselanguage` and `moai:mps-node-editing` before constructing repository methods or expression/statement subtrees.
 
+## Unknown construct
+
+Do not infer a shape from dumps, and do not write your own tools for it. Follow this order:
+
+1. Find the projection in the documentation's [chapter map (Kapitellandkarte)](../../docu/manmap.md); it names the concept and its FQ name.
+2. Read roles, cardinalities and enum values with `mps_mcp_get_concept_details` (`detail="shape"`). Its `sampleNode` is a one-level placeholder, not a pattern.
+3. Find a real instance in the packaged examples ([sandbox.md](references/sandbox.md)): `mps_mcp_query_nodes` `FIND_INSTANCES` with `scope:"models"` and `sampleOnly:true`.
+4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file.
+5. Dry-run your blueprint (`dryRun:true`); it checks roles, cardinality and assignability.
+
 ## Quick Start
 
 1. Pass `projectPath` in every call (`moai:mps-mcp-workflow`, "Which project the tools act on"). If it is unknown, use the current directory on the first call, then take the path from the rejection and reuse it. If the project list is empty, ask the user to open the project.

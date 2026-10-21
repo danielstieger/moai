@@ -14,7 +14,8 @@ moai/
 ├── conventions/                Binding modeling conventions (in German)
 ├── MPS_AGENT_GUIDE.md          General MPS working rules
 ├── INSTALL_INSTRUCTIONS.md     Installation instructions for agents
-└── TEMPLATE_PROJECT_AGENTS.md  Template for the application project
+├── TEMPLATE_PROJECT_AGENTS.md  Template for the application project
+└── maintenance/                For MoAI maintainers only, not for agents in a project
 ```
 
 The MoWare skills are:
