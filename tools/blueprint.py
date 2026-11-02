@@ -26,7 +26,7 @@ deprecated concepts or roles) are printed; check the inserted node afterwards.
 """
 import sys
 
-sys.dont_write_bytecode = True  # write nothing into the package (moai/ is a submodule in projects)
+sys.dont_write_bytecode = True  # write no bytecode into the project or the package
 
 import json
 import os

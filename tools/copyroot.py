@@ -20,7 +20,7 @@ The result is checked with blueprint.py; the tool prints the output path and its
 """
 import sys
 
-sys.dont_write_bytecode = True  # write nothing into the package (moai/ is a submodule in projects)
+sys.dont_write_bytecode = True  # write no bytecode into the project or the package
 
 import json
 import os

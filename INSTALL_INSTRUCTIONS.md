@@ -19,16 +19,20 @@
   | Keywords       | moware, jetbrains-mps, objectflow, manmap, dataux                                                               |
 - **MoAI is not listed in any plugin marketplace.** Do not search for it and do
   not install a plugin of the same name from any other source. MoAI is
-  included exclusively from the local directory `moai/` in this application
+  included exclusively from the local directory `moai_plugin/moai/` in this application
   project.
-- MoAI lives as a versioned Git submodule under `moai/`. The application
-  project determines the version in use through the submodule commit.
+- MoAI lives as a versioned Git submodule under `moai_plugin/moai/`. The
+  application project determines the version in use through the submodule
+  commit.
+- `moai_plugin/tools/` is a copy of the MoAI tools that belongs to the
+  application project. Agents may extend it; it is checked in with the project.
 
 ## Rules
 
-- The package boundary rules in `moai/TEMPLATE_PROJECT_AGENTS.md` ("MoAI
-  Package Boundary", "Skills") apply during installation as well: nothing is
-  written below `moai/`, nothing is copied out of it.
+- The package boundary rules in `moai_plugin/moai/TEMPLATE_PROJECT_AGENTS.md`
+  ("MoAI Package Boundary", "Skills") apply during installation as well:
+  nothing is written below `moai_plugin/moai/`, and only `tools/` is copied out
+  of it (step 3).
 - Do not overwrite existing instruction files (`AGENTS.md`, `CLAUDE.md` or
   similar); merge the content instead.
 - If a step requires a decision that cannot be derived from these
@@ -43,7 +47,7 @@
   documentation or help for this.
 - Prefer a **project-scoped** registration that can be versioned with the
   application project over a user-wide installation.
-- The registration points to the directory `moai/` (relative path from the
+- The registration points to the directory `moai_plugin/moai/` (relative path from the
   project root), not to a copy.
 - Enable the plugin if the runtime distinguishes between installed and
   enabled.
@@ -52,14 +56,22 @@
 
 ### 2. Set up project instructions
 
-- Copy `moai/TEMPLATE_PROJECT_AGENTS.md` to the project root as `AGENTS.md`.
+- Copy `moai_plugin/moai/TEMPLATE_PROJECT_AGENTS.md` to the project root as `AGENTS.md`.
   If an `AGENTS.md` already exists, add the template content as a separate
   section.
 - If your runtime reads an instruction file other than `AGENTS.md`, make sure
   that file references `AGENTS.md` or includes its content, instead of
   duplicating the instructions.
 
-### 3. Check prerequisites
+### 3. Copy the tools
+
+Run in the project root:
+
+```bash
+cp -r moai_plugin/moai/tools moai_plugin/tools
+```
+
+### 4. Check prerequisites
 
 - Check whether tools from an MPS MCP integration are available in your
   runtime.
@@ -67,9 +79,9 @@
   JetBrains MPS must be running with the target project open and the MPS MCP
   integration enabled.
 - Check that `python3` (3.8 or later) is available; the MoAI tools in
-  `moai/tools/` need it. If it is missing, report it.
+  `moai_plugin/tools/` need it. If it is missing, report it.
 
-### 4. Verify
+### 5. Verify
 
 - Reload the runtime or plugins if required for the changes to take effect,
   or state the required command or restart.
@@ -86,3 +98,18 @@ Report briefly:
 - whether the skills are visible;
 - status of the MPS MCP integration;
 - open issues and steps required from the user (e.g. restart, commit).
+
+## Update
+
+Only when the user asks for it. In the project root:
+
+```bash
+git submodule update --remote --merge moai_plugin/moai
+```
+
+The tools in `moai_plugin/tools/` do not change with this. Synchronize them by hand
+with `moai_plugin/moai/tools/`. Do not simply copy over them: they may contain the
+project's own extensions, which would be lost.
+
+`AGENTS.md` does not change either. If `moai_plugin/moai/TEMPLATE_PROJECT_AGENTS.md`
+has relevant changes, synchronize them by hand and keep the project's own entries.

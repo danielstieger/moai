@@ -5,12 +5,12 @@ Workflow (see the DSL skills):
   1. Insert the methods as Java text with `mps_mcp_parse_java_and_insert` (featureKind CLASS_CONTENT or METHOD,
      insert.mode child into the root's `member` role). The parser leaves the markers unresolved; that is expected.
   2. `mps_mcp_print_node` (deep=true) of the root.
-  3. python3 -I moai/tools/text2of.py ROOTDUMP [--repo-type METHOD=TYPE]... [--only NAME]...
+  3. python3 -I moai_plugin/tools/text2of.py ROOTDUMP [--repo-type METHOD=TYPE]... [--only NAME]...
      writes one blueprint per member into the system temp directory and prints a table:
        name | reference of the node to replace (SET CHILD childNodeRef) | file
      Constructors and test methods are replaced through their body only, so references to them stay valid.
   4. `mps_mcp_update_node` SET CHILD per row, then FIX_REFERENCES on the root (calls between replaced members
-     bind to the old node until the last row is set), `moai/tools/verify.py node` and the model check.
+     bind to the old node until the last row is set), `moai_plugin/tools/verify.py node` and the model check.
 
 The kind of method follows the root: methods of a Service become service methods, of a Repository repository
 methods (`--repo-type name=CHECKOUT|CHECKIN|DELETE`, default READONLY), otherwise plain instance methods.
@@ -25,6 +25,7 @@ Markers (Java text -> result):
   BD("1.50") SERVERDATE() SERVERDATETIME() DATE(y,m,d) DATETIME(y,m,d,h,mi,s)   -> literals (fixed: fromServer=false)
   STATUS("Decl","ELEM")  OF(x,"A","B")          -> Decl.ELEM, x of A, B
   EQ(a,b)  NE(a,b)                               -> a :eq: b, a :ne: b
+  ISEMPTY(s)  ISNOTEMPTY(s)                      -> s.isEmpty, s.isNotEmpty on a string (s.isEmpty() is the list operation)
   FMT("fmt", args)                               -> 'fmt'%(args)
   PRE(cond,"fmt",args) PREW(..) PRE(null,..)     -> precondition (WARNING_HINT / always raised)
   GUARD(cond,"fmt",args)                         -> guard
@@ -46,16 +47,21 @@ Markers (Java text -> result):
   SESSION_ENTITIES("Type","all")                 -> session entities (checked_out|keys_of_checked_out|all|keys_of_all)
   MERGE(src,dest,"entity","list","readonly"[,sess])  -> session merge (entity|list|ref; readonly|checkedout|none)
   SQL("QUERY"|"STATEMENT","text\\nnext line",[MAPPER("m")|ROWMAPPER("m")|lambda])
-      in the text: :var, :var.prop (bound parameters), {Decl.ELEM} (status constant)
+  SQL("QUERY"|"STATEMENT",() -> { SQLTEXT("text"); if (c) { String x = ..; SQLTEXT("AND A = :x"); } },[mapping])
+      dynamic SQL: the block is Java; every reached SQLTEXT adds its fragment, in execution order
+      in the text: :var, :var.prop, :var.ref#KEY, :var.method() (bound parameters), {Decl.ELEM} (status constant)
 Command bodies (command init, page init, scopes, conclusions, final conclusions, termination handlers):
   DONE()  PAGE("Name")  PUSH(x)  QUEUE_NEXT("Command", args)   -> done, page Name, pushSelection(x), queue next command
   TERM_OK()  PUSHED()  WAS_CHILD()               -> terminatedInFinalOk, pushed, wasChild (termination handler)
   command parameters and variables are written by name; page init ends with `return x;`
 Anything else that stays unresolved stops the tool with its location.
+
+A limit of this tool is no limit of the language: do not change the model to suit it and do not write a separate
+script. Extend moai_plugin/tools/ with the smallest change ("Unknown construct" in the DSL skills).
 """
 import sys
 
-sys.dont_write_bytecode = True  # write nothing into the package (moai/ is a submodule in projects)
+sys.dont_write_bytecode = True  # write no bytecode into the project or the package
 
 import json
 import os
@@ -91,7 +97,9 @@ TXT = "jetbrains.mps.lang.text.structure."
 MERGE_KINDS = {"entity", "list", "ref"}
 MERGE_SESSION = {"readonly": "session_readonly", "checkedout": "session_checkedout", "none": "not_consider_session"}
 SESSION_MODES = {"checked_out": "checked_out", "keys_of_checked_out": "ckecked_out_keys", "all": "all", "keys_of_all": "all_keys"}
-SQL_PART = re.compile(r"(:[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)?|\{[A-Za-z_]\w*\.[A-Za-z_]\w*\})")
+TOOL_LIMIT = ("hint: a limit of this tool is no limit of the language; do not change the model to suit it, extend "
+              "moai_plugin/tools/ (\"Unknown construct\" in the DSL skills)")
+SQL_PART = re.compile(r"(:[A-Za-z_]\w*(?:\.[A-Za-z_]\w*(?:#KEY|\(\))?)?|\{[A-Za-z_]\w*\.[A-Za-z_]\w*\})")
 
 
 TERM_PARAMS = {"TERM_OK": "PageCmdTermConceptFuntionParamTermOk", "PUSHED": "PageCmdTermConceptFuntionParamPushed",
@@ -158,6 +166,14 @@ def walk(n):
             yield from walk(x)
 
 
+def blueprint_nodes(n):
+    """Every node of a blueprint this tool has built (unlike walk(), which goes over a dump)."""
+    yield n
+    for c in n.get("children", []):
+        for x in c.get("nodes", []):
+            yield from blueprint_nodes(x)
+
+
 def short(n):
     return f"{n.get('name') or fq(n).rsplit('.', 1)[-1]} ({fq(n).rsplit('.', 1)[-1]}, {n.get('reference', '')})"
 
@@ -173,6 +189,7 @@ class Converter:
         self.locals = {x.get("name") for x in walk(member)
                        if fq(x) in (BL + "ParameterDeclaration", BL + "LocalVariableDeclaration")}
         self.bigdec_names = set()           # parameters / locals / closure params known as BigDecimal
+        self.in_sql_block = False           # SQLTEXT is valid only inside the block of a SQL(..)
         for x in walk(member):
             if fq(x) in (BL + "ParameterDeclaration", BL + "LocalVariableDeclaration"):
                 t = kid(x, "type")
@@ -219,12 +236,18 @@ class Converter:
                 return self.tokens(head), last
         raise Stop(f"{what}: x.property is expected, found {short(n)}")
 
-    def sql(self, args, what):
-        kind = self.string(args[0], what)
-        if kind not in ("QUERY", "STATEMENT"):
-            raise Stop(f"{what}: kind must be QUERY or STATEMENT, not '{kind}'")
+    def sql_operation(self, field):
+        """The part after the dot of a bound parameter: prop, ref#KEY or method()."""
+        if field.endswith("#KEY"):
+            return node(MM + "C2EntityKeyPropReference", refs={"property": field[:-4]})
+        if field.endswith("()"):
+            return node(MM + "C2MethodReference", refs={"method": field[:-2]})
+        return node(MM + "C2PropertyReference", refs={"property": field})
+
+    def sql_text(self, n, what):
+        """A string literal with SQL text -> one C2SqlText."""
         lines = []
-        sql_text = self.string(args[1], what).replace("\\n", "\n")  # the parser keeps \n as two characters
+        sql_text = self.string(n, what).replace("\\n", "\n")  # the parser keeps \n as two characters
         for text in sql_text.split("\n"):
             elements = []
             for word in text.split():
@@ -234,8 +257,8 @@ class Converter:
                     if part.startswith(":"):
                         var, _, field = part[1:].partition(".")
                         ref_node = node(MM + "C2SqlWordVarReference", refs={"varDecl": var})
-                        elements.append(node(MM + "C2Dot", children={"operand": ref_node, "operation": node(
-                            MM + "C2PropertyReference", refs={"property": field})}) if field else ref_node)
+                        elements.append(node(MM + "C2Dot", children={"operand": ref_node, "operation": self.sql_operation(field)})
+                                        if field else ref_node)
                     elif part.startswith("{"):
                         decl, _, elem = part[1:-1].partition(".")
                         elements.append(node(MM + "C2SqlStatusReference", children={"primConstant": node(
@@ -247,6 +270,35 @@ class Converter:
                 lines.append(node(TXT + "Line", children={"elements": elements}))
         if not lines:
             raise Stop(f"{what}: the SQL text is empty")
+        return node(MM + "C2SqlText", children={"lines": lines})
+
+    def sql_block(self, closure, what):
+        """SQL(kind, () -> { ... }, ..): the block of a dynamic SQL statement."""
+        if kids(closure, "parameter"):
+            raise Stop(f"{what}: the SQL block takes no parameters")
+        body = kid(closure, "body")
+        if body is None or fq(body) != BL + "StatementList":
+            raise Stop(f"{what}: the SQL block must be a block: () -> {{ SQLTEXT(..); }}")
+        statements = kids(body, "statement")
+        if len(statements) == 1 and fq(statements[0]) == BL + "BlockStatement":  # the parser wraps a lambda's block
+            body = kid(statements[0], "statements")
+        outer, self.in_sql_block = self.in_sql_block, True
+        try:
+            out = self.fix(body)
+        finally:
+            self.in_sql_block = outer
+        if not any(x["concept"] == MM + "C2SqlText" for x in blueprint_nodes(out)):
+            raise Stop(f"{what}: the SQL block contains no SQLTEXT")
+        return out
+
+    def sql(self, args, what):
+        kind = self.string(args[0], what)
+        if kind not in ("QUERY", "STATEMENT"):
+            raise Stop(f"{what}: kind must be QUERY or STATEMENT, not '{kind}'")
+        if len(args) > 1 and fq(args[1]) == CLO + "ClosureLiteral":
+            statements = self.sql_block(args[1], what)
+        else:
+            statements = node(BL + "StatementList", children={"statement": self.sql_text(args[1], what)})
         mapping = None
         if len(args) > 2:
             mname, margs = self.marker(args[2])
@@ -258,9 +310,7 @@ class Converter:
                 mapping = self.fix(args[2])  # an inline lambda
         if kind == "STATEMENT" and mapping is not None:
             raise Stop(f"{what}: a STATEMENT has no result mapping")
-        out = node(MM + "C2SqlBlock", {"sqlType": kind},
-                   {"statements": node(BL + "StatementList", children={"statement": node(MM + "C2SqlText", children={"lines": lines})}),
-                    "mapping": mapping})
+        out = node(MM + "C2SqlBlock", {"sqlType": kind}, {"statements": statements, "mapping": mapping})
         if kind == "STATEMENT":
             out["children"].append({"role": "mapping", "nodes": []})  # suppress the factory's row closure
         return out
@@ -292,6 +342,16 @@ class Converter:
         if stmts and stmts[0]["nodes"] and stmts[0]["nodes"][-1]["concept"] == BL + "BreakStatement":
             stmts[0]["nodes"].pop()
         return out
+
+    def unknown_arraylist(self, n):
+        """new ArrayList<T>() the parser could not resolve (java.util not visible in the model)."""
+        types = kids(n, "typeParameter") or kids(n, "typeArgument")
+        if len(types) != 1:
+            raise Stop(f"new ArrayList needs its element type, new ArrayList<T>(): {short(n)}")
+        if kids(n, "actualArgument"):
+            raise Stop(f"new ArrayList with arguments is not supported, only new ArrayList<T>(): {short(n)}")
+        return node(BL + "GenericNewExpression", children={"creator": node(COL + "ListCreatorWithInit", children={
+            "elementType": self.fix(types[0])})})
 
     def fmt(self, args, what):
         if not args:
@@ -423,6 +483,10 @@ class Converter:
             call = node(OF + "CommandCallBasis", children={"actualArgument": [self.fix(a) for a in args[1:]]},
                         refs={"command": self.string(args[0], "QUEUE_NEXT command")})
             return node(OF + "SessionQueueNextCommand", children={"commandCall": call})
+        if name == "SQLTEXT":
+            if not self.in_sql_block:
+                raise Stop('SQLTEXT is valid only inside a SQL block: SQL("QUERY", () -> { SQLTEXT(..); }, ..)')
+            return self.sql_text(args[0], "SQLTEXT")
         if name == "DONE":
             return node(OF + "DoneCommand")
         if name == "PAGE":
@@ -484,6 +548,8 @@ class Converter:
             return node(BL + "DotExpression", children={"operand": self.tokens(tokens), "operation": op})
         if c == BL + "UnknownNameRef":
             return self.tokens(prop(n, "tokens"))
+        if c == BL + "UnknownNew" and (prop(n, "className") or "").rsplit(".", 1)[-1] == "ArrayList":
+            return self.unknown_arraylist(n)
         if c.startswith(BL + "Unknown"):
             raise Stop(f"the parser could not read {short(n)}; rewrite the expression")
 
@@ -575,6 +641,10 @@ class Converter:
             return node(OF + "OperationCall", children={"actualArgument": [self.fix(a) for a in rest[2:]],
                                                         "sessionExpression": self.fix(sess) if sess else None},
                         refs={"runtimeHandledObject": self.string(rest[0], what), "baseMethodDeclaration": self.string(rest[1], what)})
+        if name in ("ISEMPTY", "ISNOTEMPTY"):
+            return node(BL + "DotExpression", children={
+                "operand": self.fix(args[0]),
+                "operation": node(BL + ("IsEmptyOperation" if name == "ISEMPTY" else "IsNotEmptyOperation"))})
         if name == "ISNULLKEY":
             return node(BL + "DotExpression", children={"operand": self.fix(args[0]), "operation": node(OF + "IsNull")})
         if name in ("KEY", "META"):
@@ -611,7 +681,7 @@ class Converter:
             return node(MM + "OptionalOperator", children={"expression": self.fix(args[0])})
         if name in ("GET", "WHERE"):
             return self.query(name, args, [])
-        if name in ("PRE", "PREW", "GUARD", "LOG", "SESSION_OP", "SAVE", "DELETE", "VALIDATION", "FAIL_IN", "DONE", "PAGE", "PUSH", "QUEUE_NEXT"):
+        if name in ("PRE", "PREW", "GUARD", "LOG", "SESSION_OP", "SAVE", "DELETE", "VALIDATION", "FAIL_IN", "DONE", "PAGE", "PUSH", "QUEUE_NEXT", "SQLTEXT"):
             raise Stop(f"{what} is a statement marker; write it as a statement of its own")
         raise Stop(f"unknown marker or unresolved method {what}")
 
@@ -749,6 +819,8 @@ def main(argv):
     rows, errors = convert_root(root, repo_types, only)
     for e in errors:
         print("error:", e, file=sys.stderr)
+    if errors:
+        print(TOOL_LIMIT, file=sys.stderr)
     st = Structure()
     rc = 1 if errors else 0
     outdir = tempfile.mkdtemp(prefix="moai-text2of-")

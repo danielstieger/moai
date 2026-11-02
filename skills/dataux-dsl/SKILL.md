@@ -37,11 +37,13 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 
 Do not infer a shape from dumps, and do not write your own tools for it. Follow this order:
 
-1. Find the projection in the documentation's [chapter map (Kapitellandkarte)](../../docu/dataux.md), or search name and alias offline with `python3 -I moai/tools/blueprint.py find <text>`; both give the concept and its FQ name.
+1. Find the projection in the documentation's [chapter map (Kapitellandkarte)](../../docu/dataux.md), or search name and alias offline with `python3 -I moai_plugin/tools/blueprint.py find <text>`; both give the concept and its FQ name.
 2. Read roles, cardinalities, enum values and the concrete concepts that fit each child role offline with `blueprint.py concept <Name>`. Use `mps_mcp_get_concept_details` only for a concept the tool does not know.
 3. Find a real instance in the packaged examples ([sandbox.md](references/sandbox.md)): `mps_mcp_query_nodes` `FIND_INSTANCES` with `scope:"models"` and `sampleOnly:true`.
-4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file; search a dump by concept, name or unresolved reference with `python3 -I moai/tools/dump.py grep`.
+4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file; search a dump by concept, name or unresolved reference with `python3 -I moai_plugin/tools/dump.py grep`.
 5. Write the blueprint as a short spec and expand it with `blueprint.py build`; it checks roles, cardinality, assignability, enum values and placeholders. Then dry-run it (`dryRun:true`).
+
+**A tool cannot express it:** A limit of a MoAI tool is not a limit of the language. Do not change the model to suit a tool and do not write a separate script. Extend the tool in `moai_plugin/tools/` with the smallest change, without weakening its checks. Everything in `moai_plugin/moai/` stays read-only.
 
 ## Quick start
 
@@ -49,12 +51,12 @@ Do not infer a shape from dumps, and do not write your own tools for it. Follow 
 2. Resolve the destination model and inspect its used languages and dependencies with `mps_mcp_get_project_structure`.
 3. Load [references/concepts.md](references/concepts.md), then select the relevant recipe in [references/workflows.md](references/workflows.md).
 4. Inspect a stable package example from [references/sandbox.md](references/sandbox.md) when its shape matches the task. Use application models only as transient evidence and never retain their names or references.
-5. Start from [references/blueprints/](references/blueprints/). Replace every `TARGET_MODEL.*` value with a name or persistent node reference resolved in the destination model, then search the text for `TARGET_`; every hit stops. Or write a short spec and expand it with `python3 -I moai/tools/blueprint.py build SPEC` (format: `blueprint.py --help`); check a filled template with `blueprint.py check`.
+5. Start from [references/blueprints/](references/blueprints/). Replace every `TARGET_MODEL.*` value with a name or persistent node reference resolved in the destination model, then search the text for `TARGET_`; every hit stops. Or write a short spec and expand it with `python3 -I moai_plugin/tools/blueprint.py build SPEC` (format: `blueprint.py --help`); check a filled template with `blueprint.py check`.
 6. Send the blueprint inline (up to 4 KB; every shipped blueprint fits minified) or copy it to `${TMPDIR:-/tmp}` and pass the absolute path of the copy; files under `skills/` are rejected by the server.
 7. Dry-run roots with `mps_mcp_insert_root_node_from_json`; dry-run subtrees with `mps_mcp_update_node` using `ADD CHILD`. Name warnings are expected; factories do not run in the dry-run.
-8. Insert the skeleton, add non-trivial subtrees incrementally, and use surgical updates for later edits. After each real write `fixReferences.stillBroken` must be 0. Compare the inserted node with its blueprint: `mps_mcp_print_node` (`deep=true`) of the new node, then `python3 -I moai/tools/verify.py node BLUEPRINT PRINTOUT`. Fix every deviation; read what it lists as "added" (node-factory effects). ([node factories](references/gotchas.md#node-factories))
+8. Insert the skeleton, add non-trivial subtrees incrementally, and use surgical updates for later edits. After each real write `fixReferences.stillBroken` must be 0. Compare the inserted node with its blueprint: `mps_mcp_print_node` (`deep=true`) of the new node, then `python3 -I moai_plugin/tools/verify.py node BLUEPRINT PRINTOUT`. Fix every deviation; read what it lists as "added" (node-factory effects). ([node factories](references/gotchas.md#node-factories))
 9. Review every changed root against the applicable conventions. A shape copied from a blueprint, a packaged example, or the project itself does not prove compliance.
-10. Run `mps_mcp_check_root_node_problems` on the changed root, or on the model reference with `perRoot=true` after work on several roots. Read `warnings`, `details.uncheckedSubtrees`, and each problem's `rules[].statement`; apply offered `quickFixes` with `autoApplyQuickFixes=true` (node/root references) or `mps_mcp_list_node_intentions` / `mps_mcp_apply_intention`. Repair references with `mps_mcp_alter_nodes FIX_REFERENCES` only when `stillBroken` stays above 0, and perform the task-required make/generation checks. Read a large report with `python3 -I moai/tools/dump.py problems FILE` (one line per problem).
+10. Run `mps_mcp_check_root_node_problems` on the changed root, or on the model reference with `perRoot=true` after work on several roots. Read `warnings`, `details.uncheckedSubtrees`, and each problem's `rules[].statement`; apply offered `quickFixes` with `autoApplyQuickFixes=true` (node/root references) or `mps_mcp_list_node_intentions` / `mps_mcp_apply_intention`. Repair references with `mps_mcp_alter_nodes FIX_REFERENCES` only when `stillBroken` stays above 0, and perform the task-required make/generation checks. Read a large report with `python3 -I moai_plugin/tools/dump.py problems FILE` (one line per problem).
 
 ## Stable package references
 

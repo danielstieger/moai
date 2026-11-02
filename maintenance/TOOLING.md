@@ -26,7 +26,7 @@ Skills alone do not solve Z1 and Z3: a service method stays 6–15 KB of JSON, a
 
 ## Decisions
 
-- Tools are part of the package (`tools/`), versioned with MoAI. They are never copied into a project and write nothing into it.
+- Tools are part of the package (`tools/`), versioned with MoAI, and are copied at installation to `moai_plugin/tools/` in the project; the package itself is the submodule `moai_plugin/moai/`. Agents may extend the copy when a tool has a gap. Users send that directory as a zip, and the maintainer analyzes it. This replaces "never copied into a project" (2026-11-02, run 5: agents bypassed the tools at a gap and changed the model or wrote own scripts). The tools themselves still write nothing into the project.
 - **One generic builder** built from the structure export, no hand-written building blocks per concept.
 - **Method bodies:** Java-like text with markers, converted to ObjectFlow nodes. The marker set of run 4 is the starting point.
 - **References by name**, persistent only for the exceptions in `moai:mps-node-editing` (Critical Directives).
@@ -38,7 +38,7 @@ Skills alone do not solve Z1 and Z3: a service method stays 6–15 KB of JSON, a
 
 ## Runtime rules for all tools
 
-- Python standard library, offline, called with `python3 -I`; each tool sets `sys.dont_write_bytecode = True`, so no `__pycache__` appears in `moai/` (a submodule in projects).
+- Python standard library, offline, called with `python3 -I`; each tool sets `sys.dont_write_bytecode = True`, so no `__pycache__` appears in `moai_plugin/` (in projects).
 - Input and output as files in the system temp directory, which the MCP tools read; no state in the working directory.
 - No references of an application project.
 - Each tool states the language version it is checked against; the builder reads it from the export.
@@ -83,12 +83,12 @@ Skills alone do not solve Z1 and Z3: a service method stays 6–15 KB of JSON, a
 
 | Where | Change |
 | --- | --- |
-| `TEMPLATE_PROJECT_AGENTS.md`, new section "Tools" | MoAI ships tools in `moai/tools/`; use them first, do not rebuild them; input and output only in the temp directory |
+| `TEMPLATE_PROJECT_AGENTS.md`, new section "Tools" | MoAI ships tools, copied to `moai_plugin/tools/`; use them first, do not rebuild them; input and output only in the temp directory |
 | DSL skills, `mps-node-editing` | builder as the standard way to write blueprints (quick start) |
 | `mps-node-editing`, DSL skills | target/actual comparison replaces the manual `print_node` check after an insert |
 | skills that produce large dumps or check reports | name the `mps_dump.py` or `tools/dump.py` call where the output is produced |
 | `objectflow-dsl` (workflow OFXConfig) | root copy for the wbkit templates |
-| `INSTALL_INSTRUCTIONS.md` (step 3) | check that `python3` is available |
+| `INSTALL_INSTRUCTIONS.md` (prerequisites) | check that `python3` is available |
 | `readme.md` | `tools/` in the contents |
 | `maintenance/RELEASE.md` (new) | release steps: export, export comparison, update skills and examples |
 
@@ -112,6 +112,7 @@ Skills alone do not solve Z1 and Z3: a service method stays 6–15 KB of JSON, a
 - **Commands (2026-10-21):** for a `Command` root the tool replaces the body of every concept function (command init, page init, scopes, conclusions, final conclusions, termination handlers). The parser binds command parameters and variables as plain `VariableReference` ("out of search scope"); the tool turns them into `ContainerParamReference` / `ContainerVariableReference`, and `UnknownNameRef` (`x.prop` inside a marker) into a property chain. New markers `DONE()`, `PAGE("Name")`, `PUSH(x)`. Page init returns with `return x;` (a bare `x;` is no Java statement). Tested in `mjfuhrpark2` with a `GRAPH_OWNER_CMD` (checkout via `CALL` in command init, precondition, `pushSelection`, conclusion with `done` / `page`, checkin via `CALL` in FINAL OK, registered by MPS as `+ to session ops`): model check "no problems found". Static resources for the conclusion label were copied with `copyroot.py` from `org.modellwerkstatt.dataux.tests`.
 - **All markers (2026-10-21):** added `STATUS_SWITCH` (Java switch; trailing `break` dropped, empty cases merged), `META`, `ROLE`, `SELECTED`, `SESSION_ENTITIES`, `MERGE`, `QUEUE_NEXT`, `SQL` (lines from `\n`, `:var`, `:var.prop`, `{Decl.ELEM}`, `MAPPER`/`ROWMAPPER`/lambda; STATEMENT with empty mapping). Tested in `mjfuhrpark2` together with `GUARD`, `KEY`/`ISNULLKEY`, `SESSION_OP`, `DELETE`, `SAVE` with option: no errors in the converted roots. The builder now also takes full-form nodes inside a short spec.
 - **`CALL_WITH` and `FAIL_IN` (2026-10-21):** tested in `mjfuhrpark2` (service method with `CALL_WITH(session, ..)`, test method with `FAIL_IN` with and without text); model check clean. An unresolved `session` now becomes the `Session` concept instead of a business property.
+- **Run 5 (2026-11-02):** dynamic SQL with `SQL(kind, () -> { SQLTEXT(..); if (..) { SQLTEXT(..); } }, mapping)`; bound parameters `:x.ref#KEY` and `:x.method()`; `ISEMPTY`/`ISNOTEMPTY` for strings (`x.isEmpty()` stays the list operation, since the tool does not know the type of a property of another root); `new ArrayList<T>()` also when the parser leaves it as `UnknownNew` (java.util not visible in the model). `+` (`C2SqlIntegration`) stays out: legacy. Tested in `mjfurhpark` (throwaway models) with the real parser: model check clean, make successful, generated Java read: fragments in execution order, parameters bound, `isEmpty`/`isNotEmpty` null-safe. A referenced method must have been converted itself: with the parser's Java `String` return type `:x.method()` does not resolve. The SQL was not run against a database.
 
 Starting point for the markers (run 4):
 
@@ -150,6 +151,7 @@ Starting point for the markers (run 4):
 - **Step 3 done (2026-10-21):** `tools/scaffold.py configs`, on top of `copyroot.py`. Input: the specification and `print_node` dumps of `baseconfig` and the wanted templates (default `Test`, `FX8`) from `org.modellwerkstatt.wbkit.shared.configuration` (packaged: `FIND_INSTANCES` with `scope: "models"`). `firma.app` replaced, sections no chosen config includes dropped, database overwrites from `datenbank`; Static Ressources `AppRessourcen` with platform `RICH` and the labels and hotkeys of the UI conventions. The templates already follow the conventions (the test config scans `org.modellwerkstatt.wbkit.shared` for `CS`). Tested in `mjfuhrpark2`: model check clean, all references inside the new model.
 - **Step 4 done (2026-10-21):** `tools/scaffold.py suche`. `<X>Filter` (criteria, `ergebnisse: list<X>`) and `<X>SucheRepo.suche` (mapped `where` with `optional` per criterion, `like` for text, excluded status) in `unit.read`; `SEARCH_CMD` with `NEWSTYLE_CMD_TERM_HANDLING` in `unit`: up to 3 criteria one page (grid: form with one column per criterion and `ISSUE UPDATE/SCANABLE`, table with `LABEL`; conclusions Suchen `SCAN_UPDATE` and Aktualisieren F12), more criteria a wizard (Weiter F4, Zurück F3, Aktualisieren F12); `any cmd term with <X>` handler with `session merge`. Result list of entities (decision: no SQL, no mapper; DTO results with computed columns stay hand-made). New in `text2of.py`: `TERM_OK()`, `PUSHED()`, `WAS_CHILD()`; new label `Suchen` (`SCAN_UPDATE`) in `scaffold.py configs`. Tested in `mjfuhrpark2`: one-page variant with bodies clean; wizard structure clean (bodies are the same patterns). Found on the way: the Delegate Form factory adds an empty `LABEL` (error); the scaffold sets an empty `options` role.
 - **Step 5 done (2026-10-21):** `tools/scaffold.py commands`. `<X> anlegen` (`GRAPH_OWNER_CMD`, editable form, check-in in FINAL OK, pushes the new object); `<X> bearbeiten` (`GRAPH_OWNER_CMD`, ENTER, key parameter from the selection, checkout in command init, DISABLED form over the positions table); `GRAPH_EDIT_CMD`s for head data, editing and adding a position (`generally enabled` by status from `bearbeitbar`, revert of the aggregate); one `GRAPH_OWNER_CMD` without page per transition (`generally enabled` by the source status of the selection, checkout, service method, check-in); search page panes re-emitted with the menu entries (replace the roots). Tested in `mjfuhrpark2` with the full stack (domain, labels, search, commands, 21 roots): all filled commands and all page panes clean. Found on the way: a `GRAPH_EDIT_CMD` must not push anything (checker since 2026.1; run 4 still did).
+- **Run 5 (2026-11-02):** `typ: status` as a property type, also on positions (several status per aggregate); `aggregat.status` stays the life cycle with transitions. Status criteria of a search are set to `null` in `command init`, otherwise the search starts filtered on the on-creation element. A command to remove a position is not generated: open whether removed parts stay in the aggregate's list. Tested in `mjfurhpark` (domain and search; `tests` and `commands` offline only): model check clean, make successful.
 
 **Skill changes in stage 3:** the workflows "Create a command", search, owner/edit and config in `objectflow-dsl` and `dataux-dsl` point to the scaffolds. Done (2026-10-21): section "Scaffold a new area" in `objectflow-dsl/references/workflows.md`, one-line pointers in the domain, command, test and config workflows of `objectflow-dsl`, the persistence and repository workflows of `manmap-dsl` and the page pane workflow of `dataux-dsl`; `scaffold.py` in the tool list of `TEMPLATE_PROJECT_AGENTS.md`.
 

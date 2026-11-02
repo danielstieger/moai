@@ -1,14 +1,16 @@
 # Agent Guide for a MoWare Application Project
 
-This project uses the MoAI package in the `moai/` subdirectory. MoAI provides
+This project uses the MoAI package in the `moai_plugin/moai/` subdirectory. MoAI provides
 the agent skills and documentation for the modellwerkstatt MoWare DSLs and the
 JetBrains MPS workflow.
 
 ## MoAI Package Boundary
 
-- Treat `moai/` as a versioned dependency. Do not modify files below `moai/`;
-  anything project-specific, including runtime registration files, lives in
+- Treat `moai_plugin/moai/` as a versioned dependency. Do not modify files below
+  it; anything project-specific, including runtime registration files, lives in
   the application project outside the submodule.
+- `moai_plugin/tools/` is the project's copy of the MoAI tools. It may be extended,
+  see "Tools".
 
 ## Skills
 
@@ -34,12 +36,12 @@ installed or enabled. Do not recreate MoAI skills as project-local skills.
 
 Use these package documents for the intended MoWare semantics:
 
-- `moai/docu/moware-werkbank.md` — architecture and interaction of the DSLs;
-- `moai/docu/objectflow.md` — ObjectFlow language documentation;
-- `moai/docu/manmap.md` — ManMap language documentation;
-- `moai/docu/dataux.md` — DataUX language documentation.
+- `moai_plugin/moai/docu/moware-werkbank.md` — architecture and interaction of the DSLs;
+- `moai_plugin/moai/docu/objectflow.md` — ObjectFlow language documentation;
+- `moai_plugin/moai/docu/manmap.md` — ManMap language documentation;
+- `moai_plugin/moai/docu/dataux.md` — DataUX language documentation.
 
-Read them in stages. For research and planning, `moai/docu/moware-werkbank.md`
+Read them in stages. For research and planning, `moai_plugin/moai/docu/moware-werkbank.md`
 together with the sections "Modellierungsumfang und Ausdrucksmöglichkeiten" and
 the chapter maps ("Kapitellandkarte") of the three DSL documents is sufficient;
 they name every concept the documentation treats with its projection and FQ
@@ -49,7 +51,7 @@ costs about 140,000 tokens and is rarely needed.
 
 ## Tools
 
-MoAI ships command-line tools in `moai/tools/` (Python standard library, call
+MoAI ships command-line tools, copied to `moai_plugin/tools/` (Python standard library, call
 with `python3 -I`):
 
 - `blueprint.py` – look up concepts (`find`, `concept`) and build or check
@@ -66,9 +68,13 @@ Use them instead of writing your own scripts for the same purpose. Their input
 and output files live in the system temp directory; they write nothing into the
 project. The skills say where each tool fits into a workflow.
 
+A limit of a MoAI tool is not a limit of the language. Do not change the model to suit a tool and do not write a
+separate script. Extend the tool in `moai_plugin/tools/` with the smallest change,
+without weakening its checks. Everything in `moai_plugin/moai/` stays read-only.
+
 ## Conventions
 
-Before planning or modeling, read all files in `./moai/conventions/`. They are the MoWare
+Before planning or modeling, read all files in `./moai_plugin/moai/conventions/`. They are the MoWare
 standard modeling conventions (e.g. structure, naming) and apply in full unless
 this project states otherwise in the section below.
 
@@ -90,6 +96,6 @@ the tools appropriate for it.
 
 ## MPS Workflow
 
-Before any MPS-related work, read and follow `moai/MPS_AGENT_GUIDE.md`. Its MPS
+Before any MPS-related work, read and follow `moai_plugin/moai/MPS_AGENT_GUIDE.md`. Its MPS
 tooling, model-editing, validation, generated-code, and troubleshooting rules
 apply to this application project.

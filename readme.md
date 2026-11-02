@@ -51,8 +51,8 @@ project.
 1. Add the submodule manually in the root of the application project:
 
 ```bash
-   git submodule add https://github.com/danielstieger/moai.git moai
-   git -C moai sparse-checkout set --no-cone '/*' '!/maintenance/'
+   git submodule add https://github.com/danielstieger/moai.git moai_plugin/moai
+   git -C moai_plugin/moai sparse-checkout set --no-cone '/*' '!/maintenance/'
    git submodule update --init --recursive
 ```
 
@@ -60,13 +60,14 @@ project.
    [INSTALL_INSTRUCTIONS.md](INSTALL_INSTRUCTIONS.md) is written as a prompt
    for this. In the root of the application project, this is enough:
 
-   > Read `INSTALL_INSTRUCTIONS.md` from ./moai and perform the installation
+   > Read `INSTALL_INSTRUCTIONS.md` from ./moai_plugin/moai and perform the installation
    > for this project.
 
    The agent registers the plugin in its runtime, sets up `AGENTS.md` from
-   `moai/TEMPLATE_PROJECT_AGENTS.md` and checks the prerequisites. The template
-   marks `moai/` as a packaged dependency and points agents to the installed
-   MoAI skills and the documentation.
+   `moai_plugin/moai/TEMPLATE_PROJECT_AGENTS.md`, copies the tools to
+   `moai_plugin/tools/` and checks the prerequisites. The template marks
+   `moai_plugin/moai/` as a packaged dependency and points agents to the
+   installed MoAI skills and the documentation.
 
 ## Updating
 
@@ -75,16 +76,14 @@ submodule commit. An update is performed in the application project and then
 versioned as a new submodule state:
 
 ```bash
-git submodule update --remote --merge moai
-git add moai
+git submodule update --remote --merge moai_plugin/moai
+git add moai_plugin/moai
 ```
 
-The rules for working with the package (read-only `moai/`, project-specific
+The tools in `moai_plugin/tools/` and `AGENTS.md` do not change with it. Afterwards
+ask a coding agent to synchronize them ("Update" in
+[INSTALL_INSTRUCTIONS.md](INSTALL_INSTRUCTIONS.md)).
+
+The rules for working with the package (read-only `moai_plugin/moai/`, project-specific
 instructions and skills outside the submodule) are stated in
 `TEMPLATE_PROJECT_AGENTS.md`.
-
-## Prerequisites
-
-- JetBrains MPS 2026.2 (build 262.10968.569) with the target project open;
-- enabled MPS MCP integration for model-aware agent work;
-- the MoAI plugin installed and enabled in the agent runtime in use.

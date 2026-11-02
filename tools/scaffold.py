@@ -50,16 +50,21 @@ Specification (domain):
              [, "verweis": true] (cross reference to another aggregate's entity, column <NAME>_ID)
              [, "beispiel": "BD(\\"12.50\\")"] (tests: test value as Java with markers)}
   TYPE: string | int | LocalDate | DateTime | BigDecimal | name of a value object or entity (with felder / verweis)
+        | status, with "status": {"name": .., "werte": [..]} as above; also on positions (e.g. "fahrzeugklasse").
+          "aggregat.status" stays the life cycle with its "uebergaenge"; such a property has no transitions
 
 Conventions applied: model <firma>.<app>.<bereich>.domain; names <Aggregat>Repo, <Aggregat>Service,
 <Bereich>Persistenz (recommendations, overridable in "namen"); technical key `id` with sequence S_<TABLE>;
 positions carry the parent key <aggregat>Id and are loaded explicitly; no delete method (objects are not
 deleted physically, a status marks them); every transition checks its source status with a precondition
 and then sets the target status.
+
+A limit of this tool is no limit of the language: do not change the model to suit it and do not write a separate
+script. Extend moai_plugin/tools/ with the smallest change ("Unknown construct" in the DSL skills).
 """
 import sys
 
-sys.dont_write_bytecode = True  # write nothing into the package (moai/ is a submodule in projects)
+sys.dont_write_bytecode = True  # write no bytecode into the project or the package
 
 import json
 import os
@@ -104,6 +109,10 @@ def prop_type(p, where):
         return "IntegerType"
     if t in STUB_TYPES:
         return {"concept": "ClassifierType", "references": {"classifier": STUB_TYPES[t]}}
+    if t == "status":
+        if not isinstance(p.get("status"), dict) or not p["status"].get("name"):
+            raise SpecError(f'{where}: typ status needs "status": {{"name": .., "werte": [..]}}')
+        return {"concept": "StatusType", "references": {"status": p["status"]["name"]}}
     if t == "boolean":
         raise SpecError(f"{where}: boolean is no Business Property type; model a yes/no as a status")
     if isinstance(t, str) and t[:1].isupper() and ("felder" in p or p.get("verweis")):
@@ -165,6 +174,24 @@ def status_decl(s, where):
             e["children"]["options"] = "OnCreationStatusElemOption"
         elems.append(e)
     return {"concept": "StatusDeclaration", "properties": {"name": s["name"]}, "children": {"element": elems}}
+
+
+def property_status(props, where):
+    """The status declarations of the properties with typ status."""
+    return [status_decl(p["status"], f"{where}[{i}].status") for i, p in enumerate(props) if p.get("typ") == "status"]
+
+
+def check_status_names(a):
+    """A declaration exists once; the property `status` of an aggregate with a life cycle is taken."""
+    props = a.get("properties", [])
+    pos_props = ((a.get("positionen") or {}).get("entity") or {}).get("properties", [])
+    if a.get("status") and any(p.get("name") == "status" for p in props):
+        raise SpecError("$.aggregat.properties: 'status' is the life cycle of the aggregate (aggregat.status); name the property differently")
+    names = [a["status"].get("name")] if a.get("status") else []
+    names += [p["status"].get("name") for p in props + pos_props if p.get("typ") == "status" and isinstance(p.get("status"), dict)]
+    twice = sorted({n for n in names if names.count(n) > 1})
+    if twice:
+        raise SpecError(f"$.aggregat: status {', '.join(map(str, twice))} is declared more than once")
 
 
 def field(prop, col):
@@ -251,10 +278,11 @@ def domain(spec):
 
     props = [spec_property(p, f"$.aggregat.properties[{i}]") for i, p in enumerate(a.get("properties", []))]
     atoms = [field("id", "ID")] + [atom(p) for p in a.get("properties", [])]
+    check_status_names(a)
     status = a.get("status")
-    sdecl = None
+    sdecl = property_status(a.get("properties", []), "$.aggregat.properties")
     if status:
-        sdecl = status_decl(status, "$.aggregat.status")
+        sdecl.insert(0, status_decl(status, "$.aggregat.status"))
         props.append(business_property("status", {"concept": "StatusType", "references": {"status": status["name"]}},
                                        "Status", f"Status {agg}"))
         atoms.append(field("status", "STATUS"))
@@ -283,7 +311,7 @@ def domain(spec):
         sort = next((p["name"] for p in pprops_spec if p.get("typ") == "int" and "nummer" in p["name"].lower()), "id")
         pos = {"entity": pe["name"], "property": pspec["property"], "key": key, "sort": sort,
                "mapping": entity_mapping("Map" + pe["name"], pe["name"], ptable, patoms)}
-        roots.append(("position", entity(pe["name"], pprops)))
+        roots.append(("position", entity(pe["name"], pprops, property_status(pprops_spec, "$.aggregat.positionen.entity.properties"))))
     roots.insert(0, ("entity", entity(agg, [key_property(agg, table)] + props, sdecl)))
     mappings = [entity_mapping("Map" + agg, agg, table, atoms)] + ([pos["mapping"]] if pos else [])
     if spec.get("persistenzVorhanden"):
@@ -338,6 +366,8 @@ def tests(spec):
         v = lower(name)
         lines = [f"public {name} baue{name}({'int nummer' if param else ''}) {{", f"  {name} {v} = new {name}();"]
         for p in props:
+            if p.get("typ") == "status" and "beispiel" not in p:
+                continue  # the on-creation element is a valid test value
             val = "nummer" if param and p["name"] == param else sample(p)
             if val is None:
                 open_values.append(f"{name}.{p['name']}")
@@ -439,7 +469,7 @@ def suche(spec, menus=None):
     props = {p["name"]: p for p in a.get("properties", [])}
     status = a.get("status")
     if status:
-        props["status"] = {"name": "status", "typ": "status", "kurz": "Status"}
+        props["status"] = {"name": "status", "typ": "status", "kurz": "Status", "status": status, "lang": f"Status {agg}"}
     kriterien, spalten = s.get("kriterien") or [], s.get("spalten") or []
     if not kriterien or not spalten:
         raise SpecError("$.suche needs kriterien and spalten (property names of the aggregate)")
@@ -457,8 +487,9 @@ def suche(spec, menus=None):
     for n in kriterien:
         p = dict(props[n])
         if p["typ"] == "status":
-            fprops.append(business_property(n, {"concept": "StatusType", "references": {"status": status["name"]}},
-                                            "Status", f"Status {agg}"))
+            kurz = p.get("kurz", cap(n))
+            fprops.append(business_property(n, {"concept": "StatusType", "references": {"status": p["status"]["name"]}},
+                                            kurz, p.get("lang", kurz)))
             continue
         if p["typ"] == "string":
             p["laenge"] = [0, (p.get("laenge") or [0, 200])[1]]
@@ -544,7 +575,9 @@ def suche(spec, menus=None):
         bodies = [("page init 'Suche'", search),
                   ("conclusion 'Suchen'", ['PAGE("Suche");']),
                   ("conclusion 'Aktualisieren'", ['PAGE("Suche");'])]
-    bodies = [("command init", [f"filter = new {flt}();"])] + bodies + [("cmdTermHandler", handler)]
+    # a status starts with its on-creation element; `optional` drops a criterion only when it is null
+    init = [f"filter = new {flt}();"] + [f"filter.{n} = null;" for n in kriterien if props[n]["typ"] == "status"]
+    bodies = [("command init", init)] + bodies + [("cmdTermHandler", handler)]
     command = {"concept": "Command", "properties": {"name": cmd, "newCommandType": "SEARCH_CMD"},
                "children": {"variable": {"concept": "ContainerVariable", "properties": {"name": "filter"},
                                          "children": {"type": {"concept": "ClassifierType",
@@ -895,6 +928,8 @@ def main(argv):
             model, roots, java, notes = {"domain": domain, "tests": tests, "suche": suche, "commands": commands}[argv[1]](spec)
     except SpecError as e:
         print("error:", e, file=sys.stderr)
+        print("hint: if the specification cannot express what the model needs, that is a limit of this tool, not of the "
+              "language; extend moai_plugin/tools/ (\"Unknown construct\" in the DSL skills)", file=sys.stderr)
         return 1
     return write(Structure(), model, roots, java, notes, out)
 

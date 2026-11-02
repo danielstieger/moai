@@ -2,7 +2,7 @@
 
 ## Scaffold a new area
 
-For a new aggregate area, generate the convention-compliant skeleton with `moai/tools/scaffold.py` instead of building it root by root; the specification and its options are listed by `python3 -I moai/tools/scaffold.py --help`. One JSON specification serves all steps, in this order (conventions: inside out):
+For a new aggregate area, generate the convention-compliant skeleton with `moai_plugin/tools/scaffold.py` instead of building it root by root; the specification and its options are listed by `python3 -I moai_plugin/tools/scaffold.py --help`. One JSON specification serves all steps, in this order (conventions: inside out):
 
 1. `domain` – entities, status, persistence description, aggregate repository, `<Aggregat>Service` with the transitions
 2. `tests` – `TestDaten` and `<Bereich>Tests`
@@ -28,11 +28,11 @@ For a new aggregate, start with `scaffold.py domain` ([Scaffold a new area](#sca
 
 ## Write method bodies and command functions
 
-Bodies of Services, Repositories, data-structure methods and command functions (command init, page init, scopes, conclusions, final conclusions) are written as Java text with markers and converted with `moai/tools/text2of.py`; the markers are listed by `python3 -I moai/tools/text2of.py --help`. Do not build such bodies as JSON.
+Bodies of Services, Repositories, data-structure methods and command functions (command init, page init, scopes, conclusions, final conclusions) are written as Java text with markers and converted with `moai_plugin/tools/text2of.py`; the markers are listed by `python3 -I moai_plugin/tools/text2of.py --help`. Do not build such bodies as JSON.
 
 1. Insert the root skeleton first (`blueprint.py build`). In a command, every function to fill must exist, empty.
 2. Insert the Java text with `mps_mcp_parse_java_and_insert`: methods as `CLASS_CONTENT` into the root's `member` role, all methods of a root in one call; statements of a command function as `STATEMENTS` into the function's `body`. The parser reports the markers as unresolved; that is expected.
-3. `mps_mcp_print_node` (`deep=true`) of the root, then `python3 -I moai/tools/text2of.py PRINTOUT [--repo-type method=CHECKOUT|CHECKIN|DELETE]`. It prints `name | node to replace | file` per member or function body and stops with the location on anything it cannot convert.
+3. `mps_mcp_print_node` (`deep=true`) of the root, then `python3 -I moai_plugin/tools/text2of.py PRINTOUT [--repo-type method=CHECKOUT|CHECKIN|DELETE]`. It prints `name | node to replace | file` per member or function body and stops with the location on anything it cannot convert.
 4. `mps_mcp_update_node` `SET CHILD` per row (`childNodeRef` = the node, `childJson` = the file), then `FIX_REFERENCES` on the root and the model check. A call to another replaced member binds by name to the old node until that member is replaced too; `FIX_REFERENCES` rebinds it.
 5. To change a body later, write it again as text: delete the member or clear the function body, then steps 2 to 4.
 
@@ -88,7 +88,7 @@ Test-model facts: test models are ordinary models named `<…>.tests` (no `@test
 
 ## Create an OFXConfig
 
-Templates with explanations are in model `org.modellwerkstatt.wbkit.shared.configuration` (solution `org.modellwerkstatt.wbkit`); `baseconfig` holds the sections the other templates include. `scaffold.py configs` ([Scaffold a new area](#scaffold-a-new-area)) copies and adapts the test and FX8 templates; copy further templates together with `baseconfig` with `moai/tools/copyroot.py` (conventions `anwendungsaufbau`: no wbkit import there), then adapt names and values.
+Templates with explanations are in model `org.modellwerkstatt.wbkit.shared.configuration` (solution `org.modellwerkstatt.wbkit`); `baseconfig` holds the sections the other templates include. `scaffold.py configs` ([Scaffold a new area](#scaffold-a-new-area)) copies and adapts the test and FX8 templates; copy further templates together with `baseconfig` with `moai_plugin/tools/copyroot.py` (conventions `anwendungsaufbau`: no wbkit import there), then adapt names and values.
 
 ## Integrate persistence with ManMap
 

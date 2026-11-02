@@ -25,7 +25,7 @@ Source semantics: [repositories and the four method kinds](../../../docu/manmap.
 1. Load `moai:mps-baselanguage` and `moai:mps-node-editing`.
 2. Insert [repository-skeleton.json](blueprints/repository-skeleton.json), or identify the existing root and preserve its ID. Which repository holds which method, placement and name: conventions `anwendungsaufbau`.
 3. Add one `RepositoryInstanceMethodDeclaration` under inherited role `member`; [repository-method-skeleton.json](blueprints/repository-method-skeleton.json) is a minimal void-body starting point.
-4. Write the methods as Java with markers (`GET`, `WHERE`, `SAVE`, `DELETE`, `SQL`) and convert them with `moai/tools/text2of.py`, setting the method kind with `--repo-type` (`moai:objectflow-dsl`, `references/workflows.md`, "Write method bodies and command functions").
+4. Write the methods as Java with markers (`GET`, `WHERE`, `SAVE`, `DELETE`, `SQL`) and convert them with `moai_plugin/tools/text2of.py`, setting the method kind with `--repo-type` (`moai:objectflow-dsl`, `references/workflows.md`, "Write method bodies and command functions").
 5. Resolve mapping references against the persistence root used by the target model.
 6. Add query/save/delete/SQL subtrees surgically.
 7. Validate the root (several changed roots: the model reference with `perRoot=true`), then generate/build the owning solution.
@@ -57,6 +57,8 @@ Use [save-with-map-subtree.json](blueprints/save-with-map-subtree.json) or [dele
 Insert versus update without a forced option, composite keys: see [Insert oder Update](../../../docu/manmap.md#insert-oder-update).
 
 ## Direct SQL and Read Models
+
+Apply the conventions `lesemodelle`.
 
 Source semantics: [Custom SQL](../../../docu/manmap.md#custom-sql-mit-sql), [parameter binding](../../../docu/manmap.md#parameter-in-sql-text), [row/no-key mappers](../../../docu/manmap.md#row-mapper-und-nokeystoreread-only-map), and [the read-model workflow](../../../docu/manmap.md#lesemodell-mit-custom-sql-verwenden).
 

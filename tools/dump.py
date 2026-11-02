@@ -17,14 +17,18 @@ Output is plain text on stdout; exit code 0, 2 for usage, 3 for unreadable input
 """
 import sys
 
-sys.dont_write_bytecode = True  # write nothing into the package (moai/ is a submodule in projects)
+sys.dont_write_bytecode = True  # write no bytecode into the project or the package
 
 import json
 import os
 import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "..", "skills", "mps-mcp-workflow", "scripts"))
+# in the package ../skills, in the project's copy (moai_plugin/tools) ../moai/skills
+for _base in (os.path.join(HERE, ".."), os.path.join(HERE, "..", "moai")):
+    if os.path.isdir(os.path.join(_base, "skills", "mps-mcp-workflow", "scripts")):
+        sys.path.insert(0, os.path.join(_base, "skills", "mps-mcp-workflow", "scripts"))
+        break
 import mps_dump  # noqa: E402
 
 

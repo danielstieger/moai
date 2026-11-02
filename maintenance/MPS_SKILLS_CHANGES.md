@@ -24,6 +24,7 @@ Reasons marked "(inferred)" were derived from the content, since the commit mess
 | 2026-10-21 | `mps-node-editing/references/staged-construction.md` | Step "Harvest refs" renamed to "Read child refs" (refs for the following `ADD`/`SET CHILD` calls); references between nodes by name. | Consistency with the reference rule. |
 | 2026-10-21 | `mps-baselanguage/SKILL.md`, `references/json-ast-workflow.md`, `critical-rules.md`, `troubleshooting.md`, `stub-references.md` | Harvesting replaced by the reference rule of `mps-node-editing`; former steps "Auto-resolution" and "Repair" merged into "References". | The skills contradicted each other (harvest vs. names); one rule in one place. |
 | 2026-10-21 | `mps-baselanguage/SKILL.md` (Choose Your Path, "MoWare DSL roots") | Bodies in ObjectFlow and ManMap roots are written as Java with markers and converted with `moai/tools/text2of.py`; JSON blueprints for such bodies are no longer the path. | MoAI tooling (`maintenance/TOOLING.md`, stage 2): the parser alone resolves no business properties, status, `#` calls or MoWare literals; hand-built JSON bodies were the largest cost in runs 3 and 4. |
+| 2026-11-02 | `mps-node-editing/SKILL.md`, `mps-baselanguage/SKILL.md`, `mps-mcp-workflow/references/analysis-tools.md` | Tool path `moai/tools/` becomes `moai_plugin/tools/`: the package is now the submodule `moai_plugin/moai/`, the tools a project-owned copy next to it. |
 
 ## Before 2026-10-21
 
