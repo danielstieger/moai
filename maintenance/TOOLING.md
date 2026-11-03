@@ -30,7 +30,7 @@ Skills alone do not solve Z1 and Z3: a service method stays 6–15 KB of JSON, a
 - **One generic builder** built from the structure export, no hand-written building blocks per concept.
 - **Method bodies:** Java-like text with markers, converted to ObjectFlow nodes. The marker set of run 4 is the starting point.
 - **References by name**, persistent only for the exceptions in `moai:mps-node-editing` (Critical Directives).
-- **No hand-written pattern layer.** A hand-maintained pattern list is never complete. Multi-level shapes come from real instances: an example export at release and `blueprint.py example`. Source: a convention-compliant example application in wbkit (to be built); until then `org.modellwerkstatt.dataux.tests` and the wbkit configuration templates. Builder, example export and scaffolds stay even if the MCP improves.
+- **No hand-written pattern layer.** A hand-maintained pattern list is never complete. Multi-level shapes come from real instances: an example export at release and `blueprint.py example`. Source: the example application `org.modellwerkstatt.wbkit.examples.fuhrparkapp`, next to `org.modellwerkstatt.dataux.tests` and the wbkit configuration templates. Builder, example export and scaffolds stay even if the MCP improves.
 - **The structure export is a maintainer step** before each release ([RELEASE.md](RELEASE.md), to be written in stage 1).
 - The scripts of runs 3 and 4 (`mjfuhrpark/example_tooling/`, `rechnung/example_tooling/`) are studied, not reused.
 - **Maintenance project:** `mjfuhrpark2`, an MPS project with an editable solution using the DevKit `org.modellwerkstatt.MoWareWerkbank`; used for the export, tool tests and `mps-dsl-memory`.
@@ -97,6 +97,7 @@ Skills alone do not solve Z1 and Z3: a service method stays 6–15 KB of JSON, a
 ## Stage 2 – Examples and method bodies
 
 **Example export** (maintainer, at release, next to the structure export)
+- Not built; deferred. Until then the skills point to the example application directly.
 - Done last: after a new example application has been built with the new plugin.
 - For every concept, take real instances from the example sources and store them as short specs in `tools/data/examples/`, references by name.
 - `blueprint.py example <Concept>` shows one; the agent adapts it instead of guessing a shape from a dump.
@@ -152,6 +153,8 @@ Starting point for the markers (run 4):
 - **Step 4 done (2026-10-21):** `tools/scaffold.py suche`. `<X>Filter` (criteria, `ergebnisse: list<X>`) and `<X>SucheRepo.suche` (mapped `where` with `optional` per criterion, `like` for text, excluded status) in `unit.read`; `SEARCH_CMD` with `NEWSTYLE_CMD_TERM_HANDLING` in `unit`: up to 3 criteria one page (grid: form with one column per criterion and `ISSUE UPDATE/SCANABLE`, table with `LABEL`; conclusions Suchen `SCAN_UPDATE` and Aktualisieren F12), more criteria a wizard (Weiter F4, Zurück F3, Aktualisieren F12); `any cmd term with <X>` handler with `session merge`. Result list of entities (decision: no SQL, no mapper; DTO results with computed columns stay hand-made). New in `text2of.py`: `TERM_OK()`, `PUSHED()`, `WAS_CHILD()`; new label `Suchen` (`SCAN_UPDATE`) in `scaffold.py configs`. Tested in `mjfuhrpark2`: one-page variant with bodies clean; wizard structure clean (bodies are the same patterns). Found on the way: the Delegate Form factory adds an empty `LABEL` (error); the scaffold sets an empty `options` role.
 - **Step 5 done (2026-10-21):** `tools/scaffold.py commands`. `<X> anlegen` (`GRAPH_OWNER_CMD`, editable form, check-in in FINAL OK, pushes the new object); `<X> bearbeiten` (`GRAPH_OWNER_CMD`, ENTER, key parameter from the selection, checkout in command init, DISABLED form over the positions table); `GRAPH_EDIT_CMD`s for head data, editing and adding a position (`generally enabled` by status from `bearbeitbar`, revert of the aggregate); one `GRAPH_OWNER_CMD` without page per transition (`generally enabled` by the source status of the selection, checkout, service method, check-in); search page panes re-emitted with the menu entries (replace the roots). Tested in `mjfuhrpark2` with the full stack (domain, labels, search, commands, 21 roots): all filled commands and all page panes clean. Found on the way: a `GRAPH_EDIT_CMD` must not push anything (checker since 2026.1; run 4 still did).
 - **Run 5 (2026-11-02):** `typ: status` as a property type, also on positions (several status per aggregate); `aggregat.status` stays the life cycle with transitions. Status criteria of a search are set to `null` in `command init`, otherwise the search starts filtered on the on-creation element. A command to remove a position is not generated: open whether removed parts stay in the aggregate's list. Tested in `mjfurhpark` (domain and search; `tests` and `commands` offline only): model check clean, make successful.
+- **Run 6 (2026-11-02):** example application built with the plugin (`fahrzeug`, `lenker`; 13 models, 80 roots; moware `4a29595`), UI checked by the maintainer. Comparison of the scaffolds with it: open.
+- **Tool structure (2026-11-03):** `text2of.py` and `scaffold.py` split into `text2of_lib/` and `scaffold_lib/`. Markers and generators register themselves (`registry.py`); a new module is found automatically and listed by `--help`.
 
 **Skill changes in stage 3:** the workflows "Create a command", search, owner/edit and config in `objectflow-dsl` and `dataux-dsl` point to the scaffolds. Done (2026-10-21): section "Scaffold a new area" in `objectflow-dsl/references/workflows.md`, one-line pointers in the domain, command, test and config workflows of `objectflow-dsl`, the persistence and repository workflows of `manmap-dsl` and the page pane workflow of `dataux-dsl`; `scaffold.py` in the tool list of `TEMPLATE_PROJECT_AGENTS.md`.
 
@@ -169,7 +172,6 @@ Together, once the tooling is complete. A new run rebuilds the domain of runs 3 
 
 ## Open questions
 
-- **Example application in wbkit:** scope (e.g. one aggregate with positions, value objects, status transitions, search, owner/edit, configs, tests), owner. Timing: built with the new plugin once the tooling is complete, then the example export follows. It becomes the example source, the template for the scaffolds and the reference for acceptance.
 - **`sampleNode`** of `get_concept_details` is a one-level placeholder and no pattern.
 - **Markers:** check before fixing them whether they cover all constructs allowed in bodies and are unambiguous for agents.
 - **Limit of resolution by name:** when property chains get too long is observed, not measured.

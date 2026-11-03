@@ -40,7 +40,7 @@ Do not infer a shape from dumps, and do not write your own tools for it. Follow 
 4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file; search a dump by concept, name or unresolved reference with `python3 -I moai_plugin/tools/dump.py grep`.
 5. Write the blueprint as a short spec and expand it with `blueprint.py build`; it checks roles, cardinality, assignability, enum values and placeholders. Then dry-run it (`dryRun:true`).
 
-**A tool cannot express it:** A limit of a MoAI tool is not a limit of the language. Do not change the model to suit a tool and do not write a separate script. Extend the tool in `moai_plugin/tools/` with the smallest change, without weakening its checks. Everything in `moai_plugin/moai/` stays read-only.
+**A tool cannot express it:** A limit of a MoAI tool is not a limit of the language. Do not change the model to suit a tool and do not write a separate script. Extend the tool in `moai_plugin/tools/`; the extension applies to this project only. Everything in `moai_plugin/moai/` stays read-only.
 
 ## Quick start
 

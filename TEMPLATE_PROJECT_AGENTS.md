@@ -61,16 +61,16 @@ with `python3 -I`):
 - `copyroot.py` – copy roots from another model, e.g. configuration templates;
 - `text2of.py` – convert method and command bodies written as Java with markers
   into ObjectFlow and ManMap nodes;
-- `scaffold.py` – generate the convention-compliant skeleton of a new aggregate
-  area (domain, tests, configs, search, commands) from a JSON specification.
+- `scaffold.py` – generate convention-compliant skeletons from a JSON
+  specification; `--help` lists the generators.
 
 Use them instead of writing your own scripts for the same purpose. Their input
 and output files live in the system temp directory; they write nothing into the
 project. The skills say where each tool fits into a workflow.
 
 A limit of a MoAI tool is not a limit of the language. Do not change the model to suit a tool and do not write a
-separate script. Extend the tool in `moai_plugin/tools/` with the smallest change,
-without weakening its checks. Everything in `moai_plugin/moai/` stays read-only.
+separate script. Extend the tool in `moai_plugin/tools/`; the extension applies to
+this project only. Everything in `moai_plugin/moai/` stays read-only.
 
 ## Conventions
 

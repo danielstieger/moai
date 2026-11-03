@@ -11,7 +11,8 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 
 - Treat the live `org.modellwerkstatt.dataux` language as the technical authority for concepts, roles, cardinalities, reference targets, and assignability.
 - Use the package documentation for semantics and runtime behavior; start with [DataUX UI modeling](../../docu/dataux.md#teil-i--ui-modellierung) and the [MoWare responsibility map](../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin).
-- The shipped solution `org.modellwerkstatt.dataux.tests` supplies the stable examples recorded in [references/sandbox.md](references/sandbox.md). It is useful but does not cover every UI shape.
+- For a complete, convention-compliant area, look at the models `org.modellwerkstatt.wbkit.examples.fuhrparkapp.*` (shipped solution `org.modellwerkstatt.wbkit`, read-only).
+- The shipped solution `org.modellwerkstatt.dataux.tests` supplies the stable examples of single concepts recorded in [references/sandbox.md](references/sandbox.md). It is useful but does not cover every UI shape.
 - Never persist a project path, editor-session state, or references from an application project.
 - Conventions are referenced by name, e.g. conventions `oberflaeche` (file `mw-oberflaeche_v1.md`); the project's `AGENTS.md` states where they are and which ones it changes. This skill does not repeat their content.
 - For target-model classifiers, properties, commands, the `OFXConfig`, and reusable UI roots, replace the explicit `TARGET_MODEL.*` placeholders immediately before insertion.
@@ -43,7 +44,7 @@ Do not infer a shape from dumps, and do not write your own tools for it. Follow 
 4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file; search a dump by concept, name or unresolved reference with `python3 -I moai_plugin/tools/dump.py grep`.
 5. Write the blueprint as a short spec and expand it with `blueprint.py build`; it checks roles, cardinality, assignability, enum values and placeholders. Then dry-run it (`dryRun:true`).
 
-**A tool cannot express it:** A limit of a MoAI tool is not a limit of the language. Do not change the model to suit a tool and do not write a separate script. Extend the tool in `moai_plugin/tools/` with the smallest change, without weakening its checks. Everything in `moai_plugin/moai/` stays read-only.
+**A tool cannot express it:** A limit of a MoAI tool is not a limit of the language. Do not change the model to suit a tool and do not write a separate script. Extend the tool in `moai_plugin/tools/`; the extension applies to this project only. Everything in `moai_plugin/moai/` stays read-only.
 
 ## Quick start
 

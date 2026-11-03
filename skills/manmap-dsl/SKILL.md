@@ -16,6 +16,7 @@ ManMap models relational persistence and read models for MoWare applications. `P
 - Discover the language by its qualified name `org.modellwerkstatt.manmap`. Query concepts with `l:5aaa957f-3447-4783-b1f7-b301fa3e0394:org.modellwerkstatt.manmap` or the plain language name in `languageRefs`, not the module reference syntax; one `languageRefs` call with `detail="shape"` covers all concepts. Enum literals (`sqlType`, `repoMethodType`): `mps_mcp_query_structure` `GET_ENUMERATION_LITERALS`.
 - Use the `qualifiedName` as `concept` in blueprints (`moai:mps-mcp-workflow`, `references/node-editing-rules.md`).
 - Treat every `$TARGET_*` value in a blueprint as a required target-model placeholder. Resolve it by scope or replace it with a persistent `r:` node reference from the target model immediately before insertion. The dry-run does not reliably report a forgotten placeholder: search the blueprint text for `TARGET_` before every write and stop on any match.
+- For a complete, convention-compliant area, look at the models `org.modellwerkstatt.wbkit.examples.fuhrparkapp.*` (shipped solution `org.modellwerkstatt.wbkit`, read-only).
 - Never copy persistent references from an application example into another model. The stable references in [sandbox.md](references/sandbox.md) are read-only navigation and verification anchors, not insertion values.
 - Prefer skeleton-plus-subtree construction for persistence descriptions and repositories. Preserve existing node IDs with surgical updates.
 - No lazy loading, no cascading save/delete; references and lists are loaded explicitly (separate queries or `refJoin`/`listJoin`): see [Explizites Laden](../../docu/manmap.md#explizites-laden) and [Referenzen, eingebettete Werte und Listen](../../docu/manmap.md#referenzen-eingebettete-werte-und-listen).
@@ -35,7 +36,7 @@ Do not infer a shape from dumps, and do not write your own tools for it. Follow 
 4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file; search a dump by concept, name or unresolved reference with `python3 -I moai_plugin/tools/dump.py grep`.
 5. Write the blueprint as a short spec and expand it with `blueprint.py build`; it checks roles, cardinality, assignability, enum values and placeholders. Then dry-run it (`dryRun:true`).
 
-**A tool cannot express it:** A limit of a MoAI tool is not a limit of the language. Do not change the model to suit a tool and do not write a separate script. Extend the tool in `moai_plugin/tools/` with the smallest change, without weakening its checks. Everything in `moai_plugin/moai/` stays read-only.
+**A tool cannot express it:** A limit of a MoAI tool is not a limit of the language. Do not change the model to suit a tool and do not write a separate script. Extend the tool in `moai_plugin/tools/`; the extension applies to this project only. Everything in `moai_plugin/moai/` stays read-only.
 
 ## Quick Start
 

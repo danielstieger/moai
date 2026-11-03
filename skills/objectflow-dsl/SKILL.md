@@ -10,7 +10,8 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 ## Source authority and portability
 
 - Treat the live `org.modellwerkstatt.objectflow` language as the technical authority for concepts, features, cardinalities, and assignability.
-- Use the packaged solution `org.modellwerkstatt.dataux.tests` for stable examples. Its verified model and node references are in [references/sandbox.md](references/sandbox.md).
+- For a complete, convention-compliant area, look at the models `org.modellwerkstatt.wbkit.examples.fuhrparkapp.*` (shipped solution `org.modellwerkstatt.wbkit`, read-only).
+- Use the packaged solution `org.modellwerkstatt.dataux.tests` for stable examples of single concepts. Its verified model and node references are in [references/sandbox.md](references/sandbox.md).
 - Use the package documentation for semantics and runtime behavior; start with the [ObjectFlow scope](../../docu/objectflow.md#modellierungsumfang-und-ausdrucksmöglichkeiten) and the [MoWare responsibility map](../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin).
 - Never persist a project path, editor-session state, or references from an application project.
 - Conventions are referenced by name, e.g. conventions `commands` (file `mw-commands_v1.md`); the project's `AGENTS.md` states where they are and which ones it changes. This skill does not repeat their content.
@@ -42,7 +43,7 @@ Do not infer a shape from dumps, and do not write your own tools for it. Follow 
 4. Print it and read large results with `mps_dump.py` (`moai:mps-mcp-workflow`, Scripts) instead of opening the file; search a dump by concept, name or unresolved reference with `python3 -I moai_plugin/tools/dump.py grep`.
 5. Write the blueprint as a short spec and expand it with `blueprint.py build`; it checks roles, cardinality, assignability, enum values and placeholders. Then dry-run it (`dryRun:true`).
 
-**A tool cannot express it:** A limit of a MoAI tool is not a limit of the language. Do not change the model to suit a tool and do not write a separate script. Extend the tool in `moai_plugin/tools/` with the smallest change, without weakening its checks. Everything in `moai_plugin/moai/` stays read-only.
+**A tool cannot express it:** A limit of a MoAI tool is not a limit of the language. Do not change the model to suit a tool and do not write a separate script. Extend the tool in `moai_plugin/tools/`; the extension applies to this project only. Everything in `moai_plugin/moai/` stays read-only.
 
 ## Quick start
 

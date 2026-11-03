@@ -10,6 +10,8 @@ For a new aggregate area, generate the convention-compliant skeleton with `moai_
 4. `suche` – filter, search repository, `SEARCH_CMD` with page panes
 5. `commands` – owner, edit and transition commands, menu entries
 
+Outside an aggregate area: `rollen`, `app` and `ux` (free page panes and commands); see `--help`.
+
 Each step prints a plan: insert the roots, write the bodies as in [Write method bodies and command functions](#write-method-bodies-and-command-functions), check the model. Then add the business logic. The workflows below cover extending and changing an existing area.
 
 ## Create a domain structure
