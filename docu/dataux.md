@@ -360,7 +360,7 @@ Die `exception strategy` ersetzt keine fachliche Problembehandlung innerhalb des
 | `DELAY` | `OptDelayPair` | `org.modellwerkstatt.dataux.structure.OptDelayPair` | Wartezeit zwischen vollständigen Durchläufen eines referenzierten `consumer/producer pair`s |
 | `CONSUMERS` | `OptNumConsumersPair` | `org.modellwerkstatt.dataux.structure.OptNumConsumersPair` | Anzahl paralleler Consumer eines referenzierten `consumer/producer pair`s |
 | `DEPENDENT_CONSECUTIVE` | `OptBatchDependent` | `org.modellwerkstatt.dataux.structure.OptBatchDependent` | `consumer/producer pair`s werden abhängig und nacheinander behandelt |
-| `RUN_IN_CONSOLE` | `OptRunInConsole` | `org.modellwerkstatt.dataux.structure.OptRunInConsole` | Nicht mehr unterstützt; der Checker meldet einen Fehler. Konsolenbetrieb wird in der `OFXConfig` konfiguriert |
+| `RUN_IN_CONSOLE` | `OptRunInConsole` | `org.modellwerkstatt.dataux.structure.OptRunInConsole` | Nicht mehr unterstützt. Konsolenbetrieb wird in der `OFXConfig` konfiguriert |
 | `OptIncludeBatchUi` | `OptIncludeBatchUi` | `org.modellwerkstatt.dataux.structure.OptIncludeBatchUi` | Bindet einen referenzierten Batchjob in einen UI-Modulkontext ein |
 | `VERSION` | `OptVersion` | `org.modellwerkstatt.dataux.structure.OptVersion` | Version des Moduls |
 | `OFFICIAL NAME` | `OptOfficialAppName` | `org.modellwerkstatt.dataux.structure.OptOfficialAppName` | Sichtbarer offizieller Modulname |

@@ -152,7 +152,7 @@ Auch ein geladener `string` ist nie `null`: Für `NULL` in einer String-Spalte l
 
 Für `where`-Filter in ManMap gelten eigene Regeln, siehe [Spezifikum - Filterausdrücke und gemappte Felder](manmap.md#spezifikum---filterausdrücke-und-gemappte-felder).
 
-Ein Vergleich mit dem Literal `null` bleibt ein direkter Vergleich; Ausnahme sind Value-Object-Schlüssel: `rechnung.kunde#Key == null` meldet der Checker als Fehler, hier ist `isNullKey` zu verwenden (siehe [Beziehungen und Objektgraphen](#beziehungen-und-objektgraphen)). Diese Regeln verhindern NullPointerExceptions und Identitätsvergleiche, ersetzen aber keine bewusste fachliche Entscheidung über optionale Werte.
+Ein Vergleich mit dem Literal `null` bleibt ein direkter Vergleich; Ausnahme sind Value-Object-Schlüssel: `rechnung.kunde#Key == null` ist nicht zulässig, hier ist `isNullKey` zu verwenden (siehe [Beziehungen und Objektgraphen](#beziehungen-und-objektgraphen)). Diese Regeln verhindern NullPointerExceptions und Identitätsvergleiche, ersetzen aber keine bewusste fachliche Entscheidung über optionale Werte.
 
 ### Beziehungen und Objektgraphen
 
@@ -171,7 +171,7 @@ Der erste Ausdruck lädt die Kunden-Entity gezielt über das Repository. Der zwe
 
 Auf `rechnung.kunde` direkt zuzugreifen setzt dagegen voraus, dass die Kundenreferenz geladen wurde; andernfalls löst der Zugriff `OFXNotInitializedException` aus. Die Wahl ist deshalb bewusst zu treffen: Entweder lädt die Repository-Methode die benötigte Beziehung mit, oder der Ablauf verwendet zunächst `#Key` und lädt die Entity über eine Repository-Methode, etwa `# KundenRepo.get(rechnung.kunde#Key)`.
 
-Mit `isNullKey`, beispielsweise `rechnung.kunde#Key.isNullKey`, lässt sich prüfen, ob ein solcher Referenzschlüssel fachlich nicht gesetzt ist; bei Value-Object-Schlüsseln ist das verpflichtend, ein Vergleich mit `null` ist dort ein Checker-Fehler.
+Mit `isNullKey`, beispielsweise `rechnung.kunde#Key.isNullKey`, lässt sich prüfen, ob ein solcher Referenzschlüssel fachlich nicht gesetzt ist; bei Value-Object-Schlüsseln ist das verpflichtend, ein Vergleich mit `null` ist dort nicht zulässig.
 
 Die Prüfung kennt die ObjectFlow/ManMap-Semantik leerer Schlüssel und ist deshalb aussagekräftiger als ein bloßer Vergleich mit Java-`null`: Auch die Leerwerte einfacher Schlüssel und die Bestandteile eines zusammengesetzten Value-Object-Schlüssels werden berücksichtigt. Das ist besonders bei optionalen Beziehungen sinnvoll, bevor der Schlüssel an ein Repository übergeben oder ein Bestandteil des Schlüssels gelesen wird. `isNullKey` prüft den Schlüssel; es prüft nicht, ob das referenzierte Objekt bereits geladen wurde.
 
@@ -179,7 +179,9 @@ Die Prüfung kennt die ObjectFlow/ManMap-Semantik leerer Schlüssel und ist desh
 
 Ein Status übernimmt in fachlichen Datenstrukturen die Rolle, die in reinem Java häufig ein `enum` erfüllt: Er begrenzt einen Wert auf eine benannte Menge zulässiger Zustände. Er kann jedoch mehr als ein einfaches Java-Enum. Ein `StatusElement` besitzt neben seinem Namen einen technischen Persistenzwert, Kurz- und Langbeschreibung sowie optionale Metadaten für Erzeugung, Laden und Darstellung. Statuswerte können als Property-Typ verwendet, verglichen, in SQL referenziert und durch DataUX mit Beschriftung und Farbe dargestellt werden.
 
-Eine Status-Property kann im Speicher immer `null` sein. `ALLOW_NULL_PERSISTANCE` und `WHEN_NULL_WL` schließen sich aus: Entweder bleibt ein `null`-Persistenzwert `null`, oder er wird beim Laden in ein Element umgesetzt; beides zugleich meldet der Checker als Fehler. `WHEN_NULL_WL` und `WHEN_UNDEFINED_WL` behandeln unterschiedliche Fälle. Ein leerer Wert kann fachlich erlaubt sein; ein unbekannter Wert weist dagegen häufig auf fehlerhafte Daten oder eine nicht abgestimmte Version hin. Der zweite Fallback darf diesen Fehler daher nur dann in einen normalen Status überführen, wenn dies fachlich ausdrücklich beabsichtigt ist.
+Das Element mit `ON_CREATION` ist der Anfangszustand neu erzeugter Objekte. Jede Statusdeklaration muss genau ein solches Element enthalten.
+
+Eine Status-Property kann im Speicher immer `null` sein. `ALLOW_NULL_PERSISTANCE` und `WHEN_NULL_WL` schließen sich aus und dürfen nicht zusammen verwendet werden: Entweder bleibt ein `null`-Persistenzwert `null`, oder er wird beim Laden in ein Element umgesetzt. `WHEN_NULL_WL` und `WHEN_UNDEFINED_WL` behandeln unterschiedliche Fälle. Ein leerer Wert kann fachlich erlaubt sein; ein unbekannter Wert weist dagegen häufig auf fehlerhafte Daten oder eine nicht abgestimmte Version hin. Der zweite Fallback darf diesen Fehler daher nur dann in einen normalen Status überführen, wenn dies fachlich ausdrücklich beabsichtigt ist.
 
 ### Methoden an Datenstrukturen
 
@@ -282,7 +284,7 @@ Service- und Repository-Methoden werden mit dem Komponentenaufruf `#` aufgerufen
 | ManMap-`CHECKIN`- oder `DELETE`-Methode in `FINAL OK_CONCLUSION` | Wird als Session-Operation registriert; der Editor zeigt am Aufruf `+ to session ops` (bei Cancel-Operationen `+ to cancel ops`) |
 | Aufruf an der Position `<marker operation>` oder `<journal operation>` in `FINAL CANCEL_CONCLUSION` | Wird als dafür vorgesehene Cancel-Operation behandelt; eigene Transaktion, Session-Operationen werden nicht abgearbeitet |
 
-Ein beliebiger Aufruf innerhalb von `FINAL CANCEL_CONCLUSION` ist damit noch keine Cancel-Operation. Dafür muss der Komponentenaufruf `#` ausdrücklich in der strukturell vorgesehenen Marker- oder Journal-Position stehen. Diese Positionen gibt es nur in einem `GRAPH_OWNER_CMD`; in anderen Command-Typen meldet der Checker einen Fehler.
+Ein beliebiger Aufruf innerhalb von `FINAL CANCEL_CONCLUSION` ist damit noch keine Cancel-Operation. Dafür muss der Komponentenaufruf `#` ausdrücklich in der strukturell vorgesehenen Marker- oder Journal-Position stehen. Diese Positionen gibt es nur in einem `GRAPH_OWNER_CMD`; in anderen Command-Typen sind sie nicht zulässig.
 
 Der optionale Session-Ausdruck `#+ with <Session>` übergibt für diesen Aufruf eine Custom Session an die aufgerufene Komponente. Innerhalb der aufgerufenen Methode ist `session` diese Custom Session; Aufrufe, die von dort ohne eigenen Session-Ausdruck ausgehen, verwenden sie ebenfalls. Ohne diesen Ausdruck verwendet der Aufruf die Session des aktuellen Kontexts. Der Session-Ausdruck ermöglicht damit einen gezielten Session-Wechsel innerhalb eines bereits bestehenden Session-Kontexts, beispielsweise in einer Service Method. Eine weitere Service- oder Repository-Methode kann dadurch mit einer anderen Session ausgeführt werden. Damit lässt sich ein Objekt unabhängig von den bereits ausgecheckten Entities der aktuellen Session laden oder auschecken; insbesondere kann so ein Double-Checkout in derselben Session bewusst vermieden werden. Eine separat verwaltete Custom Session kann außerdem für eine kurze, eigenständige Transaktion verwendet werden, deren Commit nicht vom späteren Abschluss der äußeren Session abhängt: Ein späterer Abbruch der äußeren Session nimmt diesen Commit nicht zurück. Zudem liegen dieselben Objekte dann in zwei Sessions als unterschiedliche Instanzen vor. Der Session-Ausdruck soll deshalb sparsam eingesetzt werden, zumal die Transaktionsgrenze am Aufruf nicht ohne Weiteres erkennbar ist.
 
@@ -295,7 +297,7 @@ Das hat zwei wichtige Konsequenzen:
 1. Ein Rückgabewert oder eine durch den späteren Aufruf vorgenommene Änderung ist direkt nach `session operation add` noch nicht verfügbar.
 2. Wird beispielsweise beim späteren Insert eine Entity-ID vergeben, kann diese ID nicht unmittelbar nach der Registrierung ausgegeben oder verwendet werden.
 
-Service Methods mit `TO_SESSION_OPS` und passende ManMap-`CHECKIN`-/`DELETE`-Methoden übernehmen diese Registrierung automatisch, wenn sie in `FINAL OK_CONCLUSION` per `#` aufgerufen werden. Ein zusätzliches `session operation add` ist dann nicht zulässig. Die zwei oben genannten Konsequenzen gelten dann ebenfalls. Für normale Service Methods und für `CHECKIN`-/`DELETE`-Aufrufe in Services ist `session operation add` zu verwenden, wenn der Aufruf bewusst erst beim erfolgreichen Abschluss des Session Owners ausgeführt werden und an dessen gemeinsamer Transaktion teilnehmen soll; ein direkter `CHECKIN`-/`DELETE`-Aufruf in einem Command außerhalb von `FINAL OK_CONCLUSION` ist ein Checker-Fehler. Das ist nur sinnvoll, wenn sein Ergebnis nicht bereits im laufenden Programmfluss benötigt wird und der umgebende Session Owner die registrierten Operationen tatsächlich ausführt.
+Service Methods mit `TO_SESSION_OPS` und passende ManMap-`CHECKIN`-/`DELETE`-Methoden übernehmen diese Registrierung automatisch, wenn sie in `FINAL OK_CONCLUSION` per `#` aufgerufen werden. Ein zusätzliches `session operation add` ist dann nicht zulässig. Die zwei oben genannten Konsequenzen gelten dann ebenfalls. Für normale Service Methods und für `CHECKIN`-/`DELETE`-Aufrufe in Services ist `session operation add` zu verwenden, wenn der Aufruf bewusst erst beim erfolgreichen Abschluss des Session Owners ausgeführt werden und an dessen gemeinsamer Transaktion teilnehmen soll; ein direkter `CHECKIN`-/`DELETE`-Aufruf in einem Command außerhalb von `FINAL OK_CONCLUSION` ist nicht zulässig. Das ist nur sinnvoll, wenn sein Ergebnis nicht bereits im laufenden Programmfluss benötigt wird und der umgebende Session Owner die registrierten Operationen tatsächlich ausführt.
 
 ### Preconditions, Validation, Guards und Exceptions
 
@@ -324,7 +326,7 @@ Alle Teile außer dem Problemtext sind optional. Bleibt die `condition` leer, ze
 | --- | --- |
 | `WARNING_HINT` | Behandelt das Problem nur als Warnhinweis. Der Programmfluss wird nicht abgebrochen; der Text erscheint orange statt rot. |
 | `PRIO_INFO` | Meldet beziehungsweise protokolliert das Problem mit Priorität Info. |
-| `PRIO_ERROR` | Standardpriorität jeder Precondition; darf nicht explizit angegeben werden, der Checker meldet sonst einen Fehler. |
+| `PRIO_ERROR` | Standardpriorität jeder Precondition; darf nicht explizit angegeben werden. |
 | `PRIO_FATAL` | Meldet beziehungsweise protokolliert das Problem mit Priorität Fatal. |
 
 Nach dem Schrägstrich folgt die optionale Instanzbeschreibung (`instance` des `ProblemMessage`, im Editor `<inst>`): ein Ausdruck, der das betroffene Objekt benennt, etwa `rechnung.nummer`, und mit dem Problem gemeldet wird. Die anschließenden optionalen Schlüssel/Wert-Paare sind `LogStatementProperty`-Einträge. Sie ergänzen den Problembericht und die Diagnoseprotokollierung um strukturierte Werte, ohne den Benutzertext mit technischen Details zu überladen.
@@ -670,7 +672,7 @@ Innerhalb der Conclusion steuern zwei spezielle Statements den weiteren Ablauf:
 - `page <Name>` wechselt auf die angegebene Page und führt deren `page init` aus. Ein Verweis auf die aktuelle Page wirkt als Refresh; so entsteht etwa eine Refresh-Conclusion für ein `SEARCH_CMD`, ohne den Command neu zu starten.
 - `done` beendet den interaktiven Teil erfolgreich und führt `FINAL OK_CONCLUSION` aus.
 
-Preconditions in einer Conclusion prüfen die vom Editor übernommenen Eingaben unmittelbar vor dem Übergang. Ein `GRAPH_EDIT_CMD` kann so seine Teilbearbeitung vor `done` prüfen; ein `GRAPH_OWNER_CMD` kann vor `done` die Voraussetzungen für das anschließende Registrieren und Ausführen der Speicheroperationen absichern. Eine Conclusion muss mindestens `page`, `done` oder eine Precondition enthalten; andernfalls meldet der Checker einen Fehler. Schlägt eine Precondition fehl, endet die Conclusion an dieser Stelle ohne Übergang: Die Page bleibt sichtbar und der Benutzer kann anhand der Meldung korrigieren oder eine andere Aktion wählen.
+Preconditions in einer Conclusion prüfen die vom Editor übernommenen Eingaben unmittelbar vor dem Übergang. Ein `GRAPH_EDIT_CMD` kann so seine Teilbearbeitung vor `done` prüfen; ein `GRAPH_OWNER_CMD` kann vor `done` die Voraussetzungen für das anschließende Registrieren und Ausführen der Speicheroperationen absichern. Eine Conclusion muss mindestens `page`, `done` oder eine Precondition enthalten. Schlägt eine Precondition fehl, endet die Conclusion an dieser Stelle ohne Übergang: Die Page bleibt sichtbar und der Benutzer kann anhand der Meldung korrigieren oder eine andere Aktion wählen.
 
 #### Conclusions mit SCAN/UPDATE oder GO/OK
 
@@ -842,7 +844,7 @@ Jeder solche Übergang bildet eine klare Sicherungsgrenze: Erst der erfolgreiche
 
 ### Explizites Command-Termination-Handling und Session Merge
 
-Im alten Termination-Modus übernahm beziehungsweise ersetzte die Laufzeit gepushte Entities in einem `SEARCH_CMD` teilweise automatisch. Die Option `NEWSTYLE_CMD_TERM_HANDLING` deaktiviert diesen Automatismus und ist das präferierte Pattern. Ohne die Option ist nur ein `child cmd term`-Handler ohne Classifier zulässig; `any cmd term`-Handler und Handler mit Classifier meldet der Checker dann als Fehler. In einem Command mit Successors werden `cmdTermHandler` nicht unterstützt.
+Im alten Termination-Modus übernahm beziehungsweise ersetzte die Laufzeit gepushte Entities in einem `SEARCH_CMD` teilweise automatisch. Die Option `NEWSTYLE_CMD_TERM_HANDLING` deaktiviert diesen Automatismus und ist das präferierte Pattern. Ohne die Option ist nur ein `child cmd term`-Handler ohne Classifier zulässig; `any cmd term`-Handler und Handler mit Classifier sind nicht zulässig. In einem Command mit Successors werden `cmdTermHandler` nicht unterstützt.
 
 Die Verarbeitung übernimmt stattdessen ein `cmdTermHandler` an einer Page des weiterhin aktiven Commands. Welcher Command auf eine Termination reagiert, hängt vom `CmdTermType` des Handlers ab:
 
@@ -1025,7 +1027,7 @@ assert gespeicherteRechnungId != 0;
 
 Die Testbeschreibung simuliert damit die Entscheidungen, die sonst ein Benutzer über die UI trifft. Die DataUX-Darstellung wird nicht benötigt. Zum Verhalten von `session queue next command` ohne UI siehe [Command nach dem Commit einplanen](#command-nach-dem-commit-einplanen).
 
-Einen Benutzerabbruch (`<user_cancel>`) kann ein Test nur bei einem `SEARCH_CMD` erzwingen. Bei allen anderen Command-Typen meldet der Checker einen Fehler; einen `GRAPH_OWNER_CMD` oder `GRAPH_EDIT_CMD` über einen ESC-Abbruch zu testen, ist auch fachlich nicht sinnvoll. Abbrüche dieser Commands werden über `FINAL CANCEL_CONCLUSION` getestet: Eine Precondition in der erzwungenen Conclusion scheitert und führt, da der Test ohne UI läuft, wie in einem Job zu `FINAL CANCEL_CONCLUSION`. Den erwarteten Abbruch beschreibt der Test mit `FAIL IN OFXJobWorkCanceledException` am `run command`; danach kann er Revert (siehe [Revert beim Abbruch](#revert-beim-abbruch)) und Zustand prüfen.
+Einen Benutzerabbruch (`<user_cancel>`) kann ein Test nur bei einem `SEARCH_CMD` erzwingen. Bei allen anderen Command-Typen ist er nicht zulässig; einen `GRAPH_OWNER_CMD` oder `GRAPH_EDIT_CMD` über einen ESC-Abbruch zu testen, ist auch fachlich nicht sinnvoll. Abbrüche dieser Commands werden über `FINAL CANCEL_CONCLUSION` getestet: Eine Precondition in der erzwungenen Conclusion scheitert und führt, da der Test ohne UI läuft, wie in einem Job zu `FINAL CANCEL_CONCLUSION`. Den erwarteten Abbruch beschreibt der Test mit `FAIL IN OFXJobWorkCanceledException` am `run command`; danach kann er Revert (siehe [Revert beim Abbruch](#revert-beim-abbruch)) und Zustand prüfen.
 
 Ein `GRAPH_EDIT_CMD` benötigt die Session seines Session Owners und kann deshalb nicht auf oberster Ebene eines Tests ausgeführt werden. Er wird als Child-Command in einer Page des `run command` für den zugehörigen `GRAPH_OWNER_CMD` beantwortet.
 
@@ -1135,7 +1137,7 @@ Der User Service bündelt benutzer- beziehungsweise laufzeitabhängige Infrastru
 
 `Roles and Permissions` bündelt drei Arten von Zugriffskonzepten: `static role`, `Scope` und `identity` (siehe [Kapitellandkarte](#kapitellandkarte-querschnittsthemen)).
 
-Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN_OPEN_RW role ...`; der Ausdruck hinter `CAN_OPEN_RO`/`CAN_OPEN_RW` ist üblicherweise ein `role`-Ausdruck. Fehlt beides, ist der Command uneingeschränkt zugänglich. Die Art der Berechtigung beschreibt nicht den Datenzugriff, sondern die Bedienbarkeit des Commands: Öffnet ein Benutzer den Command über `CAN_OPEN_RO`, läuft dieser mit einer Read-only-Session (siehe [Session-weites Read-only und Dirty](#session-weites-read-only-und-dirty)) und ist damit eine reine Ansicht. Erfüllt ein Benutzer sowohl einen `CAN_OPEN_RO`- als auch einen `CAN_OPEN_RW`-Eintrag, gilt `CAN_OPEN_RW`. Ein `GRAPH_EDIT_CMD` darf kein `CAN_OPEN_RO` deklarieren, weil Read-only an der Session seines Session Owners hängt; der Checker meldet einen Fehler. Ein `SEARCH_CMD` mit Filterformular braucht `CAN_OPEN_RW` oder gar keine Berechtigung; weil seine Session nie committed wird (siehe [Die vier Command-Typen](#die-vier-command-typen)), ist damit kein Schreibrecht verbunden.
+Commands deklarieren Zugriffsberechtigungen als `CAN_OPEN_RO role ...` oder `CAN_OPEN_RW role ...`; der Ausdruck hinter `CAN_OPEN_RO`/`CAN_OPEN_RW` ist üblicherweise ein `role`-Ausdruck. Fehlt beides, ist der Command uneingeschränkt zugänglich. Die Art der Berechtigung beschreibt nicht den Datenzugriff, sondern die Bedienbarkeit des Commands: Öffnet ein Benutzer den Command über `CAN_OPEN_RO`, läuft dieser mit einer Read-only-Session (siehe [Session-weites Read-only und Dirty](#session-weites-read-only-und-dirty)) und ist damit eine reine Ansicht. Erfüllt ein Benutzer sowohl einen `CAN_OPEN_RO`- als auch einen `CAN_OPEN_RW`-Eintrag, gilt `CAN_OPEN_RW`. Ein `GRAPH_EDIT_CMD` darf kein `CAN_OPEN_RO` deklarieren, weil Read-only an der Session seines Session Owners hängt. Ein `SEARCH_CMD` mit Filterformular braucht `CAN_OPEN_RW` oder gar keine Berechtigung; weil seine Session nie committed wird (siehe [Die vier Command-Typen](#die-vier-command-typen)), ist damit kein Schreibrecht verbunden.
 
 Scopes sind nicht nur Berechtigungsflags, sondern liefern eine eingeschränkte Objektmenge. Sie können Parameter und lokale Variablen besitzen und Services beziehungsweise Repositories über `#` verwenden.
 
