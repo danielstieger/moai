@@ -1036,19 +1036,21 @@ Ein `GRAPH_EDIT_CMD` benötigt die Session seines Session Owners und kann deshal
 ObjectFlow unterstützt insbesondere folgende Testformen:
 
 1. **Datenstruktur und Value Object:** Konstruktion, Berechnung und Gleichheit prüfen.
-2. **Service:** Domänenoperationen, Zustandsübergänge und ihre Preconditions ausführen, mit Objekten, die der Test selbst aufbaut, oder mit konfigurierten Komponenten.
+2. **Service:** Domänenoperationen, Zustandsübergänge und ihre Preconditions ausführen, mit Objekten, die der Test selbst aufbaut, oder mit konfigurierten Komponenten; aufgerufene Repositories und Services lassen sich dabei ersetzen (siehe [Repositories und Services im Test ersetzen](#repositories-und-services-im-test-ersetzen)).
 3. **Repository und Session:** Laden, Checkout, Identity-Map und explizite Session-Integration prüfen.
 4. **Command:** Mit `run command` Initialisierung, Pages, Conclusions, Revert, Successors und finalen Abschluss testen – eine Form von Integrationstest.
 
 Persistenzwirksame Erwartungen prüft der Test, indem er die Daten nach dem Commit zurückliest, in einer frischen Custom Session, damit nicht die bereits geladenen Instanzen der Test-Session verwendet werden.
 
-#### Repositories im Test ersetzen
+#### Repositories und Services im Test ersetzen
 
 Ein ManMap-`Repository` kann über seine `superclass`-Rolle ein anderes Repository erweitern. Damit lässt sich zu einem produktiven Repository eine Testimplementierung modellieren, die einzelne Methoden überschreibt und beispielsweise kontrollierte Fake-Daten liefert. Die Vererbung allein ersetzt die produktive Komponente jedoch nicht: Durch `Component Scanning` oder `Generation Time Resolution` können produktives Repository und Test-Repository gleichzeitig als kompatible Beans vorhanden sein.
 
 Die von der Testsuite verwendete `OFXConfig` kennzeichnet deshalb die vollständig qualifizierte Klasse des Test-Repositories mit `primary instance`. Daraus wird eine primäre Spring-Bean. Wird anschließend der Basistyp des produktiven Repositories benötigt, wählt die Komponentenauflösung die primäre Testimplementierung; Komponentenaufrufe `#` bleiben unverändert und erreichen deren überschriebene Methoden. `primary instance` gehört ausschließlich in die Testkonfiguration beziehungsweise in eine nur dort eingebundene `section`. Pro benötigtem Komponententyp darf nicht mehr als ein passender primärer Kandidat entstehen.
 
 Für dasselbe Basis-Repository können mehrere Test-Repositories existieren, etwa für einen leeren Datenbestand, einen typischen Erfolgsfall oder einen simulierten Fehler. Die jeweilige Testkonfiguration wählt genau die benötigte Implementierung aus. Dadurch bleiben Service und Command unverändert und werden trotzdem mit einem gezielt kontrollierten Repository-Verhalten ausgeführt. Die Vererbung allein aktiviert das Test-Repository nicht; entscheidend ist seine Instanziierung und Auswahl in der tatsächlich von der Testsuite referenzierten Konfiguration.
+
+Derselbe Mechanismus gilt für Services: Ein `Service` kann über seine `superclass`-Rolle einen anderen Service erweitern und einzelne seiner Methoden überschreiben. Ein solcher Test-Service wird wie ein Test-Repository aktiviert: Die Testkonfiguration kennzeichnet seine vollständig qualifizierte Klasse mit `primary instance`, und Komponentenaufrufe `#` auf den produktiven Service erreichen dann die überschriebenen Methoden. Es gelten dieselben Regeln wie für Test-Repositories.
 
 ## Teil V – Querschnittsthemen
 

@@ -1,5 +1,9 @@
 ## Verbindliche Konventionen für Tests
 
+### Benennung
+
+- **KONVENTION:** Namen von `Simple Test`s beschreiben den geprüften Fall in Worten mit Leerzeichen, nicht in CamelCase: `Offene Rechnung freigeben`, nicht `testOffeneRechnungFreigeben`.
+
 ### Was getestet wird
 
 - **KONVENTION:** Jede Service Method für einen Zustandsübergang hat einen Test für den erfolgreichen Übergang.
