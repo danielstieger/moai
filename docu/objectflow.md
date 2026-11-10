@@ -193,6 +193,15 @@ Von einer Datenstruktur aus ist kein Komponentenaufruf `#Component_Name.Methoden
 - Benötigte Werte werden vom Aufrufer vorab bereitgestellt oder als Parameter übergeben.
 - Logik, die andere Aggregate, Repositories, Konfiguration oder weitere Komponenten benötigt, liegt in einem Service.
 - Die Datenstrukturmethoden bleiben dadurch in unterschiedlichen Commands, Jobs und Tests wiederverwendbar und lassen sich ohne Laufzeitkonfiguration prüfen.
+
+### Vererbung von Entities und DTOs
+
+`Entity` und `DTO` können über `extends` eine bestehende Datenstruktur derselben Art erweitern: Eine Entity erbt ausschließlich von einer Entity, ein DTO ausschließlich von einem DTO. Die abgeleitete Datenstruktur übernimmt Business Properties, Beziehungen, Statusdeklarationen und Methoden ihrer Basis, ergänzt eigene Business Properties, Status und Methoden und kann geerbte Methoden mit `@Override` überschreiben. So kann ein `Beleg` etwa Belegnummer, Datum und Positionen festlegen, während `Rechnung` und `Gutschrift` ihn um ihre jeweils eigenen Properties und typspezifisches Verhalten erweitern. Abstrakte Datenstrukturen werden nicht unterstützt; auch die Basis ist vollständig instanziierbar. Value Objects sind versiegelt und können weder erweitert werden noch selbst erweitern.
+
+Bei Entities liegt der Schlüssel immer in der Basis-Entity. Alle Entities einer Hierarchie teilen damit dieselbe Identität: Eine `Rechnung` wird über dieselbe Belegnummer identifiziert wie jeder andere `Beleg`. Abgeleitete Entities deklarieren keine weiteren `KEY`-Properties.
+
+Wo die Basis erwartet wird, kann ebenso eine abgeleitete Instanz stehen. Eine `list<Beleg>` kann Rechnungen und Gutschriften gemeinsam enthalten; ein Methodenaufruf führt die Implementierung des tatsächlichen Laufzeittyps aus. Abläufe in Services und Commands lassen sich dadurch gegen die Basis formulieren, während das typspezifische Verhalten in den abgeleiteten Datenstrukturen bleibt. Wie eine Entity-Hierarchie auf Tabellen abgebildet wird, legt erst das Mapping fest, siehe [Vererbung im Mapping](manmap.md#vererbung-im-mapping).
+
 ### Dirty-Tracking, Read-only und unveränderliche Werte
 
 Entities führen einen Dirty-Zustand. Wird einer normalen Business Property nach dem Laden über ManMap tatsächlich ein anderer Wert zugewiesen, wird die Entity dirty. Eine neu erzeugte Entity beginnt ebenfalls als neu und dirty. Nach dem Laden in eine ManMap-Session ist der Ausgangszustand "clean".

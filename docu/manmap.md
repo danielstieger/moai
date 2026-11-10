@@ -134,6 +134,16 @@ Für Listen gibt es zwei wichtige Formen:
 
 Im Regelfall genügt die Schlüsselreferenz: Das Kind muss den Parent nicht kennen, und in einem Command liefert `getSelected()` den Parent ohnehin. Die Rückreferenz lohnt sich, wenn innerhalb des Aggregats vom Kind zum Parent navigiert werden muss. Beide Formen beschreiben nur die Beziehung; Laden und Speichern der Listenelemente bleiben explizit (siehe [Explizites Laden](#explizites-laden) und [Speichern von Objektgraphen](#speichern-von-objektgraphen)).
 
+### Vererbung im Mapping
+
+ManMap besitzt kein eigenes Sprachmittel für Vererbungshierarchien: Es gibt weder eine Strategie-Option noch eine Discriminator-Spalte. Jedes `EntityMapping` bildet genau eine Entity auf genau eine Tabelle ab; die Strategie ergibt sich allein daraus, wie die Mappings der Hierarchie modelliert werden. Zeigen die Mappings mehrerer Entities auf dieselbe Tabelle, entsteht eine Single-Table-Abbildung, bei der der Typ als fachliche Property modelliert und in den Abfragen gefiltert wird. Zeigt jedes Mapping auf eine eigene Tabelle, entsteht eine Tabelle je konkreter Entity; auch eine Aufteilung auf Basis- und Subklassentabellen (Joined Table) und Kombinationen lassen sich modellieren.
+
+Jede abgeleitete Entity, die geladen oder gespeichert wird, braucht ein eigenes `EntityMapping`. Es mappt die geerbten Properties direkt oder übernimmt das Mapping der Basis mit `IncludeMapping` und ergänzt die eigenen Felder; beide Formen erzeugen dasselbe Mapping. `IncludeMapping` ist vorzuziehen, weil die Spalten der Basis dann nur einmal gepflegt werden, und auch die eingebundenen Felder stehen in `where` zur Verfügung. Eingebunden werden können nur Mappings der eigenen Klasse oder ihrer Basisklassen, nicht die einer abgeleiteten Entity.
+
+Laden und Speichern sind an das Mapping der exakten Klasse gebunden. `save with` und `delete with` akzeptieren nur Instanzen der Klasse ihres Mappings; eine abgeleitete Instanz über das Mapping der Basis zu speichern, ist ein Typfehler. Eine Abfrage erzeugt immer Instanzen der Klasse ihres Mappings, auch für Zeilen, die fachlich zu einer abgeleiteten Entity gehören, und ihr Ergebnis ist nicht als Liste der Basis typisiert. Polymorphe Abfragen gibt es nicht: Werden Instanzen mehrerer Typen gemeinsam benötigt, lädt der Repository- oder Service-Code sie über die jeweiligen Mappings und führt sie in einer Liste der Basis zusammen.
+
+Die Session-Identität gilt je Typ. Wird derselbe Datensatz über das Mapping der Basis und über das Mapping einer abgeleiteten Entity geladen, hält die Session zwei getrennte Objekte, deren Änderungen sich nicht gegenseitig sehen.
+
 ### Grenzen von `IncludeMapping`
 
 `IncludeMapping` dient der Wiederverwendung vorhandener Feldabbildungen. Es lädt oder speichert keinen Objektgraphen und ersetzt kein fachlich passendes Mapping.
