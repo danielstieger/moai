@@ -85,15 +85,15 @@ Entity / Value Object / DTO / Service / Command
 
 ### Wo gehört eine Änderung hin?
 
-| Änderungswunsch                                         | DSL                                                                             | Primärer Modellierungsort                                                                         |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Neue fachliche Eigenschaft                              | `org.modellwerkstatt.objectflow`                                                | `Entity`, `Value Object` oder `DTO`, abhängig von der Bedeutung der Daten                         |
-| Neue Geschäftsregel oder Berechnung                     | `org.modellwerkstatt.objectflow`                                                | Fachliches Verhalten in `Entity`, `Value Object` oder `Service`                                   |
-| Neues Persistenzmapping                                 | `org.modellwerkstatt.manmap`                                                    | `EntityMapping` innerhalb einer `Persistence Description`                                          |
-| Neue Datenbankabfrage oder Speicheroperation            | `org.modellwerkstatt.manmap`                                                    | Methode und gegebenenfalls Mapper innerhalb eines `Repository`                                    |
-| Neuer Anwendungsfall oder geänderter Interaktionsablauf | `org.modellwerkstatt.objectflow`                                                | `Command` und dessen Pages                                                                        |
-| Neue Darstellung oder Bedienelemente                    | `org.modellwerkstatt.dataux`                                                    | `Page Pane` und darin eingebundene `Delegate Form`s, `Table`s, Layouts oder andere UI-Komponenten        |
-| Neue Anwendung oder geändertes Hauptmenü                | `org.modellwerkstatt.dataux`                                                    | `AppUI Module`                                                                                   |
+| Änderungswunsch | DSL | Primärer Modellierungsort | Details |
+| --- | --- | --- | --- |
+| Neue fachliche Eigenschaft | `org.modellwerkstatt.objectflow` | `Entity`, `Value Object` oder `DTO`, abhängig von der Bedeutung der Daten | [Business Properties](objectflow.md#business-properties) |
+| Neue Geschäftsregel oder Berechnung | `org.modellwerkstatt.objectflow` | Fachliches Verhalten in `Entity`, `Value Object` oder `Service` | [Methoden an Datenstrukturen](objectflow.md#methoden-an-datenstrukturen), [Service-Methoden](objectflow.md#service-methoden) |
+| Neues Persistenzmapping | `org.modellwerkstatt.manmap` | `EntityMapping` innerhalb einer `Persistence Description` | [`Persistence Description` und Mapping-Möglichkeiten](manmap.md#persistence-description-und-mapping-möglichkeiten) |
+| Neue Datenbankabfrage oder Speicheroperation | `org.modellwerkstatt.manmap` | Methode und gegebenenfalls Mapper innerhalb eines `Repository` | [Repositories und die vier Methodenarten](manmap.md#repositories-und-die-vier-methodenarten), [Gemappte Abfragen](manmap.md#gemappte-abfragen-mit-queryfrommap), [Speichern](manmap.md#speichern-mit-save-with) |
+| Neuer Anwendungsfall oder geänderter Interaktionsablauf | `org.modellwerkstatt.objectflow` | `Command` und dessen Pages | [Die vier Command-Typen](objectflow.md#die-vier-command-typen), [Pages und Page Conclusions](objectflow.md#pages-und-page-conclusions) |
+| Neue Darstellung oder Bedienelemente | `org.modellwerkstatt.dataux` | `Page Pane` und darin eingebundene `Delegate Form`s, `Table`s, Layouts oder andere UI-Komponenten | [`Page Pane`s](dataux.md#page-panes), [Formulare, Tabellen und Delegates](dataux.md#formulare-tabellen-und-delegates) |
+| Neue Anwendung oder geändertes Hauptmenü | `org.modellwerkstatt.dataux` | `AppUI Module` | [Anwendung mit `AppUI Module`](dataux.md#anwendung-mit-appui-module), [Menüs und Command-Aktionen](dataux.md#menüs-und-command-aktionen) |
 
 Fachliche Prüfungen und Berechnungen gehören in das fachliche Modell beziehungsweise in Services. Datenbankabfragen und Speicheroperationen werden in Repositories implementiert. Commands koordinieren den Anwendungsfall, die Session und die zugehörigen Pages. Deren Darstellung wird durch `Page Pane`s und die darin eingebundenen UI-Komponenten beschrieben. Eine Änderung kann daher mehrere Modellierungsorte und DSLs betreffen.
 
@@ -246,24 +246,24 @@ Spaltenanordnung, Formularlayouts, Menügestaltung und die Benutzerinteraktion m
 Für die Entwicklung von Anwendungen gelten folgende Grundprinzipien:
 
 1. **Das fachliche Modell ist der Ausgangspunkt.**
-   Persistenter fachlicher Zustand wird mit Entities und Value Objects modelliert. Fachliche Regeln, Berechnungen und Zustandsübergänge gehören an die fachlichen Datenstrukturen oder in geeignete Services. DTOs dienen dagegen anwendungsfallbezogenen Daten, Projektionen, Suchen und Darstellungen. Fachliche Regeln sollen nicht in Benutzeroberflächen, Persistenzcode oder technische Laufzeitkomponenten verlagert werden.
+   Persistenter fachlicher Zustand wird mit Entities und Value Objects modelliert. Fachliche Regeln, Berechnungen und Zustandsübergänge gehören an die fachlichen Datenstrukturen oder in geeignete Services. DTOs dienen dagegen anwendungsfallbezogenen Daten, Projektionen, Suchen und Darstellungen. Fachliche Regeln sollen nicht in Benutzeroberflächen, Persistenzcode oder technische Laufzeitkomponenten verlagert werden. Details: [Entity, Value Object und DTO](objectflow.md#entity-value-object-und-dto).
 
 2. **Benötigte Objektgraphen werden bewusst und explizit geladen.**
-   Eine Beziehung zwischen fachlichen Objekten bedeutet nicht automatisch, dass die referenzierten Daten geladen sind. Automatisches Lazy Loading ist nicht möglich. Repository-Methoden müssen deshalb den für einen Anwendungsfall benötigten Objektgraphen gezielt aufbauen. Welche Daten geladen werden, ist Teil des Entwurfs des Anwendungsfalls.
+   Eine Beziehung zwischen fachlichen Objekten bedeutet nicht automatisch, dass die referenzierten Daten geladen sind. Automatisches Lazy Loading ist nicht möglich. Repository-Methoden müssen deshalb den für einen Anwendungsfall benötigten Objektgraphen gezielt aufbauen. Welche Daten geladen werden, ist Teil des Entwurfs des Anwendungsfalls. Details: [Explizites Laden](manmap.md#explizites-laden).
 
 3. **Persistenz ist ebenfalls explizit.**
-   Eine fachliche Beziehung oder ein Mapping bedeutet nicht automatisch, dass ein vollständiger Objektgraph kaskadierend gespeichert wird. Check-in- und Delete-Operationen müssen ausdrücklich festlegen, welche Bestandteile gespeichert oder gelöscht werden. Fachmodell, Mapping und tatsächlich ausgeführte Speicheroperation sind getrennte Aspekte.
+   Eine fachliche Beziehung oder ein Mapping bedeutet nicht automatisch, dass ein vollständiger Objektgraph kaskadierend gespeichert wird. Check-in- und Delete-Operationen müssen ausdrücklich festlegen, welche Bestandteile gespeichert oder gelöscht werden. Fachmodell, Mapping und tatsächlich ausgeführte Speicheroperation sind getrennte Aspekte. Details: [Speichern von Objektgraphen](manmap.md#speichern-von-objektgraphen), [Löschen mit `delete with`](manmap.md#löschen-mit-delete-with).
 
 4. **Read-only-Zugriff und Bearbeitung werden bewusst unterschieden.**
-   Daten für Suchen, Übersichten und Auswertungen sollen ohne Änderungsabsicht geladen werden. Zweckgebundene Lesemodelle werden vorzugsweise als DTOs modelliert. Soll eine Entity verändert werden, muss sie in einem dafür vorgesehenen bearbeitbaren Kontext geladen beziehungsweise ausgecheckt werden. Read-only-Projektionen dürfen nicht allein deshalb wie bearbeitbare Domänenobjekte behandelt werden, weil sie dieselbe Struktur wie eine Entity besitzen.
+   Daten für Suchen, Übersichten und Auswertungen sollen ohne Änderungsabsicht geladen werden. Zweckgebundene Lesemodelle werden vorzugsweise als DTOs modelliert. Soll eine Entity verändert werden, muss sie in einem dafür vorgesehenen bearbeitbaren Kontext geladen beziehungsweise ausgecheckt werden. Read-only-Projektionen dürfen nicht allein deshalb wie bearbeitbare Domänenobjekte behandelt werden, weil sie dieselbe Struktur wie eine Entity besitzen. Details: [Read-only, Checkout und Session-Identität](manmap.md#read-only-checkout-und-session-identität).
 
 5. **Session und Transaktion gehören zum Anwendungsablauf, nicht zu einzelnen Repository-Aufrufen.**
-   Repository-Methoden führen Datenzugriffsoperationen aus, bestimmen aber nicht selbst die fachliche Transaktionsgrenze. Der Session Owner – typischerweise ein `GRAPH_OWNER_CMD` – koordiniert Session und Transaktion. Speicher- und Löschoperationen werden als Session-Operationen registriert und erst beim erfolgreichen Abschluss ausgeführt und committed; bei einem Abbruch werden sie nicht ausgeführt.
+   Repository-Methoden führen Datenzugriffsoperationen aus, bestimmen aber nicht selbst die fachliche Transaktionsgrenze. Der Session Owner – typischerweise ein `GRAPH_OWNER_CMD` – koordiniert Session und Transaktion. Speicher- und Löschoperationen werden als Session-Operationen registriert und erst beim erfolgreichen Abschluss ausgeführt und committed; bei einem Abbruch werden sie nicht ausgeführt. Details: [Session und Unit of Work](objectflow.md#session-und-unit-of-work), [Explizite Session-Operationen](objectflow.md#explizite-session-operationen).
 
    Das gilt auch für datenbankveränderndes Custom SQL. `UPDATE`-, `DELETE`- oder andere `STATEMENT`-Operationen dürfen nicht unmittelbar ausgeführt werden, wenn ihre Wirkung zum erfolgreichen Abschluss des Anwendungsfalls gehört, sondern müssen in den Session-Operations-Ablauf eingebunden werden. Andernfalls könnten Änderungen bereits wirksam sein, obwohl der Benutzer den `GRAPH_OWNER_CMD` anschließend noch mit `ESC` abbricht.
 
 6. **Prüfen und Verändern sind möglichst klar zu trennen.**
-   Fachliche Voraussetzungen und Precondition-Prüfungen sollen grundsätzlich erfolgen, bevor ein Objektgraph verändert wird. Dadurch hinterlässt ein abgebrochener Vorgang möglichst keinen teilweise veränderten Zustand. Abweichungen davon müssen eine bewusste fachliche Bedeutung haben und dürfen nicht zufällig aus der Reihenfolge technischer Operationen entstehen.
+   Fachliche Voraussetzungen und Precondition-Prüfungen sollen grundsätzlich erfolgen, bevor ein Objektgraph verändert wird. Dadurch hinterlässt ein abgebrochener Vorgang möglichst keinen teilweise veränderten Zustand. Abweichungen davon müssen eine bewusste fachliche Bedeutung haben und dürfen nicht zufällig aus der Reihenfolge technischer Operationen entstehen. Details: [Preconditions, Validation, Guards und Exceptions](objectflow.md#preconditions-validation-guards-und-exceptions).
 
 7. **Die Benutzeroberfläche bleibt möglichst „CheapCode“.**
    DataUX beschreibt Bindung, Darstellung, Layout und Interaktionsmöglichkeiten (CheapCode, siehe [Ziele der Werkbank](#ziele-der-werkbank)). Fachliche Entscheidungen und schwer überprüfbare Geschäftsregeln gehören nicht in die Oberfläche. Dadurch können Oberflächen in kurzen Feedbackzyklen verändert und erprobt werden, ohne das fachliche Modell unnötig zu beeinflussen.
@@ -272,7 +272,7 @@ Für die Entwicklung von Anwendungen gelten folgende Grundprinzipien:
     Modelle sollen möglichst keine unnötigen Abhängigkeiten von einem konkreten UI-Framework oder einer bestimmten Ausführungsplattform enthalten. Plattformspezifische Modellierung ist nur dort sinnvoll, wo sich die fachliche oder ergonomische Anforderung tatsächlich unterscheidet.
 
 9. **Anwendungsfälle müssen überprüfbar bleiben.**
-    Fachliche Regeln und Abläufe sollen so modelliert werden, dass sie durch Beispiele und Tests nachvollzogen werden können. Besonders sorgfältig zu prüfen sind Änderungen an fachlichen Datenstrukturen und Geschäftsregeln, da Fehler dort häufig nicht allein durch technische Tests oder das Ausprobieren der Oberfläche erkennbar werden. Die zugehörige Dokumentation wird möglichst direkt bei den beschriebenen Modellelementen gepflegt.
+    Fachliche Regeln und Abläufe sollen so modelliert werden, dass sie durch Beispiele und Tests nachvollzogen werden können. Besonders sorgfältig zu prüfen sind Änderungen an fachlichen Datenstrukturen und Geschäftsregeln, da Fehler dort häufig nicht allein durch technische Tests oder das Ausprobieren der Oberfläche erkennbar werden. Die zugehörige Dokumentation wird möglichst direkt bei den beschriebenen Modellelementen gepflegt. Details: [Typische Testebenen](objectflow.md#typische-testebenen).
 
 ## Weiterführende Dokumentation
 
