@@ -6,8 +6,9 @@ The `mps-*` skills in `skills/` derive from the generic MPS skills JetBrains shi
 (`mps_mcp_initialize_project_for_agents`). MoAI adapts them. When JetBrains releases a new version,
 this list says which MoAI changes to carry over and why.
 
-Baseline: the JetBrains originals of MPS 2026.2 (build 262.10968.569), as `mps_mcp_initialize_project_for_agents`
-installs them into a project's `.claude/skills/`. MoAI v0 (`b6eec7b`, 2026-09-29) was copied from an older JetBrains
+Baseline: the JetBrains originals of MPS 2026.2 (build 262.11879.701), as `mps_mcp_initialize_project_for_agents`
+installs them into a project's `.claude/skills/`. The originals are not kept in this repository; generate them into a
+scratch project to compare. MoAI v0 (`b6eec7b`, 2026-09-29) was copied from an older JetBrains
 catalog, so some differences are JetBrains changes MoAI never adopted (see the last section), not MoAI edits.
 Reasons marked "(inferred)" were derived from the content, since the commit messages give none.
 
@@ -28,6 +29,11 @@ Reasons marked "(inferred)" were derived from the content, since the commit mess
 | 2026-11-16 | `mps-baselanguage/SKILL.md` (Critical Directives) | New rule "No redundant null guards", pointing to `baselanguage-collections-dsl` `concepts.md` ("Null and emptiness semantics"). | Agents wrapped null-safe operations in `!= null` checks; nothing said which operations are null-safe. Verified in MPS 2026.2 with a test suite on `null` receivers. |
 | 2026-11-16 | `mps-mcp-workflow/SKILL.md` (intro) | "Load it after `AGENTS.md` and `MPS_AGENT_GUIDE.md`" becomes "Load it after `MPS_AGENT_GUIDE.md`". | MoAI reaches the agent through a session hook that adds `SESSION_CONTEXT.md`; the installation no longer generates an `AGENTS.md`. |
 | 2026-11-16 | `mps-mcp-workflow/SKILL.md` (Companion Skills), `references/mcp-tools-index.md` | Removed the box "Never call `mps_mcp_initialize_project_for_agents`"; the tool index keeps a one-line pointer. | The rule moved to `SESSION_CONTEXT.md` and `INSTALL_INSTRUCTIONS.md`, where an agent sees it before it loads a skill. |
+| 2026-11-16 | all eight `mps-*` skills | Carried over JetBrains' changes from build 262.10968.569 to 262.11879.701: corrected blueprint roles, `write action` / mandatory `repo`, node and model pointers, `perRoot` `messages`, `details.infoMessages`, `previousSession` in the IDE log, MOVE_CHILD / MOVE_NODE_TO_PARENT, `INVALID_JSON` diagnostics, console imports and `mps_mcp_clear_console`, `mps_mcp_query_dataflow`. | New MPS build. |
+| 2026-11-16 | `mps-node-editing`, `mps-mcp-workflow`, `mps-baselanguage` | JetBrains' new `scripts/blueprint.py` and the seven passages that require it were not adopted. | MoAI builds blueprints with `moai_plugin/tools/blueprint.py build`, which also checks against the language structure. |
+| 2026-11-16 | `mps-language-analysis/references/concept-details.md`, `search-concepts.md`, `mps-mcp-workflow/references/mcp-tools-index.md`, `mps-node-editing/references/troubleshooting.md`, `mps-dsl-memory/SKILL.md` | Removed the hollow-descriptor sections and fields; JetBrains' new `language-readiness.md`, `LANGUAGE_NOT_BUILT` recovery (MAKE) and `details.languageBuild` were not adopted. One troubleshooting line names the error code. | The MoWare languages ship as a built MPS plugin; an unbuilt language does not occur in an application project. |
+| 2026-11-16 | `mps-run-configurations` (SKILL.md, `runnable-shapes.md`, `decision-matrix.md`, `common-failures.md`, `classconcept-and-fallbacks.md`) | Removed the `ITestCase` / JUnit shapes and the `canRunInProcess` section; JetBrains' fourth shape (discovered test roots, `GeneratorTest`) was not adopted. The literal refusal message stays. | MoWare projects test with `OFXTestSuit` (an `IMainClass`); `ITestCase` is not used. |
+| 2026-11-16 | `mps-mcp-workflow/references/mcp-server-troubleshooting.md` (new), `MPS_AGENT_GUIDE.md` | The spaces-in-path bug moved from the guide into this reference, as JetBrains did; the guide was condensed like the new JetBrains `AGENTS.md` and gained "Keep the Full MPS MCP Toolset". Not adopted: the offer to run the initializer when skills are missing, the rules on aspect skills and project-local DSL skills, the zsh glob note. | Shorter entry file; deferred tools are not unavailable tools. |
 
 ## Before 2026-10-21
 
@@ -74,5 +80,7 @@ JetBrains 2026.2 content MoAI has not adopted. Decide deliberately each time:
 - Sub-folder splits of references: `mps-mcp-workflow` `analysis-tools/`, `reference-formats/`; `mps-baselanguage` `parse-java-tips/`; `mps-model-manipulation` `smodel-concepts-catalog/`, `java-parser-capabilities/`. MoAI keeps single files.
 - `mps-mcp-workflow/references/module-facet-settings.md`.
 - `mps-language-analysis/scripts/concept_shape.py` (front end for `mps_dump.py shape`).
-- `mps-node-editing/scripts/table_to_bulk_insert.py`.
-- Old JetBrains text MoAI still keeps although 2026.2 dropped it: "Implicit Return" in `mps-baselanguage/references/critical-rules.md`; `UndefinedType` as `type` child of `InferredClosureParameterDeclaration` (`mps-model-manipulation`, `moai:baselanguage-collections-dsl`). Check whether still valid.
+- `mps-node-editing/scripts/table_to_bulk_insert.py` (with its `aggregate` key) and `scripts/blueprint.py`.
+- `mps-mcp-workflow/references/analysis-tools/generation.md` (`mps_mcp_generation`) and `mps_mcp_run_migrations`: one line each in the tool index, no workflow.
+- `mps-mcp-workflow/references/catalog-install-and-refresh.md`, `mps-language-analysis/references/language-readiness.md`.
+- Old JetBrains text MoAI still keeps although 2026.2 dropped it: "Implicit Return" in `mps-baselanguage/references/critical-rules.md`. Check whether still valid. (`UndefinedType` as `type` child of `InferredClosureParameterDeclaration` is still in JetBrains' `mps-collections-and-closures`.)

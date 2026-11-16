@@ -155,7 +155,7 @@ The dot-op `seq.forEach{..}` (concept `VisitAllOperation`) is distinct from the 
 
 ### Select vs translate
 
-`SelectOperation` maps one input to one result. `TranslateOperation`/`selectMany` flattens the values its closure emits with `YieldStatement` (zero or many per input); a non-yielding closure normally ends with an `ExpressionStatement` as its result. Do not substitute one solely because the editor text looks similar.
+`SelectOperation` maps one input to one result. `TranslateOperation` (`translate`, alias `selectMany`) flattens what its closure produces per input: the closure either emits values with `YieldStatement` (zero or many per input) or returns a sequence (a non-yielding closure ends with an `ExpressionStatement` as its result). Do not substitute one solely because the editor text looks similar.
 
 `YieldStatement` (closures; single child `expression`) emits one element per executed `yield`; the result of `.translate` is the concatenation of all yielded elements across all inputs. This is the idiomatic way to express tree traversals that produce a flat sequence of nodes (replacement for imperative collect-into-list loops), e.g.:
 

@@ -11,9 +11,9 @@ When declaring a local variable that holds a node or collection of nodes:
 | `node<C>` | `SNodeType` (ref → concept of C) | single node reference |
 | `nlist<C>` | `SNodeListType` (ref `elementConcept` → ConceptDeclaration) | persistent children collection (link list) |
 | `node-ptr<C>` | `SNodePointerType` (ref `concept` → ConceptDeclaration) | persistent pointer to a node (survives detach / reload) |
-| `concept<C>` | `SConceptType` (ref `conceptDeclaration`) | typed concept handle (e.g. for reflection) |
+| `concept<C>` | `SConceptType` (ref `conceptDeclaraton`, sic) | typed concept handle (e.g. for reflection) |
 | `search scope` | `SearchScopeType` | resolution scope for references |
-| `enummember<E>` | `SEnumerationMemberType` (ref `enumerationDeclaration`) | single member of an MPS enum |
+| `enummember<E>` | `SEnumerationMemberType` (ref `enum`) | single member of an MPS enum |
 | `sequence<node<C>>` | `SequenceType(elementType: SNodeType)` | lazy iterable |
 | `list<node<C>>` | `ListType(elementType: SNodeType)` | mutable ordered list |
 | `set<node<C>>` | `SetType(elementType: SNodeType)` | mutable unordered set |
@@ -57,18 +57,18 @@ CollectionType
 }
 ```
 
-Use `node-ptr<C>` when you need to remember a node across operations that might detach it, or to store a reference outside the current model/session. Dereference with `.resolve(repo)` (behavior method).
+Use `node-ptr<C>` when you need to remember a node across operations that might detach it, or to store a reference outside the current model/session. Dereference with `.resolve(repo)`, the smodel operation `NodePointer_ResolveOperation` (child `repositoryArg`). For a node that exists when you write the code, the value is the literal `node-ptr/<name>/` (`NodePointerExpression`), not a lookup by name: see `link-and-concept-literals.md`.
 
 ### `concept<C>` — typed concept handle
 
 ```json
 {
   "concept": "jetbrains.mps.lang.smodel.structure.SConceptType",
-  "references": [{ "role": "conceptDeclaration", "target": "<ConceptDeclaration-noderef>" }]
+  "references": [{ "role": "conceptDeclaraton", "target": "<ConceptDeclaration-noderef>" }]
 }
 ```
 
-Populate with a `concept/C/` literal (`ConceptIdRefExpression`, id `2644386474300074836`, see `link-and-concept-literals.md`) or the `.concept` operation on a node (`Node_GetSConceptOperation`).
+The role really is spelled `conceptDeclaraton` (sic). Populate with a `concept/C/` literal (`ConceptIdRefExpression`, id `2644386474300074836`, see `link-and-concept-literals.md`) or the `.concept` operation on a node (`Node_GetSConceptOperation`).
 
 ### `search scope` and `enummember<E>`
 
@@ -77,7 +77,7 @@ Populate with a `concept/C/` literal (`ConceptIdRefExpression`, id `264438647430
 
 {
   "concept": "jetbrains.mps.lang.smodel.structure.SEnumerationMemberType",
-  "references": [{ "role": "enumerationDeclaration", "target": "<EnumerationDeclaration-noderef>" }]
+  "references": [{ "role": "enum", "target": "<EnumerationDeclaration-noderef>" }]
 }
 ```
 

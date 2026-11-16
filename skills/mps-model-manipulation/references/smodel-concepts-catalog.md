@@ -32,6 +32,22 @@ Used in `type` role of a `LocalVariableDeclaration`, `returnType`, parameter `ty
 | `RefConcept_Reference` | `1177026924588` | `<ConceptName>` concept argument wrapper |
 | `LinkIdRefExpression` | `2644386474301421077` | `link/C : role/` link literal |
 
+## Node and model pointers
+
+Blueprints, prerequisites and when to use them: `link-and-concept-literals.md`.
+
+| Concept | ID | MPS notation |
+|---|---|---|
+| `NodePointerExpression` | `7400021826774799413` | `node-ptr/Name/` literal; child `ref` = `NamedNodeReference` (lang.modelapi; ref `target`, optional `child`) or the id form `NodePointer` |
+| `ModelPointerExpression` | `1863527487546129879` | `model-ptr/model.name/` literal; child `modelRef` = `ModelPointer` (lang.modelapi) |
+| `NodePointer_ResolveOperation` | `3648723375513868532` | `ptr.resolve(repo)` → `node<C>`; child `repositoryArg` |
+| `ModelPointer_ResolveOperation` | `4065387505485742666` | `mptr.resolve(repo)` → `model`; child `repositoryArg` |
+| `NodePointer_GetModelOperation` | `6138838330738724256` | `ptr.model` → `model-ptr` |
+| `Node_PointerOperation` | `5045161044515397667` | `node.pointer` → `node-ptr<C>` |
+| `Model_PointerOperation` | `3506770386464365589` | `model.pointer` → `model-ptr` |
+| `Node_IsOperation` | `3661776679762942774` | `node.is(Name)`; child `ref` = `NamedNodeReference`, as in `NodePointerExpression` |
+| `Link_SetTargetPointerOperation` | `942336824646299470` | `node.ref.set ptr(Name)`; child `linkTarget` (`INodePointerArg`): `NodePointerArg_Identity` (`3320646261221695165`, child `ref` as above) for a literal target, `# expr` (`PoundExpression`) for a `node-ptr` value |
+
 ## Creators (node factories)
 
 `SNodeCreator` and `SNodeCreatorAndInitializer` are `AbstractCreator`s: each is the `creator` child of a `GenericNewExpression`.
@@ -96,6 +112,8 @@ All in `operation` role of a `DotExpression`.
 | `OperationParm_Concept` | `1144101972840` | `<C>` parameter wrapper for ancestor/descendants |
 | `OperationParm_Inclusion` | leaf — sibling of `OperationParm_Concept` | `+` include-self flag (`.ancestor<C, +>` / `.descendants<C, +>`) |
 | `Node_GetContainingRootOperation` | `1171310072040` | `.containingRoot` |
+| `Model_RootsOperation` | `1171315804604` | `model.roots(C)` on a model operand; `C` is child `conceptArgument` = `RefConcept_Reference` (ref `conceptDeclaration`) |
+| `Model_NodesOperation` | `1171323947159` | `model.nodes(C)` — every node of `C` in the model; `C` as for `.roots` |
 | `Node_ContainingLinkOperation` | `7504436213544206332` | `.containingLink` (alias `containingLink`) — `link<C : role>` of the containment edge to parent |
 | `Node_GetContainingRoleOperation` | `1960721196051541146` | `.role` — **DEPRECATED since MPS 3.3**; prefer `.containingLink` |
 | `Node_GetModelOperation` | `1143234257716` | `.model` |

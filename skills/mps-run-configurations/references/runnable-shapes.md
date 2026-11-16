@@ -1,20 +1,15 @@
 # Runnable Shapes — What `mps_mcp_create_run_configuration` Accepts
 
-The tool dispatches to one of **three** producer paths, matching the three `ProducerPart_*` entries the MPS `Java_Producer` and `JUnitTests_Producer` register:
+The tool creates a Java Application config for two kinds of root:
 
 | Source node | Run config type created | Default name | Typical examples |
 |---|---|---|---|
 | Concept implements `jetbrains.mps.execution.util.structure.IMainClass` | **Java Application** | `Node <name>` | DSL roots with a `main`-equivalent — Kaja `Script`, `samples.shapes.Canvas` |
 | `jetbrains.mps.baseLanguage.structure.ClassConcept` with a `static main(<String[]-subtype>)` method | **Java Application** | `Class <name>` | Plain BaseLanguage classes — the same target as MPS Project View → right-click → Run |
-| Concept implements `jetbrains.mps.baseLanguage.unitTest.structure.ITestCase` | **JUnit Tests** | `<testCaseName>` | `lang.test` `NodesTestCase` / `EditorTestCase` / `MigrationTestCase` / `BTestCase`, and BaseLanguage `unitTest.TestCase` |
 
 ## ClassConcept `main` predicate
 
 The ClassConcept path checks `ClassConcept.getMainMethod() != null`, which expands to `StaticMethodDeclaration.isMainMethod`: name equals `main`, exactly one parameter, parameter type is a typesystem strong-subtype of `String[]`. Both `String[] args` and BaseLanguage `string[] args` qualify. **Visibility is not checked** (a package-private or protected `main` qualifies just as a public one does), and the return type is not explicitly checked either (`static int main(String[])` would qualify — the launcher ignores the return value). This intentionally matches the standard producer; do not file bugs against the tool for accepting these shapes.
-
-## ITestCase `canRunInProcess` flag
-
-When the test case's `canRunInProcess` behavior returns `false` (e.g. tests that need a separate JVM), the registered configuration is created with the in-process flag **cleared**, mirroring the standard `JUnitTests_Producer.ProducerPart_NlistITestCase`. Tests whose `canRunInProcess` returns `true` (the default) keep the in-process flag at its factory default. The MCP tool replicates this transparently; the caller cannot override it.
 
 ## `compileInMPS` gate (Java Application paths only)
 
@@ -28,15 +23,15 @@ The message names an IDEA MCP route; MoAI does not use it. Report the gate to th
 
 ## Refusal: no shape matched
 
-If the node matches none of the three shapes, the tool **refuses with an error**:
+If the node matches neither shape, the tool **refuses with an error**. The message also names test-case shapes (`ITestCase`, discovered test roots); MoWare projects do not use them, an `OFXTestSuit` is an `IMainClass`:
 
 ```
-Concept '<X>' is not runnable through this tool: the root must implement IMainClass or ITestCase, or be a ClassConcept whose getMainMethod() resolves a static main(<String[]-subtype>) method (visibility is not checked)
+Concept '<X>' is not runnable through this tool: the root must implement IMainClass or ITestCase, be a test root MPS test discovery recognizes (such as a GeneratorTest), or be a ClassConcept whose getMainMethod() resolves a static main(<String[]-subtype>) method (visibility is not checked)
 ```
 
 ## Producer precedence
 
-When both apply (rare — a `ClassConcept` that also implements `IMainClass`), the tool dispatches the more specific producer first: **ITestCase wins over IMainClass wins over ClassConcept.**
+When both apply (rare — a `ClassConcept` that also implements `IMainClass`), the tool dispatches the more specific producer first: **IMainClass wins over ClassConcept.**
 
 ## What this tool does NOT do
 

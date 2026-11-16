@@ -15,6 +15,7 @@ Hub skill for working with JetBrains MPS (Meta Programming System) models and th
 - **Editing rules** (preserve node IDs, surgical `mps_mcp_update_node` over full-root rewrites, validate after every change): `moai:mps-node-editing`.
 - **Copy-then-modify beats reconstruct-from-JSON.** To create a node that closely resembles an existing one in the same model, duplicate it with `mps_mcp_alter_nodes` `COPY_NODE` (a root becomes a new root of the same model, a node in a `0..n`/`1..n` role the next sibling) and adjust the copy with `mps_mcp_update_node`. Shipped example modules are not part of the project and cannot be copied from this way.
 - **Ask the typesystem, do not simulate it.** Whether a type fits, what a slot requires, what an operator returns (BaseLanguage, collections, DSL expressions): call `mps_mcp_query_types` or `mps_mcp_query_nodes` `GET_TYPE` / `GET_EXPECTED_TYPE` — [`references/type-queries.md`](references/type-queries.md).
+- **Never simulate the dataflow engine.** Why a node is unreachable, whether a variable may be read uninitialized, which writes reach a read or which reads a write feeds: call `mps_mcp_query_dataflow` (`PRINT_PROGRAM`, `REACHING_WRITES`, `REACHING_READS`) — [`references/analysis-tools.md`](references/analysis-tools.md#dataflow-queries).
 - **Validate frequently.** A successful insertion (`"ok": true`) does not mean the AST is semantically valid — follow with `mps_mcp_check_root_node_problems`: on the changed root, or after work on several roots once on the model reference with `perRoot=true`. Read `warnings` and `details.uncheckedSubtrees`, not just the `data` verdict (commented-out code is not type- or constraints-checked); a problem's `rules[0].rule` names the reporting rule, `quickFixes` can be applied with `mps_mcp_apply_intention` — [`references/analysis-tools.md`](references/analysis-tools.md).
 - **Check the IDE log when the envelope and the effect disagree.** When a tool reports success but the effect is missing, call `mps_mcp_read_ide_log` with `sinceMinutes` covering the call window and `minLevel="WARN"` — [`references/ide-log.md`](references/ide-log.md).
 - **Language definitions are off-limits.** In a MoWare application project never edit language structure or aspects (`mps_mcp_alter_structure`, `mps_mcp_scaffold_editor`, aspect models of the MoWare languages) — see `MPS_AGENT_GUIDE.md`.
@@ -84,18 +85,19 @@ Hub references (`references/`):
 | [`node-editing-rules.md`](references/node-editing-rules.md) | The rulebook on adding/updating nodes: concept selection, role types, cardinality, assignability, persistent IDs, surgical edits, temp-directory rule. |
 | [`reference-formats.md`](references/reference-formats.md) | Node refs (`r:`/`i:`), concept refs (`c:`), model refs, list parameters, key spellings, rejected keys, node info envelope. |
 | [`response-envelope.md`](references/response-envelope.md) | The `{ok, data, warnings, details}` envelope and the "Dry-run response" rule. |
-| [`analysis-tools.md`](references/analysis-tools.md) | `mps_mcp_print_node`, `mps_mcp_check_root_node_problems` (model/module scope, `perRoot`, `rules`, `uncheckedSubtrees`, `quickFixes`), intentions, `FIX_REFERENCES`. |
+| [`analysis-tools.md`](references/analysis-tools.md) | `mps_mcp_print_node`, `mps_mcp_check_root_node_problems` (model/module scope, `perRoot`, `rules`, `uncheckedSubtrees`, `quickFixes`), intentions, `FIX_REFERENCES`, `mps_mcp_query_dataflow`. |
 | [`type-queries.md`](references/type-queries.md) | `mps_mcp_query_types` and `GET_TYPE` / `GET_EXPECTED_TYPE`. |
 | [`ide-log.md`](references/ide-log.md) | Reading `idea.log` with `mps_mcp_read_ide_log`, verifying a write call. |
 | [`module-dependencies.md`](references/module-dependencies.md) | Module and model dependencies, used languages and devkits, creating and renaming modules, "Cannot resolve concept" / `ClassNotFoundException`. |
 | [`project-management.md`](references/project-management.md) | Opening a project when MCP only sees the welcome screen (standalone MPS, Linux/Windows), closing it with `mps_mcp_close_project`. |
+| [`mcp-server-troubleshooting.md`](references/mcp-server-troubleshooting.md) | Every call fails with `URISyntaxException: Illegal character in path` (a space in an open project's path). |
 | [`mcp-tools-index.md`](references/mcp-tools-index.md) | The complete inventory of MPS MCP tools. |
 
-Large subtrees / staged construction and the inline-size/file-path rules: `moai:mps-node-editing` (`references/staged-construction.md`, SKILL.md File-Path Semantics).
+Large subtrees / staged construction and the inline-size/file-path rules: `moai:mps-node-editing` (`references/staged-construction.md`, SKILL.md File-Path Semantics). Helper scripts and generated JSON go under `$TMPDIR`, never into the project or another directory of the user.
 
 ## Scripts
 
-`scripts/mps_dump.py` (Python standard library, offline) projects a large MCP result file (`mps_mcp_get_project_structure`, `mps_mcp_print_node`, `mps_mcp_get_concept_details`) down to the lines you need instead of reading the whole 10–40 KB file: `roots`, `models`, `node`, `tree`, `shape`, `count`.
+`scripts/mps_dump.py` (Python standard library, offline) projects a large MCP result file (`mps_mcp_get_project_structure`, `mps_mcp_print_node`, `mps_mcp_get_concept_details`) down to the lines you need instead of reading the whole 10–40 KB file: `roots`, `models`, `node`, `tree`, `shape`, `count`. Lower `maxInlineBytes` only to get a file for this script: for any other result a smaller value moves the answer into a file you must then read, so keep the default and narrow the call ([`references/analysis-tools.md`](references/analysis-tools.md)).
 
 ```
 python3 scripts/mps_dump.py roots "$TMPDIR/mps-node-123.json" --concept Entity

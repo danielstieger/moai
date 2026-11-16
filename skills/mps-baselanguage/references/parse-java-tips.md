@@ -35,7 +35,9 @@ The tool takes a single `parameters` argument holding a JSON object — sent eit
                                              //   Console input command. For child/replace, if the
                                              //   parentRef/targetRef resolves to a node inside the
                                              //   current console command, it is edited in place
-                                             //   without saving.
+                                             //   without saving. Console code sees JDK classes and
+                                             //   what the console already imports; add others with
+                                             //   mps_mcp_model_dependency(modelReference: "console").
     "modelRef": string,                      // required when mode=="root" (SModelReference)
     "parentRef": string,                     // required when mode=="child" (SNodeReference)
     "targetRef": string,                     // required when mode=="replace" (SNodeReference)
@@ -59,8 +61,9 @@ The tool takes a single `parameters` argument holding a JSON object — sent eit
 ### Rules
 
 - `CLASS_STUB` is not supported and will be rejected.
+- In `root` mode a `package x.y;` line sets the class's `packageName` (the envelope warns), which decides the generated `package` statement and the `source_gen` path; without one the package falls back to the model's name. Keep the line when you rewrite a class whose package matters. `insert.virtualPackage` is only a project-tree folder.
 - Root insertion always **appends**; root order cannot be controlled. Supplying a root `position` other than `-1`/absent is **rejected** with an `INVALID_REQUEST` error (it is *not* silently ignored). Use `-1` or omit `position` to append.
-- `insert.mode: "console"` replaces the current MPS Console input command without executing it. `featureKind: "EXPRESSION"` is wrapped as a `BLExpression`; `featureKind: "STATEMENTS"` is wrapped as a `BLCommand` block. Other feature kinds are rejected in this mode; use `child` / `replace` with a `parentRef`/`targetRef` that resolves to a node inside the current console command for nested edits.
+- `insert.mode: "console"` replaces the current MPS Console input command without executing it. `featureKind: "EXPRESSION"` is wrapped as a `BLExpression`; `featureKind: "STATEMENTS"` is wrapped as a `BLCommand` block. Other feature kinds are rejected in this mode; use `child` / `replace` with a `parentRef`/`targetRef` that resolves to a node inside the current console command for nested edits. Console code resolves JDK classes and what the console model imports or its module depends on: add the models declaring other classes first with `mps_mcp_model_dependency(modelReference: "console", targetModels: [...])`. A console insert left with unresolved names says so in `warnings`. Details: `moai:mps-console` (`references/console-imports.md`).
 - For `mode: "child"` or `mode: "replace"`, if the `parentRef`/`targetRef` resolves to a node inside the current MPS Console input command, the node is edited in place without saving the model to disk. The target node must be inside the current unexecuted console input command (`mps_mcp_get_current_editor_root_node(source:"console")` + `mps_mcp_print_node` is the usual way to get fresh nested references). Console history entries and stale references from previous console interactions are rejected. Nodes outside the selected project are also rejected.
 - For child insertion, the `role` name must exist on the parent concept; otherwise the call fails.
 - For `child` insertion into a **single-cardinality** role (`0..1` / `1`), an existing occupant is **overwritten** (the new node replaces it) rather than appended — appending would otherwise create two children and break validation with *"Only one child is allowed in the role …"*. This matches `mps_mcp_update_node`. A multi-node input cannot fill one slot, so that case is still rejected; for single-cardinality roles `position` must be `-1`/absent or `0`.
@@ -82,7 +85,8 @@ The tool takes a single `parameters` argument holding a JSON object — sent eit
 ## After Insertion
 
 * **Reference resolution**: after insertion, call `mps_mcp_print_node` to verify references resolved correctly.
-* **Dependencies**: ensure the containing models and modules of all referenced nodes are imported.
+* **Dependencies**: ensure the containing models and modules of all referenced nodes are imported. A METHOD/STATEMENTS insert has no `import` lines: a short class name resolves only if a single imported model declares it (`EditorComponent` is in both `jetbrains.mps.nodeEditor` and `jetbrains.mps.openapi.editor`), so write such names fully qualified.
+* **`UnknownDotCall` on a static interface method** (`List.of`, `Path.of`): the parser leaves those unresolved, and `mps_mcp_check_root_node_problems` with `autoApplyQuickFixes` does not fix them; see `moai:mps-model-manipulation` (`references/java-parser-capabilities.md`).
 * **Type-system problems (`problems` response field)**: every success envelope (`ok:true`) carries a `problems` array. Each entry has `severity` (`error`/`warning`), `message`, and the offending node's `reference` and `concept`. It lists the problems found *within the inserted nodes' subtrees* using the same checkers as `mps_mcp_check_root_node_problems`. An **empty** array means the insert type-checks; a **non-empty** array means the insert succeeded (and, for normal project models, was persisted) but left problems you must fix (for example, a lambda whose closure type does not match the destination slot). `ok:true` does **not** by itself imply a clean model — always inspect `problems`.
 
 ## Direct AST Editing Tips

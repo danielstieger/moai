@@ -1,6 +1,6 @@
 ---
 name: mps-run-configurations
-description: Create and execute IDE run configurations for MPS root nodes via MPS MCP — Java Application for `IMainClass` / `ClassConcept` with `main`, JUnit Tests for `ITestCase` roots and whole test models. Use when launching DSL `main`-like roots, plain BaseLanguage `ClassConcept` mains, or MPS test cases from a node; reusing or replacing an existing run config; diagnosing `ClassNotFoundException`, `compileInMPS=false`, or "not runnable through this tool" failures.
+description: Create and execute IDE run configurations for MPS root nodes via MPS MCP — Java Application for `IMainClass` roots (such as an `OFXTestSuit`) and `ClassConcept` with `main`. Use when launching DSL `main`-like roots or plain BaseLanguage `ClassConcept` mains; reusing or replacing an existing run config; diagnosing `ClassNotFoundException`, `compileInMPS=false`, "No tests found", or "not runnable through this tool" failures.
 ---
 
 # Running MPS Root Nodes
@@ -10,7 +10,7 @@ This skill covers the path from "an MPS root node exists in a model" to "a green
 ## Critical Directives
 
 - Use the MPS MCP tools `mcp__mps-mcp__execute_run_configuration` and `mcp__mps-mcp__get_run_configurations`. MoAI assumes a standalone MPS; IntelliJ IDEA's MCP tools are not part of the workflow.
-- **`mps_mcp_create_run_configuration` accepts a root, an array of test roots, a model, or an array of models.** A single root is still one of three shapes: implements `IMainClass`, implements `ITestCase`, or is a `ClassConcept` with a qualifying static `main`. One model alone stays a live JUnit config; any other set is a snapshot of the test roots present at creation. A model reference passed as `nodeReference` is rejected — pass it in `modelReference`. See `references/create-and-execute.md`.
+- **`mps_mcp_create_run_configuration` takes a root in `nodeReference`.** MoWare projects run two shapes: a root implementing `IMainClass` (an `OFXTestSuit` among them) or a `ClassConcept` with a qualifying static `main`; both give a Java Application config. A model in `modelReference` gives a JUnit config, which finds no `OFXTestSuit` (`references/common-failures.md`). See `references/create-and-execute.md`.
 - **MAKE the *module*, not just the model, before running.** Model MAKE regenerates `source_gen` but does not always compile into `classes_gen`; running launches bytecode, so a stale `classes_gen` silently runs old code. See `references/compile-before-run.md`.
 - **Keep `configurationName` stable across iterations.** The tool replaces the existing config of the same `<type>.<name>` rather than creating duplicates — idempotent setup is the goal. Use distinct names only when you actually want parallel configs.
 - **Do not silently flip `compileInMPS=false` to true.** `Compile.None` and JPS-compile settings are usually intentional (sandbox modules, externally-built modules, packaged libraries). Report the gate to the user and change the facet only after they confirm.

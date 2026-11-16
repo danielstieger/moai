@@ -13,8 +13,9 @@ skill says an error "surfaces only in idea.log", the IDE log is the evidence.
 One call, no path needed. It reads the IDE's own log even for a standalone MPS whose log lies
 outside every project root, follows rotation, and is read-only. It returns parsed records
 (`{ts, level, category, message, stackTrace?}`, in file order, which is chronological up to a
-few milliseconds of thread skew) plus `levelCounts`, `filesRead`,
-`truncatedByTail`, and the log's `logFile` / `logDirectory`.
+few milliseconds of thread skew; a record not written by this IDE process adds
+`previousSession: true`) plus `levelCounts`, `filesRead`, `truncatedByTail`, the current IDE's
+`ideStartTimestamp`, `previousSessionRecords`, and the log's `logFile` / `logDirectory`.
 
 - `sinceMinutes` (>= 1; omit for no bound) / `since`: time bound (the later wins); `since` takes ISO-8601
   (`2026-10-08T14:05:00`) or the log's own `2026-10-08 14:05:00[,SSS]`.
@@ -35,6 +36,7 @@ few milliseconds of thread skew) plus `levelCounts`, `filesRead`,
    ```
 
 3. A clean envelope plus empty `records` (or `levelCounts` without `WARN`/`SEVERE`) is the verdict.
+   Ignore records marked `previousSession: true` — they are an earlier process's, not this call's.
    A `WARN`/`SEVERE` record that names the tool, concept, model, or language you touched means
    the call did not fully succeed, whatever the envelope said; unrelated background noise
    (indexing, VFS, other plugins) is common and can be ignored.
@@ -79,8 +81,14 @@ A bare `tail idea.log` right after a rotation shows almost nothing of the earlie
 `mps_mcp_read_ide_log` does this walk itself.
 
 `idea.log` is not truncated when the IDE starts: until the next rotation it also holds the end
-of the previous session. The uptime column (`[ms]`) resets to a small number at the new start,
-and a `sinceMinutes` / `since` bound keeps the previous session out of the window.
+of the previous session. The time bound is wall-clock and cannot separate the two — a
+`sinceMinutes` window opened just after a restart covers both processes — so the tool does:
+`ideStartTimestamp` names the current IDE's start, every record earlier than it carries
+`previousSession: true`, and `previousSessionRecords` counts them among the returned records.
+Leave those records out of a verdict about this session (they are the previous process's
+shutdown), or pass `since` = `ideStartTimestamp` to keep only what follows it; read them on
+purpose to find out why MPS died. By hand, the uptime column (`[ms]`) resets to a small number
+at the new start; a second MPS instance writing the same file makes it ambiguous.
 
 ### Verify a write tool call by hand
 

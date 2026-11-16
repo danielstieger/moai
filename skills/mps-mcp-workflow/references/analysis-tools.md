@@ -1,12 +1,15 @@
 # Analyzing MPS Code and Languages
 
-**Read tools inline small results.** `mps_mcp_print_node`, `mps_mcp_get_project_structure`, `mps_mcp_get_concept_details`, `mps_mcp_search_concepts`, `mps_mcp_query_nodes`, `mps_mcp_query_types`, `mps_mcp_check_root_node_problems` and `mps_mcp_list_node_intentions` return `data` inline when it is at most `maxInlineBytes` (default 20000) and a temp-file path only above that — do not assume `data` is a path. When it *is* a path, the file holds the complete `{"ok":…,"data":…}` envelope: read the payload from its `data` field.
+**Read tools inline small results.** `mps_mcp_print_node`, `mps_mcp_get_project_structure`, `mps_mcp_get_concept_details`, `mps_mcp_search_concepts`, `mps_mcp_query_nodes`, `mps_mcp_query_types`, `mps_mcp_query_dataflow`, `mps_mcp_check_root_node_problems` and `mps_mcp_list_node_intentions` return `data` inline when it is at most `maxInlineBytes` (default 20000) and a temp-file path only above that — do not assume `data` is a path. When it *is* a path, the file holds the complete `{"ok":…,"data":…}` envelope: read the payload from its `data` field.
+
+**Do not lower `maxInlineBytes` to make a result smaller.** A smaller value does not shrink the answer; it moves it into a temp file that costs a further call to read. Narrow the call instead: `onlyNodesWithProblems` or `perRoot=true` on `mps_mcp_check_root_node_problems`, a narrower `scope` on `mps_mcp_query_nodes`, `detail: "count"` on its FIND_INSTANCES. Lower it only to get a file to hand to `scripts/mps_dump.py` (`mps_mcp_get_project_structure`, `mps_mcp_print_node`, `mps_mcp_get_concept_details` results) or to `moai_plugin/tools/dump.py problems` (check reports).
 
 - Use `mps_mcp_print_node` for the structural JSON form or for a textual or HTML projection. To verify a whole root, one call with `deep=true` (JSON) or `format: "PLAIN TEXT"` (projection) beats walking its children.
 - Use `mps_mcp_check_root_node_problems` to find errors in the code — on a node, a root, a model or a module (below).
 - Use `mps_mcp_list_node_intentions` / `mps_mcp_apply_intention` to discover and apply the node's Alt+Enter actions (intentions and quick-fixes) headlessly (below).
 - Use `mps_mcp_query_nodes` for node search and navigation (FIND_INSTANCES, FIND_USAGES, GET_PARENT, GET_ROOT, GET_MODEL_FOR_NODE, NODE_INDEX, SIBLINGS, GET_CHILD_ROLE, GET_TYPE, GET_EXPECTED_TYPE). FIND_INSTANCES finds nodes of a concept (see below); FIND_USAGES finds nodes whose references point at a given node; GET_TYPE reads a node's type and GET_EXPECTED_TYPE the type its context requires.
 - Use `mps_mcp_query_types` to let the typesystem engine decide type questions instead of reading rules (table below, details in [`type-queries.md`](type-queries.md)).
+- Use `mps_mcp_query_dataflow` to let the dataflow engine decide reachability, initialization and def-use questions: unreachable code, uninitialized reads, unused assignments (PRINT_PROGRAM), which writes reach a read and which reads a write feeds (REACHING_WRITES, REACHING_READS) — [below](#dataflow-queries).
 - Use `mps_mcp_query_structure` to investigate the relationships between concepts and their assignability.
 - Use `mps_mcp_alter_nodes` (`FIX_REFERENCES`) to repair broken or mispointed references in a node and all its descendants. Typical situations where this helps:
     - After moving or copying nodes across models or modules, references to nodes in the original location may break.
@@ -84,12 +87,13 @@ A saved file contains the full MCP response envelope; its `data` field contains 
 
 ## `mps_mcp_check_root_node_problems` — Output Format
 
-Validates the specified node (and its descendants), model, or module. Pass any of them in `nodeReference` — a node reference, a model reference or qualified model name, a module reference or module name. If no problems are found, returns `data: "no problems found"`; when unchecked subtrees exist, `data` reads `no problems found in checked nodes (N subtree(s) unchecked: …)`. Otherwise the report is inline up to `maxInlineBytes` and a temp-file path above that. It reports *problems*, not content: to verify what a root contains, print it.
+Validates the specified node (and its descendants), model, or module. Pass any of them in `nodeReference` — a node reference, a model reference or qualified model name, a module reference or module name. If no problems are found, returns `data: "no problems found"`; when unchecked subtrees exist, `data` reads `no problems found in checked nodes (N subtree(s) unchecked: …)`. Otherwise the report is inline up to `maxInlineBytes` and a temp-file path above that. `info` items (advice) never make a result unclean; every verdict and report groups them in `details.infoMessages: [{severity, message, count, node, moreNodes?, quickFixIds?}]` (at most 5, `moreInfoMessages` when cut; not counted toward `maxInlineBytes`), `quickFixIds` (at most 3) being the fixes on `node` for `mps_mcp_apply_intention`. It reports *problems*, not content: to verify what a root contains, print it.
 
 A large report (a temp-file path in `data`) is read with `python3 -I moai_plugin/tools/dump.py problems FILE`: one line per problem with root, node, feature, message, reporting rule and quick-fix ids, then a count per message.
 
-- **Model reference:** checks the model itself (imports, used languages, devkits) and every root in one exhaustive call — `details.scope: "model"`, `details.rootsChecked`. Problems come as the model object plus a `roots` array, one entry per offending root. `perRoot=true` returns `[{root, name, concept, errors, warnings}]` for every root, clean ones included. Do **not** re-check the roots individually after a clean model-level result.
-- **Module reference or name:** the module (dependencies, used languages) and every model it owns; `details.modelsChecked`, `rootsChecked`; `perRoot=true` gives one row per model. Module-level warnings in `details.moduleProblems` do not make the answer unclean.
+- **Model reference:** checks the model itself (imports, used languages, devkits) and every root in one exhaustive call — `details.scope: "model"`, `details.rootsChecked`. Problems come as the model object plus a `roots` array, one entry per offending root. `perRoot=true` returns `[{root, name, concept, errors, warnings, messages?, moreMessages?}]` for every root, clean ones included. Do **not** re-check the roots individually after a clean model-level result.
+- **`perRoot` messages:** a row with errors or warnings carries `messages: [{severity, message, count, node, nodes?, moreNodes?, hasQuickFixes?}]` — the distinct texts, errors before warnings, higher `count` first (`info` items are in `details.infoMessages`). `node` is the first reporting node; a text reported on several nodes adds `nodes` (up to 5, starting with `node`) and `moreNodes` when cut. At most 5 entries per row (`moreMessages` when cut); a message over 300 characters is truncated (`…`). Soft property errors name the property (`Empty enumeration property: '<name>'`, `Property value is invalid: '<name>'`). To fit `maxInlineBytes` the rows shrink in steps — 5 messages with up to 5 nodes each, 5 messages with `node` and `moreNodes` only, 1 message per row (`details.messagesPerRow`, `details.nodesPerMessage`) — before the first form goes to a temp file. Model-level problems are in `details.modelProblems` (`[{severity, message, node?}]`, all severities). Re-check a root only to list its `quickFixes` (`hasQuickFixes: true` on the entry), never to read the texts or find the nodes.
+- **Module reference or name:** the module (dependencies, used languages) and every model it owns; `details.modelsChecked`, `rootsChecked`; `perRoot=true` gives one row per model, `[{model, name, rootsChecked, errors, warnings, messages?, moreMessages?}]`, with `messages` as on a model `perRoot` row plus the model's own problems (`hasQuickFixes` never set). Module-level warnings in `details.moduleProblems` do not make the answer unclean.
 - **When to use which:** the changed root after a single edit; the model reference with `perRoot=true` after work on several roots.
 
 - `onlyNodesWithProblems=true` (default) returns a flat list of just the nodes that have problems — easier to skim.
@@ -147,7 +151,7 @@ Two tools bring the editor's Alt+Enter actions to a node without opening an edit
 - `mps_mcp_list_node_intentions(nodeReference, includeAncestors=true, includeDisabled=false, includeQuickFixes=true)` lists entries `{type: "intention"|"quickFix", id, kind, description, targetNode, declarationNode, parameterized?, problemMessage?, autoApplicable?}`.
 - `mps_mcp_apply_intention(nodeReference, intentionId, description=null, problemMessage=null)` applies one entry in an undoable command: `nodeReference` = the entry's `targetNode` (for a check-report fix, the problem node), `intentionId` = its `id`; `description` / `problemMessage` disambiguate several instances. It returns `{applied, type, description, targetNode, problems:{before, after}}`. The action may write outside the target model; only the target model is saved automatically.
 
-Typical loop: `mps_mcp_check_root_node_problems` → a `quickFixes` id → `mps_mcp_apply_intention` → re-check.
+Typical loop: `mps_mcp_check_root_node_problems` → a `quickFixes` id → `mps_mcp_apply_intention` → re-check. An info-only node is not listed in the report: take the id from `details.infoMessages[].quickFixIds` and apply it on that entry's `node`.
 
 ## Type queries
 
@@ -163,6 +167,26 @@ Typical loop: `mps_mcp_check_root_node_problems` → a `quickFixes` id → `mps_
 | why does this node have its type | `EXPLAIN_TYPE` `{nodeReference}` |
 
 Operand forms, outputs and the meanings of `null`: [`type-queries.md`](type-queries.md).
+
+## Dataflow queries
+
+`mps_mcp_query_dataflow` asks the dataflow engine instead of tracing statements by hand: the languages' compiled dataflow builders build the program, and the analyses behind "Unreachable node", "might not have been initialized" and "Unused assignment" answer.
+
+| question | call |
+|---|---|
+| is code unreachable, a read uninitialized, an assignment unused | `PRINT_PROGRAM` `{nodeReference, maxInstructions?}` on the body: `unreachable`, `uninitializedReads`, `unusedAssignments` |
+| which assignments can this read see | `REACHING_WRITES` `{nodeReference, programRoot?}` |
+| is this write still read, which reads does it feed | `REACHING_READS` `{nodeReference, programRoot?}` |
+| what does the problem message say | `mps_mcp_check_root_node_problems` — every dataflow verdict is already a problem there |
+
+- **`PRINT_PROGRAM`** builds the program from exactly that node (a method body, one statement) → `{program, instructions, unreachable, uninitializedReads, unusedAssignments}`. `program` is `{root, defaulted?, size, hasOuterJumps}`. An instruction is `{index, kind, text, source, variable?, value?, jumpTo?, outer?, succ?}`: `kind` is `read`, `write`, `jump`, `ifjump`, `ret`, `nop`, `label`, `try`, `finally`, `endTry` or `end`; `source` is the node it stands for, `value` a write's right-hand side. The three sets are instruction indices and always cover the whole program; `maxInstructions` (default 400) caps only the listed instructions (`details.truncated: true`). `outer: true` marks a jump whose target lies outside the program root (`break`, `continue`, `return` into an enclosing node): reachability on such a program is distorted, and a warning says so.
+- **`REACHING_WRITES`** → `{program, scope, reads:[{index, source, variable, writes:[{index, source, variable, value}], uninitializedPath?, unreachable?, variableOutsideProgram?}]}`: the writes of the read's variable that can reach it. `uninitializedPath: true`: some path from the program's start reaches the read with no write.
+- **`REACHING_READS`** → `{program, scope, writes:[{index, source, variable, value, reads:[{index, source}], unreachable?, variableOutsideProgram?}]}`: the reads the write can feed. An empty `reads` is a dead write within the program.
+- **Queried node.** It supplies the reads or writes — in BaseLanguage a `VariableReference` is a read, an assignment or an initialized variable declaration a write. A node that emits none answers for its subtree (`scope: "subtree"`; pass a statement to ask about every variable in it), else `scope` is `node`; a node with neither answers an empty list and a warning.
+- **Program root.** Without `programRoot` the program is built from the body of the nearest `IMethodLike` at or above the node (a method, a concept function, a closure), or the statement list of a static or instance initializer, else from the containing root; `program.root` echoes it and `program.defaulted: true` marks the default. A write before the program root is missing from the answer. `programRoot` must be a node whose subtree holds `nodeReference`. Indices differ between programs: compare by `source`, not by `index`, across calls with different roots.
+- **Intraprocedural and variable-level.** Nothing flows through method calls or fields, and there are no expression-level value sets. `variableOutsideProgram: true` marks a variable declared outside the program root that the program does not write on entry: its other writes and reads are not seen. A language without a dataflow aspect yields an empty program.
+- **A builder failure is a result, not an error:** `{program:{root}, builderFailure:{exception, message, builder?, stack, cause?}}` plus a warning.
+- Error codes: `NOT_FOUND`, the node or `programRoot` does not exist; `INVALID_REQUEST`, `maxInstructions` below 1 or a `programRoot` that does not contain the node; `INVALID_JSON`, `parameters` is not valid JSON; `INTERNAL_ERROR`, the dataflow runtime could not be reached or an analysis failed on the built program.
 
 ## Workflow and Best Practices
 

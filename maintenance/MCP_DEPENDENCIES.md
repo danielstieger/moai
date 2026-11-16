@@ -15,8 +15,16 @@ Check this list against each new MPS / MCP version.
 | **Give compact, filtered output** (`print_node` with depth, role filter, projection; `responseDetail: summary` for parser, insert and check reports) | Reduce `mps_dump.py` to what is still needed | skills that mention `mps_dump.py` |
 | **Export structure in one call** (several languages including inherited ones, with hierarchy) | Simplify the structure export | `RELEASE.md` |
 | **Set VM options and environment variables** in run configurations | – | `mps-run-configurations`: no manual step for `--enable-native-access=ALL-UNNAMED` (conventions `allgemein`) |
-| **Detect and report modal dialogs** instead of timing out | – | `INSTALL_INSTRUCTIONS.md`, `mps-mcp-workflow`: VCS dialog hints |
+| **Detect and report modal dialogs** instead of timing out | – | `mps-mcp-workflow/references/project-management.md` (`MODAL_BLOCKED` on close) |
 | **Resolve names the same way on ADD and DELETE** of model imports | – | `mps-mcp-workflow/references/module-dependencies.md` |
+
+## Checked against build 262.11879.701
+
+No row is fully met. Partly met:
+
+- Compact output: a `perRoot` check report now carries the message texts per row; `print_node` still has only `deep`.
+- Modal dialogs: `mps_mcp_close_project` reports a pending close (`closePending`); run executions still time out.
+- Copy across models: still missing. `MOVE_NODE_TO_PARENT` now works across models (references of the moved subtree are kept, incoming usages are not updated).
 
 ## Stays in any case
 

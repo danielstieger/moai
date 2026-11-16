@@ -21,7 +21,7 @@ The MPS producer resolves the node at launch time and runs the `main` of its gen
 Two cases still send you down a fallback:
 
 1. **`compileInMPS=false` on the module.** The tool refuses with `Module '<moduleName>' (owner of node '<nodeName>') has compileInMPS=false; …`. The MPS producer would refuse for the same reason — the class is compiled by JPS so `classes_gen` is empty and the launch would fail with `ClassNotFoundException`. **Do not** blindly flip the JavaModuleFacet to MPS-compile: the `Compile.None` setting is usually intentional (sandbox modules, modules whose Java is built by an external JPS pipeline, packaged libraries). Flipping it can break the user's build or invalidate the module's contract with downstream consumers. Report the gate to the user; only change the facet when they have confirmed that MPS-compilation is what they actually want for that module.
-2. **No qualifying `main`.** If `ClassConcept.getMainMethod()` returns null (no `main`, wrong parameter type, multiple parameters), the tool refuses with the three-shape enumeration in `references/runnable-shapes.md`.
+2. **No qualifying `main`.** If `ClassConcept.getMainMethod()` returns null (no `main`, wrong parameter type, multiple parameters), the tool refuses with the message in `references/runnable-shapes.md`.
 
 ## Fallbacks for those cases
 

@@ -79,7 +79,6 @@ Returns either `data:[{...}]` inline (up to `maxInlineBytes`, default 20000) or 
 name, qualifiedName, conceptAlias, shortDescription, deprecated?,
 conceptReference, languageReference,
 isAbstract, isInterfaceConcept, isRootable,
-descriptorStatus?, descriptorRecoveryAction?,
 containingProject?, editableFromCurrentProject?
 ```
 

@@ -56,12 +56,20 @@ The Java parser produces correct MPS types in most positions, but fails for
 |---|---|---|---|
 | Method **return type** | `sequence<node<Type>>` | `ClassifierType(List<SNode>)` — **wrong** | Replace `returnType` child after parsing |
 | Method **return type** | `list<node<Type>>` | `ClassifierType(List<SNode>)` — **wrong** | Same |
-| Method parameter type | `node<CatchClause>` | `ClassifierType(SNode)` — Java type | Fine for most purposes; replace if MPS type checking fails |
+| Method parameter type | `node<CatchClause>` | `ClassifierType(SNode)` — Java type | Any smodel operation on it (`isInstanceOf`, `.name`, `.ancestor`, …) fails with `operation is not applicable to SNode`; the same holds for parsed locals and loop variables (`for (SNode n : …)`). Replace the `type` child with `SNodeType` (`node<>`) or `SNodeType{concept}` via `SET CHILD` |
 
 When a local variable or `new` expression must have an MPS type (`list<node<X>>`, `new arraylist<node<X>>`), construct it directly using the blueprints in `variable-declarations.md` — the parser has no syntax for them.
 
 **After parsing a method**, check its `returnType` and parameter `type` children.
 If they should be MPS collection or smodel types, replace them using `mps_mcp_update_node`.
+
+### Static methods of Java interfaces
+
+A call of a static method declared on an interface — `List.of(...)`, `Path.of(...)` — parses to an
+`UnknownDotCall`, even with `java.util` imported. Insert a `StaticMethodCall` blueprint instead
+(references `classConcept` → the stub interface, `baseMethodDeclaration` → the stub method; children
+`actualArgument`), taking both targets from an existing call or from `mps_mcp_query_nodes`
+FIND_INSTANCES of `StaticMethodDeclaration` in the stub model.
 
 ### smodel language expressions
 
@@ -72,6 +80,7 @@ These concepts live in `jetbrains.mps.lang.smodel` and are not parseable from Ja
 | `node.link` or `node:Concept.link` | `SLinkAccess` inside `DotExpression` | Already in tree; keep it, or use `SLinkOperations.getTarget` in parsed Java |
 | `node:SomeConcept` (type-cast) | `SNodeTypeCastExpression` | Cannot be parsed; if you need the cast node as an argument, restructure: pass the node before the cast and derive the cast inside the Java method |
 | `.someBehaviorMethod()` (behavior method call) | `jetbrains.mps.lang.behavior.structure.Node_ConceptMethodCall` | Cannot be parsed; build the `DotExpression` by hand (see `dot-expression-basics.md`, `node.behaviorMethod(args)`) or call the generated behavior descriptor directly: `<Concept>__BehaviorDescriptor.<method>_id<…>.invoke(node)` |
+| `node-ptr/Pancakes/.resolve(repo)` (a node known at design time) | `NodePointerExpression` + `NodePointer_ResolveOperation` | Cannot be parsed. Do not parse `new SNodePointer("r:…", "<id>").resolve(repo)` in its place: it runs, but it is no reference (no rename tracking, no Find Usages). Parse the rest with a placeholder expression, then `SET` `CHILD` the blueprint from `link-and-concept-literals.md` |
 | `node.parent:C` | `DotExpression(Node_GetParentOperation, SNodeTypeCastExpression)` | Cannot be parsed; use `SNodeOperations.getParent(node)` + `SNodeOperations.cast(...)` in parsed Java |
 | `node`, `propertyValue`, `editorContext`, … (implicit parameters of the enclosing concept function) | `ConceptFunctionParameter_*` of the language that owns the function | **Bound automatically** in `child` / `replace` mode when the insert lands inside a `ConceptFunction` body; the response `warnings` list what was bound. Still manual in `root` / `console` mode, with `postProcess.resolveReferences:false`, and for smodel access on the parameter (`node.name` stays a Java field reference) — replace that operation with `SPropertyAccess` / `SLinkAccess` / `Node_ConceptMethodCall` by JSON |
 

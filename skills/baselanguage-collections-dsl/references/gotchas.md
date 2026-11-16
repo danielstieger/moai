@@ -21,7 +21,6 @@
 - Filtering/mapping/slicing are lazy; scalar results and materialization force traversal — [concepts.md](concepts.md#lazy-vs-eager).
 - A placeholder such as `$TARGET_SEQUENCE_VARIABLE$` is not a distributable reference target. Resolve it in the destination model before a real write. The dry-run does not look names up ("is a name, not looked up" is expected), so a forgotten placeholder passes it: search the blueprint text for `TARGET_` before writing, and require `fixReferences.stillBroken` = 0 after the real write.
 - Use the `qualifiedName` as `concept` (`moai:mps-mcp-workflow`, `references/node-editing-rules.md`); never use a `c:` concept reference where an API expects a persistent node reference. In a reference role the insert accepts a `c:` ref silently and leaves it unresolved; only `mps_mcp_check_root_node_problems` reports it.
-- A `descriptorStatus: "hollow"` entry is untrustworthy; what to do: `moai:mps-language-analysis` (`references/concept-details.md`).
 - After edits in compiled language aspects, reload/rebuild before validation.
 - Never copy persistent references, domain names, or identifiers from an application project into this skill or its blueprints.
 

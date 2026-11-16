@@ -78,7 +78,7 @@ The tests of the transitions and of the persistence: `scaffold.py tests` ([Scaff
 
 Apply the conventions `tests`.
 
-Test-model facts: test models are ordinary models named `<…>.tests` (no `@tests` stereotype, no `tests` facet). Run an `OFXTestSuit` with `mps_mcp_create_run_configuration(nodeReference=<suite root>)`, which creates a Java Application config, then `mps_mcp_execute_run_configuration`; a model reference gives a JUnit config that finds no `OFXTestSuit` (`moai:mps-run-configurations`).
+Test-model facts: test models are ordinary models named `<…>.tests` (no `@tests` stereotype, no `tests` facet). Run an `OFXTestSuit` with `mps_mcp_create_run_configuration(nodeReference=<suite root>)`, which creates a Java Application config, then `execute_run_configuration`; a model reference gives a JUnit config that finds no `OFXTestSuit` (`moai:mps-run-configurations`).
 
 1. Insert [test-suite-skeleton.json](blueprints/test-suite-skeleton.json).
 2. Replace `TARGET_OFX_CONFIG` with the test `OFXConfig` from the model that holds the `OFXConfig`s (conventions `anwendungsaufbau`); add that model as a dependency of the `tests` model if it is missing.

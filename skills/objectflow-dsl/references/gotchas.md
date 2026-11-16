@@ -23,7 +23,6 @@
 - Look up concepts with one `mps_mcp_get_concept_details` call, `languageRefs` (the `l:` form or the plain language name) plus `detail="shape"`, instead of one call per concept. Enum literals: `mps_mcp_query_structure` `GET_ENUMERATION_LITERALS`; `enumerationRef` takes the qualified name. Never write an empty enum value `""`; omit the property.
 - Inspect roots shallowly first; deep-print only the needed subtree.
 - Use `mps_mcp_check_root_node_problems` after every complex edit: on the root, or on the model reference with `perRoot=true` after several roots.
-- A `descriptorStatus: "hollow"` entry is untrustworthy; what to do: `moai:mps-language-analysis` (`references/concept-details.md`).
 - Never copy persistent node references from an application project into this skill or into portable blueprints.
 
 ## Node factories

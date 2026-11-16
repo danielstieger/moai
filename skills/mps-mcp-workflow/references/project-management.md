@@ -63,7 +63,7 @@ On Windows prefer `mps64.exe`: `mps.bat` starts `java` asynchronously, so it ret
 1. If several projects are open, call `mps_mcp_list_open_projects` and pass the intended `mpsProjectBaseDirectory` as `projectPath` — a path at or inside that project, never an ancestor.
 2. Call `mps_mcp_close_project` with the default `force=false`. A normal close saves documents and may show Save or confirmation dialogs; the call waits at most 20 seconds.
 3. `{ok:true, data.closed:true}` → done.
-4. `code: MODAL_BLOCKED` → a modal dialog is open in MPS. Ask the user to close it, then retry. A `MODAL_BLOCKED` close is **not** a closed project.
+4. `code: MODAL_BLOCKED` on a non-force close (`details.closePending: true`) → a modal dialog is open in MPS and the close stays pending: it completes as soon as the user answers or closes the dialog. Ask the user to do that, then check `mps_mcp_list_open_projects` before retrying (an empty `projects` list in its rejection means the project closed).
 5. Close cancelled (the project stays open) → ask the user to complete the dialog, or retry with `force=true`.
 
-`force=true` skips the save and can-close dialogs (unsaved editor changes are discarded); use it only after a timed-out or cancelled close. `shutdownWithLastProject=true` also shuts MPS down when this was the only open project; MPS checks that itself. From the welcome screen MPS cannot be shut down via MCP.
+`force=true` skips the save and can-close dialogs (unsaved editor changes are discarded); use it only after checking that the project is still open following a timed-out or cancelled close. A timed-out force close is withdrawn (`closePending: false`); check `mps_mcp_list_open_projects`. `shutdownWithLastProject=true` also shuts MPS down when this was the only open project; MPS checks that itself. From the welcome screen MPS cannot be shut down via MCP.
