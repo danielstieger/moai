@@ -4,9 +4,24 @@
 
 Dieses Dokument ist die architektonische Einstiegsseite zur **modellwerkstatt MoWare-Werkbank**. Es erklärt die Zuständigkeiten und das Zusammenspiel der drei DSLs, die gemeinsamen Grundprinzipien sowie den Weg vom fachlichen Modell zur laufenden Anwendung.
 
-Die Beispiele sind fachliche Skizzen und keine ausführbare DSL-Syntax. Konkrete Konzepte, Eigenschaften, Einschränkungen und Modellierungsmuster werden in den jeweiligen DSL-Dokumentationen beschrieben. Bei Abweichungen zwischen Dokumentation und den geladenen MPS-Sprachen sind die Sprachdefinitionen und ihre Prüfregeln die technische Quelle der Wahrheit.
+Die Beispiele sind fachliche Skizzen und keine ausführbare DSL-Syntax.
+
+## Modellierungssprachen und Laufzeitumgebungen
+
+Die **modellwerkstatt MoWare-Werkbank** basiert auf JetBrains MPS und umfasst drei eng integrierte domänenspezifische Sprachen (DSLs). Aus den Modellen wird Java-Code generiert; siehe [Laufzeitumgebungen](#laufzeitumgebungen).
+
+- **ManMap** (`org.modellwerkstatt.manmap`) – Persistenz: Mappings zwischen Datenbanktabellen und Entities, Laden, Speichern und Löschen über Repositories sowie Lesemodelle, deren SQL-Ergebnisse Mapper in DTOs überführen.
+- **ObjectFlow** (`org.modellwerkstatt.objectflow`) – Fachmodell und Geschäftslogik: Entities, Value Objects und Services, Commands für Aktionen und Anwendungsabläufe, dazu Testsuiten sowie Rollen und Berechtigungen.
+- **DataUX** (`org.modellwerkstatt.dataux`) – Benutzeroberflächen und ausführbare Module: `Table`s, `Delegate Form`s und Layouts mit ihren Datenbindungen, Anwendungen mit Hauptmenü und Batchjobs.
 
 ## Ziele der Werkbank
+
+Die **modellwerkstatt MoWare-Werkbank** stellt die fachliche Gestaltung von Geschäftsanwendungen in den Mittelpunkt: Welche Daten werden benötigt, wie hängen sie zusammen, welche Geschäftsregeln gelten und wie arbeiten Benutzer mit ihnen? Generatoren und Laufzeitumgebungen übernehmen wiederkehrende technische Aufgaben und Infrastruktur-Code.
+
+- **Fachliche Modellierung:** Geeignete Datenstrukturen und korrekte Geschäftsregeln bleiben die zentrale Entwurfsaufgabe.
+- **Ausdrucksstarke Geschäftslogik:** Berechnungen, Prüfungen und Änderungen werden unmittelbar an den fachlichen Datenstrukturen formuliert; UI-Frameworks und Laufzeitumgebungen kapselt die Werkzeugkette.
+- **Einheitliche Architektur und klare Zuständigkeiten:** Die Sprachkonzepte geben vor, wo Datenzugriff, Geschäftslogik und Benutzeroberflächen beschrieben werden.
+- **Langfristige Wartbarkeit und technische Flexibilität:** Das fachliche Wissen liegt in den Modellen, die technische Umsetzung in Generatoren und Laufzeitumgebungen; beides lässt sich unabhängig weiterentwickeln.
 
 **ExpensiveCode und CheapCode.** MoWare unterscheidet zwischen aufwendig erarbeitetem Fachwissen (*ExpensiveCode*) und leichter überprüfbaren und anpassbaren Teilen einer Anwendung (*CheapCode*). Zum ExpensiveCode gehören insbesondere fachliche Datenstrukturen, Geschäftsregeln und Verarbeitungslogik. Ihre Entwicklung erfordert Domänenwissen und sorgfältige Abstimmung; Fehler sind häufig erst durch eine fachliche Prüfung erkennbar. CheapCode umfasst dagegen UI-Beschreibungen, Menüs und die Gestaltung der Interaktion mit dem fachlichen Modell. Fehler in diesen Bereichen fallen beim Ausprobieren meist schnell auf und lassen sich gezielt korrigieren. Das fachliche Modell verlangt besondere Sorgfalt, während Oberflächen und Bedienabläufe durch kurze Feedbackzyklen schrittweise verbessert werden können.
 

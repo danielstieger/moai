@@ -9,7 +9,6 @@ ObjectFlow models domain structures, domain/application logic, command-driven us
 
 ## Source authority and portability
 
-- Treat the live `org.modellwerkstatt.objectflow` language as the technical authority for concepts, features, cardinalities, and assignability.
 - For a complete, convention-compliant area, look at the models `org.modellwerkstatt.wbkit.examples.fuhrparkapp.*` (shipped solution `org.modellwerkstatt.wbkit`, read-only).
 - Use the packaged solution `org.modellwerkstatt.dataux.tests` for stable examples of single concepts. Its verified model and node references are in [references/sandbox.md](references/sandbox.md).
 - Use the package documentation for semantics and runtime behavior; start with the [ObjectFlow scope](../../docu/objectflow.md#modellierungsumfang-und-ausdrucksmöglichkeiten) and the [MoWare responsibility map](../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin).

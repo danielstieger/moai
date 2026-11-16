@@ -9,7 +9,6 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 
 ## Source authority and portability
 
-- Treat the live `org.modellwerkstatt.dataux` language as the technical authority for concepts, roles, cardinalities, reference targets, and assignability.
 - Use the package documentation for semantics and runtime behavior; start with [DataUX UI modeling](../../docu/dataux.md#teil-i--ui-modellierung) and the [MoWare responsibility map](../../docu/moware-werkbank.md#wo-gehört-eine-änderung-hin).
 - For a complete, convention-compliant area, look at the models `org.modellwerkstatt.wbkit.examples.fuhrparkapp.*` (shipped solution `org.modellwerkstatt.wbkit`, read-only).
 - The shipped solution `org.modellwerkstatt.dataux.tests` supplies the stable examples of single concepts recorded in [references/sandbox.md](references/sandbox.md). It is useful but does not cover every UI shape.

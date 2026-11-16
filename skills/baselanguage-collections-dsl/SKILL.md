@@ -9,7 +9,6 @@ description: Collections and closures. Use when creating, editing, validating, o
 
 ## Source authority and portability
 
-- Treat the installed `jetbrains.mps.baseLanguage.collections` and `jetbrains.mps.baseLanguage.closures` runtime descriptors as the authority for concepts, features, cardinalities, and assignability.
 - Use the packaged solution `org.modellwerkstatt.dataux.tests` for stable examples listed in [references/sandbox.md](references/sandbox.md).
 - Never persist a project path or IDE-session state.
 - Never copy model, root, or node references from an application project. Patterns learned elsewhere must be anonymized and use explicit `TARGET_*` placeholders.
