@@ -392,7 +392,3 @@ Aus den `EntityMapping`s einer `Persistence Description` wird in MPS das Datenba
 - [MoWare-Werkbank im Überblick](moware-werkbank.md)
 - [ObjectFlow – Fachliches Modell, Services und Anwendungsabläufe](objectflow.md)
 - [DataUX – Benutzeroberflächen und ausführbare Module](dataux.md)
-
-## Dokumentstand
-
-Diese Dokumentation beschreibt ManMap, Stand Oktober 2026, auf Basis von JetBrains MPS 2026.2.

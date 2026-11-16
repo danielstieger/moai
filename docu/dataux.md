@@ -434,7 +434,3 @@ Beide Modulformen können dieselben fachlichen Services und Repositories verwend
 - [MoWare-Werkbank im Überblick](moware-werkbank.md)
 - [ObjectFlow – Fachliches Modell, Services und Anwendungsabläufe](objectflow.md)
 - [ManMap – Persistenz und Lesemodelle](manmap.md)
-
-## Dokumentstand
-
-Diese Dokumentation beschreibt DataUX, Stand Oktober 2026, auf Basis von JetBrains MPS 2026.2.

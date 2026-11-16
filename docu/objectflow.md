@@ -138,6 +138,8 @@ Auch ein geladener `string` ist nie `null`: Für `NULL` in einer String-Spalte l
 
 `null` soll ausdrücklich „kein Wert vorhanden“ bedeuten und nicht als Ersatz für einen regulären Zustand dienen; initialisierte Werte werden nicht vorsorglich durch `null` ersetzt. Value Objects, Datum/Zeit und Referenzen müssen vor der Verwendung explizit gesetzt oder auf `null` geprüft werden. Wie die Oberfläche leere Eingaben behandelt, beschreibt DataUX unter [Pflichtwerte, leere Eingaben und `null`](dataux.md#pflichtwerte-leere-eingaben-und-null).
 
+Unabhängig von der Initialisierung sind `isEmpty`, `isNotEmpty`, `:eq:`, `:ne:` und die Collections-Operationen (`size`, `where`, `select`, `any`, `contains`, `forEach` …) null-sicher: Ein `null`-Wert verhält sich dabei wie ein leerer String beziehungsweise eine leere Liste, eine `!= null`-Bedingung davor ist überflüssig. Nicht null-sicher sind Java-Methodenaufrufe wie `length()` oder `substring()` und die Java-`for`-Schleife über eine Liste. `add` auf einer Liste, die `null` ist, wirft keinen Fehler, das Element geht aber verloren.
+
 `==` und `!=` werden je nach Typ unterschiedlich übersetzt. Null-sicher heißt dabei: Zwei `null`-Werte gelten als gleich, genau ein `null`-Wert als ungleich. Maßgeblich ist folgende Regel:
 
 | Werte | Vergleich | Übersetzung |
@@ -1219,7 +1221,3 @@ Die generierte Datenstruktur ist dabei die maßgebliche Schemasicht: Zusätzlich
 - [MoWare-Werkbank im Überblick](moware-werkbank.md)
 - [ManMap – Persistenz und Lesemodelle](manmap.md)
 - [DataUX – Benutzeroberflächen und ausführbare Module](dataux.md)
-
-## Dokumentstand
-
-Diese Dokumentation beschreibt ObjectFlow, Stand Oktober 2026, auf Basis von JetBrains MPS 2026.2.

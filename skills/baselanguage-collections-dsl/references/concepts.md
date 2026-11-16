@@ -58,9 +58,25 @@ sequence<T>    ← Iterable-like, lazy
 
 ## Null and emptiness semantics
 
-- Assigning `null` to a `sequence`/`list`/`set`/`map` typed variable yields an **empty** collection; subsequent operations do **not** NPE.
-- Terminal accessors on empty sequences return **null** instead of throwing: `seq.first`, `seq.last`, `seq.findFirst{..}`, `seq.reduceLeft{..}` → `null` when empty. Preserve these empty/null semantics when translating to host logic.
-- This affects null-check placement in generated Java — explicit `== null` checks after `first`/`last` are idiomatic, not defensive noise.
+Do not guard a null-safe operation with `!= null`. Generated code wraps every collections receiver (`ListSequence.fromList(x)`, `Sequence.fromIterable(x)`, `SetSequence.fromSet(x)`, `MapSequence.fromMap(x)`); for `null` the wrapper is an empty null object, so the operation does **not** NPE.
+
+| Operation | Result on a `null` receiver |
+|---|---|
+| `str.isEmpty` / `str.isNotEmpty` (BaseLanguage, on `string`) | `true` / `false`; no trim, `"  "` is not empty |
+| `a :eq: b` / `a :ne: b` | null-safe, compares with `equals` (`Objects.equals`) |
+| `seq.isEmpty` / `seq.isNotEmpty` / `seq.size` | `true` / `false` / `0` |
+| `where`, `select`, `translate`, `ofType`, `forEach`, Collections `foreach` | empty sequence / no iteration |
+| `seq.any{..}` / `seq.contains(x)` / `map.containsKey(k)` | `false` |
+| `seq.first`, `seq.last`, `seq.findFirst{..}`, `seq.reduceLeft{..}`, `list[i]`, `map[k]` | no exception, returns `null` |
+
+A check is still needed, or the result surprises:
+
+- **Results can be `null`**: `first`, `last`, `findFirst`, `reduceLeft`, `list[i]`, `map[k]` return `null` on a null or empty receiver. An explicit `== null` check on the result is idiomatic, not defensive noise. Preserve these empty/null semantics when translating to host logic.
+- **Writes to a `null` collection are lost silently**: `list.add`, `addAll`, `map[k] = v` neither throw nor store anything; the variable stays `null`.
+- `seq.all{..}` is `true` on a null or empty receiver.
+- `str.trim` is null-safe but returns `null`; a chained Java call on it throws.
+- **Plain Java is not wrapped**: a Java method call (`str.length()`, `str.substring(..)`, `str.trim()`, `list.size()`, `map.get(k)`) and the BaseLanguage `for (T x : list)` throw an NPE on `null`. The checker warns about the method calls ("This operation can produce 'java.lang.NullPointerException'"), not about the `for`.
+- `null` **elements** are not filtered: `it.getX()` inside a closure throws on a null element.
 
 ## Collection creators
 

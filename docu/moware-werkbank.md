@@ -285,7 +285,3 @@ Die Detaildokumentationen beschreiben Konzepte, Möglichkeiten, Einschränkungen
 | `org.modellwerkstatt.manmap` | [manmap.md](manmap.md) |
 | `org.modellwerkstatt.objectflow` | [objectflow.md](objectflow.md) |
 | `org.modellwerkstatt.dataux` | [dataux.md](dataux.md) |
-
-## Stand der Dokumentation
-
-Diese Dokumentation beschreibt die **modellwerkstatt MoWare-Werkbank, Stand Oktober 2026**, auf Basis von **JetBrains MPS 2026.2**.

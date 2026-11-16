@@ -10,6 +10,7 @@ description: Author and edit MPS `jetbrains.mps.baseLanguage` (Java) nodes — c
 ## Critical Directives
 
 - **Node equality**: `:eq:`/`:ne:` (`NPEEqualsExpression`/`NPENotEqualsExpression`), never `==`/`.equals()` — `moai:mps-model-manipulation` (`references/node-equality.md`).
+- **No redundant null guards**: string `isEmpty`/`isNotEmpty`, `:eq:`/`:ne:` and collections operations are null-safe; Java method calls (`s.length()`, `s.trim()`, `list.size()`) are not — `moai:baselanguage-collections-dsl` (`references/concepts.md`, "Null and emptiness semantics").
 - **Constructor return type**: `ConstructorDeclaration.returnType` MUST be a `VoidType` node. Leaving it empty fails validation.
 - **`ClassCreator` wiring**: `ClassCreator.baseMethodDeclaration` points at the **constructor declaration**, not the class. `InstanceMethodCallOperation.baseMethodDeclaration` points at the **method declaration**.
 - **`new …` is always a `GenericNewExpression` plus a creator**: the `GenericNewExpression` is the `Expression`; its `creator` child is `ClassCreator`, `ArrayCreator`, `ArrayCreatorWithInitializer`, `AnonymousClassCreator`, a collections creator, or smodel `SNodeCreator` (`new node<C>()`). Creators are `AbstractCreator`s, not `Expression`s — none can stand alone in `ReturnStatement.expression`, an argument, or an initializer.
