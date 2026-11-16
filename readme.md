@@ -14,7 +14,7 @@ moai/
 ├── conventions/                Binding modeling conventions (in German)
 ├── MPS_AGENT_GUIDE.md          General MPS working rules
 ├── INSTALL_INSTRUCTIONS.md     Installation instructions for agents
-├── TEMPLATE_PROJECT_AGENTS.md  Template for the application project
+├── SESSION_CONTEXT.md          Text a session hook adds to every agent session
 ├── tools/                      Tools for agents (Python), with the language structure export
 └── maintenance/                For MoAI maintainers only, not for agents in a project
 ```
@@ -63,11 +63,12 @@ project.
    > Read `INSTALL_INSTRUCTIONS.md` from ./moai_plugin/moai and perform the installation
    > for this project.
 
-   The agent registers the plugin in its runtime, sets up `AGENTS.md` from
-   `moai_plugin/moai/TEMPLATE_PROJECT_AGENTS.md`, copies the tools to
-   `moai_plugin/tools/` and checks the prerequisites. The template marks
-   `moai_plugin/moai/` as a packaged dependency and points agents to the
-   installed MoAI skills and the documentation.
+   The agent registers the plugin in its runtime, sets up a session hook that
+   adds `moai_plugin/moai/SESSION_CONTEXT.md` to every session, copies the tools
+   to `moai_plugin/tools/` and checks the prerequisites. The session context marks
+   `moai_plugin/moai/` as a packaged dependency and points agents to the MoAI
+   skills, conventions and documentation. The project's own `AGENTS.md` /
+   `CLAUDE.md` are not touched.
 
 ## Updating
 
@@ -80,10 +81,10 @@ git submodule update --remote --merge moai_plugin/moai
 git add moai_plugin/moai
 ```
 
-The tools in `moai_plugin/tools/` and `AGENTS.md` do not change with it. Afterwards
+The tools in `moai_plugin/tools/` do not change with it. Afterwards
 ask a coding agent to synchronize them ("Update" in
 [INSTALL_INSTRUCTIONS.md](INSTALL_INSTRUCTIONS.md)).
 
 The rules for working with the package (read-only `moai_plugin/moai/`, project-specific
 instructions and skills outside the submodule) are stated in
-`TEMPLATE_PROJECT_AGENTS.md`.
+`SESSION_CONTEXT.md`.

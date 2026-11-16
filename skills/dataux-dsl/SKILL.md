@@ -13,7 +13,7 @@ DataUX describes the presentation and UI interaction layer of a MoWare applicati
 - For a complete, convention-compliant area, look at the models `org.modellwerkstatt.wbkit.examples.fuhrparkapp.*` (shipped solution `org.modellwerkstatt.wbkit`, read-only).
 - The shipped solution `org.modellwerkstatt.dataux.tests` supplies the stable examples of single concepts recorded in [references/sandbox.md](references/sandbox.md). It is useful but does not cover every UI shape.
 - Never persist a project path, editor-session state, or references from an application project.
-- Conventions are referenced by name, e.g. conventions `oberflaeche` (file `mw-oberflaeche_v1.md`); the project's `AGENTS.md` states where they are and which ones it changes. This skill does not repeat their content.
+- Conventions are referenced by name, e.g. conventions `oberflaeche` (file `mw-oberflaeche_v1.md`); the session context states where they are; the project's `CLAUDE.md` / `AGENTS.md` states which ones it changes. This skill does not repeat their content.
 - For target-model classifiers, properties, commands, the `OFXConfig`, and reusable UI roots, replace the explicit `TARGET_MODEL.*` placeholders immediately before insertion.
 
 ## Critical rules

@@ -23,7 +23,7 @@ If MCP tool calls start failing session-wide with this error:
 
 ## Project Nature
 
-This repository is primarily an MPS project. Generated Java and XML artifacts are produced by MPS generators and must not be edited directly. By default, all meaningful source lives in MPS models, but some projects also include hand-authored JVM or build code (e.g. custom runtime libraries, Gradle build scripts, or test harnesses). If this project contains such code, the section "Hand-Authored Code Outside MPS" in `AGENTS.md` lists it together with the tools appropriate for it.
+This repository is primarily an MPS project. Generated Java and XML artifacts are produced by MPS generators and must not be edited directly. By default, all meaningful source lives in MPS models, but some projects also include hand-authored JVM or build code (e.g. custom runtime libraries, Gradle build scripts, or test harnesses). If this project contains such code, the project's `CLAUDE.md` / `AGENTS.md` lists it together with the tools appropriate for it.
 
 Use MPS MCP tools as the primary toolset for all model-related work.
 

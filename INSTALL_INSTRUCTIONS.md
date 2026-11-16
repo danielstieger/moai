@@ -29,12 +29,14 @@
 
 ## Rules
 
-- The package boundary rules in `moai_plugin/moai/TEMPLATE_PROJECT_AGENTS.md`
-  ("MoAI Package Boundary", "Skills") apply during installation as well:
-  nothing is written below `moai_plugin/moai/`, and only `tools/` is copied out
-  of it (step 3).
-- Do not overwrite existing instruction files (`AGENTS.md`, `CLAUDE.md` or
-  similar); merge the content instead.
+- The package boundary in `moai_plugin/moai/SESSION_CONTEXT.md` ("Package boundary", "Skills")
+  applies during installation as well: nothing is written below `moai_plugin/moai/`, and only
+  `tools/` is copied out of it (step 3).
+- Do not create or change the project's instruction files (`AGENTS.md`, `CLAUDE.md` or
+  similar). They belong to the project; MoAI reaches the agent through a hook (step 2).
+- Do not call the MPS MCP tool `mps_mcp_initialize_project_for_agents`, during installation or
+  later. It installs JetBrains' generic `mps-*` skills and its own `AGENTS.md` / `CLAUDE.md`
+  into the project, which compete with MoAI.
 - If a step requires a decision that cannot be derived from these
   instructions or the project, ask instead of guessing.
 
@@ -54,14 +56,19 @@
 - If your runtime does not support local plugins, stop here and report this
   together with the available alternatives, without implementing any of them.
 
-### 2. Set up project instructions
+### 2. Set up the session hook
 
-- Copy `moai_plugin/moai/TEMPLATE_PROJECT_AGENTS.md` to the project root as `AGENTS.md`.
-  If an `AGENTS.md` already exists, add the template content as a separate
-  section.
-- If your runtime reads an instruction file other than `AGENTS.md`, make sure
-  that file references `AGENTS.md` or includes its content, instead of
-  duplicating the instructions.
+- Configure a hook in your runtime that adds the content of
+  `moai_plugin/moai/SESSION_CONTEXT.md`, unchanged, to the agent's context at every session
+  start: a new session, a resumed or continued session, after the conversation is cleared, and
+  after the context is compacted.
+- If your runtime starts subagents with a context of their own, configure the same for the
+  start of a subagent.
+- The hook reads the file each time it runs. Do not copy the text into the hook configuration;
+  a submodule update must take effect without reinstalling.
+- Register the hook **project-scoped**, in a file that is versioned with the application
+  project and lies outside `moai_plugin/moai/`.
+- If your runtime has no hook that adds context at session start, stop here and report this.
 
 ### 3. Copy the tools
 
@@ -87,6 +94,8 @@ cp -r moai_plugin/moai/tools moai_plugin/tools
   or state the required command or restart.
 - Confirm that `moai:mps-mcp-workflow` is visible in your runtime, then that
   every skill named in its skill table is visible as well.
+- Run the hook command once by hand and confirm that it prints `SESSION_CONTEXT.md`. The hook
+  takes effect with the next session; state that a new session is required.
 
 ## Final Report
 
@@ -95,6 +104,7 @@ Report briefly:
 - the included MoAI version according to last commit in moai submodule
 - how and in which scope the plugin was registered, including created or
   modified files;
+- which hooks were configured, in which file, and for which events;
 - whether the skills are visible;
 - status of the MPS MCP integration;
 - open issues and steps required from the user (e.g. restart, commit).
@@ -110,6 +120,3 @@ git submodule update --remote --merge moai_plugin/moai
 The tools in `moai_plugin/tools/` do not change with this. Synchronize them by hand
 with `moai_plugin/moai/tools/`. Do not simply copy over them: they may contain the
 project's own extensions, which would be lost.
-
-`AGENTS.md` does not change either. If `moai_plugin/moai/TEMPLATE_PROJECT_AGENTS.md`
-has relevant changes, synchronize them by hand and keep the project's own entries.

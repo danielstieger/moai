@@ -1,6 +1,6 @@
 ## Verbindliche Konventionen für den Aufbau einer Anwendung
 
-Diese Konventionen sind der MoWare-Standard für den Aufbau einer Anwendung. Was ein Projekt davon abändert, steht in seiner `AGENTS.md`.
+Diese Konventionen sind der MoWare-Standard für den Aufbau einer Anwendung. Was ein Projekt davon abändert, steht in seiner `CLAUDE.md` / `AGENTS.md`.
 
 ### Bounded Contexts und Bereiche
 

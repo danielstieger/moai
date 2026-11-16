@@ -9,7 +9,7 @@ Every call takes the top-level `projectPath` ([`../SKILL.md`](../SKILL.md#which-
 - `mps_mcp_close_project`: closes the project selected by `projectPath` (`force`, `shutdownWithLastProject`; `MODAL_BLOCKED` after 20 s). No tool opens a project ([`project-management.md`](project-management.md)).
 - `mps_mcp_get_project_structure`: the universal tool to explore the project. Use `startingPoint` and filtering to avoid large responses; pass `includeStubModules=true` to include read-only libraries/stubs and modules from other open MPS projects. `nodeDetail="names"` reduces node records to name/concept/reference, `nodeDepth` bounds how far `includeNodes` inlines.
 - `mps_mcp_reload_all`: reloads module classes from disk; compiles nothing.
-- `mps_mcp_initialize_project_for_agents`: **never call it in a MoWare project** — it installs JetBrains' generic `mps-*` skills and a `CLAUDE.md` into the project, competing with the `moai:` skills.
+- `mps_mcp_initialize_project_for_agents`: **never called in a MoWare project** (session context).
 
 ## Modules and Models
 

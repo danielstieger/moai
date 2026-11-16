@@ -5,7 +5,7 @@ description: Complete JetBrains MPS workflow guide for MoWare application projec
 
 # Projectional Agent Toolkit – JetBrains MPS for Agents
 
-Hub skill for working with JetBrains MPS (Meta Programming System) models and the MPS MCP tools. Load it after `AGENTS.md` and `MPS_AGENT_GUIDE.md` whenever the task involves MPS artifacts or MPS MCP tooling.
+Hub skill for working with JetBrains MPS (Meta Programming System) models and the MPS MCP tools. Load it after `MPS_AGENT_GUIDE.md` whenever the task involves MPS artifacts or MPS MCP tooling.
 
 ## Critical Directives
 
@@ -35,8 +35,6 @@ Hub skill for working with JetBrains MPS (Meta Programming System) models and th
 ## Companion Skills
 
 All skills bundled with this package are loaded as `moai:<skill-name>`. Load whichever ones apply to the current task.
-
-> **Never call `mps_mcp_initialize_project_for_agents` in a MoWare project.** It installs JetBrains' generic `mps-*` skills into the project's `.claude/skills` (they compete with the `moai:` skills) and creates a `CLAUDE.md`. The `moai` package is the only skill catalog; see `INSTALL_INSTRUCTIONS.md`.
 
 | Skill | What it covers |
 |-------|---------------|

@@ -18,5 +18,5 @@ Each kind of knowledge has one place. Agents find it there, and a maintainer kno
 
 - **No knowledge twice.** Link to the one place instead of repeating it.
 - **Exception: the entry of a skill.** A short section an agent must see when it starts (e.g. "Unknown construct" in the DSL skills) is repeated in every skill that needs it. Agents follow links poorly; the entry is where they look.
-- **Conventions are referenced by name** in skills (e.g. conventions `commands`). Where they are and which ones a project changes is stated only in the project's `AGENTS.md` (from `TEMPLATE_PROJECT_AGENTS.md`).
+- **Conventions are referenced by name** in skills (e.g. conventions `commands`). Where they are is stated in `SESSION_CONTEXT.md`; which ones a project changes, only in the project's `CLAUDE.md` / `AGENTS.md`.
 - **Changes to the JetBrains `mps-*` skills** are recorded with their reason in [MPS_SKILLS_CHANGES.md](MPS_SKILLS_CHANGES.md).
