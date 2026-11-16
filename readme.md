@@ -26,7 +26,8 @@ The MoWare skills are:
 - `moai:manmap-dsl` for persistence mappings, repositories, queries and SQL;
 - `moai:dataux-dsl` for user interfaces, applications and batch jobs;
 - `moai:baselanguage-collections-dsl` for BaseLanguage collections and
-  closures inside MoWare code.
+  closures inside MoWare code;
+- `moai:plan` for planning an area before it is modeled.
 
 `moai:mps-mcp-workflow` is the hub skill for MPS work; its skill table lists
 the remaining MPS skills (BaseLanguage, node editing, model manipulation,

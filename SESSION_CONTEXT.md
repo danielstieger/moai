@@ -21,6 +21,8 @@ The MoAI plugin supplies the skills for all work in this project:
 - `moai:dataux-dsl` – pages, forms, tables, layouts, bindings, includes, menus, applications,
   batch jobs;
 - `moai:baselanguage-collections-dsl` – BaseLanguage collections and closures;
+- `moai:plan` – plan an area before modeling it: fixed template, questions instead of guesses,
+  approval before any change in MPS;
 - `moai:mps-mcp-workflow` – MPS tooling and workflow; its skill table names the matching MPS
   support skill.
 

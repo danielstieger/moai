@@ -39,6 +39,7 @@ All skills bundled with this package are loaded as `moai:<skill-name>`. Load whi
 
 | Skill | What it covers |
 |-------|---------------|
+| `moai:plan` | Plan an area before modeling: fixed template from the inside out, questions instead of guesses, approval before changes. |
 | `moai:baselanguage-collections-dsl` | Collections and closures: BaseLanguage collection types, creators, operations, access expressions, foreach statements, closure literals, `yield`, and the downcast expression. |
 | `moai:mps-baselanguage` | Author and edit `jetbrains.mps.baseLanguage` nodes using the Java parser or JSON AST blueprints. |
 | `moai:mps-console` | Console commands and `smodel.query` scope queries. |
