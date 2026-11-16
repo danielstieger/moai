@@ -386,9 +386,3 @@ Aus den `EntityMapping`s einer `Persistence Description` wird in MPS das Datenba
 3. Die Anwendung zeigt oder verarbeitet die read-only DTOs.
 4. Eine enthaltene ID kann an einen späteren `CHECKOUT`-Ablauf übergeben werden.
 5. Die DTOs werden nicht zurückgespeichert und nach dem Anwendungsfall verworfen.
-
-## Weiterführende Dokumentation
-
-- [MoWare-Werkbank im Überblick](moware-werkbank.md)
-- [ObjectFlow – Fachliches Modell, Services und Anwendungsabläufe](objectflow.md)
-- [DataUX – Benutzeroberflächen und ausführbare Module](dataux.md)

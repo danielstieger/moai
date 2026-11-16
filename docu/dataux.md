@@ -428,9 +428,3 @@ Beide Modulformen können dieselben fachlichen Services und Repositories verwend
 3. Ein Command verarbeitet jeweils eine Arbeitseinheit und kann definierte Pages besitzen.
 4. Die `OFXConfig` entscheidet über UI- oder Konsolenbetrieb; für die Konsole wird die `ConsoleBatchJobAppFactory` als Anwendungsfabrik konfiguriert.
 5. Wird der Batchjob in eine Anwendung eingebunden, können vorhandene Pages durch passende `Page Pane`s sichtbar gemacht werden.
-
-## Weiterführende Dokumentation
-
-- [MoWare-Werkbank im Überblick](moware-werkbank.md)
-- [ObjectFlow – Fachliches Modell, Services und Anwendungsabläufe](objectflow.md)
-- [ManMap – Persistenz und Lesemodelle](manmap.md)

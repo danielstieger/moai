@@ -6,33 +6,9 @@ Dieses Dokument ist die architektonische Einstiegsseite zur **modellwerkstatt Mo
 
 Die Beispiele sind fachliche Skizzen und keine ausführbare DSL-Syntax. Konkrete Konzepte, Eigenschaften, Einschränkungen und Modellierungsmuster werden in den jeweiligen DSL-Dokumentationen beschrieben. Bei Abweichungen zwischen Dokumentation und den geladenen MPS-Sprachen sind die Sprachdefinitionen und ihre Prüfregeln die technische Quelle der Wahrheit.
 
-Die Dokumentation beschreibt beobachtete und technisch bestätigte Praxis. Sie legt keine zusätzliche, von der Sprache nicht erzwungene Architektur fest; das tun verbindliche Konventionen. Wo sich aus bestehenden Anwendungen wiederkehrende Empfehlungen ergeben, werden diese als solche benannt.
-
-## Modellierungssprachen und Laufzeitumgebungen
-
-Die **modellwerkstatt MoWare-Werkbank** basiert auf JetBrains MPS und umfasst drei eng integrierte domänenspezifische Sprachen (DSLs) zur Erstellung von Geschäftsanwendungen. Sie decken Persistenz, Geschäftslogik und Benutzeroberflächen ab.
-
-**ManMap** (`org.modellwerkstatt.manmap`) bildet die Persistenzschicht der Anwendung. Die Sprache definiert die Zuordnung zwischen relationalen Datenbanktabellen und Entities und stellt Operationen zum Laden, Speichern und Löschen bereit. Diese bilden die Grundlage für den Datenzugriff über Repositories. Darüber hinaus unterstützt ManMap die Arbeit mit Lesemodellen (Read Models) und Tabellenmodellen (Table Models): Komplexe SQL-Abfragen lassen sich formulieren und ihre Ergebnismengen über spezialisierte Mapper in DTOs (Data Transfer Objects) überführen.
-
-**ObjectFlow** (`org.modellwerkstatt.objectflow`) dient der Modellierung von Service-Komponenten und Geschäftslogik. Die Sprache umfasst fachliche Datenstrukturen wie Entities und Value Objects sowie Commands zur Beschreibung von Aktionen und Anwendungsabläufen. Darüber hinaus unterstützt ObjectFlow die Modellierung von Testabläufen in Testsuiten sowie die Definition von Rollen und Berechtigungen.
-
-**DataUX** (`org.modellwerkstatt.dataux`) dient der Modellierung von Benutzeroberflächen, Anwendungen und Batchjobs. `Table`s und `Delegate Form`s werden durch ihre Spalten, Felder, Formatierungen und Datenbindungen beschrieben; Layouts strukturieren die Darstellung und ermöglichen die Zusammenstellung komplexerer Oberflächen. Anwendungen dienen Endanwendern als Einstiegspunkt und verfügen über das Hauptmenü. Für die automatisierte Verarbeitung lassen sich Batchjobs modellieren.
-
-Aus den in MPS modellierten Anwendungen wird Java-Code generiert; die drei Laufzeitumgebungen sind unter [Laufzeitumgebungen](#laufzeitumgebungen) beschrieben.
-
 ## Ziele der Werkbank
 
-Die **modellwerkstatt MoWare-Werkbank** stellt die fachliche Gestaltung von Geschäftsanwendungen in den Mittelpunkt: Welche Daten werden benötigt, wie hängen sie zusammen, welche Geschäftsregeln gelten und wie arbeiten Benutzer mit ihnen? Die Modellsprachen bieten dafür passende Ausdrucksmittel. Generatoren und Laufzeitumgebungen übernehmen wiederkehrende technische Aufgaben und Infrastruktur-Code. Dadurch konzentriert sich die Anwendungsentwicklung auf fachliche Datenstrukturen, Geschäftslogik und Benutzerinteraktionen.
-
-**Fachliche Modellierung.** Die Entwicklung geeigneter Datenstrukturen und korrekter Geschäftsregeln bleibt die zentrale Entwurfsaufgabe (Einordnung unter [Zentrale Konzepte](#zentrale-konzepte-der-moware-werkbank)).
-
-**Ausdrucksstarke Geschäftslogik.** Berechnungen, Prüfungen und Änderungen werden unmittelbar an den fachlichen Datenstrukturen formuliert. Java-Ausdrücke und Mengenoperationen unterstützen diese Arbeit. Technische Details der verwendeten UI-Frameworks und Laufzeitumgebungen werden weitgehend durch die Werkzeugkette gekapselt.
-
-**Einheitliche Architektur und klare Zuständigkeiten.** Die Sprachkonzepte geben vor, wo Datenzugriff, Geschäftslogik und Benutzeroberflächen beschrieben werden. Diese gemeinsame Struktur erleichtert die Orientierung, die Wiederverwendung und die Zusammenarbeit. Fachliche Begriffe bleiben im Modell sichtbar und unterstützen die Abstimmung zwischen Entwicklern und Fachverantwortlichen.
-
 **ExpensiveCode und CheapCode.** MoWare unterscheidet zwischen aufwendig erarbeitetem Fachwissen (*ExpensiveCode*) und leichter überprüfbaren und anpassbaren Teilen einer Anwendung (*CheapCode*). Zum ExpensiveCode gehören insbesondere fachliche Datenstrukturen, Geschäftsregeln und Verarbeitungslogik. Ihre Entwicklung erfordert Domänenwissen und sorgfältige Abstimmung; Fehler sind häufig erst durch eine fachliche Prüfung erkennbar. CheapCode umfasst dagegen UI-Beschreibungen, Menüs und die Gestaltung der Interaktion mit dem fachlichen Modell. Fehler in diesen Bereichen fallen beim Ausprobieren meist schnell auf und lassen sich gezielt korrigieren. Das fachliche Modell verlangt besondere Sorgfalt, während Oberflächen und Bedienabläufe durch kurze Feedbackzyklen schrittweise verbessert werden können.
-
-**Langfristige Wartbarkeit und technische Flexibilität.** Das fachliche Wissen wird in den Modellen festgehalten. Generatoren und Laufzeitumgebungen bestimmen dessen technische Umsetzung. Diese Trennung ermöglicht es, fachliche Anforderungen und technische Infrastruktur weitgehend unabhängig weiterzuentwickeln. Ziel ist, bestehende Modelle langfristig zu nutzen und Anpassungen an Frameworks oder Ausführungsplattformen möglichst zentral umzusetzen.
 
 ## Zentrale Konzepte der MoWare-Werkbank
 
@@ -101,15 +77,15 @@ Fachliche Prüfungen und Berechnungen gehören in das fachliche Modell beziehung
 
 Die Ausführung richtet sich nach dem modellierten Modultyp: Anwendungen mit Benutzeroberfläche unterstützen drei Laufzeitumgebungen, Batchjobs können automatisiert oder mit Benutzeroberfläche betrieben werden. Testsuiten können in MPS über eine Run-Konfiguration oder standalone mit Java ausgeführt werden.
 
-| Modultyp         | Ausführungsart                                    | Technologie/Laufzeitumgebung                     | Primärer Einsatz                                                       |
-| ---------------- | ------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------- |
-| `AppUI Module`    | Desktop-Anwendung                                 | JavaFX / `org.modellwerkstatt.fx8forms`          | Desktop-PCs                                                            |
-| `AppUI Module`    | Webanwendung auf Tomcat                           | Vaadin / `org.modellwerkstatt.turkuforms`        | Desktop-PCs                                                            |
-| `AppUI Module`    | HTML5-Webanwendung auf Tomcat                     | Pebble Templates / `org.modellwerkstatt.h2forms` | MDE-Geräte, beispielsweise von Zebra oder Datalogic, sowie Smartphones |
-| `BatchJob Module` | Automatisierte Ausführung ohne Benutzeroberfläche | Servlet auf Tomcat                               | Hintergrundverarbeitung                                                |
-| `BatchJob Module` | Ausführung mit Desktop-Oberfläche                 | JavaFX / `org.modellwerkstatt.fx8forms`          | Interaktive Ausführung auf Desktop-PCs                                 |
-| `BatchJob Module` | Ausführung mit Weboberfläche                      | Vaadin / `org.modellwerkstatt.turkuforms`        | Interaktive Ausführung im Browser                                      |
-| `OFXTestSuit`    | Testausführung                                    | MPS (Run-Konfiguration) oder standalone mit Java | Ausführen und Prüfen modellierter Testabläufe                          |
+| Modultyp | Ausführungsart | Technologie/Laufzeitumgebung | Primärer Einsatz |
+| --- | --- | --- | --- |
+| `AppUI Module` | Desktop-Anwendung | JavaFX / `org.modellwerkstatt.fx8forms` | Desktop-PCs |
+| `AppUI Module` | Webanwendung auf Tomcat | Vaadin / `org.modellwerkstatt.turkuforms` | Desktop-PCs |
+| `AppUI Module` | HTML5-Webanwendung auf Tomcat | Pebble Templates / `org.modellwerkstatt.h2forms` | MDE-Geräte, beispielsweise von Zebra oder Datalogic, sowie Smartphones |
+| `BatchJob Module` | Automatisierte Ausführung ohne Benutzeroberfläche | Servlet auf Tomcat | Hintergrundverarbeitung |
+| `BatchJob Module` | Ausführung mit Desktop-Oberfläche | JavaFX / `org.modellwerkstatt.fx8forms` | Interaktive Ausführung auf Desktop-PCs |
+| `BatchJob Module` | Ausführung mit Weboberfläche | Vaadin / `org.modellwerkstatt.turkuforms` | Interaktive Ausführung im Browser |
+| `OFXTestSuit` | Testausführung | MPS (Run-Konfiguration) oder standalone mit Java | Ausführen und Prüfen modellierter Testabläufe |
 
 `org.modellwerkstatt.turkuforms` ist nicht Teil von MPS und wird erst im finalen Build-Prozess der Anwendung eingebunden; in MPS sind nur `org.modellwerkstatt.fx8forms` und `org.modellwerkstatt.h2forms` verfügbar.
 
@@ -123,16 +99,16 @@ Das Beispiel umfasst die Suche nach Rechnungen, die Bearbeitung einer Rechnung m
 
 ### Fachliches Modell mit ObjectFlow
 
-| Element       | Beispiel                  | Aufgabe                                                                                                                                                       |
-| ------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Entity`      | `Rechnung`                | Enthält Rechnungs-ID, Rechnungsnummer, Rechnungsdatum und eine Liste von Rechnungspositionen.                                                                 |
-| `Entity`      | `Rechnungsposition`       | Enthält Positionsnummer, Beschreibung, Menge, Einzelpreis und Lieferstichtag.                                                                                 |
-| `Value Object` | `Geldbetrag`              | Fasst Betrag und Währung zusammen.                                                                                                                            |
-| `Value Object` | `Lieferstichtag`          | Stichtag mit Toleranztagen davor und danach. Prüft mit `istTermingerecht(datum)`, ob ein Lieferdatum im erlaubten Fenster liegt; die Regel bleibt im Wert gekapselt. |
-| `DTO`         | `RechnungInfo`            | Read-only-Projektion für ein Suchergebnis. Enthält die Rechnungs-ID sowie die für die Ergebnisliste benötigten Rechnungsdaten.                                 |
-| `DTO`         | `RechnungFilter`          | Enthält die Suchkriterien Rechnungsnummer, Datumsbereich, Positionsbeschreibung und Mindestsumme sowie die Property `results` vom Typ `list<RechnungInfo>`.                           |
-| `DTO`         | `RechnungsSummenErgebnis` | Nimmt das Ergebnis der SQL-Aggregation zur Summe aller Rechnungen auf.                                                                                        |
-| `Service`     | `RechnungService`         | Berechnet Positionswerte und Rechnungssumme und prüft fachliche Regeln bei der Bearbeitung.                                                                   |
+| Element | Beispiel | Aufgabe |
+| --- | --- | --- |
+| `Entity` | `Rechnung` | Enthält Rechnungs-ID, Rechnungsnummer, Rechnungsdatum und eine Liste von Rechnungspositionen. |
+| `Entity` | `Rechnungsposition` | Enthält Positionsnummer, Beschreibung, Menge, Einzelpreis und Lieferstichtag. |
+| `Value Object` | `Geldbetrag` | Fasst Betrag und Währung zusammen. |
+| `Value Object` | `Lieferstichtag` | Stichtag mit Toleranztagen davor und danach. Prüft mit `istTermingerecht(datum)`, ob ein Lieferdatum im erlaubten Fenster liegt; die Regel bleibt im Wert gekapselt. |
+| `DTO` | `RechnungInfo` | Read-only-Projektion für ein Suchergebnis. Enthält die Rechnungs-ID sowie die für die Ergebnisliste benötigten Rechnungsdaten. |
+| `DTO` | `RechnungFilter` | Enthält die Suchkriterien Rechnungsnummer, Datumsbereich, Positionsbeschreibung und Mindestsumme sowie die Property `results` vom Typ `list<RechnungInfo>`. |
+| `DTO` | `RechnungsSummenErgebnis` | Nimmt das Ergebnis der SQL-Aggregation zur Summe aller Rechnungen auf. |
+| `Service` | `RechnungService` | Berechnet Positionswerte und Rechnungssumme und prüft fachliche Regeln bei der Bearbeitung. |
 
 Für das vereinfachte Beispiel müssen Mengen positiv und Einzelpreise nicht negativ sein. Alle Rechnungen verwenden dieselbe Währung. Die Summe einer Rechnung ergibt sich aus ihren Positionswerten. Steuern und Rundungsregeln werden in diesem Beispiel nicht behandelt.
 
@@ -142,12 +118,12 @@ Eine `Persistence Description` enthält die Mappings für `Rechnung` und `Rechnu
 
 Zwei Repositories kapseln die Datenbankzugriffe. Das `RechnungsRepo` lädt und speichert das Aggregat Rechnung; das `RechnungsLeseRepo` enthält die Abfragen, die nur lesen.
 
-| Repository          | Beispielhafte Methode        | Aufgabe                                                                                                                                                                       |
-| ------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `RechnungsRepo`     | `checkout(id)`               | Lädt die Rechnung und explizit ihre Positionen zur Bearbeitung. Stellt den vollständigen Rechnungsgraphen zusammen.                                                           |
-| `RechnungsRepo`     | `checkin(rechnung)`          | Speichert die bearbeitete Rechnung einschließlich der zugehörigen Änderungen an ihren Positionen.                                                                             |
-| `RechnungsLeseRepo` | `sucheRechnungen(filter)`    | Übersetzt die Suchkriterien aus `RechnungFilter` in eine benutzerdefinierte SQL-Abfrage und liefert je Ergebniszeile ein `RechnungInfo`-DTO. |
-| `RechnungsLeseRepo` | `ladeSummeAllerRechnungen()` | Führt die Aggregation direkt per SQL in der Datenbank aus und liefert das Ergebnis als DTO `RechnungsSummenErgebnis`.                           |
+| Repository | Beispielhafte Methode | Aufgabe |
+| --- | --- | --- |
+| `RechnungsRepo` | `checkout(id)` | Lädt die Rechnung und explizit ihre Positionen zur Bearbeitung. Stellt den vollständigen Rechnungsgraphen zusammen. |
+| `RechnungsRepo` | `checkin(rechnung)` | Speichert die bearbeitete Rechnung einschließlich der zugehörigen Änderungen an ihren Positionen. |
+| `RechnungsLeseRepo` | `sucheRechnungen(filter)` | Übersetzt die Suchkriterien aus `RechnungFilter` in eine benutzerdefinierte SQL-Abfrage und liefert je Ergebniszeile ein `RechnungInfo`-DTO. |
+| `RechnungsLeseRepo` | `ladeSummeAllerRechnungen()` | Führt die Aggregation direkt per SQL in der Datenbank aus und liefert das Ergebnis als DTO `RechnungsSummenErgebnis`. |
 
 Beide Methoden des `RechnungsLeseRepo` bilden ihre Ergebniszeilen über ein `nokeystore/read-only map` auf DTOs ab. Diese DTOs sind read-only und werden nicht in die Session-Identity-Map integriert.
 
@@ -157,13 +133,13 @@ Auch für die Summe aller Rechnungen werden keine vollständigen Rechnungsgraphe
 
 ### Anwendungsfälle mit ObjectFlow
 
-| Beispiel-Command                  | Command-Typ       | Aufgabe                                                                                                                       |
-| --------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `Rechnungen suchen`               | `SEARCH_CMD`      | Erfasst Suchkriterien und zeigt die als `RechnungInfo`-DTOs geladenen Treffer auf einer zweiten Page an.                     |
-| `Rechnung bearbeiten`             | `GRAPH_OWNER_CMD` | Lädt eine Rechnung anhand ihrer ID, zeigt Kopf und Positionen an und registriert Repository-Methoden zum Speichern als Session-Operationen. |
-| `Rechnungskopf bearbeiten`        | `GRAPH_EDIT_CMD`  | Bearbeitet die Kopfdaten innerhalb der bestehenden Session des `GRAPH_OWNER_CMD`.                                              |
-| `Rechnungsposition bearbeiten`    | `GRAPH_EDIT_CMD`  | Bearbeitet eine Position innerhalb der bestehenden Session des `GRAPH_OWNER_CMD`.                                             |
-| `Summe aller Rechnungen anzeigen` | `SEARCH_CMD`      | Ruft die SQL-Aggregation im `RechnungsLeseRepo` auf und zeigt das Ergebnis an.                                                |
+| Beispiel-Command | Command-Typ | Aufgabe |
+| --- | --- | --- |
+| `Rechnungen suchen` | `SEARCH_CMD` | Erfasst Suchkriterien und zeigt die als `RechnungInfo`-DTOs geladenen Treffer auf einer zweiten Page an. |
+| `Rechnung bearbeiten` | `GRAPH_OWNER_CMD` | Lädt eine Rechnung anhand ihrer ID, zeigt Kopf und Positionen an und registriert Repository-Methoden zum Speichern als Session-Operationen. |
+| `Rechnungskopf bearbeiten` | `GRAPH_EDIT_CMD` | Bearbeitet die Kopfdaten innerhalb der bestehenden Session des `GRAPH_OWNER_CMD`. |
+| `Rechnungsposition bearbeiten` | `GRAPH_EDIT_CMD` | Bearbeitet eine Position innerhalb der bestehenden Session des `GRAPH_OWNER_CMD`. |
+| `Summe aller Rechnungen anzeigen` | `SEARCH_CMD` | Ruft die SQL-Aggregation im `RechnungsLeseRepo` auf und zeigt das Ergebnis an. |
 
 Der ebenfalls verfügbare Typ `GRAPH_OWNER_CMD(modal)` wird in diesem Beispiel nicht benötigt.
 
@@ -198,15 +174,15 @@ Die Repository-Methode führt eine aggregierende SQL-Abfrage direkt auf der Date
 
 Eine **Page** beschreibt eine Seite im Ablauf eines Commands. Das zugehörige **`Page Pane`** bildet ihr Gegenstück in der Benutzeroberfläche und nimmt deren UI-Inhalte auf. `Delegate Form`s, `Table`s, Layouts und andere UI-Komponenten müssen jeweils innerhalb eines `Page Pane`s eingebunden sein, gegebenenfalls über darin enthaltene Layouts. `Page Pane`s können wiederverwendet werden.
 
-| Element                                 | Inhalt                                                                                                                                                                     |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AppUI Module`                           | Einstieg in die Rechnungsverwaltung mit Menüeinträgen für `Rechnungen suchen` und `Summe aller Rechnungen anzeigen`.                                                       |
-| `Page Pane` für die Suchfilter-Page      | Enthält ein `Delegate Form`, dessen Eingabefelder an die Suchkriterien des DTOs `RechnungFilter` gebunden sind.                                                             |
-| `Page Pane` für die Suchergebnis-Page    | Enthält eine `Table`, die die `RechnungInfo`-DTOs aus `RechnungFilter.results` zeigt. Ein Doppelklick startet `Rechnung bearbeiten` mit der Rechnungs-ID aus dem DTO.    |
+| Element | Inhalt |
+| --- | --- |
+| `AppUI Module` | Einstieg in die Rechnungsverwaltung mit Menüeinträgen für `Rechnungen suchen` und `Summe aller Rechnungen anzeigen`. |
+| `Page Pane` für die Suchfilter-Page | Enthält ein `Delegate Form`, dessen Eingabefelder an die Suchkriterien des DTOs `RechnungFilter` gebunden sind. |
+| `Page Pane` für die Suchergebnis-Page | Enthält eine `Table`, die die `RechnungInfo`-DTOs aus `RechnungFilter.results` zeigt. Ein Doppelklick startet `Rechnung bearbeiten` mit der Rechnungs-ID aus dem DTO. |
 | `Page Pane` für die Rechnungsbearbeitung | Enthält ein `Delegate Form` (`DISABLED`) für den Rechnungskopf und eine `Table` für die geladenen Rechnungspositionen; die Aktionen öffnen `Rechnungskopf bearbeiten` und `Rechnungsposition bearbeiten`. Ein `Grid Layout` oder `Tab Layout` strukturiert diese Komponenten. |
-| `Page Pane` für die Kopfbearbeitung     | Enthält ein `Delegate Form` zur Bearbeitung des Rechnungskopfs im Command `Rechnungskopf bearbeiten`.                                                                      |
-| `Page Pane` für die Positionsbearbeitung | Enthält ein `Delegate Form` zur Bearbeitung einer einzelnen Rechnungsposition im Command `Rechnungsposition bearbeiten`.                                                    |
-| `Page Pane` für die Summenanzeige        | Enthält ein `Delegate Form` zur Anzeige des DTOs `RechnungsSummenErgebnis`.                                                                                                 |
+| `Page Pane` für die Kopfbearbeitung | Enthält ein `Delegate Form` zur Bearbeitung des Rechnungskopfs im Command `Rechnungskopf bearbeiten`. |
+| `Page Pane` für die Positionsbearbeitung | Enthält ein `Delegate Form` zur Bearbeitung einer einzelnen Rechnungsposition im Command `Rechnungsposition bearbeiten`. |
+| `Page Pane` für die Summenanzeige | Enthält ein `Delegate Form` zur Anzeige des DTOs `RechnungsSummenErgebnis`. |
 
 Die Folge der Pages wird im jeweiligen Command beschrieben. Die zugeordneten `Page Pane`s und ihre enthaltenen UI-Komponenten legen Darstellung, Datenbindungen und angebotene Interaktionen fest.
 
@@ -273,15 +249,3 @@ Für die Entwicklung von Anwendungen gelten folgende Grundprinzipien:
 
 9. **Anwendungsfälle müssen überprüfbar bleiben.**
     Fachliche Regeln und Abläufe sollen so modelliert werden, dass sie durch Beispiele und Tests nachvollzogen werden können. Besonders sorgfältig zu prüfen sind Änderungen an fachlichen Datenstrukturen und Geschäftsregeln, da Fehler dort häufig nicht allein durch technische Tests oder das Ausprobieren der Oberfläche erkennbar werden. Die zugehörige Dokumentation wird möglichst direkt bei den beschriebenen Modellelementen gepflegt. Details: [Typische Testebenen](objectflow.md#typische-testebenen).
-
-## Weiterführende Dokumentation
-
-Die Detaildokumentationen beschreiben Konzepte, Möglichkeiten, Einschränkungen, Regeln, Beispiele und Best Practices der jeweiligen DSL.
-
-### Detaildokumentationen zu DSLs
-
-| DSL | Dokumentation | 
-| --- | --- |
-| `org.modellwerkstatt.manmap` | [manmap.md](manmap.md) |
-| `org.modellwerkstatt.objectflow` | [objectflow.md](objectflow.md) |
-| `org.modellwerkstatt.dataux` | [dataux.md](dataux.md) |

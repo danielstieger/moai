@@ -1215,9 +1215,3 @@ Zyklen werden nur über `OPPOSITE` behandelt: Eine mit `OPPOSITE` markierte Key 
 Für einfache Fälle steht `CONV.CONV_DEFAULT_EN` als fertige Implementierung von `IConvFormatOptions` (`org.modellwerkstatt.objectflow.serdes.IConvFormatOptions`) bereit. Sie verwendet englische Locale, `hh:mm:ss dd.MM.yy` für Zeitpunkte, `dd.MM.yy` für lokale Datumswerte, `#0.00` für Dezimalzahlen und aktiviert `ALL_PROPERTIES_NECESSARY`. Sobald eine Schnittstelle andere Formate, Feldnamen oder Null-Regeln benötigt, ist eine eigene `IConvFormatOptions`-Konfiguration vorzuziehen.
 
 Die generierte Datenstruktur ist dabei die maßgebliche Schemasicht: Zusätzliche Eingangsfelder dürfen vorhanden sein, während die Behandlung fehlender Felder von den gewählten Modi abhängt. Formatfehler, fehlende Pflichtfelder und strukturell unpassende JSON- oder XML-Daten führen zu `SerdesException`; technische Reflexions- und Sicherheitsfehler werden als RuntimeException weitergegeben. Serdes ersetzt keine fachliche Validierung des deserialisierten Graphen.
-
-## Weiterführende Dokumentation
-
-- [MoWare-Werkbank im Überblick](moware-werkbank.md)
-- [ManMap – Persistenz und Lesemodelle](manmap.md)
-- [DataUX – Benutzeroberflächen und ausführbare Module](dataux.md)
