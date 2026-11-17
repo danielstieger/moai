@@ -45,6 +45,13 @@ read before planning or modeling and apply in full. A project that deviates from
 states so in its own `CLAUDE.md` / `AGENTS.md`; without such a statement there is no deviation,
 and an agent never deviates on its own.
 
+## Plans
+
+`plan/` in the project root holds the plans written with `moai:plan`: `zuschnitt.md` (the areas of
+the application) and one file per change to an area (`<bereich>-<thema>.md`). Before modeling, the
+plan for the task is read; a plan with status "freigegeben" is binding, a plan with status
+"Entwurf" is not modeled.
+
 ## Documentation
 
 The intended MoWare semantics are documented in `moai_plugin/moai/docu/`: `moware-werkbank.md`

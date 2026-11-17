@@ -1,5 +1,7 @@
 # Plan: Zuschnitt `<firma>.<app>`
 
+*Der Zuschnitt wird fortgeschrieben: Kommt ein Bounded Context oder ein Bereich hinzu, wird diese Datei ergänzt und erneut freigegeben.*
+
 | | |
 |---|---|
 | Status | Entwurf / freigegeben |
@@ -9,59 +11,73 @@
 
 *Wenige Sätze in Fachsprache: was die Anwendung leisten soll und für wen.*
 
-## 1. Bounded Contexts
+## 1. Glossar
+
+*Die Fachbegriffe der Anwendung; Bereichspläne und Modelle verwenden genau diese Namen.*
+
+| Begriff | Bedeutung | Bounded Context |
+|---|---|---|
+
+## 2. Bounded Contexts
 
 | Bounded Context | Fachlicher Inhalt | eigene Solution |
 |---|---|---|
 
-## 2. Bereiche
+## 3. Bereiche
 
 | Bereich | Bounded Context | Art (Aggregat / Use Case) | Aggregate bzw. Ablauf | Grund für den Schnitt |
 |---|---|---|---|---|
 
-## 3. Abhängigkeiten zwischen Bereichen
+## 4. Abhängigkeiten zwischen Bereichen
 
 *Wer braucht einen Fakt oder ein Aggregat von wem; keine Zyklen zwischen Bounded Contexts.*
 
 | Bereich | braucht von | wozu |
 |---|---|---|
 
-## 4. Gemeinsame Werte
+## 5. Gemeinsame Werte
 
 *Status und Value Objects, die keinem Bereich gehören (`sharedvalues`).*
 
 | Wert | verwendet von |
 |---|---|
 
-## 5. Fremdsysteme
+## 6. Fremdsysteme
 
 | Fremdsystem | lesend / schreibend | Bounded Context | wozu |
 |---|---|---|---|
 
-## 6. Laufzeit und Konfiguration
+## 7. Laufzeit und Konfiguration
 
 *Die `OFXConfig`s im Modell `base`: je Laufzeitumgebung und für die Tests.*
 
-| Konfiguration | Laufzeitumgebung | Datenbank |
-|---|---|---|
+| Konfiguration | Laufzeitumgebung | Zielgeräte | Datenbank |
+|---|---|---|---|
 
-## 7. Rollen
+## 8. Anmeldung und Rollen
+
+*Woher der Benutzername kommt (Login-Maske, OAuth) und woher Benutzer-ID und Rollen stammen.*
 
 | Rolle | darf |
 |---|---|
 
-## 8. Abweichungen von Konventionen
+## 9. Batchjobs
 
-*Leer heißt: keine. Jede Zeile braucht die Entscheidung des Nutzers.*
+| Batchjob | Bereich | wozu | Zeitplan |
+|---|---|---|---|
+
+## 10. Abweichungen von Konventionen
+
+*Leer heißt: keine. Jede Zeile braucht die Entscheidung des Nutzers; Abweichungen, die das Projekt festlegt, tragen als Grund „Projekt“.*
 
 | Konvention | Abweichung | Grund |
 |---|---|---|
 
-## 9. Offene Fragen
+## 11. Offene Fragen
 
 *Alle `KLÄREN:`-Punkte aus den Abschnitten oben. Vor der Freigabe leer.*
 
-## 10. Reihenfolge der Bereichspläne
+## 12. Reihenfolge der Bereichspläne
 
 *Bereiche, von denen andere abhängen, zuerst.*
 

@@ -27,7 +27,8 @@ The MoWare skills are:
 - `moai:dataux-dsl` for user interfaces, applications and batch jobs;
 - `moai:baselanguage-collections-dsl` for BaseLanguage collections and
   closures inside MoWare code;
-- `moai:plan` for planning an area before it is modeled.
+- `moai:plan` for planning a change to an area before it is modeled (see
+  [Planning with `moai:plan`](#planning-with-moaiplan)).
 
 `moai:mps-mcp-workflow` is the hub skill for MPS work; its skill table lists
 the remaining MPS skills (BaseLanguage, node editing, model manipulation,
@@ -43,6 +44,56 @@ language analysis, MPS console, run configurations).
 The documentation describes the intended domain semantics; its relation to
 the loaded MPS languages is stated in "Zweck und Geltungsbereich" of
 `docu/moware-werkbank.md`.
+
+## Planning with `moai:plan`
+
+`moai:plan` turns a requirement into a plan file that the developer approves
+before anything is changed in MPS. It is called with the requirement:
+
+> /moai:plan Die Buchhaltung kann eine Rechnung stornieren, solange keine
+> Zahlung gebucht ist.
+
+The argument `full` makes the agent read all four documents completely
+instead of only the parts the area touches.
+
+What it produces depends on the request:
+
+| Request | Result |
+|---|---|
+| New application or new bounded context | `plan/zuschnitt.md`: glossary, bounded contexts, areas and their dependencies, roles, runtime configuration. One file per application, updated when an area is added. |
+| New area | `plan/<bereich>-neu.md`, after the area is entered in `zuschnitt.md`. |
+| Change to an existing area | `plan/<bereich>-<thema>.md`, containing only what is new or changes. |
+| Small change (no new entity, no new transition, no new or changed rule) | No plan file; the change, the affected roots and the open questions are presented directly. |
+
+The plans live in `plan/` of the application project, outside `moai_plugin/`.
+A plan follows a fixed template from the inside out: acceptance criteria,
+`domain` (values, aggregate, status, transitions, rules, persistence), `read`,
+`tests`, `unit.read` and `unit`, `app` and permissions, then the list of roots
+that are created or changed and the order of implementation. A filled example
+is [beispiel-rechnung-stornieren.md](skills/plan/templates/beispiel-rechnung-stornieren.md).
+
+How the agent works with the plan:
+
+- **Questions instead of guesses.** Anything domain-related that the
+  requirement, the conventions, the project instructions and the existing
+  model do not answer is marked `KLÄREN:` and asked in one round, with a
+  proposal where there is one. A plan with an open `KLÄREN:` cannot be
+  approved.
+- **Assumptions for presentation.** Columns, layout, labels and the position
+  of a menu entry are set as `ANNAHME:` and listed; they do not block the
+  approval.
+- **Approval.** The plan has the status "Entwurf" until the developer
+  explicitly approves it ("freigegeben"). Before that, models are only read.
+- **Traceability.** Every transition and rule refers to an acceptance
+  criterion, and every acceptance criterion has a test.
+- **Binding during modeling.** The approved plan is modeled in its stated
+  order with the DSL skills. If a domain gap appears, the agent stops, the
+  plan goes back to "Entwurf" and is approved again.
+- **Schema by the developer.** The plan names the tables and columns to be
+  created; the agent halts before the tests that need the database until the
+  schema is confirmed.
+- **Deviations from conventions** are decided by the developer and stand in
+  their own section of the plan.
 
 ## Installation as a Git Submodule
 
