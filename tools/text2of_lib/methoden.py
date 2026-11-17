@@ -20,6 +20,7 @@ COLL_NOARG = {"size": "GetSizeOperation", "isEmpty": "IsEmptyOperation", "isNotE
               "first": "GetFirstOperation", "last": "GetLastOperation", "toList": "ToListOperation",
               "distinct": "DistinctOperation"}
 COLL_ONEARG = {"add": "AddElementOperation", "remove": "RemoveElementOperation", "contains": "ContainsOperation"}
+JDK_LIST_METHODS = {"size", "isEmpty", "add", "remove", "contains"}  # java.util.List methods with a collections operation
 
 
 def bigdec_call(conv, callee, args):
@@ -30,6 +31,15 @@ def bigdec_call(conv, callee, args):
 def _need(callee, args, count, form):
     if len(args) != count:
         raise Stop(f".{callee}: {len(args)} argument(s) given, write {form}")
+
+
+def list_op(conv, callee, args):
+    """The collections operation of a call the parser bound to java.util.List: the operand is a list, never a BigDecimal."""
+    if callee in COLL_NOARG:
+        _need(callee, args, 0, f"coll.{callee}()")
+        return node(COL + COLL_NOARG[callee])
+    _need(callee, args, 1, f"coll.{callee}(element)")
+    return node(COL + COLL_ONEARG[callee], children={"argument": conv.fix(args[0])})
 
 
 def method_op(conv, callee, operand, args):

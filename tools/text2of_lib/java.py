@@ -5,7 +5,7 @@ Loaded after markers/: handlers of the same concept run in import order.
 import json
 
 from .knoten import BL, CLO, COL, OF, Stop, fq, kid, kids, node, prop, ref, short, unresolved
-from .methoden import BIGDEC_METHODS, bigdec_call, method_op
+from .methoden import BIGDEC_METHODS, JDK_LIST_METHODS, bigdec_call, list_op, method_op
 from .registry import rewrite
 
 
@@ -84,7 +84,26 @@ def dot_expression(conv, n):
     if fq(op) == BL + "InstanceMethodCallOperation" and unresolved(ref(op, "baseMethodDeclaration")):
         return node(BL + "DotExpression", children={
             "operand": conv.fix(operand), "operation": method_op(conv, op.get("name"), operand, kids(op, "actualArgument"))})
+    if fq(op) == BL + "InstanceMethodCallOperation" and jdk_list_call(op):
+        return node(BL + "DotExpression", children={
+            "operand": conv.fix(operand), "operation": list_op(conv, jdk_list_call(op), kids(op, "actualArgument"))})
     return None
+
+
+def jdk_list_call(op):
+    """A call the parser bound to java.util.List/ArrayList/Collection, e.g. `xs.size()` on a local `List<T> xs` in a model
+    that imports java.util. The declaration becomes list<T> (classifier_type), so the call has to become the collections
+    operation too; left as a Java call the checker reports "list<T> is not a strong subtype of java.util.List".
+    Returns the method name, or None."""
+    r = ref(op, "baseMethodDeclaration")
+    target = str((r or {}).get("targetReference") or "")
+    signature = target.rsplit("~", 1)[-1]  # ..java:java.util(JDK/)/~List.add%28java.lang.Object%29
+    owner, _, method = signature.split("%28", 1)[0].partition(".")
+    if "java:java.util(" not in target or owner not in ("List", "ArrayList", "Collection") or method not in JDK_LIST_METHODS:
+        return None
+    if method == "remove" and "%28int%29" in signature:  # remove(int index) is no RemoveElementOperation
+        return None
+    return method
 
 
 @rewrite(BL + "VariableReference")
